@@ -20,3 +20,10 @@ export async function getDatabase() {
   const db = client.db(config.MONGODB_DB);
   return db;
 }
+
+// This is a list of collections in the database
+export const collections = {
+  PLAYERS: "players",
+  MAPS: "maps",
+  RECORDINGS: "recordings",
+};

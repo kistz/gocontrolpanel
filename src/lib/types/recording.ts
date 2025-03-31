@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 
 export interface Recording {
-  _id: ObjectId;
   name: string;
   type: string;
   mode: string;

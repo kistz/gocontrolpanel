@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 
 export interface Map {
-  _id: ObjectId;
   name: string;
   uid: string;
   fileName: string;
