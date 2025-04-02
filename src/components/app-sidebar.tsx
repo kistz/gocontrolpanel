@@ -6,6 +6,8 @@ import {
   IconChartBar,
   IconDashboard,
   IconDatabase,
+  IconDeviceGamepad,
+  IconDeviceGamepad2,
   IconFileAi,
   IconFileDescription,
   IconFileWord,
@@ -32,6 +34,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 const data = {
   user: {
@@ -158,12 +161,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:!p-1.5 cursor-pointer"
             >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
+              <Link href="#">
+                <IconDeviceGamepad2 className="!size-5" />
+                <span className="text-base font-semibold">GoController</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
