@@ -63,6 +63,26 @@ const chartData = [
   { date: new Date("2025-04-24T18:13:25.025+00:00"), records: 12 },
   { date: new Date("2025-04-25T18:13:25.025+00:00"), records: 25 },
   { date: new Date("2025-04-26T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-04-27T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-04-28T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-04-29T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-04-30T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-01T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-02T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-03T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-04T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-05T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-06T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-07T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-08T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-09T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-10T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-11T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-12T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-13T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-14T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-15T18:13:25.025+00:00"), records: 523 },
+  { date: new Date("2025-05-16T18:13:25.025+00:00"), records: 523 },
 ]
 
 export function ChartAreaInteractive() {
@@ -76,17 +96,16 @@ export function ChartAreaInteractive() {
   }, [isMobile])
 
   const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
+    const referenceDate = new Date("2025-05-16")
     let daysToSubtract = 90
     if (timeRange === "30d") {
       daysToSubtract = 30
     } else if (timeRange === "7d") {
       daysToSubtract = 7
     }
-    const startDate = new Date(referenceDate)
+    const startDate = referenceDate
     startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
+    return item.date >= startDate
   })
 
   return (
@@ -159,7 +178,7 @@ export function ChartAreaInteractive() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              minTickGap={32}
+              minTickGap={24}
               tickFormatter={(value) => {
                 const date = new Date(value)
                 return date.toLocaleDateString("en-US", {
