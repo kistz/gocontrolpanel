@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  IconChartBar,
+  IconClock,
   IconDashboard,
-  IconDatabase,
   IconDeviceGamepad2,
-  IconFolder,
-  IconListDetails,
+  IconMap,
+  IconServer,
+  IconUser,
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -22,6 +22,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { routes } from "@/routes";
 import Link from "next/link";
 
 const data = {
@@ -32,30 +33,30 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: routes.dashboard,
       icon: IconDashboard,
     },
     {
       title: "Players",
-      url: "#",
-      icon: IconListDetails,
+      url: routes.players,
+      icon: IconUser,
     },
     {
       title: "Records",
-      url: "#",
-      icon: IconChartBar,
+      url: routes.records,
+      icon: IconClock,
     },
     {
       title: "Maps",
-      url: "#",
-      icon: IconFolder,
+      url: routes.maps,
+      icon: IconMap,
     },
   ],
   admin: [
     {
       name: "Server",
-      url: "#",
-      icon: IconDatabase,
+      url: routes.server,
+      icon: IconServer,
     },
   ],
 };
@@ -70,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5 cursor-pointer"
             >
-              <Link href="#">
+              <Link href="/">
                 <IconDeviceGamepad2 className="!size-5" />
                 <span className="text-base font-semibold">GoController</span>
               </Link>

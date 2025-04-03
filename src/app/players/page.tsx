@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getAllPlayers } from "@/lib/database/player";
+import { getAllPlayers } from "@/database/player";
 
 export default async function PlayersPage() {
   const players = await getAllPlayers();

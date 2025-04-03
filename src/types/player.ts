@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export interface Player {
   login: string;
   nickName: string;
@@ -7,4 +5,4 @@ export interface Player {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
-};
+}
