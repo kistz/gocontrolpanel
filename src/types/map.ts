@@ -1,4 +1,7 @@
-export interface Map {
+import { ObjectId } from "mongodb";
+
+export interface DBMap {
+  _id: ObjectId;
   name: string;
   uid: string;
   fileName: string;

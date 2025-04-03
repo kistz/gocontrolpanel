@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 
-export interface Recording {
+export interface DBRecording {
+  _id: ObjectId;
   name: string;
   type: string;
   mode: string;
@@ -11,27 +12,27 @@ export interface Recording {
 }
 
 export interface MapRecords {
-  _id: ObjectId;
-  mapId: ObjectId;
+  _id: string;
+  mapId: string;
   matchRounds: MatchRound[];
   rounds: Round[];
   finishes: PlayerFinish[];
 }
 
 export interface MatchRound {
-  _id: ObjectId;
+  _id: string;
   roundNumber: number;
   teams: Team[];
 }
 
 export interface Round {
-  _id: ObjectId;
+  _id: string;
   roundNumber: number;
   players: PlayerRound[];
 }
 
 export interface Team {
-  _id: ObjectId;
+  _id: string;
   teamId: number;
   name: string;
   points: number;
@@ -40,8 +41,8 @@ export interface Team {
 }
 
 export interface PlayerRound {
-  _id: ObjectId;
-  playerId?: ObjectId;
+  _id: string;
+  playerId?: string;
   login: string;
   accountId: string;
   points: number;
@@ -51,8 +52,8 @@ export interface PlayerRound {
 }
 
 export interface PlayerFinish {
-  _id: ObjectId;
-  playerId?: ObjectId;
+  _id: string;
+  playerId?: string;
   login: string;
   accountId: string;
   time: number;

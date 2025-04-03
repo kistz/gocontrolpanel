@@ -1,20 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/data-table";
 import { getAllPlayers } from "@/database/player";
+import { columns } from "./columns";
 
 export default async function PlayersPage() {
   const players = await getAllPlayers();
 
-  return (
-    <div>
-      <h1>Players</h1>
-      <ul>
-        {players.map((player) => (
-          <li key={player._id.toString()}>
-            {player.nickName} - {player.path}
-          </li>
-        ))}
-        <Button>Test</Button>
-      </ul>
-    </div>
-  );
+  return <DataTable columns={columns} data={players} />;
 }
