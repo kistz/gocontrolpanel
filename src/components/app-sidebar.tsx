@@ -55,7 +55,7 @@ const data = {
   admin: [
     {
       name: "Server",
-      url: routes.server,
+      url: routes.admin.server,
       icon: IconServer,
     },
   ],

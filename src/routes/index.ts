@@ -3,5 +3,7 @@ export const routes = {
   players: "/players",
   maps: "/maps",
   records: "/records",
-  server: "/server",
+  admin: {
+    server: "/admin/server",
+  }
 }
