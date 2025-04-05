@@ -1,8 +1,8 @@
 "use server";
+import { auth } from "@/lib/auth";
 import { ObjectId } from "mongodb";
 import { DBPlayer, Player } from "../types/player";
 import { collections, getDatabase } from "./mongodb";
-import { getServerSession } from "next-auth";
 
 export async function getAllPlayers(): Promise<Player[]> {
   const db = await getDatabase();
@@ -23,9 +23,7 @@ export async function getPlayerById(
   return mapDBPlayerToPlayer(player);
 }
 
-export async function getPlayerByLogin(
-  login: string,
-): Promise<Player | null> {
+export async function getPlayerByLogin(login: string): Promise<Player | null> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
   const player = await collection.findOne({ login });
@@ -35,11 +33,24 @@ export async function getPlayerByLogin(
   return mapDBPlayerToPlayer(player);
 }
 
-export async function deletePlayerById(playerId: ObjectId | string): Promise<void> {
-  const session = await getServerSession();
+export async function deletePlayerById(
+  playerId: ObjectId | string,
+): Promise<void> {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Not authenticated");
+  }
+
+  if (!session.user.roles.includes("admin")) {
+    throw new Error("Not authorized");
+  }
+
+  if (playerId === session.user._id) {
+    throw new Error("Cannot delete your own account");
+  }
+
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  console.log("Deleting player with ID:", playerId);
   // const result = await collection.deleteOne({ _id: new ObjectId(playerId) });
   // if (result.deletedCount === 0) {
   //   throw new Error(`Player with ID ${playerId} not found`);

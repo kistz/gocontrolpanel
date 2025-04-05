@@ -1,15 +1,10 @@
-import {
-  collections,
-  connectToDatabase,
-  getDatabase,
-} from "@/database/mongodb";
-import { getPlayerByLogin } from "@/database/player";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import { ObjectId } from "mongodb";
-import NextAuth, { NextAuthOptions, Profile } from "next-auth";
+import { getPlayerById, getPlayerByLogin } from "@/database/player";
+import { getServerSession, NextAuthOptions, Profile } from "next-auth";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import config from "./config";
+import { Player } from "@/types/player";
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -21,7 +16,7 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
       response_type: "code",
       client_id: config.NADEO_CLIENT_ID,
       redirect_uri: config.NADEO_REDIRECT_URI,
-      scope: ""
+      scope: "",
     },
   },
   token: {
@@ -55,7 +50,6 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
   clientId: config.NADEO_CLIENT_ID,
   clientSecret: config.NADEO_CLIENT_SECRET,
   async profile(profile) {
-    console.log(profile);
     return {
       id: profile.accountId,
       accountId: profile.accountId,
@@ -66,37 +60,52 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
 
 export const authOptions: NextAuthOptions = {
   providers: [NadeoProvider()],
-  session: {
-    strategy: "database",
-  },
-  adapter: MongoDBAdapter(connectToDatabase()),
   callbacks: {
-    async session({ session, user }) {
-      const login = slugid.encode(user.accountId);
-      const dbUser = await getPlayerByLogin(login);
-      if (!dbUser) {
-        throw new Error(`User with login ${login} not found`);
+    async session({ session, token }) {
+      if (!token) {
+        throw new Error("Token is missing");
       }
 
-      session.user.roles = dbUser.roles || [];
+      session.user = {
+        _id: token._id,
+        accountId: token.accountId,
+        login: token.login,
+        displayName: token.displayName,
+        roles: token.roles || [],
+      };
 
       return session;
     },
     async jwt({ token, user }) {
+      let dbUser: Player | null;
       if (user) {
         const login = slugid.encode(user.accountId);
-        const dbUser = await getPlayerByLogin(login);
-        if (!dbUser) {
-          throw new Error(`User with login ${login} not found`);
-        }
+        dbUser = await getPlayerByLogin(login);
 
-        token._id = dbUser._id.toString();
         token.accountId = user.accountId;
+        token.login = login;
         token.displayName = user.displayName;
-        token.roles = dbUser.roles || [];
+      } else {
+        dbUser = await getPlayerById(token._id);
       }
+
+      if (!dbUser) {
+        throw new Error(`User not found`);
+      }
+
+      token._id = dbUser._id.toString();
+      token.roles = dbUser.roles || [];
 
       return token;
     },
   },
 };
+
+export function auth(
+  ...args:
+    | [GetServerSidePropsContext["req"], GetServerSidePropsContext["res"]]
+    | [NextApiRequest, NextApiResponse]
+    | []
+) {
+  return getServerSession(...args, authOptions)
+}

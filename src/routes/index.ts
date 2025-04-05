@@ -5,5 +5,6 @@ export const routes = {
   records: "/records",
   admin: {
     server: "/admin/server",
-  }
+  },
+  login: "/login"
 }

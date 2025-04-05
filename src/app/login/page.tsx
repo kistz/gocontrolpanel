@@ -1,11 +1,12 @@
 "use client";
+import { LoginForm } from "@/components/login-form";
 import { routes } from "@/routes";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -19,32 +20,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
-        {status === "loading" ? (
-          <p>Loading...</p>
-        ) : session ? (
-          <div>
-            <p>Welcome back, {session.user?.displayName}!</p>
-            <p>Your roles: {session.user?.roles.join(", ")}</p>
-            <button
-              onClick={() => router.push("/")} // Redirect to dashboard or other page
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Go to Dashboard
-            </button>
-          </div>
-        ) : (
-          <div>
-            <button
-              onClick={handleLogin}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Login with Nadeo
-            </button>
-          </div>
-        )}
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <LoginForm handleLogin={handleLogin} />
       </div>
     </div>
   );

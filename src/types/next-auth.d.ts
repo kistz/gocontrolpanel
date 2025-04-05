@@ -13,7 +13,9 @@ declare module "next-auth" {
       roles: string[];
       displayName: string;
       accountId: string;
+      login: string;
     };
+    expires: ISODateString;
   }
 
   interface Profile {
@@ -26,6 +28,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     _id: string;
     accountId: string;
+    login: string;
     displayName: string;
     roles: string[];
   }

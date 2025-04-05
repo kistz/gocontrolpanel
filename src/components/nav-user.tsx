@@ -25,6 +25,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./theme-toggle";
+import { signOut } from "next-auth/react";
+import { routes } from "@/routes";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
@@ -35,6 +38,15 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+
+  const signOutHandler = async () => {
+    const data = await signOut({
+      callbackUrl: routes.login,
+      redirect: false,
+    });
+    router.push(data.url);
+  }
 
   return (
     <SidebarMenu>
@@ -47,7 +59,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{user.name.slice(0,2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -77,7 +89,7 @@ export function NavUser({
               <ThemeToggle />
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={signOutHandler}>
               <IconLogout />
               Log out
             </DropdownMenuItem>

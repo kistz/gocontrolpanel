@@ -15,6 +15,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Player>[] = [
   {
@@ -58,7 +59,10 @@ export const columns: ColumnDef<Player>[] = [
             await deletePlayerById(player._id);
             router.refresh();
           } catch (error) {
-            console.error("Error deleting player:", error);
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            toast.error("Error deleting player", {
+              description: errorMessage
+            });
           }
         });
       };
