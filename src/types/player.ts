@@ -5,6 +5,7 @@ export interface DBPlayer {
   login: string;
   nickName: string;
   path: string;
+  roles?: string[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -15,6 +16,7 @@ export interface Player {
   login: string;
   nickName: string;
   path: string;
+  roles?: string[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
