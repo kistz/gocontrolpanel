@@ -14,19 +14,19 @@ export function LoginForm({
 }: LoginFormProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-md">
-              <IconDeviceGamepad2 className="size-6" />
-            </div>
-            <span className="sr-only">GoController Panel</span>
-            <h1 className="text-xl font-bold">Welcome to GoController Panel</h1>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex size-8 items-center justify-center rounded-md">
+            <IconDeviceGamepad2 className="size-6" />
           </div>
-
-          <Button className="w-full" onClick={handleLogin}>
-            Login with Nadeo
-          </Button>
+          <span className="sr-only">GoController Panel</span>
+          <h1 className="text-xl font-bold">Welcome to GoController Panel</h1>
         </div>
+
+        <Button className="w-full" onClick={handleLogin}>
+          Login with Nadeo
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,14 @@
 import { getPlayerById, getPlayerByLogin } from "@/database/player";
+import { Player } from "@/types/player";
+import {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
 import { getServerSession, NextAuthOptions, Profile } from "next-auth";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import config from "./config";
-import { Player } from "@/types/player";
-import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -107,5 +111,5 @@ export function auth(
     | [NextApiRequest, NextApiResponse]
     | []
 ) {
-  return getServerSession(...args, authOptions)
+  return getServerSession(...args, authOptions);
 }

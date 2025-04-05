@@ -14,7 +14,11 @@ if (!config.MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable");
 }
 
-if (!config.NADEO_CLIENT_ID || !config.NADEO_CLIENT_SECRET || !config.NADEO_REDIRECT_URI) {
+if (
+  !config.NADEO_CLIENT_ID ||
+  !config.NADEO_CLIENT_SECRET ||
+  !config.NADEO_REDIRECT_URI
+) {
   throw new Error("Please define the needed NADEO environment variables");
 }
 

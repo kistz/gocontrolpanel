@@ -51,10 +51,10 @@ export async function deletePlayerById(
 
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  // const result = await collection.deleteOne({ _id: new ObjectId(playerId) });
-  // if (result.deletedCount === 0) {
-  //   throw new Error(`Player with ID ${playerId} not found`);
-  // }
+  const result = await collection.deleteOne({ _id: new ObjectId(playerId) });
+  if (result.deletedCount === 0) {
+    throw new Error(`Player with ID ${playerId} not found`);
+  }
 }
 
 function mapDBPlayerToPlayer(dbPlayer: DBPlayer): Player {

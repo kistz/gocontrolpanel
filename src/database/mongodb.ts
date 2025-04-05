@@ -1,5 +1,5 @@
-import { MongoClient } from "mongodb";
 import config from "@/lib/config";
+import { MongoClient } from "mongodb";
 
 let cachedClient: MongoClient | null = null;
 

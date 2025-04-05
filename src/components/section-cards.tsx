@@ -1,13 +1,13 @@
-import { IconTrendingUp } from "@tabler/icons-react"
+import { IconTrendingUp } from "@tabler/icons-react";
 
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardAction,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 export function SectionCards() {
   return (
@@ -55,5 +55,5 @@ export function SectionCards() {
         </CardHeader>
       </Card>
     </div>
-  )
+  );
 }

@@ -50,7 +50,7 @@ export const columns: ColumnDef<Player>[] = [
     id: "actions",
     cell: ({ row }) => {
       const player = row.original;
-      const [isPending, startTransition] = useTransition();
+      const [_, startTransition] = useTransition();
       const router = useRouter();
 
       const handleDelete = () => {
@@ -59,9 +59,10 @@ export const columns: ColumnDef<Player>[] = [
             await deletePlayerById(player._id);
             router.refresh();
           } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            const errorMessage =
+              error instanceof Error ? error.message : "Unknown error";
             toast.error("Error deleting player", {
-              description: errorMessage
+              description: errorMessage,
             });
           }
         });
@@ -78,10 +79,7 @@ export const columns: ColumnDef<Player>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem>View player</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={handleDelete}
-            >
+            <DropdownMenuItem variant="destructive" onClick={handleDelete}>
               Delete player
             </DropdownMenuItem>
           </DropdownMenuContent>

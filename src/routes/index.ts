@@ -6,5 +6,5 @@ export const routes = {
   admin: {
     server: "/admin/server",
   },
-  login: "/login"
-}
+  login: "/login",
+};
