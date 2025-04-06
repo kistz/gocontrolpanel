@@ -13,7 +13,7 @@ export const usePaginationAPI = <TData>(
     sorting: { field: string; order: string },
   ) => Promise<{ data: TData[]; totalCount: number }>,
   pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string },
+  sorting: { field: string; order: string } = { field: "_id", order: "ASC" },
 ): PaginationAPIHook<TData> => {
   const [data, setData] = useState<TData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);

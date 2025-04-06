@@ -1,0 +1,85 @@
+"use client";
+import { getMapsPaginated } from "@/database/map";
+import { usePagination } from "@/hooks/use-pagination";
+import { usePaginationAPI } from "@/hooks/use-pagination-api";
+import { Map } from "@/types/map";
+import { useEffect, useState } from "react";
+import MapCard from "./map-card";
+
+interface MapsCardsProps {
+  fetchData?: (
+    pagination: {
+      skip: number;
+      limit: number;
+    },
+    sorting: {
+      field: string;
+      order: string;
+    },
+  ) => Promise<{ data: Map[]; totalCount: number }>;
+}
+
+export default function MapsCards({
+  fetchData = getMapsPaginated,
+}: MapsCardsProps) {
+  const [cols, setCols] = useState(3);
+  const [rows, setRows] = useState(3);
+  const { pagination, setPagination, skip, limit } = usePagination(cols * rows);
+  const { data, totalCount, loading, refetch } = usePaginationAPI(fetchData, {
+    skip,
+    limit,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setCols(1);
+        setRows(3);
+      } else if (window.innerWidth < 1536) {
+        setCols(2);
+        setRows(3);
+      } else {
+        setCols(3);
+        setRows(3);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    setPagination((prev) => {
+      const maxPageIndex = Math.floor(totalCount / (cols * rows));
+      const newPageIndex = Math.min(prev.pageIndex, maxPageIndex);
+      return {
+        pageSize: cols * rows,
+        pageIndex: newPageIndex,
+      };
+    });
+    refetch();
+  }, [cols, rows]);
+
+  return (
+    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 grid-rows-3 h-full">
+      {data.map((map) => (
+        <MapCard map={map} key={map._id} />
+      ))}
+      {loading && (
+        <div className="col-span-full flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
+        </div>
+      )}
+      {!loading && data.length === 0 && (
+        <div className="col-span-full flex items-center justify-center">
+          <p>No maps found</p>
+        </div>
+      )}
+    </div>
+  );
+}

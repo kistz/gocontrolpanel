@@ -82,7 +82,7 @@ const chartData = [
   { date: new Date("2025-05-16T18:13:25.025+00:00"), records: 523 },
 ];
 
-export function DashboardChart() {
+export default function DashboardChart() {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("90d");
 

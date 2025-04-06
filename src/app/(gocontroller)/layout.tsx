@@ -28,7 +28,7 @@ export default async function GoControllerLayout({
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <div className="p-4 lg:p-6">{children}</div>
+        <div className="p-4 lg:p-6 h-full">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

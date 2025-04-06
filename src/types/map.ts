@@ -11,6 +11,10 @@ export interface DBMap {
   goldTime: number;
   silverTime: number;
   bronzeTime: number;
+  submitter?: string;
+  timestamp?: Date;
+  fileUrl?: string;
+  thumbnailUrl?: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -27,6 +31,10 @@ export interface Map {
   goldTime: number;
   silverTime: number;
   bronzeTime: number;
+  submitter?: string;
+  timestamp?: Date;
+  fileUrl?: string;
+  thumbnailUrl?: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;

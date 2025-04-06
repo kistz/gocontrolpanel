@@ -1,5 +1,5 @@
-import { DashboardCards } from "@/components/dashboard/dashboard-cards";
-import { DashboardChart } from "@/components/dashboard/dashboard-chart";
+import DashboardCards from "@/components/dashboard/dashboard-cards";
+import DashboardChart from "@/components/dashboard/dashboard-chart";
 
 export default function Page() {
   return (

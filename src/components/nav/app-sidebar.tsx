@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  IconClock,
   IconDashboard,
   IconDeviceGamepad2,
   IconMap,
   IconServer,
-  IconUser,
+  IconStopwatch,
+  IconUsers,
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -39,12 +39,12 @@ const data = {
     {
       title: "Players",
       url: routes.players,
-      icon: IconUser,
+      icon: IconUsers,
     },
     {
       title: "Records",
       url: routes.records,
-      icon: IconClock,
+      icon: IconStopwatch,
     },
     {
       title: "Maps",
