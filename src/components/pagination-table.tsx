@@ -24,7 +24,7 @@ import { useSorting } from "@/hooks/use-sorting";
 import { DataTablePagination } from "./data-table-pagination";
 
 interface PaginationTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  createColumns: (refetch: () => void) => ColumnDef<TData, TValue>[];
   fetchData: (
     pagination: {
       skip: number;
@@ -40,7 +40,7 @@ interface PaginationTableProps<TData, TValue> {
 }
 
 export function PaginationTable<TData, TValue>({
-  columns,
+  createColumns,
   fetchData,
   pageSize = 10,
   limitHeight = 206,
@@ -50,11 +50,13 @@ export function PaginationTable<TData, TValue>({
 
   const { pagination, setPagination, skip, limit } = usePagination(pageSize);
   const { sorting, setSorting, field, order } = useSorting();
-  const { data, totalCount, loading } = usePaginationAPI<TData>(
+  const { data, totalCount, loading, refetch } = usePaginationAPI<TData>(
     fetchData,
     { skip, limit },
     { field, order },
   );
+
+  const columns = createColumns(refetch);
 
   const table = useReactTable({
     data,

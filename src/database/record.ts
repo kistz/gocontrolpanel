@@ -46,7 +46,7 @@ export async function deleteRecordById(recordId: ObjectId | string): Promise<voi
   const collection = db.collection<DBRecord>(collections.RECORDS);
   const result = await collection.deleteOne({ _id: new ObjectId(recordId) });
   if (result.deletedCount === 0) {
-    throw new Error(`Record with ID ${recordId} not found`);
+    throw new Error(`Record not found`);
   }
 }
 

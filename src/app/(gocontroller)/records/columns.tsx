@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<Record>[] = [
+export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
   {
     accessorKey: "login",
     header: ({ column }) => (
@@ -69,7 +69,7 @@ export const columns: ColumnDef<Record>[] = [
         startTransition(async () => {
           try {
             await deleteRecordById(record._id);
-            router.refresh();
+            refetch();
           } catch (error) {
             const errorMessage =
               error instanceof Error ? error.message : "Unknown error";

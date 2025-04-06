@@ -4,6 +4,7 @@ interface PaginationAPIHook<TData> {
   data: TData[];
   totalCount: number;
   loading: boolean;
+  refetch: () => Promise<void>;
 }
 
 export const usePaginationAPI = <TData>(
@@ -36,5 +37,5 @@ export const usePaginationAPI = <TData>(
     fetchDataFromAPI();
   }, [pagination.skip, pagination.limit, sorting.field, sorting.order]);
 
-  return { data, totalCount, loading };
+  return { data, totalCount, loading, refetch: fetchDataFromAPI };
 };
