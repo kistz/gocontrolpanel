@@ -9,8 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deletePlayerById } from "@/database/player";
-import { Player } from "@/types/player";
+import { deleteRecordById } from "@/database/record";
+import { Record } from "@/types/record";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -18,13 +18,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<Player>[] = [
-  {
-    accessorKey: "nickName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Nickname"} />
-    ),
-  },
+export const columns: ColumnDef<Record>[] = [
   {
     accessorKey: "login",
     header: ({ column }) => (
@@ -32,9 +26,21 @@ export const columns: ColumnDef<Player>[] = [
     ),
   },
   {
+    accessorKey: "time",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Time"} />
+    ),
+  },
+  {
+    accessorKey: "mapUid",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Map Uid"} />
+    ),
+  },
+  {
     accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Joined"} />
+      <DataTableColumnHeader column={column} title={"Driven"} />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"));
@@ -50,7 +56,7 @@ export const columns: ColumnDef<Player>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const player = row.original;
+      const record = row.original;
       const [_, startTransition] = useTransition();
       const router = useRouter();
       const { data: session, status } = useSession();
@@ -60,12 +66,12 @@ export const columns: ColumnDef<Player>[] = [
       const handleDelete = () => {
         startTransition(async () => {
           try {
-            await deletePlayerById(player._id);
+            await deleteRecordById(record._id);
             router.refresh();
           } catch (error) {
             const errorMessage =
               error instanceof Error ? error.message : "Unknown error";
-            toast.error("Error deleting player", {
+            toast.error("Error deleting record", {
               description: errorMessage,
             });
           }
@@ -74,26 +80,29 @@ export const columns: ColumnDef<Player>[] = [
 
       return (
         <div className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>View player</DropdownMenuItem>
-            {isAdmin && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={handleDelete}>
-                  Delete player
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>View record</DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={handleDelete}
+                  >
+                    Delete record
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },
