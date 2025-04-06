@@ -1,9 +1,9 @@
 "use server";
 
-import { DBRecord, Record } from "@/types/record";
-import { collections, getDatabase } from "./mongodb";
-import { ObjectId } from "mongodb";
 import { auth } from "@/lib/auth";
+import { DBRecord, Record } from "@/types/record";
+import { ObjectId } from "mongodb";
+import { collections, getDatabase } from "./mongodb";
 
 export async function getAllRecords(): Promise<Record[]> {
   const db = await getDatabase();
@@ -25,14 +25,16 @@ export async function getRecordsPaginated(
     .limit(pagination.limit)
     .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
     .toArray();
-    
+
   return {
     data: records.map((record) => mapDBRecordToRecord(record)),
     totalCount,
   };
 }
 
-export async function deleteRecordById(recordId: ObjectId | string): Promise<void> {
+export async function deleteRecordById(
+  recordId: ObjectId | string,
+): Promise<void> {
   const session = await auth();
   if (!session) {
     throw new Error("Not authenticated");

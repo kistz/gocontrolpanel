@@ -1,6 +1,6 @@
-import { SessionWrapper } from "@/components/session-wrapper";
-import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { SessionWrapper } from "@/providers/session-wrapper";
+import { ThemeProvider } from "@/providers/theme-provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";

@@ -10,9 +10,9 @@ import {
 } from "@tabler/icons-react";
 import * as React from "react";
 
-import { NavAdmin } from "@/components/nav-admin";
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
+import { NavAdmin } from "@/components/nav/nav-admin";
+import { NavMain } from "@/components/nav/nav-main";
+import { NavUser } from "@/components/nav/nav-user";
 import {
   Sidebar,
   SidebarContent,

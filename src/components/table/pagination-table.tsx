@@ -6,10 +6,10 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 
+import { DataTablePagination } from "@/components/table/data-table-pagination";
 import {
   Table,
   TableBody,
@@ -19,32 +19,58 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
-import { useState } from "react";
-import { DataTablePagination } from "./data-table-pagination";
+import { usePagination } from "@/hooks/use-pagination";
+import { usePaginationAPI } from "@/hooks/use-pagination-api";
+import { useSorting } from "@/hooks/use-sorting";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface PaginationTableProps<TData, TValue> {
+  createColumns: (refetch: () => void) => ColumnDef<TData, TValue>[];
+  fetchData: (
+    pagination: {
+      skip: number;
+      limit: number;
+    },
+    sorting: {
+      field: string;
+      order: string;
+    },
+  ) => Promise<{ data: TData[]; totalCount: number }>;
+  pageSize?: number;
   limitHeight?: number;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
+export function PaginationTable<TData, TValue>({
+  createColumns,
+  fetchData,
+  pageSize = 10,
   limitHeight = 206,
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+}: PaginationTableProps<TData, TValue>) {
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
+
+  const { pagination, setPagination, skip, limit } = usePagination(pageSize);
+  const { sorting, setSorting, field, order } = useSorting();
+  const { data, totalCount, loading, refetch } = usePaginationAPI<TData>(
+    fetchData,
+    { skip, limit },
+    { field, order },
+  );
+
+  const columns = createColumns(refetch);
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onPaginationChange: (newPagination) => setPagination(newPagination),
+    onSortingChange: setSorting,
+    manualPagination: true,
+    manualSorting: true,
+    rowCount: totalCount,
     state: {
+      pagination,
       sorting,
     },
   });
@@ -94,6 +120,17 @@ export function DataTable<TData, TValue>({
                   ))}
                 </TableRow>
               ))
+            ) : loading ? (
+              <TableRow className="block">
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className="p-8 flex justify-center items-center"
+                >
+                  <div className="flex justify-center items-center">
+                    <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : (
               <TableRow>
                 <TableCell

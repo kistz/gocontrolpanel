@@ -21,7 +21,7 @@ import {
 import { routes } from "@/routes";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggle } from "../theme-toggle";
 
 export function NavUser({
   user,

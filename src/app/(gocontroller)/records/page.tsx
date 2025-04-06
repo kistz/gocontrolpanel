@@ -1,7 +1,12 @@
-import { PaginationTable } from "@/components/pagination-table";
+import { PaginationTable } from "@/components/table/pagination-table";
 import { getRecordsPaginated } from "@/database/record";
 import { createColumns } from "./columns";
 
 export default async function RecordsPage() {
-  return <PaginationTable createColumns={createColumns} fetchData={getRecordsPaginated} />;
+  return (
+    <PaginationTable
+      createColumns={createColumns}
+      fetchData={getRecordsPaginated}
+    />
+  );
 }

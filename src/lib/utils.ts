@@ -12,5 +12,5 @@ export function formatTime(time: number): string {
 
   const minutes = Math.floor(time / 60000);
   const seconds = (time % 60000) / 1000;
-  return `${minutes}:${seconds.toFixed(3).padStart(6, '0')}`;
+  return `${minutes}:${seconds.toFixed(3).padStart(6, "0")}`;
 }

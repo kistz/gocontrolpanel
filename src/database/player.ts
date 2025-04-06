@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import { ObjectId } from "mongodb";
 import { DBPlayer, Player } from "../types/player";
 import { collections, getDatabase } from "./mongodb";
-import test from "node:test";
 
 export async function getAllPlayers(): Promise<Player[]> {
   const db = await getDatabase();
@@ -25,7 +24,7 @@ export async function getPlayersPaginated(
     .limit(pagination.limit)
     .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
     .toArray();
-    
+
   return {
     data: players.map((player) => mapDBPlayerToPlayer(player)),
     totalCount,

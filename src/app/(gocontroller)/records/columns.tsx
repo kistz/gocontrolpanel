@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import TimeDisplay from "@/components/time-display";
 import { Button } from "@/components/ui/button";
 import {
