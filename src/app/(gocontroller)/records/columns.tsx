@@ -70,6 +70,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
           try {
             await deleteRecordById(record._id);
             refetch();
+            toast.success("Record deleted successfully");
           } catch (error) {
             const errorMessage =
               error instanceof Error ? error.message : "Unknown error";

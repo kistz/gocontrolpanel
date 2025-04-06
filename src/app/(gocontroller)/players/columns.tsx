@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<Player>[] = [
+export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (
@@ -61,7 +61,8 @@ export const columns: ColumnDef<Player>[] = [
         startTransition(async () => {
           try {
             await deletePlayerById(player._id);
-            router.refresh();
+            refetch();
+            toast.success("Player deleted successfully");
           } catch (error) {
             const errorMessage =
               error instanceof Error ? error.message : "Unknown error";
