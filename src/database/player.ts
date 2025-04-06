@@ -3,12 +3,33 @@ import { auth } from "@/lib/auth";
 import { ObjectId } from "mongodb";
 import { DBPlayer, Player } from "../types/player";
 import { collections, getDatabase } from "./mongodb";
+import test from "node:test";
 
 export async function getAllPlayers(): Promise<Player[]> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
   const players = await collection.find().toArray();
   return players.map((player) => mapDBPlayerToPlayer(player));
+}
+
+export async function getPlayersPaginated(
+  pagination: { skip: number; limit: number },
+  sorting: { field: string; order: string },
+): Promise<{ data: Player[]; totalCount: number }> {
+  const db = await getDatabase();
+  const collection = db.collection<DBPlayer>(collections.PLAYERS);
+  const totalCount = await collection.countDocuments();
+  const players = await collection
+    .find()
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
+    .toArray();
+    
+  return {
+    data: players.map((player) => mapDBPlayerToPlayer(player)),
+    totalCount,
+  };
 }
 
 export async function getPlayerById(

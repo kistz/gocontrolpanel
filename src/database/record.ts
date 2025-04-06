@@ -12,6 +12,26 @@ export async function getAllRecords(): Promise<Record[]> {
   return records.map((record) => mapDBRecordToRecord(record));
 }
 
+export async function getRecordsPaginated(
+  pagination: { skip: number; limit: number },
+  sorting: { field: string; order: string },
+): Promise<{ data: Record[]; totalCount: number }> {
+  const db = await getDatabase();
+  const collection = db.collection<DBRecord>(collections.RECORDS);
+  const totalCount = await collection.countDocuments();
+  const records = await collection
+    .find()
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
+    .toArray();
+    
+  return {
+    data: records.map((record) => mapDBRecordToRecord(record)),
+    totalCount,
+  };
+}
+
 export async function deleteRecordById(recordId: ObjectId | string): Promise<void> {
   const session = await auth();
   if (!session) {

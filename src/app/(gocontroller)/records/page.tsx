@@ -1,10 +1,7 @@
-import { DataTable } from "@/components/data-table";
-import { getAllPlayers } from "@/database/player";
+import { PaginationTable } from "@/components/pagination-table";
+import { getRecordsPaginated } from "@/database/record";
 import { columns } from "./columns";
-import { getAllRecords } from "@/database/record";
 
 export default async function RecordsPage() {
-  const records = await getAllRecords();
-
-  return <DataTable columns={columns} data={records} />;
+  return <PaginationTable columns={columns} fetchData={getRecordsPaginated} />;
 }
