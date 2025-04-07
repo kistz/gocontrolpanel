@@ -53,7 +53,7 @@ export default function MapMedals({ map, ref }: MapMedalsProps) {
       {!isCompact && (
         <div className="flex items-center gap-2">
           <IconMedal className="text-amber-700" size={24} />
-          <TimeDisplay time={map.bronzeTime} className="text-sm" />
+          <TimeDisplay time={map.bronzeTime} className="text-sm mr-1" />
         </div>
       )}
     </Card>
