@@ -106,7 +106,7 @@ export default function DashboardChart() {
   });
 
   return (
-    <Card className="@container/card">
+    <Card className="@container/card gap-6 py-6">
       <CardHeader>
         <CardTitle>Total Records</CardTitle>
         <CardDescription>

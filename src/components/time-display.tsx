@@ -1,5 +1,10 @@
 import { formatTime } from "@/lib/utils";
 
-export default function TimeDisplay({ time }: { time: number }) {
-  return <div>{formatTime(time)}</div>;
+interface TimeDisplayProps {
+  time: number;
+  className?: string;
+}
+
+export default function TimeDisplay({ time, className }: TimeDisplayProps) {
+  return <div className={className}>{formatTime(time)}</div>;
 }

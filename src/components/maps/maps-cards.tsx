@@ -23,7 +23,7 @@ export default function MapsCards({
   fetchData = getMapsPaginated,
 }: MapsCardsProps) {
   const [cols, setCols] = useState(3);
-  const [rows, setRows] = useState(3);
+  const [rows, setRows] = useState(2);
   const { pagination, setPagination, skip, limit } = usePagination(cols * rows);
   const { data, totalCount, loading, refetch } = usePaginationAPI(fetchData, {
     skip,
@@ -34,13 +34,13 @@ export default function MapsCards({
     const handleResize = () => {
       if (window.innerWidth < 1024) {
         setCols(1);
-        setRows(3);
+        setRows(2);
       } else if (window.innerWidth < 1536) {
         setCols(2);
-        setRows(3);
+        setRows(2);
       } else {
         setCols(3);
-        setRows(3);
+        setRows(2);
       }
     };
 
@@ -66,7 +66,7 @@ export default function MapsCards({
   }, [cols, rows]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 grid-rows-3 h-full">
+    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 grid-rows-2">
       {data.map((map) => (
         <MapCard map={map} key={map._id} />
       ))}

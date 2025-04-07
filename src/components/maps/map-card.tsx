@@ -1,16 +1,20 @@
 import { Card } from "@/components/ui/card";
 import { Map } from "@/types/map";
 import { IconPhoto, IconUser } from "@tabler/icons-react";
+import { useRef } from "react";
 import { parseTmTags } from "tmtags";
 import MapCardActions from "./map-card-actions";
+import MapMedals from "./map-medals";
 
 interface MapCardProps {
   map: Map;
 }
 
 export default function MapCard({ map }: MapCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
   return (
-    <Card className="flex flex-col flex-1 p-0 gap-0">
+    <Card ref={ref} className="flex flex-col flex-1">
       <div className="relative">
         {map.thumbnailUrl ? (
           <img
@@ -38,10 +42,9 @@ export default function MapCard({ map }: MapCardProps) {
           </div>
         </div>
       </div>
-      <div className="p-4 flex flex-1 items-end">
-        <div>
-          <MapCardActions map={map} />
-        </div>
+      <div className="p-3 flex flex-1 flex-col gap-2">
+        <MapMedals map={map} />
+        <MapCardActions map={map} ref={ref} />
       </div>
     </Card>
   );
