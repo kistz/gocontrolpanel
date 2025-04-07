@@ -111,7 +111,10 @@ export function PaginationTable<TData, TValue>({
                   className="table table-fixed w-full"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-4 overflow-hidden overflow-ellipsis">
+                    <TableCell
+                      key={cell.id}
+                      className="px-4 overflow-hidden overflow-ellipsis"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

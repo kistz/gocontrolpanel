@@ -19,11 +19,9 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
-import Link from "next/link";
 
 const data = {
   user: {
@@ -67,10 +65,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-              <div className="flex items-center gap-2 p-2">
-                <IconDeviceGamepad2 className="!size-5" />
-                <span className="text-base font-semibold">GoController</span>
-              </div>
+            <div className="flex items-center gap-2 p-2">
+              <IconDeviceGamepad2 className="!size-5" />
+              <span className="text-base font-semibold">GoController</span>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
