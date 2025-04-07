@@ -13,6 +13,7 @@ declare module "next-auth" {
       roles: string[];
       displayName: string;
       accountId: string;
+      ubiId: string;
       login: string;
     };
     expires: ISODateString;
@@ -31,5 +32,6 @@ declare module "next-auth/jwt" {
     login: string;
     displayName: string;
     roles: string[];
+    ubiId: string;
   }
 }

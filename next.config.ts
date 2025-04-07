@@ -9,10 +9,17 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/maps/**",
         search: "",
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.ubisoft.com",
+        port: "",
+        pathname: "/**",
+        search: "",
+      },
     ],
     minimumCacheTTL: 60 * 60 * 24, // 1 day
-  }
+  },
 };
 
 export default nextConfig;

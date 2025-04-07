@@ -76,6 +76,7 @@ export const authOptions: NextAuthOptions = {
         login: token.login,
         displayName: token.displayName,
         roles: token.roles || [],
+        ubiId: token.ubiId,
       };
 
       return session;
@@ -99,6 +100,7 @@ export const authOptions: NextAuthOptions = {
 
       token._id = dbUser._id.toString();
       token.roles = dbUser.roles || [];
+      token.ubiId = dbUser.ubiUid;
 
       return token;
     },
