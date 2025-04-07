@@ -4,6 +4,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { Map } from "@/types/map";
 import { useEffect, useState } from "react";
+import GridPagination from "../grid/grid-pagination";
 import MapCard from "./map-card";
 
 interface MapsCardsProps {
@@ -66,20 +67,27 @@ export default function MapsCards({
   }, [cols, rows]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 grid-rows-2">
-      {data.map((map) => (
-        <MapCard map={map} key={map._id} />
-      ))}
-      {loading && (
-        <div className="col-span-full flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
-        </div>
-      )}
-      {!loading && data.length === 0 && (
-        <div className="col-span-full flex items-center justify-center">
-          <p>No maps found</p>
-        </div>
-      )}
+    <div className="flex flex-col gap-4">
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 grid-rows-2">
+        {data.map((map) => (
+          <MapCard map={map} key={map._id} />
+        ))}
+        {loading && (
+          <div className="col-span-full flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
+          </div>
+        )}
+        {!loading && data.length === 0 && (
+          <div className="col-span-full flex items-center justify-center">
+            <p>No maps found</p>
+          </div>
+        )}
+      </div>
+      <GridPagination
+        pagination={pagination}
+        setPagination={setPagination}
+        pageCount={Math.ceil(totalCount / pagination.pageSize)}
+      />
     </div>
   );
 }

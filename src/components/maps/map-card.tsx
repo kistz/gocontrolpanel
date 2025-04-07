@@ -43,7 +43,7 @@ export default function MapCard({ map }: MapCardProps) {
         </div>
       </div>
       <div className="p-3 flex flex-1 flex-col gap-2">
-        <MapMedals map={map} />
+        <MapMedals map={map} ref={ref} />
         <MapCardActions map={map} ref={ref} />
       </div>
     </Card>
