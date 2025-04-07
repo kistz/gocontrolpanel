@@ -27,7 +27,7 @@ export default function GridPagination({
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="hidden h-8 w-8 p-0 sm:flex"
             onClick={() => setPagination((prev) => ({ ...prev, pageIndex: 0 }))}
             disabled={pagination.pageIndex === 0}
           >
@@ -64,7 +64,7 @@ export default function GridPagination({
           </Button>
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="hidden h-8 w-8 p-0 sm:flex"
             onClick={() =>
               setPagination((prev) => ({ ...prev, pageIndex: pageCount - 1 }))
             }

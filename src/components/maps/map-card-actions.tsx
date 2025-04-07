@@ -89,10 +89,10 @@ export default function MapCardActions({ map, ref }: MapCardActionsProps) {
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => {
-                  console.log("Delete player");
+                  console.log("Delete map");
                 }}
               >
-                Delete player
+                Delete map
               </DropdownMenuItem>
             </>
           )}
