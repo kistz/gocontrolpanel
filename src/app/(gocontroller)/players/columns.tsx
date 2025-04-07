@@ -1,5 +1,6 @@
 "use client";
 
+import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
@@ -52,7 +53,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
     cell: ({ row }) => {
       const player = row.original;
       const [_, startTransition] = useTransition();
-      const router = useRouter();
+      const [isOpen, setIsOpen] = useState(false);
       const { data: session, status } = useSession();
       const isAdmin =
         status === "authenticated" && session.user.roles.includes("admin");
@@ -89,7 +90,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
-                    onClick={handleDelete}
+                    onClick={() => setIsOpen(true)}
                   >
                     Delete player
                   </DropdownMenuItem>
@@ -97,6 +98,16 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <ConfirmDialog
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onConfirm={handleDelete}
+            title="Delete player"
+            description={`Are you sure you want to delete ${player.nickName}? This action cannot be undone.`}
+            confirmText="Delete"
+            cancelText="Cancel"
+          />
         </div>
       );
     },

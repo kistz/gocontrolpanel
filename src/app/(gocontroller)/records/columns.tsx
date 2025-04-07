@@ -1,5 +1,6 @@
 "use client";
 
+import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import TimeDisplay from "@/components/time-display";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,7 @@ import { Record } from "@/types/record";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
@@ -60,7 +60,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
     cell: ({ row }) => {
       const record = row.original;
       const [_, startTransition] = useTransition();
-      const router = useRouter();
+      const [isOpen, setIsOpen] = useState(false);
       const { data: session, status } = useSession();
       const isAdmin =
         status === "authenticated" && session.user.roles.includes("admin");
@@ -97,7 +97,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
-                    onClick={handleDelete}
+                    onClick={() => setIsOpen(true)}
                   >
                     Delete record
                   </DropdownMenuItem>
@@ -105,6 +105,16 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <ConfirmDialog
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onConfirm={handleDelete}
+            title="Delete record"
+            description="Are you sure you want to delete this record?"
+            confirmText="Delete"
+            cancelText="Cancel"
+          />
         </div>
       );
     },
