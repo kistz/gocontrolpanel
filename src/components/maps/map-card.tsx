@@ -8,9 +8,10 @@ import MapMedals from "./map-medals";
 
 interface MapCardProps {
   map: Map;
+  refetch?: () => void;
 }
 
-export default function MapCard({ map }: MapCardProps) {
+export default function MapCard({ map, refetch }: MapCardProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   return (
@@ -44,7 +45,7 @@ export default function MapCard({ map }: MapCardProps) {
       </div>
       <div className="p-3 flex flex-1 flex-col gap-2">
         <MapMedals map={map} ref={ref} />
-        <MapCardActions map={map} ref={ref} />
+        <MapCardActions map={map} ref={ref} refetch={refetch} />
       </div>
     </Card>
   );
