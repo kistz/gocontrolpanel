@@ -69,18 +69,19 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.NextCallVoteTimeOut}
           className="w-20"
           type="number"
+          isRequired
         />
 
         <FormElement
           control={form.control}
           name={"defaultOptions.CallVoteRatio"}
           label="Call Vote Ratio"
-          description="The ratio for call vote."
+          description="The ratio for call vote in %."
           placeholder="Call vote ratio..."
           error={form.formState.errors.defaultOptions?.CallVoteRatio}
           className="w-20"
           type="number"
-          step="0.05"
+          isRequired
         />
         <FormElement
           control={form.control}
@@ -95,6 +96,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.HideServer}
           className="w-3/5 min-w-48"
           type="select"
+          isRequired
         />
 
         <FormElement
@@ -127,6 +129,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.KeepPlayerSlots}
           className="w-20"
           type="checkbox"
+          isRequired
         />
 
         <FormElement
@@ -137,6 +140,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.AllowMapDownload}
           className="w-20"
           type="checkbox"
+          isRequired
         />
 
         <FormElement
@@ -147,6 +151,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.AutoSaveReplays}
           className="w-20"
           type="checkbox"
+          isRequired
         />
         <FormElement
           control={form.control}
@@ -156,6 +161,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.DisableHorns}
           className="w-20"
           type="checkbox"
+          isRequired
         />
 
         <FormElement
@@ -166,6 +172,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.defaultOptions?.DisableServiceAnnounces}
           className="w-20"
           type="checkbox"
+          isRequired
         />
 
         <FormElement
@@ -177,6 +184,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.downloadRate}
           className="w-26"
           type="number"
+          isRequired
         />
 
         <FormElement
@@ -188,6 +196,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.uploadRate}
           className="w-26"
           type="number"
+          isRequired
         />
 
         <FormElement
@@ -198,6 +207,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           error={form.formState.errors.profileSkins}
           className="w-20"
           type="checkbox"
+          isRequired
         />
 
         <Button
