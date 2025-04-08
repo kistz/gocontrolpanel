@@ -105,6 +105,9 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
+  session: {
+    maxAge: 1 * 86400, // 1 day
+  },
 };
 
 export function auth(
