@@ -1,4 +1,3 @@
-import { Breadcrumb as TBreadcrumb } from "@/providers/breadcrumb-provider";
 import { routes } from "@/routes";
 import Link from "next/link";
 import React from "react";
@@ -10,6 +9,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
+
+export interface TBreadcrumb {
+  label: string;
+  path?: string;
+}
 
 interface BreadcrumbsProps {
   crumbs: TBreadcrumb[];
