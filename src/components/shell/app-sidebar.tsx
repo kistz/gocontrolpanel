@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IconAdjustmentsAlt,
   IconDashboard,
   IconDeviceGamepad2,
   IconMap,
@@ -10,8 +11,6 @@ import {
 } from "@tabler/icons-react";
 import * as React from "react";
 
-import { NavAdmin } from "@/components/shell/nav-admin";
-import { NavMain } from "@/components/shell/nav-main";
 import { NavUser } from "@/components/shell/nav-user";
 import {
   Sidebar,
@@ -22,42 +21,51 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
+import Navbar, { NavGroup } from "./navbar";
 
-const data = {
-  user: {
-    name: "Marijntje04",
-    avatar: "/avatars/shadcn.jpg",
+const navGroups: NavGroup[] = [
+  {
+    items: [
+      {
+        name: "Dashboard",
+        url: routes.dashboard,
+        icon: IconDashboard,
+      },
+      {
+        name: "Players",
+        url: routes.players,
+        icon: IconUsers,
+      },
+      {
+        name: "Records",
+        url: routes.records,
+        icon: IconStopwatch,
+      },
+      {
+        name: "Maps",
+        url: routes.maps,
+        icon: IconMap,
+      },
+    ],
   },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: routes.dashboard,
-      icon: IconDashboard,
-    },
-    {
-      title: "Players",
-      url: routes.players,
-      icon: IconUsers,
-    },
-    {
-      title: "Records",
-      url: routes.records,
-      icon: IconStopwatch,
-    },
-    {
-      title: "Maps",
-      url: routes.maps,
-      icon: IconMap,
-    },
-  ],
-  admin: [
-    {
-      name: "Server",
-      url: routes.admin.server,
-      icon: IconServer,
-    },
-  ],
-};
+  {
+    name: "Admin",
+    items: [
+      {
+        name: "Settings",
+        icon: IconAdjustmentsAlt,
+        isActive: true,
+        items: [
+          {
+            name: "Server",
+            url: routes.admin.settings.server,
+            icon: IconServer,
+          },
+        ],
+      },
+    ],
+  },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -73,11 +81,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavAdmin items={data.admin} />
+        <Navbar groups={navGroups} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );
