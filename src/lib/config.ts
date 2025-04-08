@@ -4,20 +4,20 @@ interface Config {
   MONGODB: {
     URI: string;
     DB: string;
-  },
+  };
   NODE_ENV: string;
   PORT: number;
   NADEO: {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     REDIRECT_URI: string;
-  },
+  };
   XMLRPC: {
     HOST: string;
     PORT: number;
     USER: string;
     PASS: string;
-  }
+  };
 }
 
 export const config: Config = {
@@ -34,10 +34,12 @@ export const config: Config = {
   },
   XMLRPC: {
     HOST: process.env.XMLRPC_HOST || "",
-    PORT: process.env.XMLRPC_PORT ? parseInt(process.env.XMLRPC_PORT, 10) : 5000,
+    PORT: process.env.XMLRPC_PORT
+      ? parseInt(process.env.XMLRPC_PORT, 10)
+      : 5000,
     USER: process.env.XMLRPC_USER || "",
     PASS: process.env.XMLRPC_PASS || "",
-  }
+  },
 };
 
 if (!config.MONGODB.URI) {

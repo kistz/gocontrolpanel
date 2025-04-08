@@ -16,7 +16,7 @@ export async function connectToGbxClient() {
 
   try {
     await client.call("Authenticate", config.XMLRPC.USER, config.XMLRPC.PASS);
-  } catch (error) {
+  } catch {
     throw new Error("Failed to authenticate with GBX client");
   }
 

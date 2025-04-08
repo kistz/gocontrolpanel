@@ -158,7 +158,9 @@ export default function FormElement<TControl extends FieldValues>({
                       field.onChange([...field.value, option.value]);
                     } else {
                       field.onChange(
-                        field.value.filter((value: string) => value !== option.value)
+                        field.value.filter(
+                          (value: string) => value !== option.value,
+                        ),
                       );
                     }
                   }}
