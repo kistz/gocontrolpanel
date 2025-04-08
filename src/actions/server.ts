@@ -14,7 +14,6 @@ export async function getServerSettings(): Promise<ServerSettings> {
     ["AreHornsDisabled"],
     ["AreServiceAnnouncesDisabled"],
     ["GetSystemInfo"],
-    ["GetServerTags"],
     ["AreProfileSkinsDisabled"]
   ]);
 
@@ -29,8 +28,7 @@ export async function getServerSettings(): Promise<ServerSettings> {
     const hornsDisabled = settings[3];
     const serviceAnnouncesDisabled = settings[4];
     const systemInfo = settings[5];
-    const serverTags = settings[6];
-    const profileSkinsDisabled = settings[7];
+    const profileSkinsDisabled = settings[6];
   
     const serverSettings: ServerSettings = {
       defaultOptions: {
@@ -51,10 +49,6 @@ export async function getServerSettings(): Promise<ServerSettings> {
       },
       downloadRate: systemInfo.ConnectionDownloadRate,
       uploadRate: systemInfo.ConnectionUploadRate,
-      serverTags: serverTags.map((tag: any) => ({
-        name: tag.Name,
-        value: tag.Value,
-      })),
       profileSkins: !profileSkinsDisabled,
     }
 
