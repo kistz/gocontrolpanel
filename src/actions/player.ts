@@ -11,6 +11,23 @@ export async function getAllPlayers(): Promise<Player[]> {
   return players.map((player) => mapDBPlayerToPlayer(player));
 }
 
+export async function getPlayerCount(): Promise<number> {
+  const db = await getDatabase();
+  const collection = db.collection<DBPlayer>(collections.PLAYERS);
+  return collection.countDocuments();
+}
+
+export async function getNewPlayersCount(days: number): Promise<number> {
+  const db = await getDatabase();
+  const collection = db.collection<DBPlayer>(collections.PLAYERS);
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  const count = await collection.countDocuments({
+    createdAt: { $gte: date },
+  });
+  return count;
+}
+
 export async function getPlayersPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },

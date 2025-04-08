@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -26,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
+import { getRecordCountPerDay } from "@/actions/record";
 
 const chartConfig = {
   records: {
@@ -34,73 +35,42 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const chartData = [
-  { date: new Date("2025-04-02T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-03T18:13:25.025+00:00"), records: 34 },
-  { date: new Date("2025-04-04T18:13:25.025+00:00"), records: 4 },
-  { date: new Date("2025-04-05T18:13:25.025+00:00"), records: 323 },
-  { date: new Date("2025-04-06T18:13:25.025+00:00"), records: 344 },
-  { date: new Date("2025-04-07T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-08T18:13:25.025+00:00"), records: 3 },
-  { date: new Date("2025-04-09T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-10T18:13:25.025+00:00"), records: 233 },
-  { date: new Date("2025-04-11T18:13:25.025+00:00"), records: 23 },
-  { date: new Date("2025-04-12T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-13T18:13:25.025+00:00"), records: 323 },
-  { date: new Date("2025-04-14T18:13:25.025+00:00"), records: 32 },
-  { date: new Date("2025-04-15T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-16T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-17T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-18T18:13:25.025+00:00"), records: 23 },
-  { date: new Date("2025-04-19T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-20T18:13:25.025+00:00"), records: 321 },
-  { date: new Date("2025-04-21T18:13:25.025+00:00"), records: 624 },
-  { date: new Date("2025-04-22T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-23T18:13:25.025+00:00"), records: 535 },
-  { date: new Date("2025-04-24T18:13:25.025+00:00"), records: 12 },
-  { date: new Date("2025-04-25T18:13:25.025+00:00"), records: 25 },
-  { date: new Date("2025-04-26T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-27T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-28T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-29T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-04-30T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-01T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-02T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-03T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-04T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-05T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-06T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-07T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-08T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-09T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-10T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-11T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-12T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-13T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-14T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-15T18:13:25.025+00:00"), records: 523 },
-  { date: new Date("2025-05-16T18:13:25.025+00:00"), records: 523 },
-];
-
 export default function DashboardChart() {
   const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = React.useState("90d");
+  const [timeRange, setTimeRange] = useState("90d");
+  const [chartData, setChartData] = useState<{
+    date: Date;
+    records: number;
+  }[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    async function fetchData() {
+      const res = await getRecordCountPerDay(90);
+      if (res) {
+        const data = res.map((item) => ({
+          date: new Date(item.date),
+          records: item.count,
+        }));
+        setChartData(data);
+      }
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     if (isMobile) {
       setTimeRange("7d");
     }
   }, [isMobile]);
 
   const filteredData = chartData.filter((item) => {
-    const referenceDate = new Date("2025-05-16");
     let daysToSubtract = 90;
     if (timeRange === "30d") {
       daysToSubtract = 30;
     } else if (timeRange === "7d") {
       daysToSubtract = 7;
     }
-    const startDate = referenceDate;
+    const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysToSubtract);
     return item.date >= startDate;
   });

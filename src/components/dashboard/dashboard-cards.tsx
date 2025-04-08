@@ -8,9 +8,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getNewPlayersCount, getPlayerCount } from "@/actions/player";
+import { getNewRecordsCount, getRecordCount } from "@/actions/record";
+import { getMapCount, getNewMapsCount } from "@/actions/map";
 
-export default function DashboardCards() {
+export default async function DashboardCards() {
+  const totalPlayers = await getPlayerCount();
+  const newPlayers = await getNewPlayersCount(30);
 
+  const totalRecords = await getRecordCount();
+  const newRecords = await getNewRecordsCount(30);
+
+  const totalMaps = await getMapCount();
+  const newMaps = await getNewMapsCount(30);
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @md/main:grid-cols-1 @xl/main:grid-cols-3">
@@ -18,12 +28,12 @@ export default function DashboardCards() {
         <CardHeader>
           <CardDescription>Players</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            534
+            {totalPlayers}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />
-              +87
+              +{newPlayers}
             </Badge>
           </CardAction>
         </CardHeader>
@@ -32,12 +42,12 @@ export default function DashboardCards() {
         <CardHeader>
           <CardDescription>Records</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            {totalRecords}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />
-              +535
+              +{newRecords}
             </Badge>
           </CardAction>
         </CardHeader>
@@ -46,12 +56,12 @@ export default function DashboardCards() {
         <CardHeader>
           <CardDescription>Maps</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            34
+            {totalMaps}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />
-              +6
+              +{newMaps}
             </Badge>
           </CardAction>
         </CardHeader>

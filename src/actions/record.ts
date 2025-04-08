@@ -12,6 +12,55 @@ export async function getAllRecords(): Promise<Record[]> {
   return records.map((record) => mapDBRecordToRecord(record));
 }
 
+export async function getRecordCount(): Promise<number> {
+  const db = await getDatabase();
+  const collection = db.collection<DBRecord>(collections.RECORDS);
+  return collection.countDocuments();
+}
+
+export async function getNewRecordsCount(days: number): Promise<number> {
+  const db = await getDatabase();
+  const collection = db.collection<DBRecord>(collections.RECORDS);
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  const count = await collection.countDocuments({
+    createdAt: { $gte: date },
+  });
+  return count;
+}
+
+export async function getRecordCountPerDay(days: number): Promise<
+  {
+    date: Date;
+    count: number;
+  }[]
+> {
+  const db = await getDatabase();
+  const collection = db.collection<DBRecord>(collections.RECORDS);
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  const records = await collection
+    .aggregate([
+      {
+        $match: {
+          createdAt: { $gte: date },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+    ])
+    .toArray();
+
+  return records.map((record) => ({
+    date: new Date(record._id),
+    count: record.count,
+  }));
+}
+
 export async function getRecordsPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },

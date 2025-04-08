@@ -11,6 +11,23 @@ export async function getAllMaps(): Promise<Map[]> {
   return maps.map((map) => mapDBMapToMap(map));
 }
 
+export async function getMapCount(): Promise<number> {
+  const db = await getDatabase();
+  const collection = db.collection<DBMap>(collections.MAPS);
+  return collection.countDocuments();
+}
+
+export async function getNewMapsCount(days: number): Promise<number> {
+  const db = await getDatabase();
+  const collection = db.collection<DBMap>(collections.MAPS);
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  const count = await collection.countDocuments({
+    createdAt: { $gte: date },
+  });
+  return count;
+}
+
 export async function getMapsPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
