@@ -47,12 +47,24 @@ export default function ServerSettingsPage() {
   }
 
   if (isLoading) {
-    return <div className="flex justify-center"><div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div></div>;
+    return (
+      <div className="flex justify-center">
+        <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
+      </div>
+    );
   }
 
   return (
-    <Card className="p-6">
-      <SettingsForm form={form} onSubmit={onSubmit} />
-    </Card>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold">Server Settings</h1>
+        <h4 className="text-muted-foreground">
+          Manage general server settings.
+        </h4>
+      </div>
+      <Card className="p-6">
+        <SettingsForm form={form} onSubmit={onSubmit} />
+      </Card>
+    </div>
   );
 }

@@ -103,7 +103,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           control={form.control}
           name={"defaultOptions.NextMaxPlayers"}
           label="Max Players"
-          description="The maximum number of players."
+          description="The maximum number of players. 0 for unlimited."
           placeholder="Max players..."
           error={form.formState.errors.defaultOptions?.NextMaxPlayers}
           className="w-20"
@@ -114,7 +114,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           control={form.control}
           name={"defaultOptions.NextMaxSpectators"}
           label="Max Spectators"
-          description="The maximum number of spectators."
+          description="The maximum number of spectators. 0 for unlimited."
           placeholder="Max spectators..."
           error={form.formState.errors.defaultOptions?.NextMaxSpectators}
           className="w-20"
