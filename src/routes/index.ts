@@ -4,8 +4,8 @@ export const routes = {
   maps: "/maps",
   records: "/records",
   admin: {
-    settings: {
-      server: "/admin/settings/server",
+    server: {
+      settings: "/admin/server/settings",
     }
   },
   login: "/login",

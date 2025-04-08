@@ -52,14 +52,14 @@ const navGroups: NavGroup[] = [
     name: "Admin",
     items: [
       {
-        name: "Settings",
-        icon: IconAdjustmentsAlt,
+        name: "Server",
+        icon: IconServer,
         isActive: true,
         items: [
           {
-            name: "Server",
-            url: routes.admin.settings.server,
-            icon: IconServer,
+            name: "Settings",
+            url: routes.admin.server.settings,
+            icon: IconAdjustmentsAlt,
           },
         ],
       },
