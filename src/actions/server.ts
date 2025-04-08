@@ -1,18 +1,11 @@
 "use server";
 
 import { getGbxClient } from "@/gbx/gbxclient";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 import { ServerSettings } from "@/types/server";
 
 export async function getServerSettings(): Promise<ServerSettings> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Not authenticated");
-  }
-
-  if (!session.user.roles.includes("admin")) {
-    throw new Error("Not authorized");
-  }
+  await withAuth(["admin"]);
 
   const client = await getGbxClient();
   const settings = await client.multicall([
@@ -69,15 +62,8 @@ export async function getServerSettings(): Promise<ServerSettings> {
 
 export async function saveServerSettings(
   serverSettings: ServerSettings,
-): Promise<boolean> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Not authenticated");
-  }
-
-  if (!session.user.roles.includes("admin")) {
-    throw new Error("Not authorized");
-  }
+): Promise<void> {
+  await withAuth(["admin"]);
 
   const client = await getGbxClient();
 
@@ -114,6 +100,4 @@ export async function saveServerSettings(
   } else if (!res[2]) {
     throw new Error("Failed to save profile skins");
   }
-
-  return true;
 }

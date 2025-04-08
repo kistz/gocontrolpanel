@@ -53,6 +53,18 @@ const breadCrumbs: {
       },
     ],
   },
+  {
+    path: routes.admin.server.game,
+    breadCrumbs: [
+      {
+        label: "Server",
+        path: routes.admin.server.settings,
+      },
+      {
+        label: "Game",
+      },
+    ],
+  },
 ];
 
 export function SiteHeader() {

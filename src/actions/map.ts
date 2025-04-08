@@ -1,5 +1,5 @@
 "use server";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 import { DBMap, Map } from "@/types/map";
 import { ObjectId } from "mongodb";
 import { collections, getDatabase } from "./mongodb";
@@ -49,14 +49,7 @@ export async function getMapsPaginated(
 }
 
 export async function deleteMapById(mapId: ObjectId | string): Promise<void> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Not authenticated");
-  }
-
-  if (!session.user.roles.includes("admin")) {
-    throw new Error("Not authorized");
-  }
+  await withAuth(["admin"]);
 
   const db = await getDatabase();
   const collection = db.collection<DBMap>(collections.MAPS);

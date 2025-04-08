@@ -5,7 +5,7 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import { getServerSession, NextAuthOptions, Profile } from "next-auth";
+import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import config from "./config";
@@ -118,4 +118,16 @@ export function auth(
     | []
 ) {
   return getServerSession(...args, authOptions);
+}
+
+export async function withAuth(roles?: string[]): Promise<Session> {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Not authenticated");
+  }
+
+  if (roles && !session.user.roles.some((role) => roles.includes(role))) {
+    throw new Error("Not authorized");
+  }
+  return session;
 }

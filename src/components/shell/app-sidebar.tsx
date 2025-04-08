@@ -3,6 +3,7 @@
 import {
   IconAdjustmentsAlt,
   IconDashboard,
+  IconDeviceGamepad,
   IconDeviceGamepad2,
   IconMap,
   IconServer,
@@ -61,6 +62,11 @@ const navGroups: NavGroup[] = [
             url: routes.admin.server.settings,
             icon: IconAdjustmentsAlt,
           },
+          {
+            name: "Game",
+            url: routes.admin.server.game,
+            icon: IconDeviceGamepad,
+          }
         ],
       },
     ],

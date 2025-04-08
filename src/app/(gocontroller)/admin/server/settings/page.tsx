@@ -23,9 +23,8 @@ export default function ServerSettingsPage() {
 
   async function onSubmit(values: ServerSettings) {
     try {
-      if (await saveServerSettings(values)) {
-        toast.success("Settings saved successfully");
-      }
+      await saveServerSettings(values)
+      toast.success("Settings saved successfully");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";

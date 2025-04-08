@@ -1,5 +1,5 @@
 "use server";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 import { ObjectId } from "mongodb";
 import { DBPlayer, Player } from "../types/player";
 import { collections, getDatabase } from "./mongodb";
@@ -73,14 +73,7 @@ export async function getPlayerByLogin(login: string): Promise<Player | null> {
 export async function deletePlayerById(
   playerId: ObjectId | string,
 ): Promise<void> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Not authenticated");
-  }
-
-  if (!session.user.roles.includes("admin")) {
-    throw new Error("Not authorized");
-  }
+  const session = await withAuth(["admin"]);
 
   if (playerId === session.user._id) {
     throw new Error("Cannot delete your own account");
