@@ -1,4 +1,4 @@
-import { getPlayerById, getPlayerByLogin } from "@/database/player";
+import { getPlayerById, getPlayerByLogin } from "@/actions/player";
 import { Player } from "@/types/player";
 import {
   GetServerSidePropsContext,
@@ -18,8 +18,8 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
     url: "https://api.trackmania.com/oauth/authorize",
     params: {
       response_type: "code",
-      client_id: config.NADEO_CLIENT_ID,
-      redirect_uri: config.NADEO_REDIRECT_URI,
+      client_id: config.NADEO.CLIENT_ID,
+      redirect_uri: config.NADEO.REDIRECT_URI,
       scope: "",
     },
   },
@@ -51,8 +51,8 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
     },
   },
   userinfo: "https://api.trackmania.com/api/user",
-  clientId: config.NADEO_CLIENT_ID,
-  clientSecret: config.NADEO_CLIENT_SECRET,
+  clientId: config.NADEO.CLIENT_ID,
+  clientSecret: config.NADEO.CLIENT_SECRET,
   async profile(profile) {
     return {
       id: profile.accountId,

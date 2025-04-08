@@ -1,5 +1,5 @@
 "use client";
-import { getMapsPaginated } from "@/database/map";
+import { getMapsPaginated } from "@/actions/map";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { Map } from "@/types/map";

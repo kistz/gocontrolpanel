@@ -1,7 +1,7 @@
 import { Breadcrumb as TBreadcrumb } from "@/providers/breadcrumb-provider";
 import { routes } from "@/routes";
 import Link from "next/link";
-import { useState } from "react";
+import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,8 +17,6 @@ interface BreadcrumbsProps {
 }
 
 export default function Breadcrumbs({ crumbs, className }: BreadcrumbsProps) {
-  const [open, setOpen] = useState(false);
-
   return (
     <Breadcrumb className={className}>
       <BreadcrumbList>
@@ -29,23 +27,25 @@ export default function Breadcrumbs({ crumbs, className }: BreadcrumbsProps) {
           <>
             <BreadcrumbSeparator />
             {crumbs.map((item, index) => (
-              <BreadcrumbItem key={index}>
-                {item.path ? (
-                  <>
-                    <BreadcrumbLink
-                      asChild
-                      className="max-w-20 truncate md:max-w-none"
-                    >
-                      <Link href={item.path}>{item.label}</Link>
-                    </BreadcrumbLink>
-                    {index !== crumbs.length - 1 && <BreadcrumbSeparator />}
-                  </>
-                ) : (
-                  <BreadcrumbPage className="max-w-20 truncate md:max-w-none">
-                    {item.label}
-                  </BreadcrumbPage>
-                )}
-              </BreadcrumbItem>
+              <React.Fragment key={index}>
+                <BreadcrumbItem>
+                  {item.path ? (
+                    <>
+                      <BreadcrumbLink
+                        asChild
+                        className="max-w-20 truncate md:max-w-none"
+                      >
+                        <Link href={item.path}>{item.label}</Link>
+                      </BreadcrumbLink>
+                    </>
+                  ) : (
+                    <BreadcrumbPage className="max-w-20 truncate md:max-w-none">
+                      {item.label}
+                    </BreadcrumbPage>
+                  )}
+                </BreadcrumbItem>
+                {index !== crumbs.length - 1 && <BreadcrumbSeparator />}
+              </React.Fragment>
             ))}
           </>
         )}

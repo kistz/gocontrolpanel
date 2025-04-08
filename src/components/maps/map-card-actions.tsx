@@ -1,5 +1,5 @@
+import { deleteMapById } from "@/actions/map";
 import { Button } from "@/components/ui/button";
-import { deleteMapById } from "@/database/map";
 import { Map } from "@/types/map";
 import { IconDownload, IconHeartbeat } from "@tabler/icons-react";
 import { MoreHorizontal } from "lucide-react";

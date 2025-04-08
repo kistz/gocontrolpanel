@@ -8,7 +8,7 @@ export async function connectToDatabase() {
     return cachedClient;
   }
 
-  const client = new MongoClient(config.MONGODB_URI);
+  const client = new MongoClient(config.MONGODB.URI);
   await client.connect();
 
   cachedClient = client;
@@ -17,7 +17,7 @@ export async function connectToDatabase() {
 
 export async function getDatabase() {
   const client = await connectToDatabase();
-  const db = client.db(config.MONGODB_DB);
+  const db = client.db(config.MONGODB.DB);
   return db;
 }
 

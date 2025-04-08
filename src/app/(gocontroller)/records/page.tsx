@@ -1,6 +1,6 @@
 "use client";
+import { getRecordsPaginated } from "@/actions/record";
 import { PaginationTable } from "@/components/table/pagination-table";
-import { getRecordsPaginated } from "@/database/record";
 import { useBreadcrumbs } from "@/providers/breadcrumb-provider";
 import { useEffect } from "react";
 import { createColumns } from "./columns";

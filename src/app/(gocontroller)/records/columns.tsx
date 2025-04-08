@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteRecordById } from "@/actions/record";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import TimeDisplay from "@/components/time-display";
@@ -11,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteRecordById } from "@/database/record";
 import { Record } from "@/types/record";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";

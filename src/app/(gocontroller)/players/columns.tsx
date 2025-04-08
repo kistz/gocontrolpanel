@@ -1,5 +1,6 @@
 "use client";
 
+import { deletePlayerById } from "@/actions/player";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deletePlayerById } from "@/database/player";
 import { Player } from "@/types/player";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";

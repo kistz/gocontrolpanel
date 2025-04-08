@@ -1,6 +1,6 @@
 "use client";
+import { getPlayersPaginated } from "@/actions/player";
 import { PaginationTable } from "@/components/table/pagination-table";
-import { getPlayersPaginated } from "@/database/player";
 import { useBreadcrumbs } from "@/providers/breadcrumb-provider";
 import { useEffect } from "react";
 import { createColumns } from "./columns";
