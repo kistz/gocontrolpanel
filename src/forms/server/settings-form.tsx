@@ -19,151 +19,151 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
       >
         <FormElement
           control={form.control}
-          name={"defaultOptions.serverName"}
+          name={"defaultOptions.Name"}
           label="Server Name"
           description="The name of the server."
           placeholder="Server name..."
-          error={form.formState.errors.defaultOptions?.serverName}
+          error={form.formState.errors.defaultOptions?.Name}
           className="w-full min-w-64"
           isRequired
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.serverComment"}
+          name={"defaultOptions.Comment"}
           label="Server Comment"
           description="The comment of the server."
           placeholder="Server comment..."
-          error={form.formState.errors.defaultOptions?.serverComment}
+          error={form.formState.errors.defaultOptions?.Comment}
           className="w-full min-w-64"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.serverPassword"}
+          name={"defaultOptions.Password"}
           label="Server Password"
           description="The password of the server for players."
           placeholder="Server password..."
-          error={form.formState.errors.defaultOptions?.serverPassword}
+          error={form.formState.errors.defaultOptions?.Password}
           className="w-2/3 min-w-64"
           type="password"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.serverPasswordSpectator"}
+          name={"defaultOptions.PasswordForSpectator"}
           label="Server Password Spectator"
           description="The password of the server for spectators."
           placeholder="Server password spectator..."
-          error={form.formState.errors.defaultOptions?.serverPasswordSpectator}
+          error={form.formState.errors.defaultOptions?.PasswordForSpectator}
           className="w-2/3 min-w-64"
           type="password"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.callVoteTimeout"}
+          name={"defaultOptions.NextCallVoteTimeOut"}
           label="Call Vote Timeout"
           description="The timeout for call vote in seconds."
           placeholder="Call vote timeout..."
-          error={form.formState.errors.defaultOptions?.callVoteTimeout}
+          error={form.formState.errors.defaultOptions?.NextCallVoteTimeOut}
           className="w-20"
           type="number"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.callVoteRatio"}
+          name={"defaultOptions.CallVoteRatio"}
           label="Call Vote Ratio"
           description="The ratio for call vote."
           placeholder="Call vote ratio..."
-          error={form.formState.errors.defaultOptions?.callVoteRatio}
+          error={form.formState.errors.defaultOptions?.CallVoteRatio}
           className="w-20"
           type="number"
           step="0.05"
         />
         <FormElement
           control={form.control}
-          name={"defaultOptions.serverVisibility"}
+          name={"defaultOptions.HideServer"}
           label="Server Visibility"
           description="The visibility of the server."
           options={[
-            { label: "Visible", value: "visible" },
-            { label: "Hidden", value: "hidden" },
-            { label: "Hidden from nations", value: "hidden from nations" },
+            { label: "Visible", value: "0" },
+            { label: "Hidden", value: "1" },
+            { label: "Hidden from nations", value: "2" },
           ]}
-          error={form.formState.errors.defaultOptions?.serverVisibility}
+          error={form.formState.errors.defaultOptions?.HideServer}
           className="w-3/5 min-w-48"
           type="select"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.maxPlayers"}
+          name={"defaultOptions.NextMaxPlayers"}
           label="Max Players"
           description="The maximum number of players."
           placeholder="Max players..."
-          error={form.formState.errors.defaultOptions?.maxPlayers}
+          error={form.formState.errors.defaultOptions?.NextMaxPlayers}
           className="w-20"
           type="number"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.maxSpectators"}
+          name={"defaultOptions.NextMaxSpectators"}
           label="Max Spectators"
           description="The maximum number of spectators."
           placeholder="Max spectators..."
-          error={form.formState.errors.defaultOptions?.maxSpectators}
+          error={form.formState.errors.defaultOptions?.NextMaxSpectators}
           className="w-20"
           type="number"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.keepPlayerSlots"}
+          name={"defaultOptions.KeepPlayerSlots"}
           label="Keep Player Slots"
           description="Keep player slots for spectators."
-          error={form.formState.errors.defaultOptions?.keepPlayerSlots}
+          error={form.formState.errors.defaultOptions?.KeepPlayerSlots}
           className="w-20"
           type="checkbox"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.allowMapDownload"}
+          name={"defaultOptions.AllowMapDownload"}
           label="Allow Map Download"
           description="Allow map download."
-          error={form.formState.errors.defaultOptions?.allowMapDownload}
+          error={form.formState.errors.defaultOptions?.AllowMapDownload}
           className="w-20"
           type="checkbox"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.autoSaveReplays"}
+          name={"defaultOptions.AutoSaveReplays"}
           label="Auto Save Replays"
           description="Auto save replays."
-          error={form.formState.errors.defaultOptions?.autoSaveReplays}
+          error={form.formState.errors.defaultOptions?.AutoSaveReplays}
           className="w-20"
           type="checkbox"
         />
         <FormElement
           control={form.control}
-          name={"defaultOptions.horns"}
+          name={"defaultOptions.DisableHorns"}
           label="Horns"
           description="Enable horns."
-          error={form.formState.errors.defaultOptions?.horns}
+          error={form.formState.errors.defaultOptions?.DisableHorns}
           className="w-20"
           type="checkbox"
         />
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.serviceAnnouncements"}
+          name={"defaultOptions.DisableServiceAnnounces"}
           label="Service Announcements"
           description="Enable service announcements."
-          error={form.formState.errors.defaultOptions?.serviceAnnouncements}
+          error={form.formState.errors.defaultOptions?.DisableServiceAnnounces}
           className="w-20"
           type="checkbox"
         />
@@ -200,7 +200,11 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           type="checkbox"
         />
 
-        <Button type="submit" className="mt-4 w-1/4 min-w-24" disabled={form.formState.isSubmitting}>
+        <Button
+          type="submit"
+          className="mt-4 w-1/4 min-w-24"
+          disabled={form.formState.isSubmitting}
+        >
           Save
         </Button>
       </form>

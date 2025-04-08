@@ -111,7 +111,7 @@ export default function FormElement<TControl extends FieldValues>({
         return (
           <Select
             onValueChange={field.onChange}
-            {...field}
+            defaultValue={`${field.value}`}
             disabled={isDisabled || isLoading}
           >
             <SelectTrigger className={className}>
