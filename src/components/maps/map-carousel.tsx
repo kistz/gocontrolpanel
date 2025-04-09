@@ -86,7 +86,7 @@ export default function MapCarousel({
           <IconEye
             size={16}
             className={cn(
-              "absolute top-1/4 left-2 transition-all duration-200",
+              "absolute top-1/4 left-3 transition-all duration-200",
               follow
                 ? "opacity-100 group-hover:opacity-0"
                 : "opacity-0 group-hover:opacity-100",
@@ -95,13 +95,13 @@ export default function MapCarousel({
           <IconEyeOff
             size={16}
             className={cn(
-              "absolute top-1/4 left-2 transition-all duration-200",
+              "absolute top-1/4 left-3 transition-all duration-200",
               follow
                 ? "opacity-0 group-hover:opacity-100"
                 : "opacity-100 group-hover:opacity-0",
             )}
           />
-          <span className="pl-5">{follow ? "Unfollow" : "Follow"}</span>
+          <span className="pl-6">{follow ? "Unfollow" : "Follow"}</span>
         </Button>
 
         <Button variant="outline" onClick={() => api?.scrollTo(currentIndex)}>
