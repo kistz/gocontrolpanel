@@ -101,7 +101,7 @@ export default function MapCarousel({
                 : "opacity-100 group-hover:opacity-0",
             )}
           />
-          <span className="pl-4">{follow ? "Unfollow" : "Follow"}</span>
+          <span className="pl-5">{follow ? "Unfollow" : "Follow"}</span>
         </Button>
 
         <Button variant="outline" onClick={() => api?.scrollTo(currentIndex)}>
