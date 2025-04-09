@@ -20,6 +20,10 @@ export async function connectToGbxClient() {
     throw new Error("Failed to authenticate with GBX client");
   }
 
+  await client.call("SetApiVersion", "2023-04-24");
+  await client.call("EnableCallbacks", true);
+  await client.callScript("XmlRpc.EnableCallbacks", "true");
+
   cachedClient = client;
   return client;
 }
