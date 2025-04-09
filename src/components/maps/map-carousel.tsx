@@ -1,7 +1,12 @@
+"use client";
+import { getCurrentMapIndex } from "@/actions/gbx/map";
 import { cn } from "@/lib/utils";
 import { Map } from "@/types/map";
+import { useEffect, useState } from "react";
+import { Badge } from "../ui/badge";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -22,8 +27,28 @@ export default function MapCarousel({
   startIndex = 0,
   className,
 }: MapCarouselProps) {
+  const [api, setApi] = useState<CarouselApi>();
+  const [currentIndex, setCurrentIndex] = useState<number>(startIndex);
+
+  useEffect(() => {
+    const intervalIndex = setInterval(async () => {
+      const index = await getCurrentMapIndex();
+
+      if (index === currentIndex) return;
+
+      if (api && currentIndex === api.selectedScrollSnap()) {
+        api.scrollTo(index);
+      }
+
+      setCurrentIndex(index);
+    }, 10000);
+
+    return () => clearInterval(intervalIndex);
+  }, [api, currentIndex]);
+
   return (
     <Carousel
+      setApi={setApi}
       opts={{
         loop: loop,
         startIndex: startIndex,
@@ -32,8 +57,20 @@ export default function MapCarousel({
     >
       <CarouselContent>
         {maps.map((map, index) => (
-          <CarouselItem key={index} className="lg:basis-1/2 xl:basis-1/3">
+          <CarouselItem
+            key={index}
+            className="lg:basis-1/2 xl:basis-1/3 relative"
+          >
             <CarouselMapCard map={map} />
+            {index === currentIndex && (
+              <Badge
+                variant={"outline"}
+                className="absolute top-2 left-6 z-10 bg-black flex gap-2"
+              >
+                <span className="bg-green-500 w-2 h-2 rounded-full"></span>
+                Current Map
+              </Badge>
+            )}
           </CarouselItem>
         ))}
       </CarouselContent>
