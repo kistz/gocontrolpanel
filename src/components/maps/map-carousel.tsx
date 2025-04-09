@@ -2,11 +2,7 @@
 import { getCurrentMapIndex } from "@/actions/gbx/map";
 import { cn } from "@/lib/utils";
 import { Map } from "@/types/map";
-import {
-  IconArrowForwardUp,
-  IconLock,
-  IconLockOpen,
-} from "@tabler/icons-react";
+import { IconArrowForwardUp, IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -87,7 +83,7 @@ export default function MapCarousel({
           className="group relative"
           onClick={() => setFollow(!follow)}
         >
-          <IconLock
+          <IconEye
             size={16}
             className={cn(
               "absolute top-1/4 left-2 transition-all duration-200",
@@ -96,7 +92,7 @@ export default function MapCarousel({
                 : "opacity-0 group-hover:opacity-100",
             )}
           />{" "}
-          <IconLockOpen
+          <IconEyeOff
             size={16}
             className={cn(
               "absolute top-1/4 left-2 transition-all duration-200",
