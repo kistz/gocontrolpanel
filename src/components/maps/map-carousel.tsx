@@ -2,7 +2,11 @@
 import { getCurrentMapIndex } from "@/actions/gbx/map";
 import { cn } from "@/lib/utils";
 import { Map } from "@/types/map";
-import { IconArrowForwardUp, IconEye, IconEyeOff } from "@tabler/icons-react";
+import {
+  IconArrowForwardUp,
+  IconLock,
+  IconLockOpen,
+} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -83,25 +87,8 @@ export default function MapCarousel({
           className="group relative"
           onClick={() => setFollow(!follow)}
         >
-          <IconEye
-            size={16}
-            className={cn(
-              "absolute top-1/4 left-3 transition-all duration-200",
-              follow
-                ? "opacity-100 group-hover:opacity-0"
-                : "opacity-0 group-hover:opacity-100",
-            )}
-          />{" "}
-          <IconEyeOff
-            size={16}
-            className={cn(
-              "absolute top-1/4 left-3 transition-all duration-200",
-              follow
-                ? "opacity-0 group-hover:opacity-100"
-                : "opacity-100 group-hover:opacity-0",
-            )}
-          />
-          <span className="pl-6">{follow ? "Unfollow" : "Follow"}</span>
+          {follow ? <IconLock size={16} /> : <IconLockOpen size={16} />}
+          <span>{follow ? "Following" : "Not Following"}</span>
         </Button>
 
         <Button variant="outline" onClick={() => api?.scrollTo(currentIndex)}>
