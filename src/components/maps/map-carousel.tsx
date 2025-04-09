@@ -59,18 +59,9 @@ export default function MapCarousel({
         {maps.map((map, index) => (
           <CarouselItem
             key={index}
-            className="lg:basis-1/2 xl:basis-1/3 relative"
+            className="min-[1060px]:basis-1/2 min-[1380px]:basis-1/3"
           >
-            <CarouselMapCard map={map} />
-            {index === currentIndex && (
-              <Badge
-                variant={"outline"}
-                className="absolute top-2 left-6 z-10 bg-black flex gap-2"
-              >
-                <span className="bg-green-500 w-2 h-2 rounded-full"></span>
-                Current Map
-              </Badge>
-            )}
+            <CarouselMapCard map={map} index={index} isCurrent={index === currentIndex} total={maps.length} />
           </CarouselItem>
         ))}
       </CarouselContent>

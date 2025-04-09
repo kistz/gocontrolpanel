@@ -4,20 +4,6 @@ import { withAuth } from "@/lib/auth";
 import { MapInfo } from "@/types/map";
 import { ModeScriptInfo } from "@/types/server";
 
-let previousMap: MapInfo | null = null;
-
-export async function getPreviousMap(): Promise<MapInfo | null> {
-  return previousMap;
-}
-
-export async function setupCallbacks(): Promise<void> {
-  const client = await getGbxClient();
-
-  client.on("ManiaPlanet.BeginMap", (mapInfos: MapInfo[]) => {
-    if (mapInfos.length > 0) previousMap = mapInfos[0];
-  });
-}
-
 export async function restartMap(): Promise<void> {
   await withAuth(["admin"]);
 

@@ -29,3 +29,10 @@ export async function getCurrentMapIndex(): Promise<number> {
 
   return mapIndex;
 }
+
+export async function jumpToMap(index: number): Promise<void> {
+  await withAuth(["admin"]);
+
+  const client = await getGbxClient();
+  await client.call("JumpToMapIndex", index);
+}
