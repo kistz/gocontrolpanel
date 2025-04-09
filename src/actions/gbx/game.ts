@@ -18,19 +18,6 @@ export async function setupCallbacks(): Promise<void> {
   });
 }
 
-export async function getCurrentMapInfo(): Promise<MapInfo> {
-  await withAuth(["admin"]);
-
-  const client = await getGbxClient();
-  const mapInfo = await client.call("GetCurrentMapInfo");
-
-  if (!mapInfo) {
-    throw new Error("Failed to get current map info");
-  }
-
-  return mapInfo;
-}
-
 export async function restartMap(): Promise<void> {
   await withAuth(["admin"]);
 

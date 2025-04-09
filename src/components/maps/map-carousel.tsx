@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { Map } from "@/types/map";
-import { Card, CardContent } from "../ui/card";
 import {
   Carousel,
   CarouselContent,
