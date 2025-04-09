@@ -1,5 +1,5 @@
 "use client";
-import { getServerSettings, saveServerSettings } from "@/actions/server";
+import { getServerSettings, saveServerSettings } from "@/actions/gbx/server";
 import { Card } from "@/components/ui/card";
 import SettingsForm from "@/forms/server/settings-form";
 import { ServerSettingsSchema } from "@/forms/server/settings-schema";

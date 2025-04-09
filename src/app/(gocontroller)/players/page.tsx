@@ -1,4 +1,4 @@
-import { getPlayersPaginated } from "@/actions/player";
+import { getPlayersPaginated } from "@/actions/database/player";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { createColumns } from "./columns";
 

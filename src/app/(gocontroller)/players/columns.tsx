@@ -1,6 +1,6 @@
 "use client";
 
-import { deletePlayerById } from "@/actions/player";
+import { deletePlayerById } from "@/actions/database/player";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";

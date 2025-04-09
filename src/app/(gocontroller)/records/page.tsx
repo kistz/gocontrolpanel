@@ -1,4 +1,4 @@
-import { getRecordsPaginated } from "@/actions/record";
+import { getRecordsPaginated } from "@/actions/database/record";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { createColumns } from "./columns";
 

@@ -1,5 +1,5 @@
 "use client";
-import { getMapsPaginated } from "@/actions/map";
+import { getMapsPaginated } from "@/actions/database/map";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { Map } from "@/types/map";
@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import GridPagination from "../grid/grid-pagination";
 import MapCard from "./map-card";
 
-interface MapsCardsProps {
+interface MapCardsProps {
   fetchData?: (
     pagination: {
       skip: number;
@@ -20,9 +20,9 @@ interface MapsCardsProps {
   ) => Promise<{ data: Map[]; totalCount: number }>;
 }
 
-export default function MapsCards({
+export default function MapCards({
   fetchData = getMapsPaginated,
-}: MapsCardsProps) {
+}: MapCardsProps) {
   const [cols, setCols] = useState(3);
   const [rows, setRows] = useState(2);
   const { pagination, setPagination, skip, limit } = usePagination(cols * rows);

@@ -1,4 +1,4 @@
-import { deleteMapById } from "@/actions/map";
+import { deleteMapById } from "@/actions/database/map";
 import { Button } from "@/components/ui/button";
 import { Map } from "@/types/map";
 import { IconDownload, IconHeartbeat } from "@tabler/icons-react";

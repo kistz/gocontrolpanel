@@ -1,4 +1,4 @@
-import { getPlayerById, getPlayerByLogin } from "@/actions/player";
+import { getPlayerById, getPlayerByLogin } from "@/actions/database/player";
 import { Player } from "@/types/player";
 import {
   GetServerSidePropsContext,

@@ -1,4 +1,5 @@
 "use server";
+import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
 import { DBMap, Map } from "@/types/map";
 import { ObjectId } from "mongodb";
@@ -64,4 +65,40 @@ function mapDBMapToMap(dbMap: DBMap): Map {
     ...dbMap,
     _id: dbMap._id.toString(),
   };
+}
+
+export async function getMapList(
+  count: number = 100,
+  start: number = 0,
+): Promise<Map[]> {
+  await withAuth(["admin"]);
+
+  const client = await getGbxClient();
+  const mapList = await client.call("GetMapList", count, start);
+  if (!mapList) {
+    throw new Error("Failed to get map list");
+  }
+
+  let uids: string[] = [];
+  mapList.forEach((map: any) => {
+    if (map.UId) {
+      uids.push(map.UId);
+    }
+  });
+
+  const db = await getDatabase();
+  const collection = db.collection<DBMap>(collections.MAPS);
+  const maps = await collection.find({ uid: { $in: uids } }).toArray();
+
+  const orderedMaps = mapList
+    .map((map: any) => {
+      const foundMap = maps.find((m) => m.uid === map.UId);
+      if (foundMap) {
+        return mapDBMapToMap(foundMap);
+      }
+      return null;
+    })
+    .filter((map: Map) => map !== null);
+
+  return orderedMaps as Map[];
 }

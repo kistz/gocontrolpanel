@@ -2,6 +2,7 @@
 
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
+import { getRecordCountPerDay } from "@/actions/database/record";
 import {
   Card,
   CardAction,
@@ -26,7 +27,6 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
-import { getRecordCountPerDay } from "@/actions/record";
 
 const chartConfig = {
   records: {
@@ -38,10 +38,12 @@ const chartConfig = {
 export default function DashboardChart() {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = useState("90d");
-  const [chartData, setChartData] = useState<{
-    date: Date;
-    records: number;
-  }[]>([]);
+  const [chartData, setChartData] = useState<
+    {
+      date: Date;
+      records: number;
+    }[]
+  >([]);
 
   useEffect(() => {
     async function fetchData() {

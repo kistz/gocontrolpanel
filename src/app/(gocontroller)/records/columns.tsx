@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteRecordById } from "@/actions/record";
+import { deleteRecordById } from "@/actions/database/record";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import TimeDisplay from "@/components/time-display";

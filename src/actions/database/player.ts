@@ -1,7 +1,7 @@
 "use server";
 import { withAuth } from "@/lib/auth";
 import { ObjectId } from "mongodb";
-import { DBPlayer, Player } from "../types/player";
+import { DBPlayer, Player } from "../../types/player";
 import { collections, getDatabase } from "./mongodb";
 
 export async function getAllPlayers(): Promise<Player[]> {
