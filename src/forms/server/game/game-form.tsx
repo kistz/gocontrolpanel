@@ -20,15 +20,19 @@ export default function GameForm({
   modeScriptSettings,
 }: GameFormProps) {
   return (
-    <div className="flex flex-col gap-6 xl:flex-row">
-      <div className="flex flex-col gap-4 flex-1">
-        <ShowOpponentsForm showOpponents={showOpponents} />
-        <ScriptNameForm scriptName={scriptName} />
-        <MatchSettingsForm />
-        <PlaylistForm />
+    <div className="flex flex-col gap-6">
+      <div className="flex gap-6 flex-col min-[960px]:flex-row">
+        <div className="flex flex-col gap-4 flex-1">
+          <ShowOpponentsForm showOpponents={showOpponents} />
+          <ScriptNameForm scriptName={scriptName} />
+        </div>
+        <div className="flex flex-col gap-4 flex-1">
+          <MatchSettingsForm />
+          <PlaylistForm />
+        </div>
       </div>
 
-      <div className="flex flex-col gap-4 flex-1">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <div className="flex flex-col">
             <h2 className="text-lg font-bold">Mode Script Settings </h2>
@@ -44,7 +48,10 @@ export default function GameForm({
           />
         </div>
 
-        <ModeScriptSettingsForm modeScriptSettings={modeScriptSettings} modeScriptInfo={modeScriptInfo} />
+        <ModeScriptSettingsForm
+          modeScriptSettings={modeScriptSettings}
+          modeScriptInfo={modeScriptInfo}
+        />
       </div>
     </div>
   );

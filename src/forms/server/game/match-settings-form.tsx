@@ -58,7 +58,7 @@ export default function MatchSettingsForm() {
           className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
           isRequired
         >
-          <div className="gap-2 hidden min-[500px]:flex">
+          <div className="gap-2 hidden max-[500px]:hidden max-[960px]:flex min-[1080px]:flex">
             <Button
               className="w-20"
               type="button"
@@ -76,7 +76,7 @@ export default function MatchSettingsForm() {
           </div>
         </FormElement>
 
-        <div className="flex gap-2 min-[500px]:hidden">
+        <div className="flex gap-2 max-[500px]:flex max-[960px]:hidden min-[1080px]:hidden">
           <Button className="w-20" type="button" onClick={onLoadMatchSettings}>
             Load
           </Button>

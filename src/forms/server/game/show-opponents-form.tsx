@@ -69,7 +69,7 @@ export default function ShowOpponentsForm({
               Show All
             </Button>
             <Button
-              className="w-20 hidden sm:block"
+              className="w-20 hidden max-[500px]:hidden max-[960px]:block min-[1140px]:block"
               type="submit"
               disabled={showOpponentsForm.formState.isSubmitting}
             >
@@ -77,7 +77,7 @@ export default function ShowOpponentsForm({
             </Button>
           </div>
         </FormElement>
-        <div className="flex flex-col gap-1 sm:hidden">
+        <div className="flex flex-col gap-1 max-[500px]:flex max-[960px]:hidden min-[1140px]:hidden">
           <Button
             className="w-20"
             type="submit"
