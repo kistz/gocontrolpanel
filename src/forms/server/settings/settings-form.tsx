@@ -22,7 +22,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           name={"defaultOptions.Name"}
           label="Server Name"
           description="The name of the server."
-          placeholder="Server name..."
+          placeholder="My server"
           error={form.formState.errors.defaultOptions?.Name}
           className="w-full min-w-64"
           isRequired
@@ -33,7 +33,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           name={"defaultOptions.Comment"}
           label="Server Comment"
           description="The comment of the server."
-          placeholder="Server comment..."
+          placeholder="This is my server"
           error={form.formState.errors.defaultOptions?.Comment}
           className="w-full min-w-64"
         />
@@ -43,7 +43,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           name={"defaultOptions.Password"}
           label="Server Password"
           description="The password of the server for players."
-          placeholder="Server password..."
+          placeholder="playerpass"
           error={form.formState.errors.defaultOptions?.Password}
           className="w-2/3 min-w-64"
           type="password"
@@ -54,7 +54,7 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           name={"defaultOptions.PasswordForSpectator"}
           label="Server Password Spectator"
           description="The password of the server for spectators."
-          placeholder="Server password spectator..."
+          placeholder="spectatorpass"
           error={form.formState.errors.defaultOptions?.PasswordForSpectator}
           className="w-2/3 min-w-64"
           type="password"
