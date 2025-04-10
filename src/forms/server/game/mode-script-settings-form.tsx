@@ -58,19 +58,21 @@ export default function ModeScriptSettingsForm({
   ): {
     label: string;
     description: string;
+    placeholder: string;
     type: string;
     className: string;
   } {
     switch (typeof value) {
       case "boolean":
         return {
-          label: key
+          label: key,
+          description: getDescription(key),
+          placeholder: key
             .slice(2)
             .split(/(?=[A-Z])/)
             .join(" ")
             .replace(/^\w/, (c) => c.toUpperCase())
             .replace(/_/g, ""),
-          description: getDescription(key),
           type: "checkbox",
           className: "",
         };
@@ -78,6 +80,7 @@ export default function ModeScriptSettingsForm({
         return {
           label: key,
           description: getDescription(key),
+          placeholder: "Enter value",
           type: "number",
           className: "w-26",
         };
@@ -86,6 +89,7 @@ export default function ModeScriptSettingsForm({
         return {
           label: key,
           description: getDescription(key),
+          placeholder: "Enter value",
           type: "text",
           className: "sm:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48",
         };
@@ -106,7 +110,7 @@ export default function ModeScriptSettingsForm({
           onSubmitModeScriptSettings,
         )}
       >
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-3 flex-1">
           {leftElements.map(([key, value]) => {
             const element = getElement(key, value);
 
@@ -117,7 +121,7 @@ export default function ModeScriptSettingsForm({
                 name={key}
                 label={element.label}
                 description={element.description}
-                placeholder="Enter value"
+                placeholder={element.placeholder}
                 error={modeScriptSettingsForm.formState.errors[key] as any}
                 className={element.className}
                 type={element.type}
@@ -133,7 +137,7 @@ export default function ModeScriptSettingsForm({
           </Button>
         </div>
 
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-3 flex-1">
           {rightElements.map(([key, value]) => {
             const element = getElement(key, value);
 
@@ -144,7 +148,7 @@ export default function ModeScriptSettingsForm({
                 name={key}
                 label={element.label}
                 description={element.description}
-                placeholder="Enter value"
+                placeholder={element.placeholder}
                 error={modeScriptSettingsForm.formState.errors[key] as any}
                 className={element.className}
                 type={element.type}

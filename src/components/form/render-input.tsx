@@ -108,7 +108,7 @@ export default function RenderInput<TControl extends FieldValues>({
               onCheckedChange={field.onChange}
             />
             <label htmlFor={name} className="text-sm">
-              {label}
+              {placeholder || label}
             </label>
           </div>
         );
