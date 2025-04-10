@@ -2,10 +2,12 @@ import { ModeScriptInfo } from "@/types/server";
 import ScriptNameForm from "./script-name-form";
 import ShowOpponentsForm from "./show-opponents-form";
 import MatchSettingsForm from "./mode-settings-form";
+import PlaylistForm from "./playlist-form";
 
 interface GameFormProps {
   showOpponents: number;
   scriptName: string;
+  modeScriptInfo: ModeScriptInfo;
   modeScriptSettings: Record<string, unknown>;
 }
 
@@ -20,6 +22,7 @@ export default function GameForm({
         <ShowOpponentsForm showOpponents={showOpponents} />
         <ScriptNameForm scriptName={scriptName} />
         <MatchSettingsForm />
+        <PlaylistForm />
       </div>
 
       <div className="flex flex-col gap-1 flex-1">

@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ShowOpponentsSchema } from "./game-schema";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function ShowOpponentsForm({
   showOpponents,
@@ -27,10 +28,8 @@ export default function ShowOpponentsForm({
       await setShowOpponents(values.showOpponents);
       toast.success("Show Opponents updated successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to update Show Opponents", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   }

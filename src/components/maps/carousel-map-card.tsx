@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { Map } from "@/types/map";
 import { IconBounceRight, IconPhoto, IconPlayerTrackNext, IconPlayerTrackPrev, IconRotateClockwise, IconUser } from "@tabler/icons-react";
 import { parseTmTags, stripTmTags } from "tmtags";
@@ -32,10 +32,8 @@ export default function CarouselMapCard({
         description: `Gone back to ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to jump to previous map", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   };
@@ -47,10 +45,8 @@ export default function CarouselMapCard({
         description: `Restarted ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to restart map", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   };
@@ -62,10 +58,8 @@ export default function CarouselMapCard({
         description: `Skipped to ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to skip to next map", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   };
@@ -77,10 +71,8 @@ export default function CarouselMapCard({
         description: `Jumped to ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to jump to map", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   };

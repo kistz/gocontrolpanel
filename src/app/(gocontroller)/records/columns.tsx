@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getErrorMessage } from "@/lib/utils";
 import { Record } from "@/types/record";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -72,10 +73,8 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
             refetch();
             toast.success("Record deleted successfully");
           } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : "Unknown error";
             toast.error("Error deleting record", {
-              description: errorMessage,
+              description: getErrorMessage(error),
             });
           }
         });

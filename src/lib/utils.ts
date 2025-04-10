@@ -14,3 +14,10 @@ export function formatTime(time: number): string {
   const seconds = (time % 60000) / 1000;
   return `${minutes}:${seconds.toFixed(3).padStart(6, "0")}`;
 }
+
+export function getErrorMessage(error: unknown): string {
+  let errorMessage = error instanceof Error ? error.message : "Unknown error";
+
+  const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
+  return match ? match[1] : errorMessage;
+}

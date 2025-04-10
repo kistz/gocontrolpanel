@@ -24,7 +24,7 @@ export default async function ServerGamePage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Manage Game</h1>
         <h4 className="text-muted-foreground">
-          Manage general game settings, including map rotation and game mode.
+          Manage general game settings, including map rotation, script settings and gamemodes.
         </h4>
       </div>
 

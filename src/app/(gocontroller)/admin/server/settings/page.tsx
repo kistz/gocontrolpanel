@@ -3,6 +3,7 @@ import { getServerSettings, saveServerSettings } from "@/actions/gbx/server";
 import { Card } from "@/components/ui/card";
 import SettingsForm from "@/forms/server/settings/settings-form";
 import { ServerSettingsSchema } from "@/forms/server/settings/settings-schema";
+import { getErrorMessage } from "@/lib/utils";
 import { ServerSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -26,10 +27,8 @@ export default function ServerSettingsPage() {
       await saveServerSettings(values);
       toast.success("Settings saved successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to save settings", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   }

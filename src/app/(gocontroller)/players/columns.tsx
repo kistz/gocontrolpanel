@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getErrorMessage } from "@/lib/utils";
 import { Player } from "@/types/player";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -64,10 +65,8 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             refetch();
             toast.success("Player deleted successfully");
           } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : "Unknown error";
             toast.error("Error deleting player", {
-              description: errorMessage,
+              description: getErrorMessage(error),
             });
           }
         });

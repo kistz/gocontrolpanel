@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ScriptNameSchema } from "./game-schema";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
   const scriptNameForm = useForm<ScriptName>({
@@ -23,10 +24,8 @@ export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
       await setScriptName(values.scriptName);
       toast.success("Script Name updated successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to update Script Name", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   }

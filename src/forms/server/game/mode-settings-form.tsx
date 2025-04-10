@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MatchSettingsSchema } from "./game-schema";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function MatchSettingsForm() {
   const matchSettingsForm = useForm<MatchSettings>({
@@ -20,28 +21,26 @@ export default function MatchSettingsForm() {
 
   async function onLoadMatchSettings() {
     try {
+      matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
       await loadMatchSettings(filename);
       toast.success("Match settings loaded successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to load match settings", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   }
 
   async function onSaveMatchSettings() {
     try {
+      matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
       await saveMatchSettings("MatchSettings/" + filename);
       toast.success("Match settings saved successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
       toast.error("Failed to save match settings", {
-        description: errorMessage,
+        description: getErrorMessage(error),
       });
     }
   }
