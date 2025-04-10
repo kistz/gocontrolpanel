@@ -100,7 +100,7 @@ export default function RenderInput<TControl extends FieldValues>({
         );
       case "checkbox":
         return (
-          <div className="flex items-center space-x-2">
+          <div className={cn("flex items-center space-x-2", className)}>
             <Checkbox
               id={name}
               disabled={isDisabled || isLoading}
@@ -114,7 +114,7 @@ export default function RenderInput<TControl extends FieldValues>({
         );
       case "pair-list":
         return (
-          <div className="flex flex-col gap-2">
+          <div className={cn("flex flex-col gap-2")}>
             {options?.map((option) => (
               <div key={option.value} className="flex items-center space-x-2">
                 <Checkbox

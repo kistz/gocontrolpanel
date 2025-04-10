@@ -70,7 +70,7 @@ export default function ShowOpponentsForm({
               Show All
             </Button>
             <Button
-              className="w-20"
+              className="w-20 hidden sm:block"
               type="submit"
               disabled={showOpponentsForm.formState.isSubmitting}
             >
@@ -78,6 +78,15 @@ export default function ShowOpponentsForm({
             </Button>
           </div>
         </FormElement>
+        <div className="flex flex-col gap-1 sm:hidden">
+          <Button
+            className="w-20"
+            type="submit"
+            disabled={showOpponentsForm.formState.isSubmitting}
+          >
+            Save
+          </Button>
+        </div>
       </form>
     </Form>
   );

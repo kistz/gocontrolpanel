@@ -44,7 +44,7 @@ export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
           description="The name of the script to run."
           placeholder="Trackmania/TM_TimeAttack_Online.Script.txt"
           error={scriptNameForm.formState.errors.scriptName}
-          className="w-2/3"
+          className="w-1/2 xl:w-2/3 min-w-48"
           isRequired
         >
           <Button
