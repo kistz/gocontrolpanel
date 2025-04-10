@@ -103,7 +103,7 @@ export async function getModeScriptSettings(): Promise<{
 }
 
 export async function setModeScriptSettings(settings: {
-  [key: string]: any;
+  [key: string]: string | number | boolean;
 }): Promise<void> {
   await withAuth(["admin"]);
 

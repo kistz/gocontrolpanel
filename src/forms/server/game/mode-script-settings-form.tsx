@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ModeScriptSettingsSchema } from "./game-schema";
+import { Button } from "@/components/ui/button";
 
 export default function ModeScriptSettingsForm({
   modeScriptSettings,
@@ -24,7 +25,16 @@ export default function ModeScriptSettingsForm({
 
   async function onSubmitModeScriptSettings(values: ModeScriptSettings) {
     try {
-      await setModeScriptSettings(values);
+      const parsedValues = Object.fromEntries(
+        Object.entries(values).map(([key, value]) => {
+          if (value === true) return [key, true];
+          if (value === false) return [key, false];
+          if (!isNaN(Number(value)) && value !== "") return [key, Number(value)];
+          return [key, value];
+        })
+      );
+
+      await setModeScriptSettings(parsedValues);
       toast.success("Mode Script Settings updated successfully");
     } catch (error) {
       toast.error("Failed to update Mode Script Settings", {
@@ -33,14 +43,12 @@ export default function ModeScriptSettingsForm({
     }
   }
 
-  console.log(modeScriptInfo);
-
   function getDescription(key: string): string {
     const description = modeScriptInfo.ParamDescs.find(
       (desc) => desc.Name === key && desc.Desc != "<hidden>",
     )?.Desc;
 
-    return description ? description : "No description available";
+    return description ? description : "";
   }
 
   function getElement(
@@ -50,31 +58,35 @@ export default function ModeScriptSettingsForm({
     label: string;
     description: string;
     type: string;
+    className: string;
   } {
     switch (typeof value) {
       case "boolean":
         return {
-          label: key.slice(2).split(/(?=[A-Z])/).join(" "),
+          label: key
+            .slice(2)
+            .split(/(?=[A-Z])/)
+            .join(" ")
+            .replace(/^\w/, (c) => c.toUpperCase())
+            .replace(/_/g, ""),
           description: getDescription(key),
           type: "checkbox",
+          className: "",
         };
       case "number":
         return {
           label: key,
           description: getDescription(key),
           type: "number",
+          className: "w-20",
         };
       case "string":
-        return {
-          label: key,
-          description: getDescription(key),
-          type: "text",
-        };
       default:
         return {
           label: key,
           description: getDescription(key),
           type: "text",
+          className: "w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48",
         };
     }
   }
@@ -107,6 +119,14 @@ export default function ModeScriptSettingsForm({
               );
             },
           )}
+
+          <Button
+            className="w-20"
+            type="submit"
+            disabled={modeScriptSettingsForm.formState.isSubmitting}
+          >
+            Save
+          </Button>
       </form>
     </Form>
   );
