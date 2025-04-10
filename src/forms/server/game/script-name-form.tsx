@@ -42,20 +42,18 @@ export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
           name={"scriptName"}
           label="Script Name"
           description="The name of the script to run."
-          placeholder="Script Name..."
+          placeholder="Trackmania/TM_TimeAttack_Online.Script.txt"
           error={scriptNameForm.formState.errors.scriptName}
           className="w-2/3"
           isRequired
         >
-          <div className="flex gap-2">
-            <Button
-              className="w-20"
-              type="submit"
-              disabled={scriptNameForm.formState.isSubmitting}
-            >
-              Save
-            </Button>
-          </div>
+          <Button
+            className="w-20"
+            type="submit"
+            disabled={scriptNameForm.formState.isSubmitting}
+          >
+            Save
+          </Button>
         </FormElement>
       </form>
     </Form>
