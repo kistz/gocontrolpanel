@@ -1,6 +1,7 @@
 import { ModeScriptInfo } from "@/types/server";
 import { parseTmTags } from "tmtags";
 import MatchSettingsForm from "./match-settings-form";
+import ModeScriptSettingsForm from "./mode-script-settings-form";
 import PlaylistForm from "./playlist-form";
 import ScriptNameForm from "./script-name-form";
 import ShowOpponentsForm from "./show-opponents-form";
@@ -27,14 +28,14 @@ export default function GameForm({
         <PlaylistForm />
       </div>
 
-      <div className="flex flex-col gap-1 flex-1">
+      <div className="flex flex-col gap-4 flex-1">
         <div className="flex flex-col gap-2">
-          <h2 className="text-lg font-bold">
-            Mode Script Settings{" "}
+          <div className="flex flex-col">
+            <h2 className="text-lg font-bold">Mode Script Settings </h2>
             <p className="text-base text-muted-foreground font-medium overflow-hidden overflow-ellipsis text-nowrap">
               ({modeScriptInfo.Name})
             </p>
-          </h2>
+          </div>
           <p
             className="text-base"
             dangerouslySetInnerHTML={{
@@ -42,6 +43,8 @@ export default function GameForm({
             }}
           />
         </div>
+
+        <ModeScriptSettingsForm modeScriptSettings={modeScriptSettings} modeScriptInfo={modeScriptInfo} />
       </div>
     </div>
   );

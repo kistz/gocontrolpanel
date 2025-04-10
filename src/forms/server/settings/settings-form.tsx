@@ -127,7 +127,6 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           label="Keep Player Slots"
           description="Keep player slots for spectators."
           error={form.formState.errors.defaultOptions?.KeepPlayerSlots}
-          className="w-20"
           type="checkbox"
           isRequired
         />
@@ -138,7 +137,6 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           label="Allow Map Download"
           description="Allow map download."
           error={form.formState.errors.allowMapDownload}
-          className="w-20"
           type="checkbox"
           isRequired
         />
@@ -149,7 +147,6 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           label="Auto Save Replays"
           description="Auto save replays."
           error={form.formState.errors.defaultOptions?.AutoSaveReplays}
-          className="w-20"
           type="checkbox"
           isRequired
         />
@@ -159,7 +156,6 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           label="Horns"
           description="Enable horns."
           error={form.formState.errors.defaultOptions?.DisableHorns}
-          className="w-20"
           type="checkbox"
           isRequired
         />
@@ -170,7 +166,6 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           label="Service Announcements"
           description="Enable service announcements."
           error={form.formState.errors.defaultOptions?.DisableServiceAnnounces}
-          className="w-20"
           type="checkbox"
           isRequired
         />
@@ -205,7 +200,6 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
           label="Profile Skins"
           description="Enable profile skins."
           error={form.formState.errors.profileSkins}
-          className="w-20"
           type="checkbox"
           isRequired
         />

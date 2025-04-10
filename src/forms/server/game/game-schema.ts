@@ -16,4 +16,6 @@ export const PlaylistSchema = z.object({
   filename: z.string().min(1, "Filename is required"),
 });
 
-export const ModeScriptSettingsSchema = z.record(z.unknown());
+export const ModeScriptSettingsSchema = z.record(
+  z.union([z.string(), z.number(), z.boolean()]),
+);
