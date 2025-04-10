@@ -40,7 +40,7 @@ export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
           control={scriptNameForm.control}
           name={"scriptName"}
           label="Script Name"
-          description="The name of the script to run."
+          description="The name of the script to load."
           placeholder="Trackmania/TM_TimeAttack_Online.Script.txt"
           error={scriptNameForm.formState.errors.scriptName}
           className="w-1/2 xl:w-2/3 min-w-48"
