@@ -33,12 +33,12 @@ export const ServerSettingsSchema = z.object({
       .max(255, "Max Spectators must be less than or equal to 255")
       .optional(),
     KeepPlayerSlots: z.boolean(),
-    AllowMapDownload: z.boolean(),
     AutoSaveReplays: z.boolean(),
     DisableHorns: z.boolean(),
     DisableServiceAnnounces: z.boolean(),
   }),
-
+  
+  allowMapDownload: z.boolean(),
   downloadRate: z.coerce.number().int().min(1, "Download Rate is required"),
   uploadRate: z.coerce.number().int().min(1, "Upload Rate is required"),
   profileSkins: z.boolean(),

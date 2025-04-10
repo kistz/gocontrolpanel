@@ -16,6 +16,7 @@ export async function getServerSettings(): Promise<ServerSettings> {
     ["AreServiceAnnouncesDisabled"],
     ["GetSystemInfo"],
     ["AreProfileSkinsDisabled"],
+    ["IsMapDownloadAllowed"],
   ]);
 
   if (!settings) {
@@ -30,6 +31,7 @@ export async function getServerSettings(): Promise<ServerSettings> {
     const serviceAnnouncesDisabled = settings[4];
     const systemInfo = settings[5];
     const profileSkinsDisabled = settings[6];
+    const mapDownloadAllowed = settings[7];
 
     const serverSettings: ServerSettings = {
       defaultOptions: {
@@ -43,11 +45,11 @@ export async function getServerSettings(): Promise<ServerSettings> {
         NextMaxPlayers: serverOptions.NextMaxPlayers,
         NextMaxSpectators: serverOptions.NextMaxSpectators,
         KeepPlayerSlots: keepPlayerSlots,
-        AllowMapDownload: serverOptions.AllowChallengeDownload,
         AutoSaveReplays: serverOptions.AutoSaveReplays,
         DisableHorns: !hornsDisabled,
         DisableServiceAnnounces: !serviceAnnouncesDisabled,
       },
+      allowMapDownload: mapDownloadAllowed,
       downloadRate: systemInfo.ConnectionDownloadRate,
       uploadRate: systemInfo.ConnectionUploadRate,
       profileSkins: !profileSkinsDisabled,
@@ -83,6 +85,7 @@ export async function saveServerSettings(
         serverSettings.uploadRate,
       ],
       ["DisableProfileSkins", !serverSettings.profileSkins],
+      ["AllowMapDownload", serverSettings.allowMapDownload],
     ])
     .catch((error) => {
       console.error("Error saving server settings:", error);
@@ -99,5 +102,7 @@ export async function saveServerSettings(
     throw new Error("Failed to save connection rates");
   } else if (!res[2]) {
     throw new Error("Failed to save profile skins");
+  } else if (!res[3]) {
+    throw new Error("Failed to save map download settings");
   }
 }

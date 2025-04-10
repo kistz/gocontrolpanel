@@ -1,8 +1,8 @@
 "use client";
 import { getServerSettings, saveServerSettings } from "@/actions/gbx/server";
 import { Card } from "@/components/ui/card";
-import SettingsForm from "@/forms/server/settings-form";
-import { ServerSettingsSchema } from "@/forms/server/settings-schema";
+import SettingsForm from "@/forms/server/settings/settings-form";
+import { ServerSettingsSchema } from "@/forms/server/settings/settings-schema";
 import { ServerSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -23,7 +23,7 @@ export default function ServerSettingsPage() {
 
   async function onSubmit(values: ServerSettings) {
     try {
-      await saveServerSettings(values)
+      await saveServerSettings(values);
       toast.success("Settings saved successfully");
     } catch (error) {
       const errorMessage =

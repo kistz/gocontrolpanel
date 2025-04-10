@@ -1,7 +1,6 @@
 "use server";
 import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
-import { MapInfo } from "@/types/map";
 import { ModeScriptInfo } from "@/types/server";
 
 export async function restartMap(): Promise<void> {

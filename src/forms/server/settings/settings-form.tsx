@@ -134,10 +134,10 @@ export default function SettingsForm({ form, onSubmit }: SettingsFormProps) {
 
         <FormElement
           control={form.control}
-          name={"defaultOptions.AllowMapDownload"}
+          name={"allowMapDownload"}
           label="Allow Map Download"
           description="Allow map download."
-          error={form.formState.errors.defaultOptions?.AllowMapDownload}
+          error={form.formState.errors.allowMapDownload}
           className="w-20"
           type="checkbox"
           isRequired
