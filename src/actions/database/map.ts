@@ -8,14 +8,20 @@ import { collections, getDatabase } from "./mongodb";
 export async function getAllMaps(): Promise<Map[]> {
   const db = await getDatabase();
   const collection = db.collection<DBMap>(collections.MAPS);
-  const maps = await collection.find().toArray();
+  const maps = await collection
+    .find({
+      deletedAt: { $exists: false },
+    })
+    .toArray();
   return maps.map((map) => mapDBMapToMap(map));
 }
 
 export async function getMapCount(): Promise<number> {
   const db = await getDatabase();
   const collection = db.collection<DBMap>(collections.MAPS);
-  return collection.countDocuments();
+  return collection.countDocuments({
+    deletedAt: { $exists: false },
+  });
 }
 
 export async function getNewMapsCount(days: number): Promise<number> {
@@ -25,6 +31,7 @@ export async function getNewMapsCount(days: number): Promise<number> {
   date.setDate(date.getDate() - days);
   const count = await collection.countDocuments({
     createdAt: { $gte: date },
+    deletedAt: { $exists: false },
   });
   return count;
 }
@@ -37,7 +44,9 @@ export async function getMapsPaginated(
   const collection = db.collection<DBMap>(collections.MAPS);
   const totalCount = await collection.countDocuments();
   const maps = await collection
-    .find()
+    .find({
+      deletedAt: { $exists: false },
+    })
     .skip(pagination.skip)
     .limit(pagination.limit)
     .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
@@ -54,8 +63,11 @@ export async function deleteMapById(mapId: ObjectId | string): Promise<void> {
 
   const db = await getDatabase();
   const collection = db.collection<DBMap>(collections.MAPS);
-  const result = await collection.deleteOne({ _id: new ObjectId(mapId) });
-  if (result.deletedCount === 0) {
+  const result = await collection.updateOne(
+    { _id: new ObjectId(mapId) },
+    { $set: { deletedAt: new Date() } },
+  );
+  if (result.modifiedCount === 0) {
     throw new Error(`Map not found`);
   }
 }

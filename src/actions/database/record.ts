@@ -8,14 +8,20 @@ import { collections, getDatabase } from "./mongodb";
 export async function getAllRecords(): Promise<Record[]> {
   const db = await getDatabase();
   const collection = db.collection<DBRecord>(collections.RECORDS);
-  const records = await collection.find().toArray();
+  const records = await collection
+    .find({
+      deletedAt: { $exists: false },
+    })
+    .toArray();
   return records.map((record) => mapDBRecordToRecord(record));
 }
 
 export async function getRecordCount(): Promise<number> {
   const db = await getDatabase();
   const collection = db.collection<DBRecord>(collections.RECORDS);
-  return collection.countDocuments();
+  return collection.countDocuments({
+    deletedAt: { $exists: false },
+  });
 }
 
 export async function getNewRecordsCount(days: number): Promise<number> {
@@ -25,6 +31,7 @@ export async function getNewRecordsCount(days: number): Promise<number> {
   date.setDate(date.getDate() - days);
   const count = await collection.countDocuments({
     createdAt: { $gte: date },
+    deletedAt: { $exists: false },
   });
   return count;
 }
@@ -44,6 +51,7 @@ export async function getRecordCountPerDay(days: number): Promise<
       {
         $match: {
           createdAt: { $gte: date },
+          deletedAt: { $exists: false },
         },
       },
       {
@@ -69,7 +77,9 @@ export async function getRecordsPaginated(
   const collection = db.collection<DBRecord>(collections.RECORDS);
   const totalCount = await collection.countDocuments();
   const records = await collection
-    .find()
+    .find({
+      deletedAt: { $exists: false },
+    })
     .skip(pagination.skip)
     .limit(pagination.limit)
     .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
@@ -88,8 +98,11 @@ export async function deleteRecordById(
 
   const db = await getDatabase();
   const collection = db.collection<DBRecord>(collections.RECORDS);
-  const result = await collection.deleteOne({ _id: new ObjectId(recordId) });
-  if (result.deletedCount === 0) {
+  const result = await collection.updateOne(
+    { _id: new ObjectId(recordId) },
+    { $set: { deletedAt: new Date() } },
+  );
+  if (result.modifiedCount === 0) {
     throw new Error(`Record not found`);
   }
 }

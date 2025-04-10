@@ -102,7 +102,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             onClose={() => setIsOpen(false)}
             onConfirm={handleDelete}
             title="Delete player"
-            description={`Are you sure you want to delete ${player.nickName}? This action cannot be undone.`}
+            description={`Are you sure you want to delete ${player.nickName}?`}
             confirmText="Delete"
             cancelText="Cancel"
           />

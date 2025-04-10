@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { stripTmTags } from "tmtags";
 
 interface MapCardActionsProps {
   map: Map;
@@ -122,7 +123,7 @@ export default function MapCardActions({
           }
         }}
         title="Delete Map"
-        description="Are you sure you want to delete this map? This action cannot be undone."
+        description={`Are you sure you want to delete ${stripTmTags(map.name)}.`}
         confirmText="Delete"
         cancelText="Cancel"
       />

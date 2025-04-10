@@ -7,14 +7,20 @@ import { collections, getDatabase } from "./mongodb";
 export async function getAllPlayers(): Promise<Player[]> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  const players = await collection.find().toArray();
+  const players = await collection
+    .find({
+      deletedAt: { $exists: false },
+    })
+    .toArray();
   return players.map((player) => mapDBPlayerToPlayer(player));
 }
 
 export async function getPlayerCount(): Promise<number> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  return collection.countDocuments();
+  return collection.countDocuments({
+    deletedAt: { $exists: false },
+  });
 }
 
 export async function getNewPlayersCount(days: number): Promise<number> {
@@ -24,6 +30,7 @@ export async function getNewPlayersCount(days: number): Promise<number> {
   date.setDate(date.getDate() - days);
   const count = await collection.countDocuments({
     createdAt: { $gte: date },
+    deletedAt: { $exists: false },
   });
   return count;
 }
@@ -36,7 +43,9 @@ export async function getPlayersPaginated(
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
   const totalCount = await collection.countDocuments();
   const players = await collection
-    .find()
+    .find({
+      deletedAt: { $exists: false },
+    })
     .skip(pagination.skip)
     .limit(pagination.limit)
     .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
@@ -53,7 +62,10 @@ export async function getPlayerById(
 ): Promise<Player> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  const player = await collection.findOne({ _id: new ObjectId(playerId) });
+  const player = await collection.findOne({
+    _id: new ObjectId(playerId),
+    deletedAt: { $exists: false },
+  });
   if (!player) {
     throw new Error(`Player not found`);
   }
@@ -63,7 +75,10 @@ export async function getPlayerById(
 export async function getPlayerByLogin(login: string): Promise<Player | null> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  const player = await collection.findOne({ login });
+  const player = await collection.findOne({
+    login,
+    deletedAt: { $exists: false },
+  });
   if (!player) {
     return null;
   }
@@ -81,8 +96,11 @@ export async function deletePlayerById(
 
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  const result = await collection.deleteOne({ _id: new ObjectId(playerId) });
-  if (result.deletedCount === 0) {
+  const result = await collection.updateOne(
+    { _id: new ObjectId(playerId) },
+    { $set: { deletedAt: new Date() } },
+  );
+  if (result.modifiedCount === 0) {
     throw new Error(`Player not found`);
   }
 }
