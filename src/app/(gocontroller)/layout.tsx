@@ -26,9 +26,9 @@ export default async function GoControllerLayout({
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset className="overflow-x-hidden">
+      <SidebarInset>
         <SiteHeader />
-        <div className="p-4 lg:p-6 h-full">{children}</div>
+        <div className="p-4 lg:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
