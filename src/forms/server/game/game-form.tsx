@@ -33,7 +33,7 @@ export default function GameForm({
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 min-[960px]:w-1/2">
           <div className="flex flex-col">
             <h2 className="text-lg font-bold">Mode Script Settings </h2>
             <p className="text-base text-muted-foreground font-medium overflow-hidden overflow-ellipsis text-nowrap">
