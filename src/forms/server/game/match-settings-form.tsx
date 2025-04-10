@@ -51,7 +51,7 @@ export default function MatchSettingsForm() {
         <FormElement
           control={matchSettingsForm.control}
           name={"filename"}
-          label="Filename"
+          label="Match Settings"
           description="The name of the file to save/load match settings."
           placeholder="matchlist.txt"
           error={matchSettingsForm.formState.errors.filename}

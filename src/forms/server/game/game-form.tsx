@@ -1,7 +1,7 @@
 import { ModeScriptInfo } from "@/types/server";
 import ScriptNameForm from "./script-name-form";
 import ShowOpponentsForm from "./show-opponents-form";
-import MatchSettingsForm from "./mode-settings-form";
+import MatchSettingsForm from "./match-settings-form";
 import PlaylistForm from "./playlist-form";
 
 interface GameFormProps {
@@ -14,6 +14,7 @@ interface GameFormProps {
 export default function GameForm({
   showOpponents,
   scriptName,
+  modeScriptInfo,
   modeScriptSettings,
 }: GameFormProps) {
   return (
