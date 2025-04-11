@@ -46,7 +46,7 @@ export default function ScriptNameForm({ scriptName, scripts }: { scriptName: st
             value: script,
           }))}
           error={scriptNameForm.formState.errors.scriptName}
-          className="w-[250px] min-[500px]:w-1/2"
+          className="w-[200px] min-[500px]:w-1/2"
           type="select"
           isRequired
         >
