@@ -55,7 +55,7 @@ export default function ScriptNameForm({ scriptName, scripts }: { scriptName: st
             type="submit"
             disabled={scriptNameForm.formState.isSubmitting}
           >
-            Save
+            Load
           </Button>
         </FormElement>
       </form>
