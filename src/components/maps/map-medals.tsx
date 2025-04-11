@@ -37,7 +37,7 @@ export default function MapMedals({ map, ref }: MapMedalsProps) {
   }, [isCompact, ref]);
 
   return (
-    <Card className="flex flex-1 p-2 flex-row items-center rounded-sm bg-black/40 border-none justify-between gap-2">
+    <Card className="flex flex-1 p-2 flex-row items-center rounded-sm dark:bg-black/40 border-none justify-between gap-2">
       <div className="flex items-center gap-2">
         <IconMedal className="text-green-700" size={24} />
         <TimeDisplay time={map.authorTime} className="text-sm" />

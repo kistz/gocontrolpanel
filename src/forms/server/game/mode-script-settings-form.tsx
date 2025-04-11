@@ -9,6 +9,7 @@ import { ModeScriptInfo, ModeScriptSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useCallback, useMemo } from "react";
 import { ModeScriptSettingsSchema } from "./game-schema";
 
 export default function ModeScriptSettingsForm({
@@ -23,82 +24,59 @@ export default function ModeScriptSettingsForm({
     defaultValues: modeScriptSettings as ModeScriptSettings,
   });
 
-  async function onSubmitModeScriptSettings(values: ModeScriptSettings) {
-    try {
-      const parsedValues = Object.fromEntries(
-        Object.entries(values).map(([key, value]) => {
-          if (value === true) return [key, true];
-          if (value === false) return [key, false];
-          if (!isNaN(Number(value)) && value !== "")
-            return [key, Number(value)];
-          return [key, value];
-        }),
-      );
+  /** ✅ Use `useCallback` to avoid recreating function */
+  const onSubmitModeScriptSettings = useCallback(
+    async (values: ModeScriptSettings) => {
+      try {
+        const parsedValues = Object.fromEntries(
+          Object.entries(values).map(([key, value]) => {
+            if (value === true) return [key, true];
+            if (value === false) return [key, false];
+            if (!isNaN(Number(value)) && value !== "") return [key, Number(value)];
+            return [key, value];
+          })
+        );
 
-      await setModeScriptSettings(parsedValues);
-      toast.success("Mode Script Settings updated successfully");
-    } catch (error) {
-      toast.error("Failed to update Mode Script Settings", {
-        description: getErrorMessage(error),
-      });
-    }
-  }
+        await setModeScriptSettings(parsedValues);
+        toast.success("Mode Script Settings updated successfully");
+      } catch (error) {
+        toast.error("Failed to update Mode Script Settings", {
+          description: getErrorMessage(error),
+        });
+      }
+    },
+    []
+  );
 
-  function getDescription(key: string): string {
-    const description = modeScriptInfo.ParamDescs.find(
-      (desc) => desc.Name === key && desc.Desc != "<hidden>",
-    )?.Desc;
+  /** ✅ Cache descriptions to avoid recalculating */
+  const descriptions = useMemo(() => {
+    return modeScriptInfo.ParamDescs.reduce((acc, desc) => {
+      if (desc.Desc !== "<hidden>") acc[desc.Name] = desc.Desc;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [modeScriptInfo.ParamDescs]);
 
-    return description ? description : "";
-  }
+  /** ✅ Cache form elements to avoid recalculating */
+  const formElements = useMemo(() => {
+    return Object.entries(modeScriptSettingsForm.getValues()).map(([key, value]) => {
+      return {
+        key,
+        value,
+        label: key,
+        description: descriptions[key] || "",
+        placeholder: key
+          .slice(2)
+          .split(/(?=[A-Z])/)
+          .join(" ")
+          .replace(/^\w/, (c) => c.toUpperCase())
+          .replace(/_/g, ""),
+        type: typeof value === "boolean" ? "checkbox" : typeof value === "number" ? "number" : "text",
+        className: typeof value === "number" ? "w-26" : "sm:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48",
+      };
+    });
+  }, [modeScriptSettingsForm, descriptions]);
 
-  function getElement(
-    key: string,
-    value: string | number | boolean,
-  ): {
-    label: string;
-    description: string;
-    placeholder: string;
-    type: string;
-    className: string;
-  } {
-    switch (typeof value) {
-      case "boolean":
-        return {
-          label: key,
-          description: getDescription(key),
-          placeholder: key
-            .slice(2)
-            .split(/(?=[A-Z])/)
-            .join(" ")
-            .replace(/^\w/, (c) => c.toUpperCase())
-            .replace(/_/g, ""),
-          type: "checkbox",
-          className: "",
-        };
-      case "number":
-        return {
-          label: key,
-          description: getDescription(key),
-          placeholder: "Enter value",
-          type: "number",
-          className: "w-26",
-        };
-      case "string":
-      default:
-        return {
-          label: key,
-          description: getDescription(key),
-          placeholder: "Enter value",
-          type: "text",
-          className: "sm:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48",
-        };
-    }
-  }
-
-  const formElements = Object.entries(modeScriptSettingsForm.getValues());
   const middleIndex = Math.ceil(formElements.length / 2);
-
   const leftElements = formElements.slice(0, middleIndex);
   const rightElements = formElements.slice(middleIndex);
 
@@ -106,28 +84,22 @@ export default function ModeScriptSettingsForm({
     <Form {...modeScriptSettingsForm}>
       <form
         className="flex flex-col gap-4 max-sm:flex-col max-[768px]:flex-row min-[960px]:flex-row"
-        onSubmit={modeScriptSettingsForm.handleSubmit(
-          onSubmitModeScriptSettings,
-        )}
+        onSubmit={modeScriptSettingsForm.handleSubmit(onSubmitModeScriptSettings)}
       >
         <div className="flex flex-col gap-3 flex-1">
-          {leftElements.map(([key, value]) => {
-            const element = getElement(key, value);
-
-            return (
-              <FormElement
-                key={key}
-                control={modeScriptSettingsForm.control}
-                name={key}
-                label={element.label}
-                description={element.description}
-                placeholder={element.placeholder}
-                error={modeScriptSettingsForm.formState.errors[key] as any}
-                className={element.className}
-                type={element.type}
-              />
-            );
-          })}
+          {leftElements.map(({ key, ...element }) => (
+            <FormElement
+              key={key}
+              control={modeScriptSettingsForm.control}
+              name={key}
+              label={element.label}
+              description={element.description}
+              placeholder={element.placeholder}
+              error={modeScriptSettingsForm.formState.errors[key] as any}
+              className={element.className}
+              type={element.type}
+            />
+          ))}
           <Button
             className="w-20 hidden max-sm:hidden max-[768px]:block min-[960px]:block mt-4"
             type="submit"
@@ -138,23 +110,19 @@ export default function ModeScriptSettingsForm({
         </div>
 
         <div className="flex flex-col gap-3 flex-1">
-          {rightElements.map(([key, value]) => {
-            const element = getElement(key, value);
-
-            return (
-              <FormElement
-                key={key}
-                control={modeScriptSettingsForm.control}
-                name={key}
-                label={element.label}
-                description={element.description}
-                placeholder={element.placeholder}
-                error={modeScriptSettingsForm.formState.errors[key] as any}
-                className={element.className}
-                type={element.type}
-              />
-            );
-          })}
+          {rightElements.map(({ key, ...element }) => (
+            <FormElement
+              key={key}
+              control={modeScriptSettingsForm.control}
+              name={key}
+              label={element.label}
+              description={element.description}
+              placeholder={element.placeholder}
+              error={modeScriptSettingsForm.formState.errors[key] as any}
+              className={element.className}
+              type={element.type}
+            />
+          ))}
           <Button
             className="w-20 block max-sm:block max-[768px]:hidden min-[960px]:hidden mt-4"
             type="submit"

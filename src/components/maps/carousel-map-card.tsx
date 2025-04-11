@@ -155,7 +155,7 @@ export default function CarouselMapCard({
       {isCurrent && (
         <Badge
           variant={"outline"}
-          className="absolute top-2 left-2 z-10 bg-black flex gap-2"
+          className="absolute top-2 left-2 z-10 bg-white dark:bg-black flex gap-2"
         >
           <span className="bg-green-500 w-2 h-2 rounded-full"></span>
           Current Map
