@@ -2,6 +2,7 @@
 
 import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
+import { getFiles } from "@/lib/server-utils";
 import { ServerSettings } from "@/types/server";
 
 export async function getServerSettings(): Promise<ServerSettings> {
@@ -104,5 +105,49 @@ export async function saveServerSettings(
     throw new Error("Failed to save profile skins");
   } else if (!res[3]) {
     throw new Error("Failed to save map download settings");
+  }
+}
+
+export async function getScripts(): Promise<string[]> {
+  await withAuth(["admin"]);
+
+  const defaultScripts = [
+    "Trackmania/TM_TimeAttack_Online.Script.txt",
+    "Trackmania/TM_Laps_Online.Script.txt",
+    "Trackmania/TM_Rounds_Online.Script.txt",
+    "Trackmania/TM_Cup_Online.Script.txt",
+    "Trackmania/TM_Teams_Online.Script.txt",
+    "Trackmania/TM_Knockout_Online.Script.txt",
+    "Trackmania/Deprecated/TM_Champion_Online.Script.txt",
+    "Trackmania/TM_RoyalTimeAttack_Online.Script.txt",
+    "Trackmania/TM_StuntMulti_Online.Script.txt",
+    "Trackmania/TM_Platform_Online.Script.txt",
+    "TrackMania/TM_TMWC2023_Online.Script.txt",
+    "TrackMania/TM_TMWTTeams_Online.Script.txt",
+  ];
+
+  try {
+    const client = await getGbxClient();
+    const userDataDirectory = await client.call("GameDataDirectory");
+  
+    if (!userDataDirectory) {
+      throw new Error("Failed to get UserData directory");
+    }
+  
+    const scriptsDirectory = userDataDirectory + "Scripts/Modes/";
+    const scripts = await getFiles(scriptsDirectory, /.*\.Script\.txt$/);
+  
+    const validScripts = scripts
+      .map((script: string) => {
+        return script.replace(scriptsDirectory, "");
+      })
+      .filter((path) => path !== undefined);
+  
+    const allScripts = [...validScripts, ...defaultScripts];
+
+    return [...new Set(allScripts)];
+  } catch (error) {
+    console.error("Error getting scripts:", error);
+    return defaultScripts;
   }
 }

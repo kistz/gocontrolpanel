@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { ScriptNameSchema } from "./game-schema";
 import { getErrorMessage } from "@/lib/utils";
 
-export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
+export default function ScriptNameForm({ scriptName, scripts }: { scriptName: string, scripts: string[] }) {
   const scriptNameForm = useForm<ScriptName>({
     resolver: zodResolver(ScriptNameSchema),
     defaultValues: {
@@ -41,9 +41,13 @@ export default function ScriptNameForm({ scriptName }: { scriptName: string }) {
           name={"scriptName"}
           label="Script Name"
           description="The name of the script to load."
-          placeholder="Trackmania/TM_TimeAttack_Online.Script.txt"
+          options={scripts.map((script) => ({
+            label: script,
+            value: script,
+          }))}
           error={scriptNameForm.formState.errors.scriptName}
-          className="w-2/3 min-w-48"
+          className="w-[250px] min-[500px]:w-1/2"
+          type="select"
           isRequired
         >
           <Button

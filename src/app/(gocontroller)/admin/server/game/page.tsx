@@ -6,6 +6,7 @@ import {
   getShowOpponents,
 } from "@/actions/gbx/game";
 import { getCurrentMapIndex } from "@/actions/gbx/map";
+import { getScripts } from "@/actions/gbx/server";
 import MapCarousel from "@/components/maps/map-carousel";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +21,8 @@ import { parseTmTags } from "tmtags";
 export default async function ServerGamePage() {
   const mapList = await getMapList();
   const currentIndex = await getCurrentMapIndex();
+
+  const scripts = await getScripts();
 
   const showOpponents = await getShowOpponents();
   const scriptName = await getScriptName();
@@ -40,13 +43,13 @@ export default async function ServerGamePage() {
         <TabsList className="w-full">
           <TabsTrigger
             value="map"
-            className="w-1/2 cursor-pointer data-[state=active]:bg-black dark:data-[state=active]:bg-black"
+            className="cursor-pointer data-[state=active]:bg-black dark:data-[state=active]:bg-black"
           >
             Map Rotation
           </TabsTrigger>
           <TabsTrigger
             value="script"
-            className="w-1/2 cursor-pointer data-[state=active]:bg-black dark:data-[state=active]:bg-black"
+            className="cursor-pointer data-[state=active]:bg-black dark:data-[state=active]:bg-black"
           >
             Script Settings
           </TabsTrigger>
@@ -64,7 +67,7 @@ export default async function ServerGamePage() {
             <div className="flex gap-6 flex-col min-[960px]:flex-row">
               <div className="flex flex-col gap-4 flex-1">
                 <ShowOpponentsForm showOpponents={showOpponents.NextValue} />
-                <ScriptNameForm scriptName={scriptName.NextValue} />
+                <ScriptNameForm scriptName={scriptName.NextValue} scripts={scripts} />
               </div>
               <div className="flex flex-col gap-4 flex-1">
                 <MatchSettingsForm />

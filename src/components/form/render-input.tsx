@@ -90,7 +90,7 @@ export default function RenderInput<TControl extends FieldValues>({
                 <SelectItem
                   key={option.value}
                   value={option.value}
-                  className="cursor-pointer"
+                  className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
                 >
                   {option.label}
                 </SelectItem>
