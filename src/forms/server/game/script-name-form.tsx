@@ -22,7 +22,7 @@ export default function ScriptNameForm({ scriptName, scripts }: { scriptName: st
   async function onSubmitScriptName(values: ScriptName) {
     try {
       await setScriptName(values.scriptName);
-      toast.success("Script Name updated successfully");
+      toast.success("Script loaded successfully");
     } catch (error) {
       toast.error("Failed to update Script Name", {
         description: getErrorMessage(error),
