@@ -73,8 +73,8 @@ export default function MapCards({
           <MapCard map={map} key={map._id} refetch={refetch} />
         ))}
         {loading && (
-          <div className="col-span-full flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
+          <div className="flex items-center justify-center w-full h-full">
+            <p className="text-muted-foreground">Loading...</p>
           </div>
         )}
         {!loading && data.length === 0 && (

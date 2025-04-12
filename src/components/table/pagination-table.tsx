@@ -129,8 +129,8 @@ export function PaginationTable<TData, TValue>({
                   colSpan={table.getAllColumns().length}
                   className="p-8 flex justify-center items-center"
                 >
-                  <div className="flex justify-center items-center">
-                    <div className="w-12 h-12 border-4 border-t-4 rounded-full animate-spin border-t-(--primary)"></div>
+                  <div className="flex items-center justify-center w-full h-full">
+                    <p className="text-muted-foreground">Loading...</p>
                   </div>
                 </TableCell>
               </TableRow>
