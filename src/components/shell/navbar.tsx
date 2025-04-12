@@ -19,6 +19,7 @@ import {
 } from "../ui/sidebar";
 
 export interface NavItem {
+  id?: number;
   name: string;
   url?: string;
   icon: Icon;
@@ -47,7 +48,7 @@ export default function Navbar({ groups }: NavbarProps) {
           {group.items.map((item) =>
             item.items && item.items.length > 0 ? (
               <Collapsible
-                key={item.name}
+                key={item.id || item.name}
                 asChild
                 defaultOpen={item.isActive}
                 className="group/collapsible"
@@ -58,13 +59,13 @@ export default function Navbar({ groups }: NavbarProps) {
                       {item.url ? (
                         <Link href={item.url}>
                           {item.icon && <item.icon />}
-                          <span>{item.name}</span>
+                          <span className="overflow-hidden text-ellipsis text-nowrap">{item.name}</span>
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         </Link>
                       ) : (
                         <div>
                           {item.icon && <item.icon />}
-                          <span>{item.name}</span>
+                          <span className="overflow-hidden text-ellipsis text-nowrap">{item.name}</span>
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         </div>
                       )}

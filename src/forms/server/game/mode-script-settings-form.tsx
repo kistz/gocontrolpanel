@@ -7,15 +7,17 @@ import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { ModeScriptInfo, ModeScriptSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useCallback, useMemo } from "react";
 import { ModeScriptSettingsSchema } from "./game-schema";
 
 export default function ModeScriptSettingsForm({
+  serverId,
   modeScriptSettings,
   modeScriptInfo,
 }: {
+  serverId: number;
   modeScriptSettings: Record<string, unknown>;
   modeScriptInfo: ModeScriptInfo;
 }) {
@@ -32,12 +34,13 @@ export default function ModeScriptSettingsForm({
           Object.entries(values).map(([key, value]) => {
             if (value === true) return [key, true];
             if (value === false) return [key, false];
-            if (!isNaN(Number(value)) && value !== "") return [key, Number(value)];
+            if (!isNaN(Number(value)) && value !== "")
+              return [key, Number(value)];
             return [key, value];
-          })
+          }),
         );
 
-        await setModeScriptSettings(parsedValues);
+        await setModeScriptSettings(serverId, parsedValues);
         toast.success("Mode Script Settings updated successfully");
       } catch (error) {
         toast.error("Failed to update Mode Script Settings", {
@@ -45,35 +48,48 @@ export default function ModeScriptSettingsForm({
         });
       }
     },
-    []
+    [],
   );
 
   /** ✅ Cache descriptions to avoid recalculating */
   const descriptions = useMemo(() => {
-    return modeScriptInfo.ParamDescs.reduce((acc, desc) => {
-      if (desc.Desc !== "<hidden>") acc[desc.Name] = desc.Desc;
-      return acc;
-    }, {} as Record<string, string>);
+    return modeScriptInfo.ParamDescs.reduce(
+      (acc, desc) => {
+        if (desc.Desc !== "<hidden>") acc[desc.Name] = desc.Desc;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
   }, [modeScriptInfo.ParamDescs]);
 
   /** ✅ Cache form elements to avoid recalculating */
   const formElements = useMemo(() => {
-    return Object.entries(modeScriptSettingsForm.getValues()).map(([key, value]) => {
-      return {
-        key,
-        value,
-        label: key,
-        description: descriptions[key] || "",
-        placeholder: key
-          .slice(2)
-          .split(/(?=[A-Z])/)
-          .join(" ")
-          .replace(/^\w/, (c) => c.toUpperCase())
-          .replace(/_/g, ""),
-        type: typeof value === "boolean" ? "checkbox" : typeof value === "number" ? "number" : "text",
-        className: typeof value === "number" ? "w-26" : "sm:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48",
-      };
-    });
+    return Object.entries(modeScriptSettingsForm.getValues()).map(
+      ([key, value]) => {
+        return {
+          key,
+          value,
+          label: key,
+          description: descriptions[key] || "",
+          placeholder: key
+            .slice(2)
+            .split(/(?=[A-Z])/)
+            .join(" ")
+            .replace(/^\w/, (c) => c.toUpperCase())
+            .replace(/_/g, ""),
+          type:
+            typeof value === "boolean"
+              ? "checkbox"
+              : typeof value === "number"
+                ? "number"
+                : "text",
+          className:
+            typeof value === "number"
+              ? "w-26"
+              : "sm:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48",
+        };
+      },
+    );
   }, [modeScriptSettingsForm, descriptions]);
 
   const middleIndex = Math.ceil(formElements.length / 2);
@@ -84,7 +100,9 @@ export default function ModeScriptSettingsForm({
     <Form {...modeScriptSettingsForm}>
       <form
         className="flex flex-col gap-4 max-sm:flex-col max-[768px]:flex-row min-[960px]:flex-row"
-        onSubmit={modeScriptSettingsForm.handleSubmit(onSubmitModeScriptSettings)}
+        onSubmit={modeScriptSettingsForm.handleSubmit(
+          onSubmitModeScriptSettings,
+        )}
       >
         <div className="flex flex-col gap-3 flex-1">
           {leftElements.map(({ key, ...element }) => (

@@ -1,21 +1,28 @@
 import config from "@/lib/config";
 import { GbxClient } from "@evotm/gbxclient";
 
-let cachedClient: GbxClient | null = null;
+let cachedClients: {
+  [key: number]: GbxClient;
+} = {};
 
-export async function connectToGbxClient() {
-  if (cachedClient) {
-    return cachedClient;
+export async function connectToGbxClient(id: number) {
+  if (cachedClients[id]) {
+    return cachedClients[id];
+  }
+
+  const server = config.SERVERS.find((s) => s.id == id);
+  if (!server) {
+    throw new Error(`Server ${id} not found in config`);
   }
 
   const client = new GbxClient();
-  const status = await client.connect(config.XMLRPC.HOST, config.XMLRPC.PORT);
+  const status = await client.connect(server.host, server.xmlrpc_port);
   if (!status) {
     throw new Error("Failed to connect to GBX client");
   }
 
   try {
-    await client.call("Authenticate", config.XMLRPC.USER, config.XMLRPC.PASS);
+    await client.call("Authenticate", server.user, server.password);
   } catch {
     throw new Error("Failed to authenticate with GBX client");
   }
@@ -24,11 +31,11 @@ export async function connectToGbxClient() {
   await client.call("EnableCallbacks", true);
   await client.callScript("XmlRpc.EnableCallbacks", "true");
 
-  cachedClient = client;
+  cachedClients[server.id] = client;
   return client;
 }
 
-export async function getGbxClient() {
-  const client = await connectToGbxClient();
+export async function getGbxClient(id: number) {
+  const client = await connectToGbxClient(id);
   return client;
 }

@@ -20,6 +20,7 @@ import {
 import CarouselMapCard from "./carousel-map-card";
 
 interface MapCarouselProps {
+  serverId: number;
   maps: Map[];
   loop?: boolean;
   startIndex?: number;
@@ -27,6 +28,7 @@ interface MapCarouselProps {
 }
 
 export default function MapCarousel({
+  serverId,
   maps,
   loop = false,
   startIndex = 0,
@@ -38,7 +40,7 @@ export default function MapCarousel({
 
   useEffect(() => {
     const intervalIndex = setInterval(async () => {
-      const index = await getCurrentMapIndex();
+      const index = await getCurrentMapIndex(serverId);
 
       if (index === currentIndex) return;
 
@@ -59,6 +61,7 @@ export default function MapCarousel({
         opts={{
           loop: loop,
           startIndex: startIndex,
+          align: "center",
         }}
         className={cn("px-12 md:max-w-[calc(100vw-340px)]", className)}
       >
@@ -66,9 +69,10 @@ export default function MapCarousel({
           {maps.map((map, index) => (
             <CarouselItem
               key={index}
-              className="min-[1060px]:basis-1/2 min-[1380px]:basis-1/3"
+              className="min-[1060px]:basis-1/2 min-[1380px]:basis-1/3 m-auto"
             >
               <CarouselMapCard
+                serverId={serverId}
                 map={map}
                 index={index}
                 isCurrent={index === currentIndex}

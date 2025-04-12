@@ -21,3 +21,9 @@ export function getErrorMessage(error: unknown): string {
   const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
   return match ? match[1] : errorMessage;
 }
+
+export function generatePath(path: string, params: Record<string, string | number>): string {
+  return Object.entries(params).reduce((acc, [key, value]) => {
+    return acc.replace(`:${key}`, String(value));
+  }, path);
+}

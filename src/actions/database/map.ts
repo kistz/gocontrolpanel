@@ -80,12 +80,13 @@ function mapDBMapToMap(dbMap: DBMap): Map {
 }
 
 export async function getMapList(
+  server: number,
   count: number = 100,
   start: number = 0,
 ): Promise<Map[]> {
   await withAuth(["admin"]);
 
-  const client = await getGbxClient();
+  const client = await getGbxClient(server);
   const mapList = await client.call("GetMapList", count, start);
   if (!mapList) {
     throw new Error("Failed to get map list");

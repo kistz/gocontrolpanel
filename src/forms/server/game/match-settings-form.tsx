@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { MatchSettingsSchema } from "./game-schema";
 import { getErrorMessage } from "@/lib/utils";
 
-export default function MatchSettingsForm() {
+export default function MatchSettingsForm({ serverId }: { serverId: number }) {
   const matchSettingsForm = useForm<MatchSettings>({
     resolver: zodResolver(MatchSettingsSchema),
     defaultValues: {
@@ -23,7 +23,7 @@ export default function MatchSettingsForm() {
     try {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
-      await loadMatchSettings(filename);
+      await loadMatchSettings(serverId, filename);
       toast.success("Match settings loaded successfully");
     } catch (error) {
       toast.error("Failed to load match settings", {
@@ -36,7 +36,7 @@ export default function MatchSettingsForm() {
     try {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
-      await saveMatchSettings("MatchSettings/" + filename);
+      await saveMatchSettings(serverId, "MatchSettings/" + filename);
       toast.success("Match settings saved successfully");
     } catch (error) {
       toast.error("Failed to save match settings", {

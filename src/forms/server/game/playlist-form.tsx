@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PlaylistSchema } from "./game-schema";
 
-export default function PlaylistForm() {
+export default function PlaylistForm({ serverId }: { serverId: number }) {
   const playlistForm = useForm<Playlist>({
     resolver: zodResolver(PlaylistSchema),
     defaultValues: {
@@ -23,7 +23,7 @@ export default function PlaylistForm() {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      await appendPlaylist(filename);
+      await appendPlaylist(serverId, filename);
       toast.success("Playlist appended successfully");
     } catch (error) {
       toast.error("Failed to append playlist", {
@@ -36,7 +36,7 @@ export default function PlaylistForm() {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      await insertPlaylist(filename);
+      await insertPlaylist(serverId, filename);
       toast.success("Playlist inserted successfully");
     } catch (error) {
       toast.error("Failed to insert playlist", {

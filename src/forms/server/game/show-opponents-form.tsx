@@ -12,8 +12,10 @@ import { ShowOpponentsSchema } from "./game-schema";
 import { getErrorMessage } from "@/lib/utils";
 
 export default function ShowOpponentsForm({
+  serverId,
   showOpponents,
 }: {
+  serverId: number;
   showOpponents: number;
 }) {
   const showOpponentsForm = useForm<ShowOpponents>({
@@ -25,7 +27,7 @@ export default function ShowOpponentsForm({
 
   async function onSubmitShowOpponents(values: ShowOpponents) {
     try {
-      await setShowOpponents(values.showOpponents);
+      await setShowOpponents(serverId, values.showOpponents);
       toast.success("Show Opponents updated successfully");
     } catch (error) {
       toast.error("Failed to update Show Opponents", {

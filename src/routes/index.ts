@@ -5,8 +5,8 @@ export const routes = {
   records: "/records",
   admin: {
     server: {
-      settings: "/admin/server/settings",
-      game: "/admin/server/game",
+      settings: "/admin/server/:id/settings",
+      game: "/admin/server/:id/game",
     },
   },
   login: "/login",

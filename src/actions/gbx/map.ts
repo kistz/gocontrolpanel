@@ -4,10 +4,10 @@ import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
 import { MapInfo } from "@/types/map";
 
-export async function getCurrentMapInfo(): Promise<MapInfo> {
+export async function getCurrentMapInfo(server: number): Promise<MapInfo> {
   await withAuth(["admin"]);
 
-  const client = await getGbxClient();
+  const client = await getGbxClient(server);
   const mapInfo = await client.call("GetCurrentMapInfo");
 
   if (!mapInfo) {
@@ -17,10 +17,10 @@ export async function getCurrentMapInfo(): Promise<MapInfo> {
   return mapInfo;
 }
 
-export async function getCurrentMapIndex(): Promise<number> {
+export async function getCurrentMapIndex(server: number): Promise<number> {
   await withAuth(["admin"]);
 
-  const client = await getGbxClient();
+  const client = await getGbxClient(server);
   const mapIndex = await client.call("GetCurrentMapIndex");
 
   if (typeof mapIndex !== "number") {
@@ -30,9 +30,9 @@ export async function getCurrentMapIndex(): Promise<number> {
   return mapIndex;
 }
 
-export async function jumpToMap(index: number): Promise<void> {
+export async function jumpToMap(server: number, index: number): Promise<void> {
   await withAuth(["admin"]);
 
-  const client = await getGbxClient();
+  const client = await getGbxClient(server);
   await client.call("JumpToMapIndex", index);
 }

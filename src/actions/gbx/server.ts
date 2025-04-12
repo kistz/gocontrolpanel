@@ -5,10 +5,10 @@ import { withAuth } from "@/lib/auth";
 import { getFiles } from "@/lib/server-utils";
 import { ServerSettings } from "@/types/server";
 
-export async function getServerSettings(): Promise<ServerSettings> {
+export async function getServerSettings(server: number): Promise<ServerSettings> {
   await withAuth(["admin"]);
 
-  const client = await getGbxClient();
+  const client = await getGbxClient(server);
   const settings = await client.multicall([
     ["GetServerOptions"],
     ["GetHideServer"],
@@ -64,11 +64,12 @@ export async function getServerSettings(): Promise<ServerSettings> {
 }
 
 export async function saveServerSettings(
+  server: number,
   serverSettings: ServerSettings,
 ): Promise<void> {
   await withAuth(["admin"]);
 
-  const client = await getGbxClient();
+  const client = await getGbxClient(server);
 
   serverSettings.defaultOptions.NextCallVoteTimeOut *= 1000; // Convert to milliseconds
   serverSettings.defaultOptions.CallVoteRatio /= 100; // Convert to 0-1 range
@@ -108,7 +109,7 @@ export async function saveServerSettings(
   }
 }
 
-export async function getScripts(): Promise<string[]> {
+export async function getScripts(server: number): Promise<string[]> {
   await withAuth(["admin"]);
 
   const defaultScripts = [
@@ -127,7 +128,7 @@ export async function getScripts(): Promise<string[]> {
   ];
 
   try {
-    const client = await getGbxClient();
+    const client = await getGbxClient(server);
     const userDataDirectory = await client.call("GameDataDirectory");
   
     if (!userDataDirectory) {

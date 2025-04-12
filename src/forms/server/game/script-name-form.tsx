@@ -4,14 +4,22 @@ import { setScriptName } from "@/actions/gbx/game";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { getErrorMessage } from "@/lib/utils";
 import { ScriptName } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ScriptNameSchema } from "./game-schema";
-import { getErrorMessage } from "@/lib/utils";
 
-export default function ScriptNameForm({ scriptName, scripts }: { scriptName: string, scripts: string[] }) {
+export default function ScriptNameForm({
+  scriptName,
+  scripts,
+  serverId,
+}: {
+  scriptName: string;
+  scripts: string[];
+  serverId: number;
+}) {
   const scriptNameForm = useForm<ScriptName>({
     resolver: zodResolver(ScriptNameSchema),
     defaultValues: {
@@ -21,7 +29,7 @@ export default function ScriptNameForm({ scriptName, scripts }: { scriptName: st
 
   async function onSubmitScriptName(values: ScriptName) {
     try {
-      await setScriptName(values.scriptName);
+      await setScriptName(serverId, values.scriptName);
       toast.success("Script loaded successfully");
     } catch (error) {
       toast.error("Failed to update Script Name", {

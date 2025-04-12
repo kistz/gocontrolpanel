@@ -1,26 +1,8 @@
+import { Config } from "@/types/config";
 import "dotenv/config";
+import SERVERS from "../../servers.json";
 
-interface Config {
-  MONGODB: {
-    URI: string;
-    DB: string;
-  };
-  NODE_ENV: string;
-  PORT: number;
-  NADEO: {
-    CLIENT_ID: string;
-    CLIENT_SECRET: string;
-    REDIRECT_URI: string;
-  };
-  XMLRPC: {
-    HOST: string;
-    PORT: number;
-    USER: string;
-    PASS: string;
-  };
-}
-
-export const config: Config = {
+const config: Config = {
   MONGODB: {
     URI: process.env.MONGODB_URI || "",
     DB: process.env.MONGODB_DB || "nadeo",
@@ -32,14 +14,7 @@ export const config: Config = {
     CLIENT_SECRET: process.env.NADEO_CLIENT_SECRET || "",
     REDIRECT_URI: process.env.NADEO_REDIRECT_URI || "",
   },
-  XMLRPC: {
-    HOST: process.env.XMLRPC_HOST || "",
-    PORT: process.env.XMLRPC_PORT
-      ? parseInt(process.env.XMLRPC_PORT, 10)
-      : 5000,
-    USER: process.env.XMLRPC_USER || "",
-    PASS: process.env.XMLRPC_PASS || "",
-  },
+  SERVERS,
 };
 
 if (!config.MONGODB.URI) {

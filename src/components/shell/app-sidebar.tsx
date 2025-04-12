@@ -1,5 +1,3 @@
-"use client";
-
 import {
   IconAdjustmentsAlt,
   IconDashboard,
@@ -21,8 +19,12 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { generatePath } from "@/lib/utils";
 import { routes } from "@/routes";
 import Navbar, { NavGroup } from "./navbar";
+import { getServers } from "@/actions/servers";
+
+const servers = await getServers();
 
 const navGroups: NavGroup[] = [
   {
@@ -51,25 +53,27 @@ const navGroups: NavGroup[] = [
   },
   {
     name: "Admin",
-    items: [
-      {
-        name: "Server",
-        icon: IconServer,
-        isActive: true,
-        items: [
-          {
-            name: "Settings",
-            url: routes.admin.server.settings,
-            icon: IconAdjustmentsAlt,
-          },
-          {
-            name: "Game",
-            url: routes.admin.server.game,
-            icon: IconDeviceGamepad,
-          }
-        ],
-      },
-    ],
+    items: servers.map((server) => ({
+      id: server.id,
+      name: server.name,
+      icon: IconServer,
+      items: [
+        {
+          name: "Settings",
+          url: generatePath(routes.admin.server.settings, {
+            id: server.id,
+          }),
+          icon: IconAdjustmentsAlt,
+        },
+        {
+          name: "Game",
+          url: generatePath(routes.admin.server.game, {
+            id: server.id,
+          }),
+          icon: IconDeviceGamepad,
+        },
+      ],
+    })),
   },
 ];
 

@@ -18,16 +18,22 @@ import ShowOpponentsForm from "@/forms/server/game/show-opponents-form";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { parseTmTags } from "tmtags";
 
-export default async function ServerGamePage() {
-  const mapList = await getMapList();
-  const currentIndex = await getCurrentMapIndex();
+export default async function ServerGamePage({
+  params,
+}: {
+  params: Promise<{ id: number }>;
+}) {
+  const { id } = await params;
 
-  const scripts = await getScripts();
+  const mapList = await getMapList(id);
+  const currentIndex = await getCurrentMapIndex(id);
 
-  const showOpponents = await getShowOpponents();
-  const scriptName = await getScriptName();
-  const modeScriptInfo = await getModeScriptInfo();
-  const modeScriptSettings = await getModeScriptSettings();
+  const scripts = await getScripts(id);
+
+  const showOpponents = await getShowOpponents(id);
+  const scriptName = await getScriptName(id);
+  const modeScriptInfo = await getModeScriptInfo(id);
+  const modeScriptSettings = await getModeScriptSettings(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,21 +63,29 @@ export default async function ServerGamePage() {
 
         <TabsContent value="map" className="flex flex-col gap-6">
           <MapCarousel
+            serverId={id}
             maps={mapList}
             startIndex={currentIndex}
             loop={true}
-            className="max-w-max"
+            className="w-full"
           />
 
           <Card className="p-6">
             <div className="flex gap-6 flex-col min-[960px]:flex-row">
               <div className="flex flex-col gap-4 flex-1">
-                <ShowOpponentsForm showOpponents={showOpponents.NextValue} />
-                <ScriptNameForm scriptName={scriptName.NextValue} scripts={scripts} />
+                <ShowOpponentsForm
+                  serverId={id}
+                  showOpponents={showOpponents.NextValue}
+                />
+                <ScriptNameForm
+                  serverId={id}
+                  scriptName={scriptName.NextValue}
+                  scripts={scripts}
+                />
               </div>
               <div className="flex flex-col gap-4 flex-1">
-                <MatchSettingsForm />
-                <PlaylistForm />
+                <MatchSettingsForm serverId={id} />
+                <PlaylistForm serverId={id} />
               </div>
             </div>
           </Card>
@@ -95,6 +109,7 @@ export default async function ServerGamePage() {
               </div>
 
               <ModeScriptSettingsForm
+                serverId={id}
                 modeScriptSettings={modeScriptSettings}
                 modeScriptInfo={modeScriptInfo}
               />
