@@ -1,8 +1,9 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { generatePath } from "@/lib/utils";
 import { routes } from "@/routes";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Breadcrumbs, { TBreadcrumb } from "./breadcrumbs";
 
 const breadCrumbs: {
@@ -42,11 +43,11 @@ const breadCrumbs: {
     ],
   },
   {
-    path: routes.admin.server.settings,
+    path: routes.servers.settings,
     breadCrumbs: [
       {
         label: "Server",
-        path: routes.admin.server.settings,
+        path: routes.servers.settings,
       },
       {
         label: "Settings",
@@ -54,11 +55,11 @@ const breadCrumbs: {
     ],
   },
   {
-    path: routes.admin.server.game,
+    path: routes.servers.game,
     breadCrumbs: [
       {
         label: "Server",
-        path: routes.admin.server.settings,
+        path: routes.servers.settings,
       },
       {
         label: "Game",
@@ -69,12 +70,37 @@ const breadCrumbs: {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const params = useParams();
 
-  const activeBreadCrumbs = breadCrumbs.filter((item) => {
-    if (item.path === pathname) {
-      return item;
+  const getUpdatedBreadCrumbs = (path: string): TBreadcrumb[] | null => {
+    const dynamicParams = params as Record<string, string | number>;
+
+    const dynamicPath = generatePath(path, dynamicParams);
+
+    if (dynamicPath === pathname) {
+      let breadcrumb = breadCrumbs.find((item) => item.path === path);
+      if (!breadcrumb) return null;
+
+      breadcrumb = {
+        path: generatePath(breadcrumb.path, dynamicParams),
+        breadCrumbs: breadcrumb.breadCrumbs.map((crumb) => {
+          const updatedCrumb = { ...crumb };
+          if (updatedCrumb.path) {
+            updatedCrumb.path = generatePath(updatedCrumb.path, dynamicParams);
+          }
+          return updatedCrumb;
+        }),
+      };
+
+      return breadcrumb.breadCrumbs;
     }
-  })[0];
+
+    return null;
+  };
+
+  const activeBreadCrumbs = breadCrumbs
+    .map((item) => getUpdatedBreadCrumbs(item.path))
+    .find((crumbs) => crumbs !== null);
 
   return (
     <header
@@ -89,7 +115,7 @@ export function SiteHeader() {
           className="mx-2 data-[orientation=vertical]:h-4"
         />
 
-        <Breadcrumbs crumbs={activeBreadCrumbs?.breadCrumbs || []} />
+        <Breadcrumbs crumbs={activeBreadCrumbs || []} />
       </div>
     </header>
   );

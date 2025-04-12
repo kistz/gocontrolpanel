@@ -52,7 +52,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    name: "Admin",
+    name: "Servers",
     items: servers.map((server) => ({
       id: server.id,
       name: server.name,
@@ -60,14 +60,14 @@ const navGroups: NavGroup[] = [
       items: [
         {
           name: "Settings",
-          url: generatePath(routes.admin.server.settings, {
+          url: generatePath(routes.servers.settings, {
             id: server.id,
           }),
           icon: IconAdjustmentsAlt,
         },
         {
           name: "Game",
-          url: generatePath(routes.admin.server.game, {
+          url: generatePath(routes.servers.game, {
             id: server.id,
           }),
           icon: IconDeviceGamepad,
