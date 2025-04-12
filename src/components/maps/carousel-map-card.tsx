@@ -1,13 +1,20 @@
+import { nextMap, restartMap } from "@/actions/gbx/game";
+import { jumpToMap } from "@/actions/gbx/map";
 import { cn, getErrorMessage } from "@/lib/utils";
 import { Map } from "@/types/map";
-import { IconBounceRight, IconPhoto, IconPlayerTrackNext, IconPlayerTrackPrev, IconRotateClockwise, IconUser } from "@tabler/icons-react";
+import {
+  IconBounceRight,
+  IconPhoto,
+  IconPlayerTrackNext,
+  IconPlayerTrackPrev,
+  IconRotateClockwise,
+  IconUser,
+} from "@tabler/icons-react";
+import { toast } from "sonner";
 import { parseTmTags, stripTmTags } from "tmtags";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { nextMap, restartMap } from "@/actions/gbx/game";
-import { jumpToMap } from "@/actions/gbx/map";
-import { toast } from "sonner";
 
 interface CarouselMapCardProps {
   map: Map;
@@ -31,7 +38,7 @@ export default function CarouselMapCard({
       const previousIndex = index - 1 < 0 ? total - 1 : index - 1;
       await jumpToMap(serverId, previousIndex);
       toast.success("Gone back to previous map", {
-        description: `Gone back to ${stripTmTags(map.name)} by ${map.authorNickname}`,
+        description: "Gone back to previous map",
       });
     } catch (error) {
       toast.error("Failed to jump to previous map", {
@@ -57,7 +64,7 @@ export default function CarouselMapCard({
     try {
       await nextMap(serverId);
       toast.success("Skipped to next map", {
-        description: `Skipped to ${stripTmTags(map.name)} by ${map.authorNickname}`,
+        description: "Skipped to next map",
       });
     } catch (error) {
       toast.error("Failed to skip to next map", {
