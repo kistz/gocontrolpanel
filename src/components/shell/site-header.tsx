@@ -47,7 +47,6 @@ const breadCrumbs: {
     breadCrumbs: [
       {
         label: "Server",
-        path: routes.servers.settings,
       },
       {
         label: "Settings",
@@ -59,7 +58,6 @@ const breadCrumbs: {
     breadCrumbs: [
       {
         label: "Server",
-        path: routes.servers.settings,
       },
       {
         label: "Game",
