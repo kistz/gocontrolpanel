@@ -2,70 +2,10 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { generatePath } from "@/lib/utils";
-import { routes } from "@/routes";
+import { breadCrumbs } from "@/routes";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Breadcrumbs, { TBreadcrumb } from "./breadcrumbs";
-
-const breadCrumbs: {
-  path: string;
-  breadCrumbs: TBreadcrumb[];
-}[] = [
-  {
-    path: routes.dashboard,
-    breadCrumbs: [
-      {
-        label: "Dashboard",
-      },
-    ],
-  },
-  {
-    path: routes.players,
-    breadCrumbs: [
-      {
-        label: "Players",
-      },
-    ],
-  },
-  {
-    path: routes.maps,
-    breadCrumbs: [
-      {
-        label: "Maps",
-      },
-    ],
-  },
-  {
-    path: routes.records,
-    breadCrumbs: [
-      {
-        label: "Records",
-      },
-    ],
-  },
-  {
-    path: routes.servers.settings,
-    breadCrumbs: [
-      {
-        label: "Server",
-      },
-      {
-        label: "Settings",
-      },
-    ],
-  },
-  {
-    path: routes.servers.game,
-    breadCrumbs: [
-      {
-        label: "Server",
-      },
-      {
-        label: "Game",
-      },
-    ],
-  },
-];
 
 export function SiteHeader() {
   const pathname = usePathname();

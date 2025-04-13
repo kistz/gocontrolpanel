@@ -1,15 +1,7 @@
-import {
-  IconAdjustmentsAlt,
-  IconDashboard,
-  IconDeviceGamepad,
-  IconDeviceGamepad2,
-  IconMap,
-  IconServer,
-  IconStopwatch,
-  IconUsers,
-} from "@tabler/icons-react";
+import { IconDeviceGamepad2 } from "@tabler/icons-react";
 import * as React from "react";
 
+import { getServers } from "@/actions/servers";
 import { NavUser } from "@/components/shell/nav-user";
 import {
   Sidebar,
@@ -19,63 +11,10 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { generatePath } from "@/lib/utils";
-import { routes } from "@/routes";
-import Navbar, { NavGroup } from "./navbar";
-import { getServers } from "@/actions/servers";
+import { navGroups } from "@/routes";
+import Navbar from "./navbar";
 
 const servers = await getServers();
-
-const navGroups: NavGroup[] = [
-  {
-    items: [
-      {
-        name: "Dashboard",
-        url: routes.dashboard,
-        icon: IconDashboard,
-      },
-      {
-        name: "Players",
-        url: routes.players,
-        icon: IconUsers,
-      },
-      {
-        name: "Records",
-        url: routes.records,
-        icon: IconStopwatch,
-      },
-      {
-        name: "Maps",
-        url: routes.maps,
-        icon: IconMap,
-      },
-    ],
-  },
-  {
-    name: "Servers",
-    items: servers.map((server) => ({
-      id: server.id,
-      name: server.name,
-      icon: IconServer,
-      items: [
-        {
-          name: "Settings",
-          url: generatePath(routes.servers.settings, {
-            id: server.id,
-          }),
-          icon: IconAdjustmentsAlt,
-        },
-        {
-          name: "Game",
-          url: generatePath(routes.servers.game, {
-            id: server.id,
-          }),
-          icon: IconDeviceGamepad,
-        },
-      ],
-    })),
-  },
-];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
