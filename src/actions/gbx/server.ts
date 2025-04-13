@@ -5,7 +5,9 @@ import { withAuth } from "@/lib/auth";
 import { getFiles } from "@/lib/server-utils";
 import { ServerSettings } from "@/types/server";
 
-export async function getServerSettings(server: number): Promise<ServerSettings> {
+export async function getServerSettings(
+  server: number,
+): Promise<ServerSettings> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
@@ -109,7 +111,7 @@ export async function saveServerSettings(
   }
 }
 
-export async function getScripts(server: number): Promise<string[]> {
+export async function getLocalScripts(server: number): Promise<string[]> {
   await withAuth(["admin"]);
 
   const defaultScripts = [
@@ -130,20 +132,20 @@ export async function getScripts(server: number): Promise<string[]> {
   try {
     const client = await getGbxClient(server);
     const userDataDirectory = await client.call("GameDataDirectory");
-  
+
     if (!userDataDirectory) {
       throw new Error("Failed to get UserData directory");
     }
-  
+
     const scriptsDirectory = userDataDirectory + "Scripts/Modes/";
     const scripts = await getFiles(scriptsDirectory, /.*\.Script\.txt$/);
-  
+
     const validScripts = scripts
       .map((script: string) => {
         return script.replace(scriptsDirectory, "");
       })
       .filter((path) => path !== undefined);
-  
+
     const allScripts = [...validScripts, ...defaultScripts];
 
     return [...new Set(allScripts)];
@@ -151,4 +153,25 @@ export async function getScripts(server: number): Promise<string[]> {
     console.error("Error getting scripts:", error);
     return defaultScripts;
   }
+}
+
+export async function getLocalMaps(server: number): Promise<string[]> {
+  await withAuth(["admin"]);
+
+  const client = await getGbxClient(server);
+  const mapsDirectory = await client.call("GetMapsDirectory");
+
+  if (!mapsDirectory) {
+    throw new Error("Failed to get UserData directory");
+  }
+
+  const maps = await getFiles(mapsDirectory, /\.(Map|Challenge).*\.Gbx$/i);
+
+  const validMaps = maps
+    .map((map: string) => {
+      return map.replace(mapsDirectory, "");
+    })
+    .filter((path) => path !== undefined);
+
+  return [...new Set(validMaps)];
 }

@@ -6,7 +6,7 @@ import {
   getShowOpponents,
 } from "@/actions/gbx/game";
 import { getCurrentMapIndex } from "@/actions/gbx/map";
-import { getScripts } from "@/actions/gbx/server";
+import { getLocalScripts } from "@/actions/gbx/server";
 import MapCarousel from "@/components/maps/map-carousel";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +28,7 @@ export default async function ServerGamePage({
   const mapList = await getMapList(id);
   const currentIndex = await getCurrentMapIndex(id);
 
-  const scripts = await getScripts(id);
+  const scripts = await getLocalScripts(id);
 
   const showOpponents = await getShowOpponents(id);
   const scriptName = await getScriptName(id);
