@@ -130,6 +130,10 @@ export async function getLocalScripts(server: number): Promise<string[]> {
     "TrackMania/TM_TMWTTeams_Online.Script.txt",
   ];
 
+  if (!config.SERVERS.find((s) => s.id === server)?.isLocal) {
+    return defaultScripts;
+  }
+
   try {
     const client = await getGbxClient(server);
     const userDataDirectory = await client.call("GameDataDirectory");
@@ -158,6 +162,10 @@ export async function getLocalScripts(server: number): Promise<string[]> {
 
 export async function getLocalMaps(server: number): Promise<string[]> {
   await withAuth(["admin"]);
+
+  if (!config.SERVERS.find((s) => s.id === server)?.isLocal) {
+    return [];
+  }
 
   const client = await getGbxClient(server);
   const mapsDirectory = await client.call("GetMapsDirectory");

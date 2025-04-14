@@ -23,7 +23,7 @@ import DndListRow from "./dnd-list-row";
 
 export interface DndListColumn<TData> {
   id: string;
-  cell?: ({ data }: { data: TData }) => React.ReactNode;
+  cell?: React.ComponentType<{ data: TData; serverId?: number }>;
   visibility?: boolean;
 }
 
@@ -31,14 +31,14 @@ interface DndListProps<TData extends { id: string | number }> {
   columns: DndListColumn<TData>[];
   data: TData[];
   setData: (value: SetStateAction<TData[]>) => void;
-  limitHeight?: number;
+  serverId?: number;
 }
 
 export function DndList<TData extends { id: string | number }>({
   columns,
   data,
   setData,
-  limitHeight = 206,
+  serverId,
 }: DndListProps<TData>) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -71,7 +71,6 @@ export function DndList<TData extends { id: string | number }>({
         <SortableContext items={data} strategy={verticalListSortingStrategy}>
           <div
             className="flex flex-col flex-1 overflow-auto gap-2"
-            style={{ maxHeight: `calc(100vh - ${limitHeight}px)` }}
           >
             {data.map((item) => (
               <DndListRow
@@ -81,6 +80,7 @@ export function DndList<TData extends { id: string | number }>({
                   (column) => column.visibility !== false,
                 )}
                 key={item.id}
+                serverId={serverId}
               />
             ))}
           </div>

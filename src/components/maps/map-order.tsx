@@ -1,53 +1,22 @@
 "use client";
-import { deleteRecordById } from "@/actions/database/record";
 import { addMapList, removeMapList } from "@/actions/gbx/map";
 import { getErrorMessage } from "@/lib/utils";
 import { Map, OrderMap } from "@/types/map";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { parseTmTags } from "tmtags";
-import ConfirmDialog from "../confirm-dialog";
 import { DndList, DndListColumn } from "../dnd/dnd-list";
 import { Button } from "../ui/button";
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-
-const columns: DndListColumn<OrderMap>[] = [
-  {
-    id: "id",
-    cell: () => <></>,
-    visibility: false,
-  },
-  {
-    id: "name",
-    cell: ({ data }) => (
-      <span
-        className="overflow-hidden overflow-ellipsis whitespace-nowrap"
-        dangerouslySetInnerHTML={{ __html: parseTmTags(data.name) }}
-      />
-    ),
-  },
-  {
-    id: "authorNickname",
-  },
-  {
-    id: "uid",
-  },
-];
 
 export default function MapOrder({
   mapList,
   serverId,
+  createColumns,
 }: {
   mapList: Map[];
   serverId: number;
+  createColumns: (
+    onRemoveMap: (map: OrderMap) => void,
+  ) => DndListColumn<OrderMap>[];
 }) {
   const [defaultMapList, setDefaultMapList] = useState<Map[]>(mapList);
   const [mapOrder, setMapOrder] = useState<OrderMap[]>(
@@ -99,9 +68,22 @@ export default function MapOrder({
     );
   }
 
+  async function onRemoveMap(map: OrderMap) {
+    const newMapOrder = mapOrder.filter((m) => m.uid !== map.uid);
+    setMapOrder(newMapOrder);
+    setDefaultMapList(newMapOrder);
+  }
+
+  const columns = createColumns(onRemoveMap);
+
   return (
     <div className="flex flex-col gap-3">
-      <DndList columns={columns} data={mapOrder} setData={setMapOrder} />
+      <DndList
+        columns={columns}
+        data={mapOrder}
+        setData={setMapOrder}
+        serverId={serverId}
+      />
       <div className="flex flex-row-reverse gap-2">
         <Button onClick={saveMapOrder}>Save Order</Button>
 

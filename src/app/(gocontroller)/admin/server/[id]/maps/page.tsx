@@ -1,6 +1,8 @@
 import { getMapList } from "@/actions/database/map";
 import MapOrder from "@/components/maps/map-order";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createColumns } from "./columns";
 
 export default async function ServerMapsPage({
   params,
@@ -35,7 +37,15 @@ export default async function ServerMapsPage({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
-          <MapOrder mapList={maps} serverId={id} />
+          <MapOrder
+            mapList={maps}
+            serverId={id}
+            createColumns={createColumns}
+          />
+
+          <Card className="p-6 flex flex-col gap-4">
+            <h2 className="text-lg font-bold">Local Maps</h2>
+          </Card>
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <div>jukebox</div>

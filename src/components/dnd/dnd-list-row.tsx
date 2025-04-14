@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { createElement } from "react";
 import { Card } from "../ui/card";
 import { DndListColumn } from "./dnd-list";
 
@@ -8,12 +9,14 @@ interface DndListRowProps<TData> {
   id: string | number;
   row: TData;
   columns: DndListColumn<TData>[];
+  serverId?: number;
 }
 
 export default function DndListRow<TData>({
   id,
   row,
   columns,
+  serverId,
 }: DndListRowProps<TData>) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -24,27 +27,29 @@ export default function DndListRow<TData>({
   };
 
   const isCursorGrabbing = attributes["aria-pressed"];
-  
+
   return (
     <Card
       ref={setNodeRef}
       style={style}
       key={id}
-      className={cn(
-        "flex flex-row items-center justify-between p-2 gap-1 bg-background",
-        ` ${isCursorGrabbing ? "cursor-grabbing" : "cursor-grab"}`,
-      )}
-      {...attributes}
-      {...listeners}
-      aria-describedby={`DndContext-${id}`}
+      className="flex flex-row items-center p-2 gap-1 bg-background"
     >
       {columns.map((column) => (
         <div
           key={column.id}
-          className="flex-1 overflow-hidden overflow-ellipsis"
+          className={cn(
+            "overflow-hidden overflow-ellipsis",
+            column.id !== "actions"
+              ? `${isCursorGrabbing ? "cursor-grabbing" : "cursor-grab"} flex-1`
+              : "flex-shrink-0 w-auto",
+          )}
+          {...(column.id !== "actions" ? attributes : {})}
+          {...(column.id !== "actions" ? listeners : {})}
+          aria-describedby=""
         >
           {column.cell ? (
-            <column.cell data={row} />
+            createElement(column.cell, { data: row, serverId })
           ) : (
             <span className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm">
               {row[column.id as keyof TData] as string}
