@@ -16,9 +16,13 @@ export async function connectToGbxClient(id: number) {
   }
 
   const client = new GbxClient();
-  const status = await client.connect(server.host, server.xmlrpc_port);
-  if (!status) {
-    throw new Error("Failed to connect to GBX client");
+  try {
+    const status = await client.connect(server.host, server.xmlrpc_port);
+    if (!status) {
+      throw new Error("Failed to connect to GBX client");
+    }
+  } catch (error) {
+    throw new Error(`Failed to connect to GBX client: ${error}`);
   }
 
   try {

@@ -14,7 +14,7 @@ export default async function ServerMapsPage({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Server Maps</h1>
+        <h1 className="text-2xl font-bold">Manage Server Maps</h1>
         <h4 className="text-muted-foreground">
           Manage the maps of the server and their order.
         </h4>

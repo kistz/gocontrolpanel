@@ -6,6 +6,7 @@ export interface Server {
   xmlrpc_port: number;
   user: string;
   password: string;
+  isLocal?: boolean;
 }
 
 export interface Config {

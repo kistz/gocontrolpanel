@@ -1,6 +1,13 @@
-import { Config } from "@/types/config";
+import { Config, Server } from "@/types/config";
 import "dotenv/config";
 import SERVERS from "../../servers.json";
+import isLocalhost from "is-localhost-ip";
+
+(async () => {
+  for (const server of SERVERS as Server[]) {
+    server.isLocal = await isLocalhost(server.host, true);
+  }
+})();
 
 const config: Config = {
   MONGODB: {

@@ -2,6 +2,7 @@
 
 import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
+import config from "@/lib/config";
 import { getFiles } from "@/lib/server-utils";
 import { ServerSettings } from "@/types/server";
 
