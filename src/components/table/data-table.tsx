@@ -27,6 +27,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   limitHeight?: number;
   serverId: number;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +35,7 @@ export function DataTable<TData, TValue>({
   data,
   limitHeight = 206,
   serverId,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const { ref: tableBodyRef, hasScrollbar } =
@@ -101,6 +103,17 @@ export function DataTable<TData, TValue>({
                   ))}
                 </TableRow>
               ))
+            ) : isLoading ? (
+              <TableRow className="block">
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className="p-8 flex justify-center items-center"
+                >
+                  <div className="flex items-center justify-center w-full h-full">
+                    <p className="text-muted-foreground">Loading...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : (
               <TableRow>
                 <TableCell

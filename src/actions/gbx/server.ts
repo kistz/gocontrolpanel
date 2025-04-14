@@ -187,16 +187,20 @@ export async function getLocalMaps(server: number): Promise<LocalMapInfo[]> {
   const mapInfoList: LocalMapInfo[] = [];
 
   for (const map of validMaps) {
-    const mapInfo = await client.call("GetMapInfo", map);
+    try {
+      const mapInfo = await client.call("GetMapInfo", map);
 
-    if (!mapInfo) {
-      throw new Error(`Failed to get map info for ${map}`);
+      if (!mapInfo) {
+        throw new Error(`Failed to get map info for ${map}`);
+      }
+  
+      mapInfoList.push({
+        ...mapInfo,
+        Path: path.dirname(map),
+      } as LocalMapInfo);
+    } catch (error) {
+      console.error(`Error getting map info for ${map}:`, error);
     }
-
-    mapInfoList.push({
-      ...mapInfo,
-      Path: path.dirname(map),
-    } as LocalMapInfo);
   }
 
   return mapInfoList;

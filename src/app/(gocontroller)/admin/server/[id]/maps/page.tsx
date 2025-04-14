@@ -1,9 +1,7 @@
 import { getMapList } from "@/actions/database/map";
-import { getLocalMaps } from "@/actions/gbx/server";
+import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
-import { DataTable } from "@/components/table/data-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createColumns as createLocalMapColumns } from "./local-maps-columns";
 import { createColumns as createMapOrderColumns } from "./map-order-columns";
 
 export default async function ServerMapsPage({
@@ -14,7 +12,6 @@ export default async function ServerMapsPage({
   const { id } = await params;
 
   const maps = await getMapList(id);
-  const localMaps = await getLocalMaps(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -46,11 +43,7 @@ export default async function ServerMapsPage({
             createColumns={createMapOrderColumns}
           />
 
-          <DataTable
-            createColumns={createLocalMapColumns}
-            data={localMaps}
-            serverId={id}
-          />
+          <LocalMapsTable serverId={id} />
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <div>jukebox</div>

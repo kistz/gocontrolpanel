@@ -1,7 +1,7 @@
 "use server";
 import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
-import { DBMap, Map } from "@/types/map";
+import { DBMap, Map, MapInfo } from "@/types/map";
 import { ObjectId } from "mongodb";
 import { collections, getDatabase } from "./mongodb";
 
@@ -88,30 +88,54 @@ export async function getMapList(
 
   const client = await getGbxClient(server);
   const mapList = await client.call("GetMapList", count, start);
+
   if (!mapList) {
     throw new Error("Failed to get map list");
   }
 
-  let uids: string[] = [];
-  mapList.forEach((map: any) => {
-    if (map.UId) {
-      uids.push(map.UId);
-    }
-  });
+  const uids = mapList.filter((map: any) => map.UId).map((map: any) => map.UId);
 
   const db = await getDatabase();
   const collection = db.collection<DBMap>(collections.MAPS);
-  const maps = await collection.find({ uid: { $in: uids } }).toArray();
+
+  const existingMaps = await collection.find({ uid: { $in: uids } }).toArray();
+  const existingUids = new Set(existingMaps.map((m) => m.uid));
+
+  const missingMaps = mapList.filter((map: any) => !existingUids.has(map.UId));
+
+  if (missingMaps.length > 0) {
+    const now = new Date();
+
+    const newDbMaps: DBMap[] = [];
+    for (const map of missingMaps) {
+      const mapInfo: MapInfo = await client.call("GetMapInfo", map.FileName);
+
+      newDbMaps.push({
+        _id: new ObjectId(),
+        name: mapInfo.Name || "Unknown",
+        uid: mapInfo.UId,
+        fileName: mapInfo.FileName || "",
+        author: mapInfo.Author || "",
+        authorNickname: mapInfo.AuthorNickname || "",
+        authorTime: mapInfo.AuthorTime || 0,
+        goldTime: mapInfo.GoldTime || 0,
+        silverTime: mapInfo.SilverTime || 0,
+        bronzeTime: mapInfo.BronzeTime || 0,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
+    await collection.insertMany(newDbMaps);
+    existingMaps.push(...newDbMaps);
+  }
 
   const orderedMaps = mapList
     .map((map: any) => {
-      const foundMap = maps.find((m) => m.uid === map.UId);
-      if (foundMap) {
-        return mapDBMapToMap(foundMap);
-      }
-      return null;
+      const foundMap = existingMaps.find((m) => m.uid === map.UId);
+      return foundMap ? mapDBMapToMap(foundMap) : null;
     })
-    .filter((map: Map) => map !== null);
+    .filter((map: Map | null): map is Map => map !== null);
 
-  return orderedMaps as Map[];
+  return orderedMaps;
 }
