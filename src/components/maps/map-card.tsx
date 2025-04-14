@@ -37,9 +37,12 @@ export default function MapCard({ map, refetch }: MapCardProps) {
 
           <div className="flex items-center gap-2">
             <IconUser className="!size-5 flex-shrink-0" />
-            <span className="text-sm overflow-hidden overflow-ellipsis max-w-[150px]">
-              {map.authorNickname}
-            </span>
+            <span
+              className="text-sm overflow-hidden overflow-ellipsis max-w-[150px]"
+              dangerouslySetInnerHTML={{
+                __html: parseTmTags(map.authorNickname),
+              }}
+            ></span>
           </div>
         </div>
       </div>

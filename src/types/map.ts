@@ -63,3 +63,7 @@ export interface MapInfo {
   MapType: string;
   MapStyle: string;
 }
+
+export interface LocalMapInfo extends MapInfo {
+  Path: string;
+}

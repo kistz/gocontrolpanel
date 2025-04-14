@@ -96,6 +96,12 @@ export const createColumns = (
   },
   {
     id: "authorNickname",
+    cell: ({ data }) => (
+      <span
+        className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+        dangerouslySetInnerHTML={{ __html: parseTmTags(data.authorNickname) }}
+      />
+    ),
   },
   {
     id: "uid",

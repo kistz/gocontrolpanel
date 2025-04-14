@@ -4,7 +4,9 @@ import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
 import config from "@/lib/config";
 import { getFiles } from "@/lib/server-utils";
+import { LocalMapInfo, MapInfo } from "@/types/map";
 import { ServerSettings } from "@/types/server";
+import path from "path";
 
 export async function getServerSettings(
   server: number,
@@ -130,7 +132,7 @@ export async function getLocalScripts(server: number): Promise<string[]> {
     "TrackMania/TM_TMWTTeams_Online.Script.txt",
   ];
 
-  if (!config.SERVERS.find((s) => s.id === server)?.isLocal) {
+  if (!config.SERVERS.find((s) => s.id == server)?.isLocal) {
     return defaultScripts;
   }
 
@@ -160,10 +162,10 @@ export async function getLocalScripts(server: number): Promise<string[]> {
   }
 }
 
-export async function getLocalMaps(server: number): Promise<string[]> {
+export async function getLocalMaps(server: number): Promise<LocalMapInfo[]> {
   await withAuth(["admin"]);
 
-  if (!config.SERVERS.find((s) => s.id === server)?.isLocal) {
+  if (!config.SERVERS.find((s) => s.id == server)?.isLocal) {
     return [];
   }
 
@@ -182,5 +184,20 @@ export async function getLocalMaps(server: number): Promise<string[]> {
     })
     .filter((path) => path !== undefined);
 
-  return [...new Set(validMaps)];
+  const mapInfoList: LocalMapInfo[] = [];
+
+  for (const map of validMaps) {
+    const mapInfo = await client.call("GetMapInfo", map);
+
+    if (!mapInfo) {
+      throw new Error(`Failed to get map info for ${map}`);
+    }
+
+    mapInfoList.push({
+      ...mapInfo,
+      Path: path.dirname(map),
+    } as LocalMapInfo);
+  }
+
+  return mapInfoList;
 }

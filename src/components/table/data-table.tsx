@@ -23,19 +23,23 @@ import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  createColumns: (serverId: number) => ColumnDef<TData, TValue>[];
   data: TData[];
   limitHeight?: number;
+  serverId: number;
 }
 
 export function DataTable<TData, TValue>({
-  columns,
+  createColumns,
   data,
   limitHeight = 206,
+  serverId,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
+
+  const columns = createColumns(serverId);
 
   const table = useReactTable({
     data,

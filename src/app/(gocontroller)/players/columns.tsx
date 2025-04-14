@@ -18,12 +18,20 @@ import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { parseTmTags } from "tmtags";
 
 export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Nickname"} />
+    ),
+    cell: ({ row }) => (
+      <span
+        dangerouslySetInnerHTML={{
+          __html: parseTmTags(row.getValue("nickName")),
+        }}
+      />
     ),
   },
   {
