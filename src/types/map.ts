@@ -40,6 +40,10 @@ export interface Map {
   deletedAt?: Date;
 }
 
+export interface OrderMap extends Map {
+  id: string;
+}
+
 export interface MapInfo {
   Name: string;
   UId: string;

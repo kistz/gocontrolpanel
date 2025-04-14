@@ -1,4 +1,5 @@
-import { getLocalMaps } from "@/actions/gbx/server";
+import { getMapList } from "@/actions/database/map";
+import MapOrder from "@/components/maps/map-order";
 
 export default async function ServerMapsPage({
   params,
@@ -7,5 +8,7 @@ export default async function ServerMapsPage({
 }) {
   const { id } = await params;
 
-  console.log(await getLocalMaps(id));
+  const maps = await getMapList(id);
+
+  return <MapOrder mapList={maps} />;
 }
