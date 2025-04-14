@@ -34,8 +34,11 @@ export default function MapOrder({ mapList }: { mapList: Map[] }) {
     },
     {
       id: "name",
-      cell: ({data}) => (
-        <span className="overflow-hidden overflow-ellipsis whitespace-nowrap" dangerouslySetInnerHTML={{ __html: parseTmTags(data.name) }} />
+      cell: ({ data }) => (
+        <span
+          className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+          dangerouslySetInnerHTML={{ __html: parseTmTags(data.name) }}
+        />
       ),
     },
     {
@@ -46,7 +49,7 @@ export default function MapOrder({ mapList }: { mapList: Map[] }) {
     },
     {
       id: "actions",
-      cell: ({data}) => {
+      cell: ({ data }) => {
         const [_, startTransition] = useTransition();
         const [isOpen, setIsOpen] = useState(false);
         const { data: session, status } = useSession();

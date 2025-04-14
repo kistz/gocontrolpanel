@@ -24,14 +24,14 @@ export default function DndListRow<TData>({
   };
 
   const isCursorGrabbing = attributes["aria-pressed"];
-  console.log(columns);
+  
   return (
     <Card
       ref={setNodeRef}
       style={style}
       key={id}
       className={cn(
-        "flex flex-row items-center justify-between p-2 gap-1",
+        "flex flex-row items-center justify-between p-2 gap-1 bg-background",
         ` ${isCursorGrabbing ? "cursor-grabbing" : "cursor-grab"}`,
       )}
       {...attributes}
