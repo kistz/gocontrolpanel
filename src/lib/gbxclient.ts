@@ -1,3 +1,4 @@
+"use server";
 import config from "@/lib/config";
 import { GbxClient } from "@evotm/gbxclient";
 

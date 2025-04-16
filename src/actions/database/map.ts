@@ -1,6 +1,6 @@
 "use server";
-import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
+import { getGbxClient } from "@/lib/gbxclient";
 import { DBMap, Map, MapInfo } from "@/types/map";
 import { ObjectId } from "mongodb";
 import { collections, getDatabase } from "./mongodb";

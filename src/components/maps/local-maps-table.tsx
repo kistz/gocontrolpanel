@@ -20,11 +20,12 @@ export default function LocalMapsTable({ serverId }: { serverId: number }) {
     fetchLocalMaps();
   }, [serverId]);
 
+  const columns = createLocalMapColumns(serverId);
+
   return (
     <DataTable
-      createColumns={createLocalMapColumns}
       data={data}
-      serverId={serverId}
+      columns={columns}
       isLoading={isLoading}
       limitHeight={0}
     />

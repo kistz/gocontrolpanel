@@ -67,3 +67,13 @@ export interface MapInfo {
 export interface LocalMapInfo extends MapInfo {
   Path: string;
 }
+
+export interface JukeboxMap extends Map {
+  QueuedBy: string;
+  QueuedByDisplayName: string;
+  QueuedAt: Date;
+}
+
+export interface OrderJukeboxMap extends JukeboxMap {
+  id: string | number;
+}

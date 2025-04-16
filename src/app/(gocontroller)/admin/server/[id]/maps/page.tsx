@@ -1,8 +1,10 @@
 import { getMapList } from "@/actions/database/map";
+import { getJukebox } from "@/actions/gbx/map";
+import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createColumns as createMapOrderColumns } from "./map-order-columns";
+import { createColumns as createJukeboxColumns } from "./jukebox-columns";
 
 export default async function ServerMapsPage({
   params,
@@ -12,6 +14,7 @@ export default async function ServerMapsPage({
   const { id } = await params;
 
   const maps = await getMapList(id);
+  const jukebox = await getJukebox(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,16 +40,21 @@ export default async function ServerMapsPage({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
-          <MapOrder
-            mapList={maps}
-            serverId={id}
-            createColumns={createMapOrderColumns}
-          />
+          <MapOrder mapList={maps} serverId={id} />
 
           <LocalMapsTable serverId={id} />
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
-          <p className="text-muted-foreground">Note: If you also have a seperate server controller running on this server, the jukeboxes might conflict.</p>
+          <p className="text-muted-foreground">
+            Note: If you also have a seperate server controller running on this
+            server, the jukeboxes might conflict.
+          </p>
+
+          <Jukebox
+            serverId={id}
+            jukebox={jukebox}
+            maps={maps}
+          />
         </TabsContent>
       </Tabs>
     </div>

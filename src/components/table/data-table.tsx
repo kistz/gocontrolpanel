@@ -23,25 +23,21 @@ import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
-  createColumns: (serverId: number) => ColumnDef<TData, TValue>[];
+  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   limitHeight?: number;
-  serverId: number;
   isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
-  createColumns,
+  columns,
   data,
   limitHeight = 206,
-  serverId,
   isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
-
-  const columns = createColumns(serverId);
 
   const table = useReactTable({
     data,
@@ -78,53 +74,57 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
 
-            <TableBody
+          <TableBody
             ref={tableBodyRef}
             className="block overflow-auto"
-            style={limitHeight !== 0 ? { maxHeight: `calc(100vh - ${limitHeight}px)` } : undefined}
-            >
+            style={
+              limitHeight !== 0
+                ? { maxHeight: `calc(100vh - ${limitHeight}px)` }
+                : undefined
+            }
+          >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="table table-fixed w-full"
-              >
-                {row.getVisibleCells().map((cell) => (
-                <TableCell
-                  key={cell.id}
-                  className="px-4 overflow-hidden overflow-ellipsis"
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="table table-fixed w-full"
                 >
-                  {flexRender(
-                  cell.column.columnDef.cell,
-                  cell.getContext(),
-                  )}
-                </TableCell>
-                ))}
-              </TableRow>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="px-4 overflow-hidden overflow-ellipsis"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))
             ) : isLoading ? (
               <TableRow className="block">
-              <TableCell
-                colSpan={table.getAllColumns().length}
-                className="p-8 flex justify-center items-center"
-              >
-                <div className="flex items-center justify-center w-full h-full">
-                <p className="text-muted-foreground">Loading...</p>
-                </div>
-              </TableCell>
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className="p-8 flex justify-center items-center"
+                >
+                  <div className="flex items-center justify-center w-full h-full">
+                    <p className="text-muted-foreground">Loading...</p>
+                  </div>
+                </TableCell>
               </TableRow>
             ) : (
               <TableRow>
-              <TableCell
-                colSpan={table.getAllColumns().length}
-                className="h-24 text-center"
-              >
-                No results.
-              </TableCell>
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
               </TableRow>
             )}
-            </TableBody>
+          </TableBody>
         </Table>
       </div>
 

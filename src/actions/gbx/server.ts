@@ -1,10 +1,10 @@
 "use server";
 
-import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
 import config from "@/lib/config";
+import { getGbxClient } from "@/lib/gbxclient";
 import { getFiles } from "@/lib/server-utils";
-import { LocalMapInfo, MapInfo } from "@/types/map";
+import { LocalMapInfo } from "@/types/map";
 import { ServerSettings } from "@/types/server";
 import path from "path";
 
@@ -193,7 +193,7 @@ export async function getLocalMaps(server: number): Promise<LocalMapInfo[]> {
       if (!mapInfo) {
         throw new Error(`Failed to get map info for ${map}`);
       }
-  
+
       mapInfoList.push({
         ...mapInfo,
         Path: path.dirname(map),

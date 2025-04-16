@@ -1,0 +1,128 @@
+"use client";
+
+import { addMapToJukebox, clearJukebox, setJukebox } from "@/actions/gbx/map";
+import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/jukebox-columns";
+import { createColumns as createMapColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/server-maps-columns";
+import { getErrorMessage } from "@/lib/utils";
+import { JukeboxMap, Map, OrderJukeboxMap } from "@/types/map";
+import { useState } from "react";
+import { toast } from "sonner";
+import { DndList } from "../dnd/dnd-list";
+import { DataTable } from "../table/data-table";
+import { Button } from "../ui/button";
+
+interface JukeboxProps {
+  serverId: number;
+  jukebox: JukeboxMap[];
+  maps: Map[];
+}
+
+export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
+  const [defaultJukebox, setDefaultJukebox] = useState<JukeboxMap[]>(
+    jukebox || [],
+  );
+  const [jukeboxOrder, setJukeboxOrder] = useState<OrderJukeboxMap[]>(
+    defaultJukebox.map((map) => ({
+      ...map,
+      id: map.uid,
+    })),
+  );
+
+  async function saveJukebox() {
+    try {
+      await setJukebox(serverId, jukeboxOrder);
+      setDefaultJukebox(jukeboxOrder);
+
+      toast.success("Jukebox saved successfully");
+    } catch (error) {
+      toast.error("Error saving jukebox", {
+        description: getErrorMessage(error),
+      });
+    }
+  }
+
+  async function resetJukebox() {
+    setJukeboxOrder(
+      defaultJukebox.map((map) => ({
+        ...map,
+        id: map.uid,
+      })),
+    );
+  }
+
+  async function onRemoveMap(map: OrderJukeboxMap) {
+    const newJukebox = jukeboxOrder.filter((m) => m.uid !== map.uid);
+    setJukeboxOrder(newJukebox);
+  }
+
+  async function onAddMap(map: Map) {
+    try {
+      const newMap = await addMapToJukebox(serverId, map);
+      setJukeboxOrder((prev) => [
+        ...prev,
+        {
+          ...newMap,
+          id: newMap.uid,
+        },
+      ]);
+      setDefaultJukebox((prev) => [
+        ...prev,
+        {
+          ...newMap,
+          id: newMap.uid,
+        },
+      ]);
+      toast.success("Map added to jukebox successfully");
+    } catch (error) {
+      toast.error("Error adding map to jukebox", {
+        description: getErrorMessage(error),
+      });
+    }
+  }
+
+  async function onClearJukebox() {
+    try {
+      await clearJukebox(serverId);
+      setJukeboxOrder([]);
+      setDefaultJukebox([]);
+      toast.success("Jukebox cleared successfully");
+    } catch (error) {
+      toast.error("Error clearing jukebox", {
+        description: getErrorMessage(error),
+      });
+    }
+  }
+
+  const jukeboxColumns = createJukeboxColumns(onRemoveMap);
+  const mapColumns = createMapColumns(onAddMap);
+
+  return (
+    <div className="flex flex-col gap-6">
+      {jukeboxOrder.length === 0 ? (
+        <p className="text-muted-foreground">No maps in jukebox.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <DndList
+            columns={jukeboxColumns}
+            data={jukeboxOrder}
+            setData={setJukeboxOrder}
+            serverId={serverId}
+          />
+          <div className="flex flex-row-reverse gap-2">
+            <Button onClick={saveJukebox}>Save Jukebox</Button>
+
+            <Button variant="outline" onClick={resetJukebox}>
+              Reset Jukebox
+            </Button>
+
+            <Button variant={"destructive"} onClick={onClearJukebox}>
+              Clear Jukebox
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <DataTable data={maps} columns={mapColumns} limitHeight={0} />
+    </div>
+  );
+}

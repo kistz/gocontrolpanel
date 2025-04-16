@@ -27,3 +27,17 @@ export function generatePath(path: string, params: Record<string, string | numbe
     return acc.replace(`:${key}`, String(value));
   }, path);
 }
+
+export function getDivergingList<T extends Record<string, any>>(list1: T[], list2: T[], key: string): [T[], T[]] {
+  const minLength = Math.min(list1.length, list2.length);
+  let divergenceIndex = minLength;
+
+  for (let i = 0; i < minLength; i++) {
+    if (list1[i][key] !== list2[i][key]) {
+      divergenceIndex = i;
+      break;
+    }
+  }
+
+  return [list1.slice(divergenceIndex), list2.slice(divergenceIndex)];
+}

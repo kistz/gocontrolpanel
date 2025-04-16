@@ -1,8 +1,93 @@
 "use server";
 
-import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
-import { MapInfo } from "@/types/map";
+import config from "@/lib/config";
+import { getGbxClient } from "@/lib/gbxclient";
+import { JukeboxMap, Map, MapInfo } from "@/types/map";
+
+let jukeboxes: {
+  [key: number]: JukeboxMap[];
+} = {};
+
+export async function getJukebox(server: number): Promise<JukeboxMap[]> {
+  if (!jukeboxes[server]) {
+    jukeboxes[server] = [];
+  }
+  return jukeboxes[server];
+}
+
+export async function setJukebox(server: number, jukebox: JukeboxMap[]) {
+  jukeboxes[server] = jukebox;
+}
+
+export async function clearJukebox(server: number) {
+  jukeboxes[server] = [];
+}
+
+export async function addMapToJukebox(
+  server: number,
+  map: Map,
+): Promise<JukeboxMap> {
+  const session = await withAuth(["admin"]);
+
+  if (!jukeboxes[server]) {
+    jukeboxes[server] = [];
+  }
+
+  const newMap = {
+    ...map,
+    QueuedAt: new Date(),
+    QueuedBy: session.user.login,
+    QueuedByDisplayName: session.user.displayName,
+  };
+
+  jukeboxes[server].push(newMap);
+  return newMap;
+}
+
+export async function removeMapFromJukebox(
+  server: number,
+  uid: string,
+): Promise<void> {
+  jukeboxes[server] = jukeboxes[server].filter((map) => map.uid !== uid);
+}
+
+async function onPodiumStart(server: number) {
+  if (!jukeboxes[server]) {
+    jukeboxes[server] = [];
+    return;
+  }
+
+  if (jukeboxes[server].length === 0) {
+    return;
+  }
+
+  const client = await getGbxClient(server);
+
+  const nextMap = jukeboxes[server].shift();
+  if (!nextMap) {
+    return;
+  }
+
+  await client.call("ChooseNextMap", nextMap.fileName);
+}
+
+export async function setupCallbacks(): Promise<void> {
+  config.SERVERS.forEach(async (server) => {
+    jukeboxes[server.id] = [];
+
+    const client = await getGbxClient(server.id);
+    client.on("callback", (method, data) => {
+      if (method !== "ManiaPlanet.ModeScriptCallbackArray") return;
+
+      if (!data || data.length === 0) return;
+
+      if (data[0] == "Maniaplanet.Podium_Start") {
+        onPodiumStart(server.id);
+      }
+    });
+  });
+}
 
 export async function getCurrentMapInfo(server: number): Promise<MapInfo> {
   await withAuth(["admin"]);
@@ -51,7 +136,10 @@ export async function addMap(server: number, filename: string): Promise<void> {
   await client.call("AddMap", filename);
 }
 
-export async function addMapList(server: number, filenames: string[]): Promise<number> {
+export async function addMapList(
+  server: number,
+  filenames: string[],
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
@@ -64,14 +152,20 @@ export async function addMapList(server: number, filenames: string[]): Promise<n
   return res;
 }
 
-export async function removeMap(server: number, filename: string): Promise<void> {
+export async function removeMap(
+  server: number,
+  filename: string,
+): Promise<void> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
   await client.call("RemoveMap", filename);
 }
 
-export async function removeMapList(server: number, filenames: string[]): Promise<number> {
+export async function removeMapList(
+  server: number,
+  filenames: string[],
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
@@ -84,14 +178,20 @@ export async function removeMapList(server: number, filenames: string[]): Promis
   return res;
 }
 
-export async function insertMap(server: number, filename: string): Promise<void> {
+export async function insertMap(
+  server: number,
+  filename: string,
+): Promise<void> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
   await client.call("InsertMap", filename);
 }
 
-export async function insertMapList(server: number, filenames: string[]): Promise<number> {
+export async function insertMapList(
+  server: number,
+  filenames: string[],
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);

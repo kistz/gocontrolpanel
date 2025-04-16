@@ -1,22 +1,19 @@
 "use client";
 import { addMapList, removeMapList } from "@/actions/gbx/map";
-import { getErrorMessage } from "@/lib/utils";
+import { createColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/map-order-columns";
+import { getDivergingList, getErrorMessage } from "@/lib/utils";
 import { Map, OrderMap } from "@/types/map";
 import { useState } from "react";
 import { toast } from "sonner";
-import { DndList, DndListColumn } from "../dnd/dnd-list";
+import { DndList } from "../dnd/dnd-list";
 import { Button } from "../ui/button";
 
 export default function MapOrder({
   mapList,
   serverId,
-  createColumns,
 }: {
   mapList: Map[];
   serverId: number;
-  createColumns: (
-    onRemoveMap: (map: OrderMap) => void,
-  ) => DndListColumn<OrderMap>[];
 }) {
   const [defaultMapList, setDefaultMapList] = useState<Map[]>(mapList);
   const [mapOrder, setMapOrder] = useState<OrderMap[]>(
@@ -26,23 +23,12 @@ export default function MapOrder({
     })),
   );
 
-  function getDivergingMaps() {
-    const minLength = Math.min(defaultMapList.length, mapOrder.length);
-    let divergenceIndex = minLength;
-
-    for (let i = 0; i < minLength; i++) {
-      if (defaultMapList[i].uid !== mapOrder[i].uid) {
-        divergenceIndex = i;
-        break;
-      }
-    }
-
-    return mapOrder.slice(divergenceIndex).map((map) => map.fileName);
-  }
-
   async function saveMapOrder() {
     try {
-      const files = getDivergingMaps();
+      const files = getDivergingList(defaultMapList, mapOrder, "uid")[1].map(
+        (map) => map.fileName,
+      );
+
       if (!files.length || files.length == 0) return;
 
       await removeMapList(serverId, files);

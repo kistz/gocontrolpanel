@@ -1,6 +1,6 @@
 "use server";
-import { getGbxClient } from "@/gbx/gbxclient";
 import { withAuth } from "@/lib/auth";
+import { getGbxClient } from "@/lib/gbxclient";
 import { ModeScriptInfo } from "@/types/server";
 
 export async function restartMap(server: number): Promise<void> {
@@ -24,7 +24,10 @@ export async function balanceTeams(server: number): Promise<void> {
   await client.call("AutoTeamBalance");
 }
 
-export async function setShowOpponents(server: number, count: number): Promise<void> {
+export async function setShowOpponents(
+  server: number,
+  count: number,
+): Promise<void> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
@@ -41,7 +44,10 @@ export async function getShowOpponents(server: number): Promise<{
   return await client.call("GetForceShowAllOpponents");
 }
 
-export async function setScriptName(server: number, script: string): Promise<void> {
+export async function setScriptName(
+  server: number,
+  script: string,
+): Promise<void> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
@@ -58,35 +64,49 @@ export async function getScriptName(server: number): Promise<{
   return await client.call("GetScriptName");
 }
 
-export async function loadMatchSettings(server: number, filename: string): Promise<number> {
+export async function loadMatchSettings(
+  server: number,
+  filename: string,
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
   return await client.call("LoadMatchSettings", filename);
 }
 
-export async function appendPlaylist(server: number, filename: string): Promise<number> {
+export async function appendPlaylist(
+  server: number,
+  filename: string,
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
   return await client.call("AppendPlaylistFromMatchSettings", filename);
 }
 
-export async function saveMatchSettings(server: number, filename: string): Promise<number> {
+export async function saveMatchSettings(
+  server: number,
+  filename: string,
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
   return await client.call("SaveMatchSettings", filename);
 }
 
-export async function insertPlaylist(server: number, filename: string): Promise<number> {
+export async function insertPlaylist(
+  server: number,
+  filename: string,
+): Promise<number> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
   return await client.call("InsertPlaylistFromMatchSettings", filename);
 }
 
-export async function getModeScriptInfo(server: number): Promise<ModeScriptInfo> {
+export async function getModeScriptInfo(
+  server: number,
+): Promise<ModeScriptInfo> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
@@ -102,9 +122,12 @@ export async function getModeScriptSettings(server: number): Promise<{
   return await client.call("GetModeScriptSettings");
 }
 
-export async function setModeScriptSettings(server: number, settings: {
-  [key: string]: string | number | boolean;
-}): Promise<void> {
+export async function setModeScriptSettings(
+  server: number,
+  settings: {
+    [key: string]: string | number | boolean;
+  },
+): Promise<void> {
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
