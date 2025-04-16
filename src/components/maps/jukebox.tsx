@@ -1,11 +1,16 @@
 "use client";
 
-import { addMapToJukebox, clearJukebox, setJukebox } from "@/actions/gbx/map";
+import {
+  addMapToJukebox,
+  clearJukebox,
+  getJukebox,
+  setJukebox,
+} from "@/actions/gbx/map";
 import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/jukebox-columns";
 import { createColumns as createMapColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/server-maps-columns";
 import { getErrorMessage } from "@/lib/utils";
 import { JukeboxMap, Map } from "@/types/map";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
 import { DataTable } from "../table/data-table";
@@ -23,6 +28,19 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
   );
   const [jukeboxOrder, setJukeboxOrder] =
     useState<JukeboxMap[]>(defaultJukebox);
+
+  useEffect(() => {
+    const intervalIndex = setInterval(async () => {
+      const jukebox = await getJukebox(serverId);
+
+      if (jukebox[0]?.id !== jukeboxOrder[0]?.id) {
+        setJukeboxOrder(jukebox);
+        setDefaultJukebox(jukebox);
+      }
+    }, 10000);
+
+    return () => clearInterval(intervalIndex);
+  }, [jukeboxOrder, serverId]);
 
   async function saveJukebox() {
     try {
