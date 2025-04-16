@@ -22,4 +22,5 @@ export interface Config {
     REDIRECT_URI: string;
   };
   SERVERS: Server[];
+  REDISURI: string;
 }

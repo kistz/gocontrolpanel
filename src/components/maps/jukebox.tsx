@@ -4,7 +4,7 @@ import { addMapToJukebox, clearJukebox, setJukebox } from "@/actions/gbx/map";
 import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/jukebox-columns";
 import { createColumns as createMapColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/server-maps-columns";
 import { getErrorMessage } from "@/lib/utils";
-import { JukeboxMap, Map, OrderJukeboxMap } from "@/types/map";
+import { JukeboxMap, Map } from "@/types/map";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
@@ -21,12 +21,8 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
   const [defaultJukebox, setDefaultJukebox] = useState<JukeboxMap[]>(
     jukebox || [],
   );
-  const [jukeboxOrder, setJukeboxOrder] = useState<OrderJukeboxMap[]>(
-    defaultJukebox.map((map) => ({
-      ...map,
-      id: map.uid,
-    })),
-  );
+  const [jukeboxOrder, setJukeboxOrder] =
+    useState<JukeboxMap[]>(defaultJukebox);
 
   async function saveJukebox() {
     try {
@@ -41,37 +37,16 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
     }
   }
 
-  async function resetJukebox() {
-    setJukeboxOrder(
-      defaultJukebox.map((map) => ({
-        ...map,
-        id: map.uid,
-      })),
-    );
-  }
-
-  async function onRemoveMap(map: OrderJukeboxMap) {
-    const newJukebox = jukeboxOrder.filter((m) => m.uid !== map.uid);
+  async function onRemoveMap(map: JukeboxMap) {
+    const newJukebox = jukeboxOrder.filter((m) => m.id !== map.id);
     setJukeboxOrder(newJukebox);
   }
 
   async function onAddMap(map: Map) {
     try {
       const newMap = await addMapToJukebox(serverId, map);
-      setJukeboxOrder((prev) => [
-        ...prev,
-        {
-          ...newMap,
-          id: newMap.uid,
-        },
-      ]);
-      setDefaultJukebox((prev) => [
-        ...prev,
-        {
-          ...newMap,
-          id: newMap.uid,
-        },
-      ]);
+      setJukeboxOrder((prev) => [...prev, newMap]);
+      setDefaultJukebox((prev) => [...prev, newMap]);
       toast.success("Map added to jukebox successfully");
     } catch (error) {
       toast.error("Error adding map to jukebox", {
@@ -110,10 +85,6 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
           />
           <div className="flex flex-row-reverse gap-2">
             <Button onClick={saveJukebox}>Save Jukebox</Button>
-
-            <Button variant="outline" onClick={resetJukebox}>
-              Reset Jukebox
-            </Button>
 
             <Button variant={"destructive"} onClick={onClearJukebox}>
               Clear Jukebox

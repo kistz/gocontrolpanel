@@ -1,7 +1,7 @@
 import { Config, Server } from "@/types/config";
 import "dotenv/config";
-import SERVERS from "../../servers.json";
 import isLocalhost from "is-localhost-ip";
+import SERVERS from "../../servers.json";
 
 (async () => {
   for (const server of SERVERS as Server[]) {
@@ -22,6 +22,7 @@ const config: Config = {
     REDIRECT_URI: process.env.NADEO_REDIRECT_URI || "",
   },
   SERVERS,
+  REDISURI: process.env.REDIS_URI || "",
 };
 
 if (!config.MONGODB.URI) {

@@ -4,7 +4,6 @@ import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createColumns as createJukeboxColumns } from "./jukebox-columns";
 
 export default async function ServerMapsPage({
   params,
@@ -46,15 +45,11 @@ export default async function ServerMapsPage({
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">
-            Note: If you also have a seperate server controller running on this
+            Note: If you have a seperate server controller running on this
             server, the jukeboxes might conflict.
           </p>
 
-          <Jukebox
-            serverId={id}
-            jukebox={jukebox}
-            maps={maps}
-          />
+          <Jukebox serverId={id} jukebox={jukebox} maps={maps} />
         </TabsContent>
       </Tabs>
     </div>

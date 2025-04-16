@@ -3,25 +3,28 @@
 import { withAuth } from "@/lib/auth";
 import config from "@/lib/config";
 import { getGbxClient } from "@/lib/gbxclient";
+import redis from "@/lib/redis";
 import { JukeboxMap, Map, MapInfo } from "@/types/map";
 
-let jukeboxes: {
-  [key: number]: JukeboxMap[];
-} = {};
+const getKey = (server: number) => `jukebox:${server}`;
 
 export async function getJukebox(server: number): Promise<JukeboxMap[]> {
-  if (!jukeboxes[server]) {
-    jukeboxes[server] = [];
-  }
-  return jukeboxes[server];
+  const key = getKey(server);
+  const items = await redis.lrange(key, 0, -1);
+  return items.map((item) => JSON.parse(item));
 }
 
 export async function setJukebox(server: number, jukebox: JukeboxMap[]) {
-  jukeboxes[server] = jukebox;
+  const key = getKey(server);
+  await redis.del(key);
+  if (jukebox.length > 0) {
+    await redis.rpush(key, ...jukebox.map((map) => JSON.stringify(map)));
+  }
 }
 
 export async function clearJukebox(server: number) {
-  jukeboxes[server] = [];
+  const key = getKey(server);
+  await redis.del(key);
 }
 
 export async function addMapToJukebox(
@@ -30,65 +33,69 @@ export async function addMapToJukebox(
 ): Promise<JukeboxMap> {
   const session = await withAuth(["admin"]);
 
-  if (!jukeboxes[server]) {
-    jukeboxes[server] = [];
-  }
-
-  const newMap = {
+  const newMap: JukeboxMap = {
     ...map,
+    id: new Date().toISOString(),
     QueuedAt: new Date(),
     QueuedBy: session.user.login,
     QueuedByDisplayName: session.user.displayName,
   };
 
-  jukeboxes[server].push(newMap);
+  const key = getKey(server);
+  await redis.rpush(key, JSON.stringify(newMap));
+
   return newMap;
 }
 
 export async function removeMapFromJukebox(
   server: number,
-  uid: string,
+  id: string,
 ): Promise<void> {
-  jukeboxes[server] = jukeboxes[server].filter((map) => map.uid !== uid);
+  const key = getKey(server);
+  const items = await redis.lrange(key, 0, -1);
+
+  const filtered = items.filter((item) => {
+    const parsed = JSON.parse(item);
+    return parsed.id !== id;
+  });
+
+  await redis.del(key);
+  if (filtered.length > 0) {
+    await redis.rpush(key, ...filtered);
+  }
 }
 
 async function onPodiumStart(server: number) {
-  if (!jukeboxes[server]) {
-    jukeboxes[server] = [];
-    return;
-  }
+  const key = getKey(server);
+  const items = await redis.lrange(key, 0, -1);
 
-  if (jukeboxes[server].length === 0) {
-    return;
-  }
+  if (items.length === 0) return;
+
+  const nextRaw = items[0];
+  const nextMap: JukeboxMap = JSON.parse(nextRaw);
 
   const client = await getGbxClient(server);
-
-  const nextMap = jukeboxes[server].shift();
-  if (!nextMap) {
-    return;
-  }
-
   await client.call("ChooseNextMap", nextMap.fileName);
+
+  await redis.lpop(key);
 }
 
 export async function setupCallbacks(): Promise<void> {
-  config.SERVERS.forEach(async (server) => {
-    jukeboxes[server.id] = [];
+  for (const server of config.SERVERS) {
+    const key = getKey(server.id);
+    await redis.del(key);
 
     const client = await getGbxClient(server.id);
     client.on("callback", (method, data) => {
       if (method !== "ManiaPlanet.ModeScriptCallbackArray") return;
-
       if (!data || data.length === 0) return;
 
-      if (data[0] == "Maniaplanet.Podium_Start") {
+      if (data[0] === "Maniaplanet.Podium_Start") {
         onPodiumStart(server.id);
       }
     });
-  });
+  }
 }
-
 export async function getCurrentMapInfo(server: number): Promise<MapInfo> {
   await withAuth(["admin"]);
 

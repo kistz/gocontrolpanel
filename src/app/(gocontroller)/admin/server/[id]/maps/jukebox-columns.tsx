@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage } from "@/lib/utils";
-import { OrderJukeboxMap } from "@/types/map";
+import { JukeboxMap } from "@/types/map";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -22,9 +22,9 @@ const MapActionsCell = memo(function MapActionsCell({
   serverId,
   onRemoveMap,
 }: {
-  data: OrderJukeboxMap;
+  data: JukeboxMap;
   serverId?: number;
-  onRemoveMap: (map: OrderJukeboxMap) => void;
+  onRemoveMap: (map: JukeboxMap) => void;
 }) {
   if (!serverId) return null;
 
@@ -34,7 +34,7 @@ const MapActionsCell = memo(function MapActionsCell({
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        await removeMapFromJukebox(serverId, data.uid);
+        await removeMapFromJukebox(serverId, data.id);
         onRemoveMap(data);
         toast.success("Map successfully removed");
       } catch (error) {
@@ -78,8 +78,8 @@ const MapActionsCell = memo(function MapActionsCell({
 });
 
 export const createColumns = (
-  onRemoveMap: (map: OrderJukeboxMap) => void,
-): DndListColumn<OrderJukeboxMap>[] => [
+  onRemoveMap: (map: JukeboxMap) => void,
+): DndListColumn<JukeboxMap>[] => [
   {
     id: "id",
     cell: () => <></>,

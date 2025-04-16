@@ -69,11 +69,8 @@ export interface LocalMapInfo extends MapInfo {
 }
 
 export interface JukeboxMap extends Map {
+  id: string;
   QueuedBy: string;
   QueuedByDisplayName: string;
   QueuedAt: Date;
-}
-
-export interface OrderJukeboxMap extends JukeboxMap {
-  id: string | number;
 }
