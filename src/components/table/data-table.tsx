@@ -78,53 +78,53 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
 
-          <TableBody
+            <TableBody
             ref={tableBodyRef}
             className="block overflow-auto"
-            style={{ maxHeight: `calc(100vh - ${limitHeight}px)` }}
-          >
+            style={limitHeight !== 0 ? { maxHeight: `calc(100vh - ${limitHeight}px)` } : undefined}
+            >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="table table-fixed w-full"
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className="table table-fixed w-full"
+              >
+                {row.getVisibleCells().map((cell) => (
+                <TableCell
+                  key={cell.id}
+                  className="px-4 overflow-hidden overflow-ellipsis"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="px-4 overflow-hidden overflow-ellipsis"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  {flexRender(
+                  cell.column.columnDef.cell,
+                  cell.getContext(),
+                  )}
+                </TableCell>
+                ))}
+              </TableRow>
               ))
             ) : isLoading ? (
               <TableRow className="block">
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="p-8 flex justify-center items-center"
-                >
-                  <div className="flex items-center justify-center w-full h-full">
-                    <p className="text-muted-foreground">Loading...</p>
-                  </div>
-                </TableCell>
+              <TableCell
+                colSpan={table.getAllColumns().length}
+                className="p-8 flex justify-center items-center"
+              >
+                <div className="flex items-center justify-center w-full h-full">
+                <p className="text-muted-foreground">Loading...</p>
+                </div>
+              </TableCell>
               </TableRow>
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
+              <TableCell
+                colSpan={table.getAllColumns().length}
+                className="h-24 text-center"
+              >
+                No results.
+              </TableCell>
               </TableRow>
             )}
-          </TableBody>
+            </TableBody>
         </Table>
       </div>
 

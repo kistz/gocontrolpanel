@@ -46,7 +46,7 @@ export default async function ServerMapsPage({
           <LocalMapsTable serverId={id} />
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
-          <div>jukebox</div>
+          <p className="text-muted-foreground">Note: If you also have a seperate server controller running on this server, the jukeboxes might conflict.</p>
         </TabsContent>
       </Tabs>
     </div>
