@@ -61,6 +61,7 @@ export async function getRecordCountPerDay(days: number): Promise<
         },
       },
     ])
+    .sort({ createdAt: -1 })
     .toArray();
 
   return records.map((record) => ({
