@@ -47,7 +47,7 @@ export function PaginationTable<TData, TValue>({
   createColumns,
   fetchData,
   pageSize = 10,
-  limitHeight = 206,
+  limitHeight = 266,
   filter = false,
 }: PaginationTableProps<TData, TValue>) {
   const { ref: tableBodyRef, hasScrollbar } =
