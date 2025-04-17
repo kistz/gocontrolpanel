@@ -22,7 +22,7 @@ import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
 interface PaginationTableProps<TData, TValue> {
@@ -62,6 +62,13 @@ export function PaginationTable<TData, TValue>({
     { field, order },
     globalFilter,
   );
+
+  useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  }, [globalFilter]);
 
   const columns = createColumns(refetch);
 

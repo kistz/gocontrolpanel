@@ -77,7 +77,15 @@ export async function getRecordsPaginated(
 ): Promise<{ data: Record[]; totalCount: number }> {
   const db = await getDatabase();
   const collection = db.collection<DBRecord>(collections.RECORDS);
-  const totalCount = await collection.countDocuments();
+  const totalCount = await collection.countDocuments({
+    deletedAt: { $exists: false },
+    ...(filter && {
+      $or: [
+        { login: { $regex: filter, $options: "i" } },
+        { mapUid: { $regex: filter, $options: "i" } },
+      ],
+    }),
+  });
   const records = await collection
     .find({
       deletedAt: { $exists: false },

@@ -42,7 +42,9 @@ export async function getMapsPaginated(
 ): Promise<{ data: Map[]; totalCount: number }> {
   const db = await getDatabase();
   const collection = db.collection<DBMap>(collections.MAPS);
-  const totalCount = await collection.countDocuments();
+  const totalCount = await collection.countDocuments({
+    deletedAt: { $exists: false },
+  });
   const maps = await collection
     .find({
       deletedAt: { $exists: false },

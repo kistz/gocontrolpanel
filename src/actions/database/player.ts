@@ -42,7 +42,17 @@ export async function getPlayersPaginated(
 ): Promise<{ data: Player[]; totalCount: number }> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
-  const totalCount = await collection.countDocuments();
+  const totalCount = await collection.countDocuments({
+    deletedAt: { $exists: false },
+    ...(filter && {
+      $or: [
+        { login: { $regex: filter, $options: "i" } },
+        { nickname: { $regex: filter, $options: "i" } },
+        { ubiUid: { $regex: filter, $options: "i" } },
+        { path: { $regex: filter, $options: "i" } },
+      ],
+    }),
+  });
   const players = await collection
     .find({
       deletedAt: { $exists: false },
