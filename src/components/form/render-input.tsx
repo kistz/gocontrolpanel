@@ -66,7 +66,7 @@ export default function RenderInput<TControl extends FieldValues>({
             />
             <Button
               variant={null}
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              className="absolute right-0 top-1/2 -translate-y-1/2"
               onClick={() => {
                 setShowPassword((prev) => !prev);
               }}
