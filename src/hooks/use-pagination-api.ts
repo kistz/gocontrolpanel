@@ -11,9 +11,11 @@ export const usePaginationAPI = <TData>(
   fetchData: (
     pagination: { skip: number; limit: number },
     sorting: { field: string; order: string },
+    filter?: string,
   ) => Promise<{ data: TData[]; totalCount: number }>,
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string } = { field: "_id", order: "ASC" },
+  filter: string = "",
 ): PaginationAPIHook<TData> => {
   const [data, setData] = useState<TData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -23,7 +25,7 @@ export const usePaginationAPI = <TData>(
     setLoading(true);
     try {
       const { data: fetchedData, totalCount: fetchedTotalCount } =
-        await fetchData(pagination, sorting);
+        await fetchData(pagination, sorting, filter);
       setData(fetchedData);
       setTotalCount(fetchedTotalCount);
     } catch (error) {
@@ -35,7 +37,7 @@ export const usePaginationAPI = <TData>(
 
   useEffect(() => {
     fetchDataFromAPI();
-  }, [pagination.skip, pagination.limit, sorting.field, sorting.order]);
+  }, [pagination.skip, pagination.limit, sorting.field, sorting.order, filter]);
 
   return { data, totalCount, loading, refetch: fetchDataFromAPI };
 };

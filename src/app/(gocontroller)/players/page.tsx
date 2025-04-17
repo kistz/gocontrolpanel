@@ -7,6 +7,7 @@ export default function PlayersPage() {
     <PaginationTable
       createColumns={createColumns}
       fetchData={getPlayersPaginated}
+      filter={true}
     />
   );
 }

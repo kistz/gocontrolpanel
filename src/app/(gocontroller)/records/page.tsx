@@ -7,6 +7,7 @@ export default function RecordsPage() {
     <PaginationTable
       createColumns={createColumns}
       fetchData={getRecordsPaginated}
+      filter={true}
     />
   );
 }

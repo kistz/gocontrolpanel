@@ -38,6 +38,7 @@ export async function getNewPlayersCount(days: number): Promise<number> {
 export async function getPlayersPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
+  filter?: string,
 ): Promise<{ data: Player[]; totalCount: number }> {
   const db = await getDatabase();
   const collection = db.collection<DBPlayer>(collections.PLAYERS);
@@ -45,6 +46,14 @@ export async function getPlayersPaginated(
   const players = await collection
     .find({
       deletedAt: { $exists: false },
+      ...(filter && {
+        $or: [
+          { login: { $regex: filter, $options: "i" } },
+          { nickname: { $regex: filter, $options: "i" } },
+          { ubiUid: { $regex: filter, $options: "i" } },
+          { path: { $regex: filter, $options: "i" } },
+        ],
+      }),
     })
     .skip(pagination.skip)
     .limit(pagination.limit)

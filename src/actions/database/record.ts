@@ -73,6 +73,7 @@ export async function getRecordCountPerDay(days: number): Promise<
 export async function getRecordsPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
+  filter?: string,
 ): Promise<{ data: Record[]; totalCount: number }> {
   const db = await getDatabase();
   const collection = db.collection<DBRecord>(collections.RECORDS);
@@ -80,6 +81,12 @@ export async function getRecordsPaginated(
   const records = await collection
     .find({
       deletedAt: { $exists: false },
+      ...(filter && {
+        $or: [
+          { login: { $regex: filter, $options: "i" } },
+          { mapUid: { $regex: filter, $options: "i" } },
+        ],
+      }),
     })
     .skip(pagination.skip)
     .limit(pagination.limit)
