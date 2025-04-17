@@ -4,13 +4,13 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 
-import { DataTablePagination } from "@/components/table/data-table-pagination";
 import {
   Table,
   TableBody,
@@ -21,12 +21,14 @@ import {
 } from "@/components/ui/table";
 import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { useState } from "react";
+import { Input } from "../ui/input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   limitHeight?: number;
   isLoading?: boolean;
+  filter?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,8 +36,10 @@ export function DataTable<TData, TValue>({
   data,
   limitHeight = 206,
   isLoading = false,
+  filter = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>("");
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
 
@@ -46,13 +50,26 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: "includesString",
     state: {
       sorting,
+      globalFilter,
     },
   });
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-4">
+      {filter && (
+        <Input
+          placeholder="Search..."
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(event.target.value)}
+          className="max-w-sm"
+        />
+      )}
+
       <div className="rounded-md border flex-1 overflow-hidden">
         <Table>
           <TableHeader
@@ -126,10 +143,6 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
-
-      <div className="mt-4">
-        <DataTablePagination table={table} />
       </div>
     </div>
   );
