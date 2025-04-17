@@ -4,6 +4,7 @@ import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import config from "@/lib/config";
 
 export default async function ServerMapsPage({
   params,
@@ -14,6 +15,7 @@ export default async function ServerMapsPage({
 
   const maps = await getMapList(id);
   const jukebox = await getJukebox(id);
+  const isLocal = config.SERVERS.find((s) => s.id == id)?.isLocal;
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,7 +43,7 @@ export default async function ServerMapsPage({
         <TabsContent value="maps" className="flex flex-col gap-6">
           <MapOrder mapList={maps} serverId={id} />
 
-          <LocalMapsTable serverId={id} />
+          {isLocal && <LocalMapsTable serverId={id} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">
