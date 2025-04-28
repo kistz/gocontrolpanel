@@ -4,12 +4,12 @@ import { loadMatchSettings, saveMatchSettings } from "@/actions/gbx/game";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { getErrorMessage } from "@/lib/utils";
 import { MatchSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MatchSettingsSchema } from "./game-schema";
-import { getErrorMessage } from "@/lib/utils";
 
 export default function MatchSettingsForm({ serverId }: { serverId: number }) {
   const matchSettingsForm = useForm<MatchSettings>({
@@ -23,7 +23,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
     try {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
-      await loadMatchSettings(serverId, filename);
+      await loadMatchSettings(serverId, "MatchSettings/" + filename);
       toast.success("Match settings loaded successfully");
     } catch (error) {
       toast.error("Failed to load match settings", {
