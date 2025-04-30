@@ -15,7 +15,6 @@ import { getErrorMessage } from "@/lib/utils";
 import { Player } from "@/types/player";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
@@ -41,6 +40,12 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
     ),
   },
   {
+    accessorKey: "roles",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Roles"} />
+    ),
+  },
+  {
     accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Joined"} />
@@ -62,9 +67,6 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
       const player = row.original;
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
-      const { data: session, status } = useSession();
-      const isAdmin =
-        status === "authenticated" && session.user.roles.includes("admin");
 
       const handleDelete = () => {
         startTransition(async () => {
@@ -91,17 +93,13 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>View player</DropdownMenuItem>
-              {isAdmin && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setIsOpen(true)}
-                  >
-                    Delete player
-                  </DropdownMenuItem>
-                </>
-              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setIsOpen(true)}
+              >
+                Delete player
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
