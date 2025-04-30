@@ -1,4 +1,8 @@
-import { getPlayerById, getPlayerByLogin } from "@/actions/database/player";
+import {
+  createPlayerAuth,
+  getPlayerById,
+  getPlayerByLogin,
+} from "@/actions/database/player";
 import { Player } from "@/types/player";
 import {
   GetServerSidePropsContext,
@@ -8,6 +12,7 @@ import {
 import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
+import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
@@ -95,10 +100,26 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (!dbUser) {
-        throw new Error(`User not found`);
+        let ubiUid = "";
+        try {
+          const webidentities = await getWebIdentities([token.accountId]);
+          if (webidentities && webidentities.length > 0) {
+            ubiUid = webidentities[0].uid;
+          }
+        } catch (error) {
+          console.error("Failed to fetch web identities", error);
+        }
+
+        dbUser = await createPlayerAuth({
+          login: token.login,
+          nickName: token.displayName,
+          roles: [],
+          path: "",
+          ubiUid,
+        });
       }
 
-      token._id = dbUser._id.toString();
+      token._id = dbUser._id;
       token.roles = dbUser.roles || [];
       token.ubiId = dbUser.ubiUid;
 

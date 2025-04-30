@@ -104,6 +104,40 @@ export async function getPlayerByLogin(login: string): Promise<Player | null> {
   return mapDBPlayerToPlayer(player);
 }
 
+export async function createPlayerAuth(
+  player: Omit<DBPlayer, "_id" | "createdAt" | "updatedAt">,
+): Promise<Player> {
+  const db = await getDatabase();
+  const collection = db.collection<DBPlayer>(collections.PLAYERS);
+
+  const existingPlayer = await collection.findOne({
+    $or: [
+      { login: player.login },
+      { nickname: player.nickName },
+      { ubiUid: player.ubiUid },
+    ],
+  });
+
+  if (existingPlayer) {
+    throw new Error("Player with this login or nickname already exists");
+  }
+
+  const newPlayer = {
+    ...player,
+    _id: new ObjectId(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const result = await collection.insertOne(newPlayer);
+
+  if (!result.acknowledged) {
+    throw new Error("Failed to create player");
+  }
+
+  return mapDBPlayerToPlayer({ ...newPlayer, _id: result.insertedId });
+}
+
 export async function updatePlayer(
   playerId: ObjectId | string,
   data: Partial<DBPlayer>,
