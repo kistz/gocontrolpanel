@@ -1,7 +1,8 @@
+import { withAuth } from "@/lib/auth";
 import { Icon } from "@tabler/icons-react";
+import NavAdmin from "./nav-admin";
 import NavMain from "./nav-main";
 import NavServers from "./nav-servers";
-import { auth, withAuth } from "@/lib/auth";
 
 export interface NavItem {
   id?: number;
@@ -23,7 +24,8 @@ export default async function Navbar() {
   return (
     <>
       <NavMain />
-      {session && (<NavServers />)}
+      {session && <NavServers />}
+      {session && session.user.roles.includes("admin") && <NavAdmin />}
     </>
   );
 }
