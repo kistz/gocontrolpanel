@@ -32,7 +32,7 @@ export async function authenticate(
   }
 
   const tokens: NadeoTokens = await response.json();
-  await redis.set(TOKEN_KEY, JSON.stringify(tokens));
+  await redis.set(TOKEN_KEY, JSON.stringify(tokens), "EX", 3600); // Store tokens for 1 hour
 }
 
 export async function getTokens(): Promise<NadeoTokens | null> {
