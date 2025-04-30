@@ -1,6 +1,6 @@
 import config from "@/lib/config";
 import redis from "@/lib/redis";
-import { NadeoTokens } from "@/types/nadeo";
+import { MapInfo, NadeoTokens, WebIdentity } from "@/types/api/nadeo";
 
 const TOKEN_KEY = "nadeo:tokens";
 
@@ -16,6 +16,7 @@ export async function authenticate(
 
   const auth = Buffer.from(`${login}:${pass}`).toString("base64");
 
+  console.log("Authenticating with Nadeo...");
   const response = await fetch(`${PROD_URL}/v2/authentication/token/basic`, {
     method: "POST",
     headers: {
@@ -39,14 +40,16 @@ export async function getTokens(): Promise<NadeoTokens | null> {
   return raw ? JSON.parse(raw) : null;
 }
 
-export async function getMapsInfo(mapUids: string[]): Promise<any[]> {
+export async function getMapsInfo(mapUids: string[]): Promise<MapInfo[]> {
   const url = `${PROD_URL}/maps/?mapUidList=${mapUids.join(",")}`;
-  return await doRequest<any[]>(url);
+  return await doRequest<MapInfo[]>(url);
 }
 
-export async function getWebIdentities(accountIds: string[]): Promise<any[]> {
+export async function getWebIdentities(
+  accountIds: string[],
+): Promise<WebIdentity[]> {
   const url = `${PROD_URL}/webidentities/?accountIdList=${accountIds.join(",")}`;
-  return await doRequest<any[]>(url);
+  return await doRequest<WebIdentity[]>(url);
 }
 
 export async function doRequest<T>(
@@ -60,16 +63,18 @@ export async function doRequest<T>(
   }
 
   const headers = new Headers(init.headers);
-  headers.set("Authorization", `nadeo_v1 t=${tokens!.access_token}`);
+  headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
   headers.set("User-Agent", config.NADEO.REDIRECT_URI);
 
+  console.log("Requesting Nadeo API:", url);
   let res = await fetch(url, { ...init, headers });
 
   if (res.status === 401) {
     await authenticate();
     tokens = await getTokens();
+    console.log("Retrying Nadeo API request with new tokens");
     res = await fetch(url, { ...init, headers });
-    headers.set("Authorization", `nadeo_v1 t=${tokens!.access_token}`);
+    headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
   }
 
   if (!res.ok) {

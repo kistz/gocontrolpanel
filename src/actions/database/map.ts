@@ -1,4 +1,5 @@
 "use server";
+import { getMapsInfo } from "@/lib/api/nadeo";
 import { withAuth } from "@/lib/auth";
 import { getGbxClient } from "@/lib/gbxclient";
 import { DBMap, Map, MapInfo, MapInfoMinimal } from "@/types/map";
@@ -13,6 +14,35 @@ export async function getAllMaps(): Promise<Map[]> {
       deletedAt: { $exists: false },
     })
     .toArray();
+
+  const mapsMissingApiInfo = maps.filter((map) => !map.thumbnailUrl);
+  if (mapsMissingApiInfo.length > 0) {
+    const mapUids = mapsMissingApiInfo.map((map) => map.uid);
+    const BATCH_SIZE = 200;
+
+    for (let i = 0; i < mapUids.length; i += BATCH_SIZE) {
+      const batch = mapUids.slice(i, i + BATCH_SIZE);
+      const apiMapsInfo = await getMapsInfo(batch);
+
+      for (const map of mapsMissingApiInfo) {
+        const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.uid);
+        if (mapInfoFromApi) {
+          await collection.updateOne(
+            { _id: map._id },
+            {
+              $set: {
+                submitter: mapInfoFromApi.submitter,
+                timestamp: mapInfoFromApi.timestamp,
+                fileUrl: mapInfoFromApi.fileUrl,
+                thumbnailUrl: mapInfoFromApi.thumbnailUrl,
+              },
+            },
+          );
+        }
+      }
+    }
+  }
+
   return maps.map((map) => mapDBMapToMap(map));
 }
 
@@ -110,11 +140,16 @@ export async function getMapList(
   const missingMaps = mapList.filter((map: any) => !existingUids.has(map.UId));
 
   if (missingMaps.length > 0) {
+    const apiMapsInfo = await getMapsInfo(
+      missingMaps.map((map: any) => map.UId),
+    );
+
     const now = new Date();
 
     const newDbMaps: DBMap[] = [];
     for (const map of missingMaps) {
       const mapInfo: MapInfo = await client.call("GetMapInfo", map.FileName);
+      const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.UId);
 
       newDbMaps.push({
         _id: new ObjectId(),
@@ -127,6 +162,10 @@ export async function getMapList(
         goldTime: mapInfo.GoldTime || 0,
         silverTime: mapInfo.SilverTime || 0,
         bronzeTime: mapInfo.BronzeTime || 0,
+        submitter: mapInfoFromApi?.submitter || "",
+        timestamp: mapInfoFromApi?.timestamp || new Date(),
+        fileUrl: mapInfoFromApi?.fileUrl || "",
+        thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
         createdAt: now,
         updatedAt: now,
       });

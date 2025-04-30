@@ -72,11 +72,6 @@ export default function MapCards({
         {data.map((map) => (
           <MapCard map={map} key={map._id} refetch={refetch} />
         ))}
-        {loading && (
-          <div className="flex items-center justify-center w-full h-full">
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        )}
         {!loading && data.length === 0 && (
           <div className="col-span-full flex items-center justify-center">
             <p>No maps found</p>
