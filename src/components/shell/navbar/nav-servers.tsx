@@ -16,7 +16,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import config from "@/lib/config";
 import { generatePath } from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/config";
@@ -28,18 +27,57 @@ import {
 } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { NavGroup } from ".";
+import { useEffect, useState } from "react";
+
+interface ServerNavGroup {
+  name: string;
+  servers: {
+    id: number;
+    name: string;
+    isConnected: boolean;
+    isActive: boolean;
+    icon?: React.ElementType;
+    items?: {
+      name: string;
+      url: string;
+      icon?: React.ElementType;
+    }[];
+  }[];
+}
 
 export default function NavServers() {
   const [servers, setServers] = useState<Server[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const group: NavGroup = {
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
+
+    if (!url) {
+      console.error("Connector URL is not defined");
+      return;
+    }
+
+    const socket = new WebSocket(`${url}/servers`);
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setServers(data);
+      setLoading(false);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  const group: ServerNavGroup = {
     name: "Servers",
-    items: servers.map((server) => ({
+    servers: servers.map((server) => ({
       id: server.id,
       name: server.name,
+      isConnected: server.isConnected,
       icon: IconServer,
+      isActive: false,
       items: [
         {
           name: "Settings",
@@ -74,74 +112,91 @@ export default function NavServers() {
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {group.items.map((item) =>
-            item.items && item.items.length > 0 ? (
+          {loading ? (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2">
+                  <IconServer />
+                  <span>Loading...</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ) : (
+            group.servers.length === 0 && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <div className="flex items-center gap-2">
+                    <IconServer />
+                    <span>No servers found</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          )}
+          {group.servers.map((server) =>
+            server.items && server.items.length > 0 ? (
               <Collapsible
-                key={item.id || item.name}
+                key={server.id || server.name}
                 asChild
-                defaultOpen={item.isActive}
+                defaultOpen={server.isActive}
                 className="group/collapsible"
               >
                 <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.name} asChild>
-                      {item.url ? (
-                        <Link href={item.url}>
-                          {item.icon && <item.icon />}
-                          <span className="overflow-hidden text-ellipsis text-nowrap">
-                            {item.name}
-                          </span>
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        </Link>
-                      ) : (
-                        <div>
-                          {item.icon && <item.icon />}
-                          <span className="overflow-hidden text-ellipsis text-nowrap">
-                            {item.name}
-                          </span>
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        </div>
-                      )}
+                  {server.isConnected ? (
+                    <>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={server.name} asChild>
+                          <div>
+                            {server.icon && <server.icon />}
+                            <span className="overflow-hidden text-ellipsis text-nowrap">
+                              {server.name}
+                            </span>
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          </div>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {server.items.map((item) => (
+                            <SidebarMenuSubItem key={item.name}>
+                              <SidebarMenuSubButton asChild>
+                                {item.url ? (
+                                  <Link href={item.url}>
+                                    {item.icon && <item.icon />}
+                                    <span>{item.name}</span>
+                                  </Link>
+                                ) : (
+                                  <div>
+                                    {item.icon && <item.icon />}
+                                    <span>{item.name}</span>
+                                  </div>
+                                )}
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </>
+                  ) : (
+                    <SidebarMenuButton
+                      asChild
+                      className="text-white/50 pointer-events-none"
+                    >
+                      <div>
+                        {server.icon && <server.icon />}
+                        <span>{server.name}</span>
+                      </div>
                     </SidebarMenuButton>
-                  </CollapsibleTrigger>
-
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.name}>
-                          <SidebarMenuSubButton asChild>
-                            {subItem.url ? (
-                              <Link href={subItem.url}>
-                                {subItem.icon && <subItem.icon />}
-                                <span>{subItem.name}</span>
-                              </Link>
-                            ) : (
-                              <div>
-                                {subItem.icon && <subItem.icon />}
-                                <span>{subItem.name}</span>
-                              </div>
-                            )}
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
+                  )}
                 </SidebarMenuItem>
               </Collapsible>
             ) : (
-              <SidebarMenuItem key={item.name}>
+              <SidebarMenuItem key={server.name}>
                 <SidebarMenuButton asChild>
-                  {item.url ? (
-                    <Link href={item.url}>
-                      {item.icon && <item.icon />}
-                      <span>{item.name}</span>
-                    </Link>
-                  ) : (
-                    <div>
-                      {item.icon && <item.icon />}
-                      <span>{item.name}</span>
-                    </div>
-                  )}
+                  <div>
+                    {server.icon && <server.icon />}
+                    <span>{server.name}</span>
+                  </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ),

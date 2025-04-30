@@ -17,6 +17,7 @@ export interface Config {
   };
   NODE_ENV: string;
   PORT: number;
+  CONNECTOR_URL: string;
   NADEO: {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
