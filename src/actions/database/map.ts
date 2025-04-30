@@ -4,7 +4,7 @@ import { withAuth } from "@/lib/auth";
 import { getGbxClient } from "@/lib/gbxclient";
 import { DBMap, Map, MapInfo, MapInfoMinimal } from "@/types/map";
 import { ObjectId } from "mongodb";
-import { collections, getDatabase } from "./mongodb";
+import { collections, getDatabase } from "../../lib/mongodb";
 
 export async function getAllMaps(): Promise<Map[]> {
   const db = await getDatabase();

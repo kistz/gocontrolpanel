@@ -3,7 +3,7 @@
 import { withAuth } from "@/lib/auth";
 import { DBRecord, Record } from "@/types/record";
 import { ObjectId } from "mongodb";
-import { collections, getDatabase } from "./mongodb";
+import { collections, getDatabase } from "../../lib/mongodb";
 
 export async function getAllRecords(): Promise<Record[]> {
   const db = await getDatabase();
