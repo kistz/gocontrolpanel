@@ -13,7 +13,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
+export const createColumns = (): ColumnDef<Player>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (

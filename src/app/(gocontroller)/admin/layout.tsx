@@ -1,4 +1,4 @@
-import { auth, withAuth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 import { routes } from "@/routes";
 import { redirect } from "next/navigation";
 

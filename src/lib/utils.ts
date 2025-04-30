@@ -16,7 +16,7 @@ export function formatTime(time: number): string {
 }
 
 export function getErrorMessage(error: unknown): string {
-  let errorMessage = error instanceof Error ? error.message : "Unknown error";
+  const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
   const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
   return match ? match[1] : errorMessage;

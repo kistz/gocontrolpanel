@@ -5,7 +5,7 @@ import { GbxClient } from "@evotm/gbxclient";
 import { Server } from "../types/server";
 import redis from "./redis";
 
-let cachedClients: {
+const cachedClients: {
   [key: number]: GbxClient;
 } = {};
 

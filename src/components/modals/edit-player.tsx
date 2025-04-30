@@ -1,7 +1,7 @@
 "use client";
 import EditPlayerForm from "@/forms/admin/edit-player-form";
 import { Player } from "@/types/player";
-import { IconCross, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
