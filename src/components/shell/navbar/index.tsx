@@ -1,4 +1,4 @@
-import { withAuth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { Icon } from "@tabler/icons-react";
 import NavAdmin from "./nav-admin";
 import NavMain from "./nav-main";
@@ -19,12 +19,14 @@ export interface NavGroup {
 }
 
 export default async function Navbar() {
-  const session = await withAuth(["moderator", "admin"]);
+  const session = await auth();
 
   return (
     <>
       <NavMain />
-      {session && <NavServers />}
+      {session &&
+        (session.user.roles.includes("admin") ||
+          session.user.roles.includes("moderator")) && <NavServers />}
       {session && session.user.roles.includes("admin") && <NavAdmin />}
     </>
   );
