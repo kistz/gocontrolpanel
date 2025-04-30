@@ -1,13 +1,5 @@
-import { Config, Server } from "@/types/config";
+import { Config } from "@/types/config";
 import "dotenv/config";
-import isLocalhost from "is-localhost-ip";
-import SERVERS from "../../servers.json";
-
-(async () => {
-  for (const server of SERVERS as Server[]) {
-    server.isLocal = await isLocalhost(server.host, true);
-  }
-})();
 
 const config: Config = {
   MONGODB: {
@@ -21,7 +13,7 @@ const config: Config = {
     CLIENT_SECRET: process.env.NADEO_CLIENT_SECRET || "",
     REDIRECT_URI: process.env.NADEO_REDIRECT_URI || "",
   },
-  SERVERS,
+  SERVERS: [],
   REDISURI: process.env.REDIS_URI || "",
 };
 

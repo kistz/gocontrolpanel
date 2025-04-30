@@ -23,7 +23,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "../theme-toggle";
 
-export function NavUser() {
+export function SiteUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { data: session } = useSession();

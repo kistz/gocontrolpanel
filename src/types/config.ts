@@ -3,10 +3,11 @@ export interface Server {
   name: string;
   description?: string;
   host: string;
-  xmlrpc_port: number;
+  xmlrpcPort: number;
   user: string;
-  password: string;
-  isLocal?: boolean;
+  pass: string;
+  isLocal: boolean;
+  isConnected: boolean;
 }
 
 export interface Config {

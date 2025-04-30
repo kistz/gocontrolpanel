@@ -1,11 +1,8 @@
-import { Icon } from "@tabler/icons-react";
-import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../ui/collapsible";
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -16,28 +13,45 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "../ui/sidebar";
+} from "@/components/ui/sidebar";
+import { routes } from "@/routes";
+import {
+  IconDashboard,
+  IconMap,
+  IconStopwatch,
+  IconUsers,
+} from "@tabler/icons-react";
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { NavGroup } from ".";
 
-export interface NavItem {
-  id?: number;
-  name: string;
-  url?: string;
-  icon: Icon;
-  items?: NavItem[];
-  isActive?: boolean;
-}
+export default function NavMain() {
+  const group: NavGroup = {
+    items: [
+      {
+        name: "Dashboard",
+        url: routes.dashboard,
+        icon: IconDashboard,
+      },
+      {
+        name: "Players",
+        url: routes.players,
+        icon: IconUsers,
+      },
+      {
+        name: "Records",
+        url: routes.records,
+        icon: IconStopwatch,
+      },
+      {
+        name: "Maps",
+        url: routes.maps,
+        icon: IconMap,
+      },
+    ],
+  };
 
-export interface NavGroup {
-  name?: string;
-  items: NavItem[];
-}
-
-interface NavbarProps {
-  groups: NavGroup[];
-}
-
-export default function Navbar({ groups }: NavbarProps) {
-  return groups.map((group) => (
+  return (
     <SidebarGroup
       className="group-data-[collapsible=icon]:hidden"
       key={group.name || "default"}
@@ -120,5 +134,5 @@ export default function Navbar({ groups }: NavbarProps) {
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  ));
+  );
 }
