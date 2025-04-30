@@ -25,8 +25,9 @@ export default async function Navbar() {
     <>
       <NavMain />
       {session &&
-        (session.user.roles.includes("admin") ||
-          session.user.roles.includes("moderator")) && <NavServers />}
+        session.user.roles.some((r) => ["admin", "moderator"].includes(r)) && (
+          <NavServers />
+        )}
       {session && session.user.roles.includes("admin") && <NavAdmin />}
     </>
   );
