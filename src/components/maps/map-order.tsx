@@ -1,6 +1,6 @@
 "use client";
 import { addMapList, removeMapList } from "@/actions/gbx/map";
-import { createColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/map-order-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[id]/maps/map-order-columns";
 import { getDivergingList, getErrorMessage } from "@/lib/utils";
 import { Map, OrderMap } from "@/types/map";
 import { useState } from "react";

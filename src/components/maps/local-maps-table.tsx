@@ -1,7 +1,7 @@
 "use client";
 
 import { getLocalMaps } from "@/actions/gbx/server";
-import { createColumns as createLocalMapColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/local-maps-columns";
+import { createColumns as createLocalMapColumns } from "@/app/(gocontroller)/server/[id]/maps/local-maps-columns";
 import { LocalMapInfo } from "@/types/map";
 import { useEffect, useState } from "react";
 import { DataTable } from "../table/data-table";

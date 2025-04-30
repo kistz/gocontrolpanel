@@ -6,8 +6,8 @@ import {
   getJukebox,
   setJukebox,
 } from "@/actions/gbx/map";
-import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/jukebox-columns";
-import { createColumns as createMapColumns } from "@/app/(gocontroller)/admin/server/[id]/maps/server-maps-columns";
+import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/server/[id]/maps/jukebox-columns";
+import { createColumns as createMapColumns } from "@/app/(gocontroller)/server/[id]/maps/server-maps-columns";
 import { getErrorMessage } from "@/lib/utils";
 import { JukeboxMap, Map } from "@/types/map";
 import { useEffect, useState } from "react";

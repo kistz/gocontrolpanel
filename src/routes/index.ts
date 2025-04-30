@@ -6,9 +6,13 @@ export const routes = {
   maps: "/maps",
   records: "/records",
   servers: {
-    settings: "/admin/server/:id/settings",
-    game: "/admin/server/:id/game",
-    maps: "/admin/server/:id/maps",
+    settings: "/server/:id/settings",
+    game: "/server/:id/game",
+    maps: "/server/:id/maps",
+  },
+  admin: {
+    players: "/admin/players",
+    servers: "/admin/servers",
   },
   login: "/login",
 };
@@ -79,6 +83,28 @@ export const breadCrumbs: {
       },
       {
         label: "Maps",
+      },
+    ],
+  },
+  {
+    path: routes.admin.players,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "Players",
+      },
+    ],
+  },
+  {
+    path: routes.admin.servers,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "Servers",
       },
     ],
   },
