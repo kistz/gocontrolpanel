@@ -180,7 +180,7 @@ export default function NavServers() {
                   ) : (
                     <SidebarMenuButton
                       asChild
-                      className="text-white/50 pointer-events-none"
+                      className="text-foreground/50 pointer-events-none"
                     >
                       <div>
                         {server.icon && <server.icon />}

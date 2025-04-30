@@ -2,6 +2,7 @@
 
 import { deletePlayerById } from "@/actions/database/player";
 import ConfirmDialog from "@/components/confirm-dialog";
+import EditPlayerModal from "@/components/modals/edit-player";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +45,14 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Roles"} />
     ),
+    cell: ({ row }) => {
+      const roles = row.getValue("roles") as string[];
+      // Capitalize the first letter of each role
+      const formattedRoles = roles
+        .map((role) => role.charAt(0).toUpperCase() + role.slice(1))
+        .join(", ");
+      return <span>{formattedRoles}</span>;
+    },
   },
   {
     accessorKey: "createdAt",
@@ -67,6 +76,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
       const player = row.original;
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
+      const [isEditOpen, setIsEditOpen] = useState(false);
 
       const handleDelete = () => {
         startTransition(async () => {
@@ -94,6 +104,9 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             <DropdownMenuContent align="end">
               <DropdownMenuItem>View player</DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                Edit player
+              </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsOpen(true)}
@@ -111,6 +124,12 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             description={`Are you sure you want to delete ${player.nickName}?`}
             confirmText="Delete"
             cancelText="Cancel"
+          />
+
+          <EditPlayerModal
+            playerId={player._id}
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
           />
         </div>
       );
