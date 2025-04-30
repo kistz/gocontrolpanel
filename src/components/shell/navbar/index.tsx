@@ -1,6 +1,7 @@
 import { Icon } from "@tabler/icons-react";
 import NavMain from "./nav-main";
 import NavServers from "./nav-servers";
+import { auth, withAuth } from "@/lib/auth";
 
 export interface NavItem {
   id?: number;
@@ -16,11 +17,13 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export default function Navbar() {
+export default async function Navbar() {
+  const session = await withAuth(["moderator", "admin"]);
+
   return (
     <>
       <NavMain />
-      <NavServers />
+      {session && (<NavServers />)}
     </>
   );
 }

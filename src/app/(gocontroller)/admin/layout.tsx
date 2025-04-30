@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth, withAuth } from "@/lib/auth";
 import { routes } from "@/routes";
 import { redirect } from "next/navigation";
 
@@ -7,14 +7,10 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await withAuth(["admin", "moderator"]);
 
   if (!session) {
     redirect(routes.login);
-  }
-
-  if (!session.user.roles.includes("admin")) {
-    redirect(routes.dashboard);
   }
 
   return children;
