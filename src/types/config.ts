@@ -11,6 +11,9 @@ export interface Config {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     REDIRECT_URI: string;
+    SERVER_LOGIN: string;
+    SERVER_PASSWORD: string;
+    CONTACT: string;
   };
   REDISURI: string;
 }

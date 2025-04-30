@@ -1,7 +1,7 @@
 "use server";
 import { withAuth } from "@/lib/auth";
 import { getGbxClient } from "@/lib/gbxclient";
-import { DBMap, Map, MapInfo } from "@/types/map";
+import { DBMap, Map, MapInfo, MapInfoMinimal } from "@/types/map";
 import { ObjectId } from "mongodb";
 import { collections, getDatabase } from "./mongodb";
 
@@ -89,7 +89,11 @@ export async function getMapList(
   await withAuth(["admin"]);
 
   const client = await getGbxClient(server);
-  const mapList = await client.call("GetMapList", count, start);
+  const mapList: MapInfoMinimal[] = await client.call(
+    "GetMapList",
+    count,
+    start,
+  );
 
   if (!mapList) {
     throw new Error("Failed to get map list");

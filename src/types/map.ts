@@ -44,6 +44,19 @@ export interface OrderMap extends Map {
   id: string;
 }
 
+export interface MapInfoMinimal {
+  Name: string;
+  UId: string;
+  FileName: string;
+  Environnement: string;
+  Author: string;
+  AuthorNickname: string;
+  GoldTime: number;
+  CopperPrice: number;
+  MapType: string;
+  MapStyle: string;
+}
+
 export interface MapInfo {
   Name: string;
   UId: string;
