@@ -118,7 +118,7 @@ export async function deleteRecordById(
     { _id: new ObjectId(recordId) },
     { $set: { deletedAt: new Date() } },
   );
-  if (result.modifiedCount === 0) {
+  if (result.matchedCount === 0) {
     throw new Error(`Record not found`);
   }
 }

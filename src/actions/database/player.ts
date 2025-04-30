@@ -104,6 +104,26 @@ export async function getPlayerByLogin(login: string): Promise<Player | null> {
   return mapDBPlayerToPlayer(player);
 }
 
+export async function updatePlayer(
+  playerId: ObjectId | string,
+  data: Partial<DBPlayer>,
+): Promise<void> {
+  const session = await withAuth(["admin"]);
+  if (playerId === session.user._id) {
+    throw new Error("Cannot update your own account");
+  }
+
+  const db = await getDatabase();
+  const collection = db.collection<DBPlayer>(collections.PLAYERS);
+  const result = await collection.updateOne(
+    { _id: new ObjectId(playerId) },
+    { $set: data },
+  );
+  if (result.matchedCount === 0) {
+    throw new Error(`Player not found`);
+  }
+}
+
 export async function deletePlayerById(
   playerId: ObjectId | string,
 ): Promise<void> {
@@ -119,7 +139,7 @@ export async function deletePlayerById(
     { _id: new ObjectId(playerId) },
     { $set: { deletedAt: new Date() } },
   );
-  if (result.modifiedCount === 0) {
+  if (result.matchedCount === 0) {
     throw new Error(`Player not found`);
   }
 }

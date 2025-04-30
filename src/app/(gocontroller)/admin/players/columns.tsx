@@ -127,7 +127,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
           />
 
           <EditPlayerModal
-            playerId={player._id}
+            player={player}
             isOpen={isEditOpen}
             setIsOpen={setIsEditOpen}
           />

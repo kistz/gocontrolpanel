@@ -99,7 +99,7 @@ export async function deleteMapById(mapId: ObjectId | string): Promise<void> {
     { _id: new ObjectId(mapId) },
     { $set: { deletedAt: new Date() } },
   );
-  if (result.modifiedCount === 0) {
+  if (result.matchedCount === 0) {
     throw new Error(`Map not found`);
   }
 }

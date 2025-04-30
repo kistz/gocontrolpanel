@@ -1,4 +1,4 @@
-import { Control, FieldError, FieldValues, Path } from "react-hook-form";
+import { Control, FieldError, FieldValues, Merge, Path } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -22,7 +22,7 @@ interface FormElementProps<TControl extends FieldValues> {
   isHidden?: boolean;
   isLoading?: boolean;
   step?: string;
-  error?: FieldError;
+  error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
   children?: React.ReactNode;
 }
@@ -45,6 +45,20 @@ export default function FormElement<TControl extends FieldValues>({
   children,
 }: FormElementProps<TControl & FieldValues>) {
   if (isHidden) return null;
+
+  const getErrorMessage = (
+    error: FieldError | Merge<FieldError, (FieldError | undefined)[]> | undefined
+  ): string | undefined => {
+    if (!error) return undefined;
+  
+    if ("message" in error && typeof error.message === "string") {
+      return error.message;
+    }
+  
+    return Array.isArray(error)
+      ? error.map((e) => e?.message).filter(Boolean).join(", ")
+      : undefined;
+  };
 
   return (
     <FormField
@@ -80,7 +94,7 @@ export default function FormElement<TControl extends FieldValues>({
           </FormControl>
           {error && (
             <FormMessage className="text-destructive">
-              {error.message}
+              {getErrorMessage(error)}
             </FormMessage>
           )}
         </FormItem>
