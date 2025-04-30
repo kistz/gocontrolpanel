@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { generatePath } from "@/lib/utils";
 import { routes } from "@/routes";
-import { Server } from "@/types/config";
+import { Server } from "@/types/server";
 import {
   IconAdjustmentsAlt,
   IconDeviceGamepad,
@@ -57,7 +57,7 @@ export default function NavServers() {
       return;
     }
 
-    const socket = new WebSocket(`${url}/servers`);
+    const socket = new WebSocket(`${url}/ws/servers`);
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);

@@ -22,6 +22,7 @@ import {
 import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -29,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   limitHeight?: number;
   isLoading?: boolean;
   filter?: boolean;
+  pagination?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -37,6 +39,7 @@ export function DataTable<TData, TValue>({
   limitHeight = 206,
   isLoading = false,
   filter = false,
+  pagination = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -144,6 +147,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
+      {pagination && <DataTablePagination table={table} />}
     </div>
   );
 }

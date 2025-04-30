@@ -1,8 +1,7 @@
 "use server";
 
 import { withAuth } from "@/lib/auth";
-import config from "@/lib/config";
-import { getGbxClient } from "@/lib/gbxclient";
+import { getGbxClient, getServers } from "@/lib/gbxclient";
 import { getFiles } from "@/lib/server-utils";
 import { LocalMapInfo } from "@/types/map";
 import { ServerSettings } from "@/types/server";
@@ -132,7 +131,9 @@ export async function getLocalScripts(server: number): Promise<string[]> {
     "TrackMania/TM_TMWTTeams_Online.Script.txt",
   ];
 
-  if (!config.SERVERS.find((s) => s.id == server)?.isLocal) {
+  const servers = await getServers();
+
+  if (!servers.find((s) => s.id == server)?.isLocal) {
     return defaultScripts;
   }
 
@@ -165,7 +166,8 @@ export async function getLocalScripts(server: number): Promise<string[]> {
 export async function getLocalMaps(server: number): Promise<LocalMapInfo[]> {
   await withAuth(["admin"]);
 
-  if (!config.SERVERS.find((s) => s.id == server)?.isLocal) {
+  const servers = await getServers();
+  if (!servers.find((s) => s.id == server)?.isLocal) {
     return [];
   }
 

@@ -1,14 +1,3 @@
-export interface Server {
-  id: number;
-  name: string;
-  description?: string;
-  host: string;
-  xmlrpcPort: number;
-  user: string;
-  pass: string;
-  isLocal: boolean;
-  isConnected: boolean;
-}
 
 export interface Config {
   MONGODB: {
@@ -23,6 +12,5 @@ export interface Config {
     CLIENT_SECRET: string;
     REDIRECT_URI: string;
   };
-  SERVERS: Server[];
   REDISURI: string;
 }

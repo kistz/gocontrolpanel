@@ -14,7 +14,6 @@ const config: Config = {
     CLIENT_SECRET: process.env.NADEO_CLIENT_SECRET || "",
     REDIRECT_URI: process.env.NADEO_REDIRECT_URI || "",
   },
-  SERVERS: [],
   REDISURI: process.env.REDIS_URI || "",
 };
 

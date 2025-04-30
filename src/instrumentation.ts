@@ -1,4 +1,4 @@
-import { setupCallbacks } from "./actions/gbx/map";
+import { setupCallbacks } from "./lib/gbxclient";
 
 export function register() {
   setupCallbacks();

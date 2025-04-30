@@ -1,8 +1,7 @@
 "use server";
 
 import { withAuth } from "@/lib/auth";
-import config from "@/lib/config";
-import { getGbxClient } from "@/lib/gbxclient";
+import { getGbxClient, getServers } from "@/lib/gbxclient";
 import redis from "@/lib/redis";
 import { JukeboxMap, Map, MapInfo } from "@/types/map";
 
@@ -80,8 +79,9 @@ async function onPodiumStart(server: number) {
   await redis.lpop(key);
 }
 
-export async function setupCallbacks(): Promise<void> {
-  for (const server of config.SERVERS) {
+export async function setupJukeboxCallbacks(): Promise<void> {
+  const servers = await getServers();
+  for (const server of servers) {
     const key = getKey(server.id);
     await redis.del(key);
 
@@ -96,6 +96,7 @@ export async function setupCallbacks(): Promise<void> {
     });
   }
 }
+
 export async function getCurrentMapInfo(server: number): Promise<MapInfo> {
   await withAuth(["admin"]);
 

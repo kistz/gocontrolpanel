@@ -90,7 +90,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
   const mapColumns = createMapColumns(onAddMap);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {jukeboxOrder.length === 0 ? (
         <p className="text-muted-foreground">No maps in jukebox.</p>
       ) : (
@@ -111,7 +111,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
         </div>
       )}
 
-      <DataTable data={maps} columns={mapColumns} limitHeight={0} />
+      <DataTable data={maps} columns={mapColumns} limitHeight={0} pagination />
     </div>
   );
 }
