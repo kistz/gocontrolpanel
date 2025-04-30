@@ -15,7 +15,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
-import { IconServerCog, IconUsers } from "@tabler/icons-react";
+import { IconServerCog, IconUserCog, IconUsers } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NavGroup } from ".";
@@ -27,7 +27,7 @@ export default function NavAdmin() {
       {
         name: "Players",
         url: routes.admin.players,
-        icon: IconUsers,
+        icon: IconUserCog,
       },
       {
         name: "Servers",

@@ -1,16 +1,23 @@
 "use client";
 
+import { deletePlayerById } from "@/actions/database/player";
+import ConfirmDialog from "@/components/confirm-dialog";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getErrorMessage } from "@/lib/utils";
 import { Player } from "@/types/player";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
 export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
@@ -51,7 +58,28 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
   },
   {
     id: "actions",
-    cell: () => {
+    cell: ({ row }) => {
+      const player = row.original;
+      const [_, startTransition] = useTransition();
+      const [isOpen, setIsOpen] = useState(false);
+      const { data: session, status } = useSession();
+      const isAdmin =
+        status === "authenticated" && session.user.roles.includes("admin");
+
+      const handleDelete = () => {
+        startTransition(async () => {
+          try {
+            await deletePlayerById(player._id);
+            refetch();
+            toast.success("Player deleted successfully");
+          } catch (error) {
+            toast.error("Error deleting player", {
+              description: getErrorMessage(error),
+            });
+          }
+        });
+      };
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -63,8 +91,29 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>View player</DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setIsOpen(true)}
+                  >
+                    Delete player
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <ConfirmDialog
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onConfirm={handleDelete}
+            title="Delete player"
+            description={`Are you sure you want to delete ${player.nickName}?`}
+            confirmText="Delete"
+            cancelText="Cancel"
+          />
         </div>
       );
     },
