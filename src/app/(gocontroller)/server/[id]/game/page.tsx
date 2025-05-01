@@ -25,15 +25,15 @@ export default async function ServerGamePage({
 }) {
   const { id } = await params;
 
-  const mapList = await getMapList(id);
-  const currentIndex = await getCurrentMapIndex(id);
+  const { data: mapList } = await getMapList(id);
+  const { data: currentIndex } = await getCurrentMapIndex(id);
 
-  const scripts = await getLocalScripts(id);
+  const { data: scripts } = await getLocalScripts(id);
 
-  const showOpponents = await getShowOpponents(id);
-  const scriptName = await getScriptName(id);
-  const modeScriptInfo = await getModeScriptInfo(id);
-  const modeScriptSettings = await getModeScriptSettings(id);
+  const { data: showOpponents } = await getShowOpponents(id);
+  const { data: scriptName } = await getScriptName(id);
+  const { data: modeScriptInfo } = await getModeScriptInfo(id);
+  const { data: modeScriptSettings } = await getModeScriptSettings(id);
 
   return (
     <div className="flex flex-col gap-6">

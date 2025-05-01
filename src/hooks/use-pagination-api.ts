@@ -1,3 +1,4 @@
+import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 
 interface PaginationAPIHook<TData> {
@@ -12,7 +13,7 @@ export const usePaginationAPI = <TData>(
     pagination: { skip: number; limit: number },
     sorting: { field: string; order: string },
     filter?: string,
-  ) => Promise<{ data: TData[]; totalCount: number }>,
+  ) => Promise<ServerResponse<PaginationResponse<TData>>>,
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string } = { field: "_id", order: "ASC" },
   filter: string = "",
@@ -24,8 +25,15 @@ export const usePaginationAPI = <TData>(
   const fetchDataFromAPI = async () => {
     setLoading(true);
     try {
-      const { data: fetchedData, totalCount: fetchedTotalCount } =
-        await fetchData(pagination, sorting, filter);
+      const {
+        data: { data: fetchedData, totalCount: fetchedTotalCount },
+        error,
+      } = await fetchData(pagination, sorting, filter);
+
+      if (error) {
+        throw new Error(error);
+      }
+
       setData(fetchedData);
       setTotalCount(fetchedTotalCount);
     } catch (error) {

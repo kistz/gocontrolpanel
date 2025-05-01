@@ -13,8 +13,8 @@ export default async function ServerMapsPage({
 }) {
   const { id } = await params;
 
-  const maps = await getMapList(id);
-  const jukebox = await getJukebox(id);
+  const { data: maps } = await getMapList(id);
+  const { data: jukebox } = await getJukebox(id);
   const servers = await getServers();
   const isLocal = servers.find((s) => s.id == id)?.isLocal;
 

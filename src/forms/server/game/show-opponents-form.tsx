@@ -4,12 +4,12 @@ import { setShowOpponents } from "@/actions/gbx/game";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { getErrorMessage } from "@/lib/utils";
 import { ShowOpponents } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ShowOpponentsSchema } from "./game-schema";
-import { getErrorMessage } from "@/lib/utils";
 
 export default function ShowOpponentsForm({
   serverId,
@@ -27,7 +27,10 @@ export default function ShowOpponentsForm({
 
   async function onSubmitShowOpponents(values: ShowOpponents) {
     try {
-      await setShowOpponents(serverId, values.showOpponents);
+      const { error } = await setShowOpponents(serverId, values.showOpponents);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Show Opponents updated successfully");
     } catch (error) {
       toast.error("Failed to update Show Opponents", {

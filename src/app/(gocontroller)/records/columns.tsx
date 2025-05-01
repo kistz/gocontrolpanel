@@ -69,7 +69,10 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
       const handleDelete = () => {
         startTransition(async () => {
           try {
-            await deleteRecordById(record._id);
+            const { error } = await deleteRecordById(record._id);
+            if (error) {
+              throw new Error(error);
+            }
             refetch();
             toast.success("Record deleted successfully");
           } catch (error) {

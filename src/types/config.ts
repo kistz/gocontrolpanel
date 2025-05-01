@@ -1,4 +1,3 @@
-
 export interface Config {
   MONGODB: {
     URI: string;

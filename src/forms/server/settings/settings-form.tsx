@@ -17,7 +17,7 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
   const form = useForm<ServerSettings>({
     resolver: zodResolver(ServerSettingsSchema),
     defaultValues: async () => {
-      const settings = await getServerSettings(serverId);
+      const { data: settings } = await getServerSettings(serverId);
       setIsLoading(false);
       return settings;
     },
@@ -25,7 +25,10 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
 
   async function onSubmit(values: ServerSettings) {
     try {
-      await saveServerSettings(serverId, values);
+      const { error } = await saveServerSettings(serverId, values);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Settings saved successfully");
     } catch (error) {
       toast.error("Failed to save settings", {

@@ -13,14 +13,14 @@ import {
 } from "@/components/ui/card";
 
 export default async function DashboardCards() {
-  const totalPlayers = await getPlayerCount();
-  const newPlayers = await getNewPlayersCount(30);
+  const { data: totalPlayers } = await getPlayerCount();
+  const { data: newPlayers } = await getNewPlayersCount(30);
 
-  const totalRecords = await getRecordCount();
-  const newRecords = await getNewRecordsCount(30);
+  const { data: totalRecords } = await getRecordCount();
+  const { data: newRecords } = await getNewRecordsCount(30);
 
-  const totalMaps = await getMapCount();
-  const newMaps = await getNewMapsCount(30);
+  const { data: totalMaps } = await getMapCount();
+  const { data: newMaps } = await getNewMapsCount(30);
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @md/main:grid-cols-1 @xl/main:grid-cols-3">

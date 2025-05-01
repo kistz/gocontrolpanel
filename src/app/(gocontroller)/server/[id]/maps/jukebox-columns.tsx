@@ -34,7 +34,10 @@ const MapActionsCell = memo(function MapActionsCell({
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        await removeMapFromJukebox(serverId, data.id);
+        const { error } = await removeMapFromJukebox(serverId, data.id);
+        if (error) {
+          throw new Error(error);
+        }
         onRemoveMap(data);
         toast.success("Map successfully removed");
       } catch (error) {

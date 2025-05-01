@@ -1,6 +1,9 @@
+"use server";
 import config from "@/lib/config";
 import redis from "@/lib/redis";
 import { MapInfo, NadeoTokens, WebIdentity } from "@/types/api/nadeo";
+import { ServerError, ServerResponse } from "@/types/responses";
+import { doServerAction } from "../actions";
 
 const TOKEN_KEY = "nadeo:tokens";
 
@@ -28,7 +31,9 @@ export async function authenticate(
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to authenticate with Nadeo: ${response.status}`);
+    throw new ServerError(
+      `Failed to authenticate with Nadeo: ${response.status}`,
+    );
   }
 
   const tokens: NadeoTokens = await response.json();
@@ -40,16 +45,22 @@ export async function getTokens(): Promise<NadeoTokens | null> {
   return raw ? JSON.parse(raw) : null;
 }
 
-export async function getMapsInfo(mapUids: string[]): Promise<MapInfo[]> {
-  const url = `${PROD_URL}/maps/?mapUidList=${mapUids.join(",")}`;
-  return await doRequest<MapInfo[]>(url);
+export async function getMapsInfo(
+  mapUids: string[],
+): Promise<ServerResponse<MapInfo[]>> {
+  return doServerAction(async () => {
+    const url = `${PROD_URL}/maps/?mapUidList=${mapUids.join(",")}`;
+    return await doRequest<MapInfo[]>(url);
+  });
 }
 
 export async function getWebIdentities(
   accountIds: string[],
-): Promise<WebIdentity[]> {
-  const url = `${PROD_URL}/webidentities/?accountIdList=${accountIds.join(",")}`;
-  return await doRequest<WebIdentity[]>(url);
+): Promise<ServerResponse<WebIdentity[]>> {
+  return doServerAction(async () => {
+    const url = `${PROD_URL}/webidentities/?accountIdList=${accountIds.join(",")}`;
+    return await doRequest<WebIdentity[]>(url);
+  });
 }
 
 export async function doRequest<T>(

@@ -1,3 +1,4 @@
+import { ServerError } from "@/types/responses";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -16,7 +17,7 @@ export function formatTime(time: number): string {
 }
 
 export function getErrorMessage(error: unknown): string {
-  const errorMessage = error instanceof Error ? error.message : "Unknown error";
+  const errorMessage = error instanceof Error || error instanceof ServerError ? error.message : "Unknown error";
 
   const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
   return match ? match[1] : errorMessage;

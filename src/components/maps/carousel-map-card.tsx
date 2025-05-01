@@ -38,7 +38,10 @@ export default function CarouselMapCard({
   const onPreviousMap = async () => {
     try {
       const previousIndex = index - 1 < 0 ? total - 1 : index - 1;
-      await jumpToMap(serverId, previousIndex);
+      const { error } = await jumpToMap(serverId, previousIndex);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Gone back to previous map", {
         description: "Gone back to previous map",
       });
@@ -51,7 +54,10 @@ export default function CarouselMapCard({
 
   const onRestartMap = async () => {
     try {
-      await restartMap(serverId);
+      const { error } = await restartMap(serverId);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Restarted map", {
         description: `Restarted ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });
@@ -64,7 +70,10 @@ export default function CarouselMapCard({
 
   const onNextMap = async () => {
     try {
-      await nextMap(serverId);
+      const { error } = await nextMap(serverId);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Skipped to next map", {
         description: "Skipped to next map",
       });

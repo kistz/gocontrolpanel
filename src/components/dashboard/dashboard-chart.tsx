@@ -47,7 +47,7 @@ export default function DashboardChart() {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await getRecordCountPerDay(90);
+      const { data: res } = await getRecordCountPerDay(90);
       if (res) {
         const data = res.map((item) => ({
           date: new Date(item.date),

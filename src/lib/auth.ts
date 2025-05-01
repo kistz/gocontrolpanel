@@ -90,19 +90,24 @@ export const authOptions: NextAuthOptions = {
       let dbUser: Player | null;
       if (user) {
         const login = slugid.encode(user.accountId);
-        dbUser = await getPlayerByLogin(login);
+        ({ data: dbUser } = await getPlayerByLogin(login));
 
         token.accountId = user.accountId;
         token.login = login;
         token.displayName = user.displayName;
       } else {
-        dbUser = await getPlayerById(token._id);
+        ({ data: dbUser } = await getPlayerById(token._id));
       }
 
       if (!dbUser) {
         let ubiUid = "";
         try {
-          const webidentities = await getWebIdentities([token.accountId]);
+          const { data: webidentities, error } = await getWebIdentities([
+            token.accountId,
+          ]);
+          if (error) {
+            throw new Error(error);
+          }
           if (webidentities && webidentities.length > 0) {
             ubiUid = webidentities[0].uid;
           }
@@ -110,13 +115,13 @@ export const authOptions: NextAuthOptions = {
           console.error("Failed to fetch web identities", error);
         }
 
-        dbUser = await createPlayerAuth({
+        ({ data: dbUser } = await createPlayerAuth({
           login: token.login,
           nickName: token.displayName,
           roles: [],
           path: "",
           ubiUid,
-        });
+        }));
       }
 
       token._id = dbUser._id;

@@ -31,9 +31,15 @@ export default function MapOrder({
 
       if (!files.length || files.length == 0) return;
 
-      await removeMapList(serverId, files);
+      const { error: removeError } = await removeMapList(serverId, files);
+      if (removeError) {
+        throw new Error(removeError);
+      }
 
-      await addMapList(serverId, files);
+      const { error: addError } = await addMapList(serverId, files);
+      if (addError) {
+        throw new Error(addError);
+      }
 
       setDefaultMapList(mapOrder);
 

@@ -34,9 +34,12 @@ export default function EditPlayerForm({
 
   async function onSubmit(values: FormValues) {
     try {
-      await updatePlayer(player._id, {
+      const { error } = await updatePlayer(player._id, {
         roles: values.roles,
       });
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Player updated successfully");
       if (callback) {
         callback();

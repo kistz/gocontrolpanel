@@ -23,7 +23,13 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
     try {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
-      await loadMatchSettings(serverId, "MatchSettings/" + filename);
+      const { error } = await loadMatchSettings(
+        serverId,
+        "MatchSettings/" + filename,
+      );
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Match settings loaded successfully");
     } catch (error) {
       toast.error("Failed to load match settings", {
@@ -36,7 +42,13 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
     try {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
-      await saveMatchSettings(serverId, "MatchSettings/" + filename);
+      const { error } = await saveMatchSettings(
+        serverId,
+        "MatchSettings/" + filename,
+      );
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Match settings saved successfully");
     } catch (error) {
       toast.error("Failed to save match settings", {

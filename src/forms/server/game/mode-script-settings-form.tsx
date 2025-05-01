@@ -26,7 +26,6 @@ export default function ModeScriptSettingsForm({
     defaultValues: modeScriptSettings as ModeScriptSettings,
   });
 
-  /** ✅ Use `useCallback` to avoid recreating function */
   const onSubmitModeScriptSettings = useCallback(
     async (values: ModeScriptSettings) => {
       try {
@@ -40,7 +39,10 @@ export default function ModeScriptSettingsForm({
           }),
         );
 
-        await setModeScriptSettings(serverId, parsedValues);
+        const { error } = await setModeScriptSettings(serverId, parsedValues);
+        if (error) {
+          throw new Error(error);
+        }
         toast.success("Mode Script Settings updated successfully");
       } catch (error) {
         toast.error("Failed to update Mode Script Settings", {
@@ -51,7 +53,6 @@ export default function ModeScriptSettingsForm({
     [],
   );
 
-  /** ✅ Cache descriptions to avoid recalculating */
   const descriptions = useMemo(() => {
     return modeScriptInfo.ParamDescs.reduce(
       (acc, desc) => {
@@ -62,7 +63,6 @@ export default function ModeScriptSettingsForm({
     );
   }, [modeScriptInfo.ParamDescs]);
 
-  /** ✅ Cache form elements to avoid recalculating */
   const formElements = useMemo(() => {
     return Object.entries(modeScriptSettingsForm.getValues()).map(
       ([key, value]) => {

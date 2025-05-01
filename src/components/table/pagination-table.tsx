@@ -24,6 +24,7 @@ import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
+import { PaginationResponse, ServerResponse } from "@/types/responses";
 
 interface PaginationTableProps<TData, TValue> {
   createColumns: (refetch: () => void) => ColumnDef<TData, TValue>[];
@@ -37,7 +38,7 @@ interface PaginationTableProps<TData, TValue> {
       order: string;
     },
     filter?: string,
-  ) => Promise<{ data: TData[]; totalCount: number }>;
+  ) => Promise<ServerResponse<PaginationResponse<TData>>>;
   pageSize?: number;
   filter?: boolean;
 }

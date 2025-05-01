@@ -34,7 +34,10 @@ const MapActionsCell = memo(function MapActionsCell({
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        await removeMap(serverId, data.fileName);
+        const { error } = await removeMap(serverId, data.fileName);
+        if (error) {
+          throw new Error(error);
+        }
         onRemoveMap(data);
         toast.success("Map successfully removed");
       } catch (error) {

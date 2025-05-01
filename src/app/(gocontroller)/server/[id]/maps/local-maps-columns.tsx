@@ -59,7 +59,10 @@ export const createColumns = (serverId: number): ColumnDef<LocalMapInfo>[] => [
       const handleAddMap = () => {
         startTransition(async () => {
           try {
-            await addMap(serverId, localMap.FileName);
+            const { error } = await addMap(serverId, localMap.FileName);
+            if (error) {
+              throw new Error(error);
+            }
             toast.success("Map added successfully");
           } catch (error) {
             toast.error("Error adding map", {

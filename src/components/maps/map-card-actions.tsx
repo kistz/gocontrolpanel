@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { stripTmTags } from "tmtags";
 import ConfirmDialog from "../confirm-dialog";
 import {
   DropdownMenu,
@@ -15,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { stripTmTags } from "tmtags";
 
 interface MapCardActionsProps {
   map: Map;
@@ -115,8 +115,15 @@ export default function MapCardActions({
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={async () => {
-          await deleteMapById(map._id);
           setIsDeleteDialogOpen(false);
+          const { error } = await deleteMapById(map._id);
+          if (error) {
+            toast.error("Error deleting map", {
+              description: error,
+            });
+            return;
+          }
+
           toast.success("Map deleted successfully");
           if (refetch) {
             refetch();

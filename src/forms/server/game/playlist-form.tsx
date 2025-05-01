@@ -23,7 +23,10 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      await appendPlaylist(serverId, filename);
+      const { error } = await appendPlaylist(serverId, filename);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Playlist appended successfully");
     } catch (error) {
       toast.error("Failed to append playlist", {
@@ -36,7 +39,10 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      await insertPlaylist(serverId, filename);
+      const { error } = await insertPlaylist(serverId, filename);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Playlist inserted successfully");
     } catch (error) {
       toast.error("Failed to insert playlist", {

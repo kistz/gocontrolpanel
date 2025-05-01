@@ -12,7 +12,7 @@ export default function LocalMapsTable({ serverId }: { serverId: number }) {
 
   useEffect(() => {
     async function fetchLocalMaps() {
-      const localMaps = await getLocalMaps(serverId);
+      const { data: localMaps } = await getLocalMaps(serverId);
       setData(localMaps);
       setIsLoading(false);
     }

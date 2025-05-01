@@ -31,7 +31,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   useEffect(() => {
     const intervalIndex = setInterval(async () => {
-      const jukebox = await getJukebox(serverId);
+      const { data: jukebox } = await getJukebox(serverId);
 
       if (jukebox[0]?.id !== jukeboxOrder[0]?.id) {
         setJukeboxOrder(jukebox);
@@ -44,7 +44,10 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   async function saveJukebox() {
     try {
-      await setJukebox(serverId, jukeboxOrder);
+      const { error } = await setJukebox(serverId, jukeboxOrder);
+      if (error) {
+        throw new Error(error);
+      }
       setDefaultJukebox(jukeboxOrder);
 
       toast.success("Jukebox saved successfully");
@@ -62,7 +65,10 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   async function onAddMap(map: Map) {
     try {
-      const newMap = await addMapToJukebox(serverId, map);
+      const { data: newMap, error } = await addMapToJukebox(serverId, map);
+      if (error) {
+        throw new Error(error);
+      }
       setJukeboxOrder((prev) => [...prev, newMap]);
       setDefaultJukebox((prev) => [...prev, newMap]);
       toast.success("Map added to jukebox successfully");
@@ -75,7 +81,10 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   async function onClearJukebox() {
     try {
-      await clearJukebox(serverId);
+      const { error } = await clearJukebox(serverId);
+      if (error) {
+        throw new Error(error);
+      }
       setJukeboxOrder([]);
       setDefaultJukebox([]);
       toast.success("Jukebox cleared successfully");
