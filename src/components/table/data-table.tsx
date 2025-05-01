@@ -27,7 +27,6 @@ import { DataTablePagination } from "./data-table-pagination";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  limitHeight?: number;
   isLoading?: boolean;
   filter?: boolean;
   pagination?: boolean;
@@ -36,7 +35,6 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  limitHeight = 206,
   isLoading = false,
   filter = false,
   pagination = false,
@@ -76,7 +74,7 @@ export function DataTable<TData, TValue>({
       <div className="rounded-md border flex-1 overflow-hidden">
         <Table>
           <TableHeader
-            className={`table table-fixed ${hasScrollbar ? "w-[calc(100%-1em)]" : "w-full"}`}
+            className={`table table-fixed ${hasScrollbar ? "w-[calc(100%-0.5em)]" : "w-full"}`}
           >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -97,11 +95,6 @@ export function DataTable<TData, TValue>({
           <TableBody
             ref={tableBodyRef}
             className="block overflow-auto"
-            style={
-              limitHeight !== 0
-                ? { maxHeight: `calc(100vh - ${limitHeight}px)` }
-                : undefined
-            }
           >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (

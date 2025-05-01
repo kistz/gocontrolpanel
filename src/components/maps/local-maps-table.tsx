@@ -27,7 +27,6 @@ export default function LocalMapsTable({ serverId }: { serverId: number }) {
       data={data}
       columns={columns}
       isLoading={isLoading}
-      limitHeight={0}
       filter={true}
     />
   );

@@ -39,7 +39,6 @@ interface PaginationTableProps<TData, TValue> {
     filter?: string,
   ) => Promise<{ data: TData[]; totalCount: number }>;
   pageSize?: number;
-  limitHeight?: number;
   filter?: boolean;
 }
 
@@ -47,7 +46,6 @@ export function PaginationTable<TData, TValue>({
   createColumns,
   fetchData,
   pageSize = 10,
-  limitHeight = 266,
   filter = false,
 }: PaginationTableProps<TData, TValue>) {
   const { ref: tableBodyRef, hasScrollbar } =
@@ -103,7 +101,7 @@ export function PaginationTable<TData, TValue>({
       <div className="rounded-md border flex-1 overflow-hidden">
         <Table>
           <TableHeader
-            className={`table table-fixed ${hasScrollbar ? "w-[calc(100%-1em)]" : "w-full"}`}
+            className={`table table-fixed ${hasScrollbar ? "w-[calc(100%-0.5em)]" : "w-full"}`}
           >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -124,7 +122,6 @@ export function PaginationTable<TData, TValue>({
           <TableBody
             ref={tableBodyRef}
             className="block overflow-auto"
-            style={{ maxHeight: `calc(100vh - ${limitHeight}px)` }}
           >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (

@@ -111,7 +111,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
         </div>
       )}
 
-      <DataTable data={maps} columns={mapColumns} limitHeight={0} pagination />
+      <DataTable data={maps} columns={mapColumns} pagination />
     </div>
   );
 }
