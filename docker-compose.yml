@@ -1,0 +1,61 @@
+services:
+  gocontrolpanel:
+    image: gocontroller/gocontrolpanel:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: mongodb://gocontrol:GoControl123!@mongo:27017
+      MONGODB_DB: gocontroller
+      NODE_ENV: production
+      PORT: 3000
+      CONNECTOR_URL: http://gbxconnector:6980
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET:
+      NADEO_CLIENT_ID:
+      NADEO_CLIENT_SECRET:
+      NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
+      NADEO_SERVER_LOGIN: 
+      NADEO_SERVER_PASSWORD: 
+      NADEO_CONTACT: GoControlPanel / <your contact info>
+      REDIS_URI: redis://redis:6379
+    depends_on:
+      - mongo
+      - redis
+
+  gbxconnector:
+    image: marijnregterschot/gbxconnector:latest
+    restart: unless-stopped
+    ports:
+      - "6980:6980"
+    environment:
+      PORT: 6980
+      CORS_ORIGINS: "http://localhost:3000"
+      SERVER_RECONNECT_INTERVAL: 15
+      LOG_LEVEL: DEBUG
+    volumes:
+      - ./servers.json:/app/servers.json
+
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: gocontrol
+      MONGO_INITDB_ROOT_PASSWORD: GoControl123!
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mongo-data:
+  redis-data:
