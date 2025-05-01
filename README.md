@@ -1,7 +1,3 @@
-Sure! Here's the updated README with a section explaining how to modify the `servers.json` file:
-
----
-
 # **GoControlPanel Docker Compose Setup**
 
 This repository provides a **Docker Compose** configuration to set up and run **GoControlPanel** and its dependencies using Docker containers. The configuration includes:
