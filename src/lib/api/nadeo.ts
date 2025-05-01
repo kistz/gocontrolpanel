@@ -73,8 +73,8 @@ export async function doRequest<T>(
     await authenticate();
     tokens = await getTokens();
     console.log("Retrying Nadeo API request with new tokens");
-    res = await fetch(url, { ...init, headers });
     headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
+    res = await fetch(url, { ...init, headers });
   }
 
   if (!res.ok) {
