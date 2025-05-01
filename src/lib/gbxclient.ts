@@ -69,7 +69,10 @@ export async function syncServers() {
 
 export async function getServers(): Promise<Server[]> {
   const raw = await redis.get("servers");
-  if (!raw) throw new Error("Failed to get servers from cache");
+  if (!raw) {
+    await syncServers();
+    return getServers();
+  }
   const servers: Server[] = JSON.parse(raw);
   return servers;
 }
