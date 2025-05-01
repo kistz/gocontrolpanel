@@ -21,8 +21,8 @@ Follow these steps to set up and run the services defined in the `docker-compose
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/MRegterschot/gocontrolpanel.git
+cd gocontrolpanel
 ```
 
 ### 2. Modify the Configuration
@@ -76,7 +76,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 - **name**: Name of the server.
 - **description**: Short description of the server (optional).
 - **host**: The hostname or IP address of the server.
-- **xmlrpcPort**: The XML-RPC port of the server (commonly used for APIs).
+- **xmlrpcPort**: The XML-RPC port of the server.
 - **user**: Username for authentication on the server.
 - **pass**: Password for authentication on the server.
 
@@ -190,7 +190,3 @@ docker-compose logs gocontrolpanel
 ## **License**
 
 This project is licensed under the MIT License - see the [License](License) file for details.
-
----
-
-Let me know if there’s anything else I can help with!
