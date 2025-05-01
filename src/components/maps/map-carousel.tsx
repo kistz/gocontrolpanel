@@ -1,5 +1,5 @@
 "use client";
-import { getCurrentMapIndex } from "@/actions/gbx/map";
+
 import { cn } from "@/lib/utils";
 import { Map } from "@/types/map";
 import {
@@ -7,7 +7,7 @@ import {
   IconLock,
   IconLockOpen,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Carousel,
@@ -37,30 +37,68 @@ export default function MapCarousel({
   const [api, setApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState<number>(startIndex);
   const [follow, setFollow] = useState<boolean>(true);
+  const [isSwitching, setIsSwitching] = useState<boolean>(false);
+
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const intervalIndex = setInterval(async () => {
-      const index = await getCurrentMapIndex(serverId);
+    const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
+    if (!baseUrl) {
+      console.error("NEXT_PUBLIC_CONNECTOR_URL is not defined");
+      return;
+    }
 
-      if (index === currentIndex) return;
+    const socket = new WebSocket(`${baseUrl}/ws/listeners/${serverId}`);
+    wsRef.current = socket;
 
-      if (api && follow) {
-        api.scrollTo(index);
+    socket.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+
+        if (typeof message === "string") {
+          const currentIndex = maps.findIndex((m) => m.uid === message);
+          if (currentIndex !== -1) {
+            setCurrentIndex(currentIndex);
+            if (follow && api) {
+              api.scrollTo(currentIndex);
+            }
+          }
+          return;
+        }
+
+        if (message.endMap) {
+          setIsSwitching(true);
+          return;
+        }
+
+        if (message.startMap) {
+          const newIndex = maps.findIndex((m) => m.uid === message.startMap);
+          if (newIndex !== -1) {
+            setCurrentIndex(newIndex);
+            if (follow && api) {
+              api.scrollTo(newIndex);
+            }
+          }
+          setIsSwitching(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Invalid WebSocket message:", event.data);
       }
+    };
 
-      setCurrentIndex(index);
-    }, 10000);
-
-    return () => clearInterval(intervalIndex);
-  }, [api, currentIndex, follow]);
+    return () => {
+      socket.close();
+    };
+  }, [serverId, maps, follow, api]);
 
   return (
     <div className="flex flex-col gap-2">
       <Carousel
         setApi={setApi}
         opts={{
-          loop: loop,
-          startIndex: startIndex,
+          loop,
+          startIndex,
           align: "center",
         }}
         className={cn("px-12 md:max-w-[calc(100vw-340px)]", className)}
@@ -76,6 +114,7 @@ export default function MapCarousel({
                 map={map}
                 index={index}
                 isCurrent={index === currentIndex}
+                isSwitching={isSwitching}
                 total={maps.length}
               />
             </CarouselItem>

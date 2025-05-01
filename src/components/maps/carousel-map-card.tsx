@@ -20,6 +20,7 @@ interface CarouselMapCardProps {
   map: Map;
   index: number;
   isCurrent?: boolean;
+  isSwitching?: boolean;
   total: number;
   serverId: number;
   className?: string;
@@ -29,6 +30,7 @@ export default function CarouselMapCard({
   map,
   index,
   isCurrent = false,
+  isSwitching = false,
   total,
   serverId,
   className,
@@ -169,8 +171,17 @@ export default function CarouselMapCard({
           variant={"outline"}
           className="absolute top-2 left-2 z-10 bg-white dark:bg-black flex gap-2"
         >
-          <span className="bg-green-500 w-2 h-2 rounded-full"></span>
-          Current Map
+          {isSwitching ? (
+            <>
+              <span className="bg-yellow-500 w-2 h-2 rounded-full"></span>
+              Switching Maps
+            </>
+          ) : (
+            <>
+              <span className="bg-green-500 w-2 h-2 rounded-full"></span>
+              Current Map
+            </>
+          )}
         </Badge>
       )}
     </Card>

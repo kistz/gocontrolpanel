@@ -51,7 +51,6 @@ export default function NavServers() {
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-
     if (!url) {
       console.error("Connector URL is not defined");
       return;
