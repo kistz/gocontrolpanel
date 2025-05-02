@@ -8,7 +8,7 @@ export default async function AdminServersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-end">
+      <div className="flex gap-2 justify-between items-end">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">Manage Servers</h1>
           <h4 className="text-muted-foreground">
@@ -23,7 +23,7 @@ export default async function AdminServersPage() {
 
       {servers.length === 0 ? (
         <div className="text-muted-foreground">
-          No servers found. Please add a server.
+          No servers found.
         </div>
       ) : (
         <ServerOrder servers={servers} />

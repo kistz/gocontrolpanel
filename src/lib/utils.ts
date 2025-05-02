@@ -53,3 +53,11 @@ export function getDivergingList<T extends Record<string, any>>(
 
   return [list1.slice(divergenceIndex), list2.slice(divergenceIndex)];
 }
+
+export function toReadableTitle(field: string): string {
+  return field
+    .replace(/([A-Z])/g, " $1")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}

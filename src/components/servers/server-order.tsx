@@ -1,5 +1,6 @@
 "use client";
 import { createColumns } from "@/app/(gocontroller)/admin/servers/server-order-columns";
+import DndListHeader from "@/components/dnd/dnd-list-headers";
 import { getDivergingList, getErrorMessage } from "@/lib/utils";
 import { Server } from "@/types/server";
 import { useState } from "react";
@@ -45,7 +46,14 @@ export default function ServerOrder({ servers }: { servers: Server[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <DndList columns={columns} data={serverOrder} setData={setServerOrder} />
+      <div className="flex flex-col gap-2">
+        <DndListHeader columns={columns} />
+        <DndList
+          columns={columns}
+          data={serverOrder}
+          setData={setServerOrder}
+        />
+      </div>
       <div className="flex flex-row-reverse gap-2">
         <Button onClick={saveServerOrder}>Save Order</Button>
 
