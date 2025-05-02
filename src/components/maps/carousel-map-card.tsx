@@ -15,6 +15,7 @@ import { parseTmTags, stripTmTags } from "tmtags";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import Image from "next/image";
 
 interface CarouselMapCardProps {
   map: Map;
@@ -97,11 +98,11 @@ export default function CarouselMapCard({
     <Card className={cn("flex flex-col flex-1 relative", className)}>
       <div className="relative">
         {map.thumbnailUrl ? (
-          <img
-            loading="lazy"
+          <Image
             src={map.thumbnailUrl}
+            fill
             alt={map.name}
-            className="w-full rounded-t-lg h-40 object-cover"
+            className="static! rounded-t-lg h-40! object-cover"
           />
         ) : (
           <div className="w-full h-40 rounded-t-lg flex items-center justify-center">
