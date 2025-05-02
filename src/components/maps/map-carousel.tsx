@@ -82,7 +82,7 @@ export default function MapCarousel({
           setIsSwitching(false);
           return;
         }
-      } catch (err) {
+      } catch {
         console.error("Invalid WebSocket message:", event.data);
       }
     };

@@ -72,7 +72,7 @@ export async function getScriptName(server: number): Promise<
 export async function loadMatchSettings(
   server: number,
   filename: string,
-): Promise<ServerResponse<Number>> {
+): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(server);
     return await client.call("LoadMatchSettings", filename);
@@ -120,7 +120,7 @@ export async function getModeScriptInfo(
 
 export async function getModeScriptSettings(server: number): Promise<
   ServerResponse<{
-    [key: string]: any;
+    [key: string]: string | number | boolean;
   }>
 > {
   return doServerActionWithAuth(["admin"], async () => {

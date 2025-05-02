@@ -148,8 +148,8 @@ export async function getMapList(
     }
 
     const uids = mapList
-      .filter((map: any) => map.UId)
-      .map((map: any) => map.UId);
+      .filter((map) => map.UId)
+      .map((map) => map.UId);
 
     const db = await getDatabase();
     const collection = db.collection<DBMap>(collections.MAPS);
@@ -160,12 +160,12 @@ export async function getMapList(
     const existingUids = new Set(existingMaps.map((m) => m.uid));
 
     const missingMaps = mapList.filter(
-      (map: any) => !existingUids.has(map.UId),
+      (map) => !existingUids.has(map.UId),
     );
 
     if (missingMaps.length > 0) {
       const { data: apiMapsInfo } = await getMapsInfo(
-        missingMaps.map((map: any) => map.UId),
+        missingMaps.map((map) => map.UId),
       );
 
       const now = new Date();
@@ -200,7 +200,7 @@ export async function getMapList(
     }
 
     const orderedMaps = mapList
-      .map((map: any) => {
+      .map((map) => {
         const foundMap = existingMaps.find((m) => m.uid === map.UId);
         return foundMap ? mapDBMapToMap(foundMap) : null;
       })
