@@ -31,7 +31,6 @@
   background-color: var(--color-muted-foreground);
 }
 
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

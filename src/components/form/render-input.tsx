@@ -2,7 +2,12 @@
 import { cn } from "@/lib/utils";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useState } from "react";
-import { ControllerRenderProps, FieldError, FieldValues, Merge } from "react-hook-form";
+import {
+  ControllerRenderProps,
+  FieldError,
+  FieldValues,
+  Merge,
+} from "react-hook-form";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";

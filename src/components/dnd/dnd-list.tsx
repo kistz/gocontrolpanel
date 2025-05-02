@@ -70,9 +70,7 @@ export function DndList<TData extends { id: string | number }>({
         modifiers={[restrictToVerticalAxis, restrictToParentElement]}
       >
         <SortableContext items={data} strategy={verticalListSortingStrategy}>
-          <div
-            className="flex flex-col flex-1 overflow-auto gap-2"
-          >
+          <div className="flex flex-col flex-1 overflow-auto gap-2">
             {data.map((item) => (
               <DndListRow
                 id={item.id}

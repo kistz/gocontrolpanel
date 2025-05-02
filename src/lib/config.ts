@@ -8,8 +8,7 @@ const config: Config = {
   },
   NODE_ENV: process.env.NODE_ENV || "development",
   PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
-  CONNECTOR_URL:
-    process.env.CONNECTOR_URL || "http://localhost:6980",
+  CONNECTOR_URL: process.env.CONNECTOR_URL || "http://localhost:6980",
   NADEO: {
     CLIENT_ID: process.env.NADEO_CLIENT_ID || "",
     CLIENT_SECRET: process.env.NADEO_CLIENT_SECRET || "",

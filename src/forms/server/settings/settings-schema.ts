@@ -37,7 +37,7 @@ export const ServerSettingsSchema = z.object({
     DisableHorns: z.boolean(),
     DisableServiceAnnounces: z.boolean(),
   }),
-  
+
   allowMapDownload: z.boolean(),
   downloadRate: z.coerce.number().int().min(1, "Download Rate is required"),
   uploadRate: z.coerce.number().int().min(1, "Upload Rate is required"),

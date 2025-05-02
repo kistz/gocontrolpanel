@@ -47,16 +47,22 @@ export default function FormElement<TControl extends FieldValues>({
   if (isHidden) return null;
 
   const getErrorMessage = (
-    error: FieldError | Merge<FieldError, (FieldError | undefined)[]> | undefined
+    error:
+      | FieldError
+      | Merge<FieldError, (FieldError | undefined)[]>
+      | undefined,
   ): string | undefined => {
     if (!error) return undefined;
-  
+
     if ("message" in error && typeof error.message === "string") {
       return error.message;
     }
-  
+
     return Array.isArray(error)
-      ? error.map((e) => e?.message).filter(Boolean).join(", ")
+      ? error
+          .map((e) => e?.message)
+          .filter(Boolean)
+          .join(", ")
       : undefined;
   };
 

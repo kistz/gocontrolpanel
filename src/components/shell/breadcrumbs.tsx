@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { routes } from "@/routes";
 import Link from "next/link";
 import React from "react";
@@ -9,7 +10,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
-import { cn } from "@/lib/utils";
 
 export interface TBreadcrumb {
   label: string;
@@ -44,9 +44,12 @@ export default function Breadcrumbs({ crumbs, className }: BreadcrumbsProps) {
                       </BreadcrumbLink>
                     </>
                   ) : (
-                    <BreadcrumbPage className={cn("max-w-20 truncate md:max-w-none", 
-                      index !== crumbs.length - 1 && "text-muted-foreground"
-                    )}>
+                    <BreadcrumbPage
+                      className={cn(
+                        "max-w-20 truncate md:max-w-none",
+                        index !== crumbs.length - 1 && "text-muted-foreground",
+                      )}
+                    >
                       {item.label}
                     </BreadcrumbPage>
                   )}

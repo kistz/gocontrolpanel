@@ -92,10 +92,7 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
 
-          <TableBody
-            ref={tableBodyRef}
-            className="block overflow-auto"
-          >
+          <TableBody ref={tableBodyRef} className="block overflow-auto">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

@@ -147,9 +147,7 @@ export async function getMapList(
       throw new ServerError("Failed to get map list");
     }
 
-    const uids = mapList
-      .filter((map) => map.UId)
-      .map((map) => map.UId);
+    const uids = mapList.filter((map) => map.UId).map((map) => map.UId);
 
     const db = await getDatabase();
     const collection = db.collection<DBMap>(collections.MAPS);
@@ -159,9 +157,7 @@ export async function getMapList(
       .toArray();
     const existingUids = new Set(existingMaps.map((m) => m.uid));
 
-    const missingMaps = mapList.filter(
-      (map) => !existingUids.has(map.UId),
-    );
+    const missingMaps = mapList.filter((map) => !existingUids.has(map.UId));
 
     if (missingMaps.length > 0) {
       const { data: apiMapsInfo } = await getMapsInfo(
