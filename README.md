@@ -36,6 +36,7 @@ Make sure to update the environment variables in the `docker-compose.yml` file t
   - `NODE_ENV`: The environment for your application (`production` or `development`).
   - `CONNECTOR_URL`: URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
+  - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, and `NADEO_SERVER_LOGIN` with your valid NADEO API credentials.
   - `REDIS_URI`: Redis URI for caching.
 
@@ -162,6 +163,7 @@ Each service has specific environment variables. Refer to the `docker-compose.ym
   - `MONGODB_DB`: MongoDB database name.
   - `CONNECTOR_URL`: URL of the GBXConnector.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: For NextAuth authentication.
+  - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO** credentials: `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, etc.
   - `REDIS_URI`: Redis connection string.
 
