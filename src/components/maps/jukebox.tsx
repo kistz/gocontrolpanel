@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
 import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
+import DndListHeaders from "../dnd/dnd-list-headers";
 
 interface JukeboxProps {
   serverId: number;
@@ -104,6 +105,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
         <p className="text-muted-foreground">No maps in jukebox.</p>
       ) : (
         <div className="flex flex-col gap-3">
+          <DndListHeaders columns={jukeboxColumns} />
           <DndList
             columns={jukeboxColumns}
             data={jukeboxOrder}

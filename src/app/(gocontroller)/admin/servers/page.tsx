@@ -1,4 +1,5 @@
 import AddServerModal from "@/components/modals/add-server";
+import { Modal } from "@/components/modals/modal";
 import ServerOrder from "@/components/servers/server-order";
 import { Button } from "@/components/ui/button";
 import { getServers } from "@/lib/gbxclient";
@@ -17,16 +18,20 @@ export default async function AdminServersPage() {
           </h4>
         </div>
 
-        <Button>
-          <IconPlus /> Add Server
-        </Button>
-
+        <Modal>
+          <Modal.Trigger>
+            <Button>
+              <IconPlus /> Add Server
+            </Button>
+          </Modal.Trigger>
+          <Modal.Content>
+            <AddServerModal />
+          </Modal.Content>
+        </Modal>
       </div>
 
       {servers.length === 0 ? (
-        <div className="text-muted-foreground">
-          No servers found.
-        </div>
+        <div className="text-muted-foreground">No servers found.</div>
       ) : (
         <ServerOrder servers={servers} />
       )}

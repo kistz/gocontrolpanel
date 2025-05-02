@@ -1,3 +1,4 @@
+"use client";
 import { updatePlayer } from "@/actions/database/player";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";

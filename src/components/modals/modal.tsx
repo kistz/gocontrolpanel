@@ -60,9 +60,7 @@ export function Modal({
           className="fixed top-0 left-0 z-[9998] flex h-screen w-screen items-center justify-center bg-black/50"
           onClick={handleBackdropClick}
         >
-          <div onClick={(e) => e.stopPropagation()}>
-            {cloneElement(modalElement, { closeModal })}
-          </div>
+          {cloneElement(modalElement, { closeModal })}
         </div>
       )}
     </>

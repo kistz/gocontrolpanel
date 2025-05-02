@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
 import { Button } from "../ui/button";
+import DndListHeaders from "../dnd/dnd-list-headers";
 
 export default function MapOrder({
   mapList,
@@ -70,6 +71,7 @@ export default function MapOrder({
 
   return (
     <div className="flex flex-col gap-3">
+      <DndListHeaders columns={columns} />
       <DndList
         columns={columns}
         data={mapOrder}

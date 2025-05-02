@@ -1,9 +1,12 @@
+"use client";
 import AddServerForm from "@/forms/admin/add-server-form";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddServerModal({ setIsOpen }: DefaultModalProps<void>) {
+export default function AddServerModal({
+  closeModal,
+}: DefaultModalProps<void>) {
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -14,11 +17,11 @@ export default function AddServerModal({ setIsOpen }: DefaultModalProps<void>) {
         <h1 className="text-xl font-bold">Add Server</h1>
         <IconX
           className="h-6 w-6 cursor-pointer text-muted-foreground"
-          onClick={() => setIsOpen(false)}
+          onClick={closeModal}
         />
       </div>
 
-      <AddServerForm callback={() => setIsOpen(false)} />
+      <AddServerForm callback={closeModal} />
     </Card>
   );
 }
