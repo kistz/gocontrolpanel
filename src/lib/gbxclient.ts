@@ -1,8 +1,10 @@
 "use server";
 import { setupJukeboxCallbacks } from "@/actions/gbx/map";
 import config from "@/lib/config";
+import { ServerError, ServerResponse } from "@/types/responses";
 import { GbxClient } from "@evotm/gbxclient";
 import { Server } from "../types/server";
+import { doServerAction } from "./actions";
 import redis from "./redis";
 
 const cachedClients: {
@@ -59,7 +61,7 @@ export async function syncServers(): Promise<Server[]> {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch servers from connector");
+    throw new ServerError("Failed to get servers");
   }
 
   const servers: Server[] = await res.json();
@@ -70,6 +72,23 @@ export async function syncServers(): Promise<Server[]> {
 
 export async function getServers(): Promise<Server[]> {
   return await syncServers();
+}
+
+export async function removeServer(id: number): Promise<ServerResponse> {
+  return doServerAction(async () => {
+    const res = await fetch(`${config.CONNECTOR_URL}/servers/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new ServerError("Failed to remove server");
+    }
+
+    await syncServers();
+  });
 }
 
 export async function setupCallbacks(): Promise<void> {

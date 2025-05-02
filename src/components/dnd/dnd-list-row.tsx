@@ -39,7 +39,7 @@ export default function DndListRow<TData>({
         <div
           key={column.id}
           className={cn(
-            "text-sm overflow-hidden overflow-ellipsis",
+            "text-sm overflow-hidden overflow-ellipsis min-h-full flex items-center",
             column.id !== "actions"
               ? `${isCursorGrabbing ? "cursor-grabbing" : "cursor-grab"} flex-1`
               : "flex-shrink-0 w-auto",
