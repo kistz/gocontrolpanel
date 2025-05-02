@@ -1,3 +1,4 @@
+import AddServerModal from "@/components/modals/add-server";
 import ServerOrder from "@/components/servers/server-order";
 import { Button } from "@/components/ui/button";
 import { getServers } from "@/lib/gbxclient";
@@ -19,6 +20,7 @@ export default async function AdminServersPage() {
         <Button>
           <IconPlus /> Add Server
         </Button>
+
       </div>
 
       {servers.length === 0 ? (

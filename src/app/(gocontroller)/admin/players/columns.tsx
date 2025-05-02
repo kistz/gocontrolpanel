@@ -3,6 +3,7 @@
 import { deletePlayerById } from "@/actions/database/player";
 import ConfirmDialog from "@/components/confirm-dialog";
 import EditPlayerModal from "@/components/modals/edit-player";
+import { Modal } from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -129,11 +130,11 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             cancelText="Cancel"
           />
 
-          <EditPlayerModal
-            player={player}
-            isOpen={isEditOpen}
-            setIsOpen={setIsEditOpen}
-          />
+          <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
+            <Modal.Content>
+              <EditPlayerModal data={player} />
+            </Modal.Content>
+          </Modal>
         </div>
       );
     },

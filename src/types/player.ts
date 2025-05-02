@@ -1,4 +1,6 @@
+import { EditPlayerSchema } from "@/forms/admin/edit-player-schema";
 import { ObjectId } from "mongodb";
+import { z } from "zod";
 
 export interface DBPlayer {
   _id: ObjectId;
@@ -23,3 +25,5 @@ export interface Player {
   updatedAt: Date;
   deletedAt?: Date;
 }
+
+export type EditPlayer = z.infer<typeof EditPlayerSchema>;

@@ -1,3 +1,4 @@
+import { AddServerSchema } from "@/forms/admin/add-server-schema";
 import {
   MatchSettingsSchema,
   ModeScriptSettingsSchema,
@@ -42,6 +43,8 @@ export type MatchSettings = z.infer<typeof MatchSettingsSchema>;
 export type Playlist = z.infer<typeof PlaylistSchema>;
 
 export type ModeScriptSettings = z.infer<typeof ModeScriptSettingsSchema>;
+
+export type AddServer = z.infer<typeof AddServerSchema>;
 
 export interface Server {
   id: number;
