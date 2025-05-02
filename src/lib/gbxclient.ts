@@ -50,7 +50,7 @@ export async function getGbxClient(id: number) {
 }
 
 // Sync the servers
-export async function syncServers() {
+export async function syncServers(): Promise<Server[]> {
   const res = await fetch(`${config.CONNECTOR_URL}/servers`, {
     method: "GET",
     headers: {
@@ -64,17 +64,12 @@ export async function syncServers() {
 
   const servers: Server[] = await res.json();
 
-  await redis.set("servers", JSON.stringify(servers));
+  await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
+  return servers;
 }
 
 export async function getServers(): Promise<Server[]> {
-  const raw = await redis.get("servers");
-  if (!raw) {
-    await syncServers();
-    return getServers();
-  }
-  const servers: Server[] = JSON.parse(raw);
-  return servers;
+  return await syncServers();
 }
 
 export async function setupCallbacks(): Promise<void> {
