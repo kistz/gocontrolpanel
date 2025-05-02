@@ -16,12 +16,13 @@ services:
       PORT: 3000
       CONNECTOR_URL: http://gbxconnector:6980
       NEXTAUTH_URL: http://localhost:3000
+      DEFAULT_ADMINS:
       NEXTAUTH_SECRET:
       NADEO_CLIENT_ID:
       NADEO_CLIENT_SECRET:
       NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
-      NADEO_SERVER_LOGIN: 
-      NADEO_SERVER_PASSWORD: 
+      NADEO_SERVER_LOGIN:
+      NADEO_SERVER_PASSWORD:
       NADEO_CONTACT: GoControlPanel / <your contact info>
       REDIS_URI: redis://redis:6379
     depends_on:

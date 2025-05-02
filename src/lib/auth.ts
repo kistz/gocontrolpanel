@@ -118,7 +118,9 @@ export const authOptions: NextAuthOptions = {
         ({ data: dbUser } = await createPlayerAuth({
           login: token.login,
           nickName: token.displayName,
-          roles: [],
+          roles: config.DEFAULT_ADMINS.includes(token.login)
+            ? ["admin"]
+            : [],
           path: "",
           ubiUid,
         }));
