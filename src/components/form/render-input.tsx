@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useState } from "react";
-import { ControllerRenderProps, FieldValues } from "react-hook-form";
+import { ControllerRenderProps, FieldError, FieldValues, Merge } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
@@ -27,7 +27,7 @@ interface RenderInputProps<TControl extends FieldValues> {
   isDisabled?: boolean;
   isLoading?: boolean;
   step?: string;
-  error?: any;
+  error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
 }
 

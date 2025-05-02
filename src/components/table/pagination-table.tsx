@@ -22,9 +22,9 @@ import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
+import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import { PaginationResponse, ServerResponse } from "@/types/responses";
 
 interface PaginationTableProps<TData, TValue> {
   createColumns: (refetch: () => void) => ColumnDef<TData, TValue>[];
@@ -67,6 +67,7 @@ export function PaginationTable<TData, TValue>({
       ...prev,
       pageIndex: 0,
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalFilter]);
 
   const columns = createColumns(refetch);
@@ -120,10 +121,7 @@ export function PaginationTable<TData, TValue>({
             ))}
           </TableHeader>
 
-          <TableBody
-            ref={tableBodyRef}
-            className="block overflow-auto"
-          >
+          <TableBody ref={tableBodyRef} className="block overflow-auto">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

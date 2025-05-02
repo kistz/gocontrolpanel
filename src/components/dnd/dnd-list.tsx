@@ -3,6 +3,7 @@
 import {
   closestCenter,
   DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -47,13 +48,13 @@ export function DndList<TData extends { id: string | number }>({
     }),
   );
 
-  function handleDragEnd(event: any) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (active.id !== over?.id) {
       setData((prev) => {
         const oldIndex = prev.findIndex((item) => item.id === active.id);
-        const newIndex = prev.findIndex((item) => item.id === over.id);
+        const newIndex = prev.findIndex((item) => item.id === over?.id);
 
         return arrayMove(prev, oldIndex, newIndex);
       });

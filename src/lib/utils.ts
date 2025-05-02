@@ -17,19 +17,30 @@ export function formatTime(time: number): string {
 }
 
 export function getErrorMessage(error: unknown): string {
-  const errorMessage = error instanceof Error || error instanceof ServerError ? error.message : "Unknown error";
+  const errorMessage =
+    error instanceof Error || error instanceof ServerError
+      ? error.message
+      : "Unknown error";
 
   const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
   return match ? match[1] : errorMessage;
 }
 
-export function generatePath(path: string, params: Record<string, string | number>): string {
+export function generatePath(
+  path: string,
+  params: Record<string, string | number>,
+): string {
   return Object.entries(params).reduce((acc, [key, value]) => {
     return acc.replace(`:${key}`, String(value));
   }, path);
 }
 
-export function getDivergingList<T extends Record<string, any>>(list1: T[], list2: T[], key: string): [T[], T[]] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getDivergingList<T extends Record<string, any>>(
+  list1: T[],
+  list2: T[],
+  key: string,
+): [T[], T[]] {
   const minLength = Math.min(list1.length, list2.length);
   let divergenceIndex = minLength;
 

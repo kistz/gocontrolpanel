@@ -26,10 +26,10 @@ const MapActionsCell = memo(function MapActionsCell({
   serverId?: number;
   onRemoveMap: (map: OrderMap) => void;
 }) {
-  if (!serverId) return null;
-
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+
+  if (!serverId) return null;
 
   const handleRemove = () => {
     startTransition(async () => {

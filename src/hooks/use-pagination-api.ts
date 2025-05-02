@@ -45,6 +45,7 @@ export const usePaginationAPI = <TData>(
 
   useEffect(() => {
     fetchDataFromAPI();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.skip, pagination.limit, sorting.field, sorting.order, filter]);
 
   return { data, totalCount, loading, refetch: fetchDataFromAPI };

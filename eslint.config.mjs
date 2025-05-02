@@ -21,8 +21,9 @@ const eslintConfig = [
           ignoreRestSiblings: true,
         },
       ],
-      'react-hooks/rules-of-hooks': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      "react-hooks/rules-of-hooks": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@next/next/no-img-element": "off",
     },
   },
 ];

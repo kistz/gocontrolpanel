@@ -50,7 +50,7 @@ export default function ModeScriptSettingsForm({
         });
       }
     },
-    [],
+    [serverId],
   );
 
   const descriptions = useMemo(() => {
@@ -113,7 +113,7 @@ export default function ModeScriptSettingsForm({
               label={element.label}
               description={element.description}
               placeholder={element.placeholder}
-              error={modeScriptSettingsForm.formState.errors[key] as any}
+              error={modeScriptSettingsForm.formState.errors[key]}
               className={element.className}
               type={element.type}
             />
@@ -136,7 +136,7 @@ export default function ModeScriptSettingsForm({
               label={element.label}
               description={element.description}
               placeholder={element.placeholder}
-              error={modeScriptSettingsForm.formState.errors[key] as any}
+              error={modeScriptSettingsForm.formState.errors[key]}
               className={element.className}
               type={element.type}
             />

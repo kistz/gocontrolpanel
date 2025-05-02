@@ -3,10 +3,10 @@ import { getMapsPaginated } from "@/actions/database/map";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { Map } from "@/types/map";
+import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 import GridPagination from "../grid/grid-pagination";
 import MapCard from "./map-card";
-import { PaginationResponse, ServerResponse } from "@/types/responses";
 
 interface MapCardsProps {
   fetchData?: (
@@ -65,6 +65,7 @@ export default function MapCards({
       };
     });
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cols, rows]);
 
   return (
