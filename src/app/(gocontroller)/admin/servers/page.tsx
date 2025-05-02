@@ -1,5 +1,5 @@
 import AddServerModal from "@/components/modals/add-server";
-import { Modal } from "@/components/modals/modal";
+import Modal from "@/components/modals/modal";
 import ServerOrder from "@/components/servers/server-order";
 import { Button } from "@/components/ui/button";
 import { getServers } from "@/lib/gbxclient";
@@ -7,7 +7,7 @@ import { IconPlus } from "@tabler/icons-react";
 
 export default async function AdminServersPage() {
   const servers = await getServers();
-
+  
   return (
     <div className="flex flex-col gap-6">
       <div className="flex gap-2 justify-between items-end">
