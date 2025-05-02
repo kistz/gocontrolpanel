@@ -42,9 +42,7 @@ export default function CarouselMapCard({
       if (error) {
         throw new Error(error);
       }
-      toast.success("Gone back to previous map", {
-        description: "Gone back to previous map",
-      });
+      toast.success("Gone back to previous map");
     } catch (error) {
       toast.error("Failed to jump to previous map", {
         description: getErrorMessage(error),
@@ -74,9 +72,7 @@ export default function CarouselMapCard({
       if (error) {
         throw new Error(error);
       }
-      toast.success("Skipped to next map", {
-        description: "Skipped to next map",
-      });
+      toast.success("Skipped to next map");
     } catch (error) {
       toast.error("Failed to skip to next map", {
         description: getErrorMessage(error),

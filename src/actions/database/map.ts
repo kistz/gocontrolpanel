@@ -132,22 +132,38 @@ function mapDBMapToMap(dbMap: DBMap): Map {
 
 export async function getMapList(
   server: number,
-  count: number = 100,
+  count?: number,
   start: number = 0,
 ): Promise<ServerResponse<Map[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(server);
-    const mapList: MapInfoMinimal[] = await client.call(
-      "GetMapList",
-      count,
-      start,
-    );
+    const pageSize = 100;
+    let allMapList: MapInfoMinimal[] = [];
 
-    if (!mapList) {
+    if (count === undefined) {
+      let currentStart = start;
+      while (true) {
+        const batch: MapInfoMinimal[] = await client.call(
+          "GetMapList",
+          pageSize,
+          currentStart,
+        );
+        if (!batch || batch.length === 0) break;
+
+        allMapList = allMapList.concat(batch);
+        if (batch.length < pageSize) break; // No more pages
+
+        currentStart += batch.length;
+      }
+    } else {
+      allMapList = await client.call("GetMapList", count, start);
+    }
+
+    if (!allMapList || allMapList.length === 0) {
       throw new ServerError("Failed to get map list");
     }
 
-    const uids = mapList.filter((map) => map.UId).map((map) => map.UId);
+    const uids = allMapList.filter((map) => map.UId).map((map) => map.UId);
 
     const db = await getDatabase();
     const collection = db.collection<DBMap>(collections.MAPS);
@@ -157,7 +173,7 @@ export async function getMapList(
       .toArray();
     const existingUids = new Set(existingMaps.map((m) => m.uid));
 
-    const missingMaps = mapList.filter((map) => !existingUids.has(map.UId));
+    const missingMaps = allMapList.filter((map) => !existingUids.has(map.UId));
 
     if (missingMaps.length > 0) {
       const { data: apiMapsInfo } = await getMapsInfo(
@@ -165,37 +181,45 @@ export async function getMapList(
       );
 
       const now = new Date();
-
       const newDbMaps: DBMap[] = [];
-      for (const map of missingMaps) {
-        const mapInfo: MapInfo = await client.call("GetMapInfo", map.FileName);
-        const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.UId);
 
-        newDbMaps.push({
-          _id: new ObjectId(),
-          name: mapInfo.Name || "Unknown",
-          uid: mapInfo.UId,
-          fileName: mapInfo.FileName || "",
-          author: mapInfo.Author || "",
-          authorNickname: mapInfo.AuthorNickname || "",
-          authorTime: mapInfo.AuthorTime || 0,
-          goldTime: mapInfo.GoldTime || 0,
-          silverTime: mapInfo.SilverTime || 0,
-          bronzeTime: mapInfo.BronzeTime || 0,
-          submitter: mapInfoFromApi?.submitter || "",
-          timestamp: mapInfoFromApi?.timestamp || new Date(),
-          fileUrl: mapInfoFromApi?.fileUrl || "",
-          thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
-          createdAt: now,
-          updatedAt: now,
-        });
+      for (const map of missingMaps) {
+        try {
+          const mapInfo: MapInfo = await client.call(
+            "GetMapInfo",
+            map.FileName,
+          );
+          const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.UId);
+
+          newDbMaps.push({
+            _id: new ObjectId(),
+            name: mapInfo.Name || "Unknown",
+            uid: mapInfo.UId,
+            fileName: mapInfo.FileName || "",
+            author: mapInfo.Author || "",
+            authorNickname: mapInfo.AuthorNickname || "",
+            authorTime: mapInfo.AuthorTime || 0,
+            goldTime: mapInfo.GoldTime || 0,
+            silverTime: mapInfo.SilverTime || 0,
+            bronzeTime: mapInfo.BronzeTime || 0,
+            submitter: mapInfoFromApi?.submitter || "",
+            timestamp: mapInfoFromApi?.timestamp || new Date(),
+            fileUrl: mapInfoFromApi?.fileUrl || "",
+            thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
+            createdAt: now,
+            updatedAt: now,
+          });
+        } catch (err) {
+          console.warn(`Skipping map "${map.FileName}" due to error:`, err);
+          continue;
+        }
       }
 
       await collection.insertMany(newDbMaps);
       existingMaps.push(...newDbMaps);
     }
 
-    const orderedMaps = mapList
+    const orderedMaps = allMapList
       .map((map) => {
         const foundMap = existingMaps.find((m) => m.uid === map.UId);
         return foundMap ? mapDBMapToMap(foundMap) : null;

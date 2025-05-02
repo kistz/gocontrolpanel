@@ -40,6 +40,17 @@ export default function MapCarousel({
   const [isSwitching, setIsSwitching] = useState<boolean>(false);
 
   const wsRef = useRef<WebSocket | null>(null);
+  const followRef = useRef(follow);
+  const apiRef = useRef(api);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    followRef.current = follow;
+  }, [follow]);
+
+  useEffect(() => {
+    apiRef.current = api;
+  }, [api]);
 
   useEffect(() => {
     const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
@@ -56,11 +67,11 @@ export default function MapCarousel({
         const message = JSON.parse(event.data);
 
         if (typeof message === "string") {
-          const currentIndex = maps.findIndex((m) => m.uid === message);
-          if (currentIndex !== -1) {
-            setCurrentIndex(currentIndex);
-            if (follow && api) {
-              api.scrollTo(currentIndex);
+          const index = maps.findIndex((m) => m.uid === message);
+          if (index !== -1) {
+            setCurrentIndex(index);
+            if (followRef.current && apiRef.current) {
+              apiRef.current.scrollTo(index);
             }
           }
           return;
@@ -75,8 +86,8 @@ export default function MapCarousel({
           const newIndex = maps.findIndex((m) => m.uid === message.startMap);
           if (newIndex !== -1) {
             setCurrentIndex(newIndex);
-            if (follow && api) {
-              api.scrollTo(newIndex);
+            if (followRef.current && apiRef.current) {
+              apiRef.current.scrollTo(newIndex);
             }
           }
           setIsSwitching(false);
@@ -90,7 +101,7 @@ export default function MapCarousel({
     return () => {
       socket.close();
     };
-  }, [serverId, maps, follow, api]);
+  }, [serverId, maps]);
 
   return (
     <div className="flex flex-col gap-2">
