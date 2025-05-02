@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Map } from "@/types/map";
 import { IconPhoto, IconUser } from "@tabler/icons-react";
+import Image from "next/image";
 import { useRef } from "react";
 import { parseTmTags } from "tmtags";
 import MapCardActions from "./map-card-actions";
@@ -18,11 +19,11 @@ export default function MapCard({ map, refetch }: MapCardProps) {
     <Card ref={ref} className="flex flex-col flex-1">
       <div className="relative">
         {map.thumbnailUrl ? (
-          <img
-            loading="lazy"
+          <Image
             src={map.thumbnailUrl}
+            fill
             alt={map.name}
-            className="w-full rounded-t-lg h-40 object-cover"
+            className="static! rounded-t-lg h-40! object-cover"
           />
         ) : (
           <div className="w-full h-40 rounded-t-lg flex items-center justify-center">
@@ -47,7 +48,7 @@ export default function MapCard({ map, refetch }: MapCardProps) {
         </div>
       </div>
       <div className="p-3 flex flex-1 flex-col gap-2">
-        <MapMedals map={map} ref={ref} />
+        <MapMedals map={map} />
         <MapCardActions map={map} ref={ref} refetch={refetch} />
       </div>
     </Card>
