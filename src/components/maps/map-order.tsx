@@ -6,8 +6,8 @@ import { Map, OrderMap } from "@/types/map";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
-import { Button } from "../ui/button";
 import DndListHeaders from "../dnd/dnd-list-headers";
+import { Button } from "../ui/button";
 
 export default function MapOrder({
   mapList,
@@ -71,13 +71,15 @@ export default function MapOrder({
 
   return (
     <div className="flex flex-col gap-3">
-      <DndListHeaders columns={columns} />
-      <DndList
-        columns={columns}
-        data={mapOrder}
-        setData={setMapOrder}
-        serverId={serverId}
-      />
+      <div className="flex flex-col gap-2">
+        <DndListHeaders columns={columns} />
+        <DndList
+          columns={columns}
+          data={mapOrder}
+          setData={setMapOrder}
+          serverId={serverId}
+        />
+      </div>
       <div className="flex flex-row-reverse gap-2">
         <Button onClick={saveMapOrder}>Save Order</Button>
 

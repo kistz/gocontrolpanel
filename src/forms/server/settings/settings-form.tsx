@@ -1,9 +1,9 @@
 "use client";
 import { getServerSettings, saveServerSettings } from "@/actions/gbx/server";
 import FormElement from "@/components/form/form-element";
+import FormElementSkeleton from "@/components/skeletons/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -48,12 +48,7 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
         2xl:grid-rows-6 grid-flow-col"
       >
         {Array.from({ length: 18 }).map((_, index) => (
-          <div className="flex flex-col gap-2" key={index}>
-            <Skeleton className="w-2/3 min-w-64 h-2" />
-            <Skeleton className="w-full min-w-64 h-2" />
-
-            <Skeleton className="w-1/3 min-w-64 h-8 mt-2" />
-          </div>
+          <FormElementSkeleton key={index} />
         ))}
       </div>
     );
