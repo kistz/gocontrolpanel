@@ -1,12 +1,13 @@
 "use server";
 
-import { ServerError, ServerResponse } from "@/types/responses";
-import { setupJukeboxCallbacks } from "../gbx/map";
+import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
 import { doServerAction } from "@/lib/actions";
 import config from "@/lib/config";
-import { AddServer, Server } from "@/types/server";
 import redis from "@/lib/redis";
-
+import { ServerError, ServerResponse } from "@/types/responses";
+import { Server } from "@/types/server";
+import { setupJukeboxCallbacks } from "../gbx/map";
+import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
@@ -31,7 +32,9 @@ export async function getServers(): Promise<Server[]> {
   return await syncServers();
 }
 
-export async function addServer(server: AddServer): Promise<ServerResponse> {
+export async function addServer(
+  server: AddServerSchemaType,
+): Promise<ServerResponse> {
   return doServerAction(async () => {
     const res = await fetch(`${config.CONNECTOR_URL}/servers`, {
       method: "POST",
@@ -43,6 +46,25 @@ export async function addServer(server: AddServer): Promise<ServerResponse> {
 
     if (!res.ok) {
       throw new ServerError("Failed to add server");
+    }
+
+    await syncServers();
+  });
+}
+
+export async function editServer(serverId: number, server: EditServerSchemaType): Promise<ServerResponse> {
+  return doServerAction(async () => {
+    const res = await fetch(`${config.CONNECTOR_URL}/servers/${serverId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(server),
+    });
+
+    if (!res.ok) {
+      throw new ServerError("Failed to edit server");
     }
 
     await syncServers();

@@ -12,11 +12,13 @@ import {
 interface ModalProps {
   isOpen?: boolean;
   setIsOpen?: Dispatch<React.SetStateAction<boolean>>;
+  onClose?: () => void;
 }
 
 export default function Modal({
   isOpen: controlledIsOpen,
   setIsOpen: controlledSetIsOpen,
+  onClose,
   children,
 }: ModalProps & PropsWithChildren) {
   const isControlled =
@@ -46,6 +48,9 @@ export default function Modal({
 
   const closeModal = () => {
     setIsOpen(false);
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (

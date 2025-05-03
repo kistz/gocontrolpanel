@@ -1,40 +1,46 @@
 "use client";
-import { addServer } from "@/actions/gbxconnector/servers";
+import { editServer } from "@/actions/gbxconnector/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
+import { Server } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AddServerSchema } from "./add-server-schema";
-import { EditServerSchemaType } from "./edit-server-schema";
+import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
 
-export default function AddServerForm({ callback }: { callback?: () => void }) {
+export default function EditServerForm({
+  server,
+  callback,
+}: {
+  server: Server;
+  callback?: () => void;
+}) {
   const form = useForm<EditServerSchemaType>({
-    resolver: zodResolver(AddServerSchema),
+    resolver: zodResolver(EditServerSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      host: "",
-      xmlrpcPort: 0,
-      user: "",
-      pass: "",
+      name: server.name,
+      description: server.description,
+      host: server.host,
+      xmlrpcPort: server.xmlrpcPort,
+      user: server.user,
+      pass: server.pass,
     },
   });
 
   async function onSubmit(values: EditServerSchemaType) {
     try {
-      const { error } = await addServer(values);
+      const { error } = await editServer(server.id, values);
       if (error) {
         throw new Error(error);
       }
-      toast.success("Server added successfully");
+      toast.success("Server updated successfully");
       if (callback) {
         callback();
       }
     } catch (error) {
-      toast.error("Failed to add server", {
+      toast.error("Failed to update server", {
         description: getErrorMessage(error),
       });
     }
@@ -111,7 +117,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Add Server
+          Edit Server
         </Button>
       </form>
     </Form>

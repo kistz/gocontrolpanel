@@ -130,7 +130,11 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             cancelText="Cancel"
           />
 
-          <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
+          <Modal
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
+            onClose={() => refetch()}
+          >
             <EditPlayerModal data={player} />
           </Modal>
         </div>

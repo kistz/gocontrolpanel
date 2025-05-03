@@ -3,6 +3,8 @@
 import { removeServer } from "@/actions/gbxconnector/servers";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DndListColumn } from "@/components/dnd/dnd-list";
+import EditServerModal from "@/components/modals/edit-server";
+import Modal from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -25,6 +27,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const [editIsOpen, setEditIsOpen] = useState(false);
 
   const handleRemove = () => {
     startTransition(async () => {
@@ -53,6 +56,9 @@ const ServerActionsCell = memo(function ServerActionsCell({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setEditIsOpen(true)}>
+            Edit server
+          </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
             onClick={() => setIsOpen(true)}
@@ -71,6 +77,10 @@ const ServerActionsCell = memo(function ServerActionsCell({
         confirmText="Remove"
         cancelText="Cancel"
       />
+
+      <Modal isOpen={editIsOpen} setIsOpen={setEditIsOpen}>
+        <EditServerModal data={server} />
+      </Modal>
     </div>
   );
 });

@@ -4,11 +4,11 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { EditPlayer, Player } from "@/types/player";
+import { Player } from "@/types/player";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { EditPlayerSchema } from "./edit-player-schema";
+import { EditPlayerSchema, EditPlayerSchemaType } from "./edit-player-schema";
 
 const rolesOptions = [
   { label: "Admin", value: "admin" },
@@ -22,14 +22,14 @@ export default function EditPlayerForm({
   player: Player;
   callback?: () => void;
 }) {
-  const form = useForm<EditPlayer>({
+  const form = useForm<EditPlayerSchemaType>({
     resolver: zodResolver(EditPlayerSchema),
     defaultValues: {
       roles: player.roles ?? [],
     },
   });
 
-  async function onSubmit(values: EditPlayer) {
+  async function onSubmit(values: EditPlayerSchemaType) {
     try {
       const { error } = await updatePlayer(player._id, {
         roles: values.roles,
