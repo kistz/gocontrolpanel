@@ -4,6 +4,7 @@ import {
   cloneElement,
   Dispatch,
   isValidElement,
+  PropsWithChildren,
   ReactElement,
   ReactNode,
   useState,
@@ -14,11 +15,11 @@ interface ModalProps {
   setIsOpen?: Dispatch<React.SetStateAction<boolean>>;
 }
 
-function Modal({
+export default function Modal({
   isOpen: controlledIsOpen,
   setIsOpen: controlledSetIsOpen,
   children,
-}: ModalProps & { children: ReactNode }) {
+}: ModalProps & PropsWithChildren) {
   const isControlled =
     controlledIsOpen !== undefined && controlledSetIsOpen !== undefined;
   const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
@@ -26,23 +27,19 @@ function Modal({
   const isOpen = isControlled ? controlledIsOpen : uncontrolledIsOpen;
   const setIsOpen = isControlled ? controlledSetIsOpen : setUncontrolledIsOpen;
 
-  let triggerElement: ReactElement | null = null;
-  let modalElement: ReactElement | null = null;
+  const childrenArray = Children.toArray(children);
 
-  // Process children to extract ModalTrigger and ModalContent
-  console.log("Children:", children);
-  Children.forEach(children, (child) => {
-    if (!isValidElement(child)) return;
+  let modalElement: ReactElement<{ closeModal?: () => void }> | null = null;
+  if (childrenArray.length > 0 && isValidElement(childrenArray[0])) {
+    modalElement = childrenArray[0] as ReactElement<{
+      closeModal?: () => void;
+    }>;
+  }
 
-    const displayName =
-      child.type && (child.type as React.ComponentType<any>).displayName;
-
-    if (displayName === "ModalTrigger") {
-      triggerElement = child;
-    } else if (displayName === "ModalContent") {
-      modalElement = child;
-    }
-  });
+  let triggerElement: ReactElement<{ onClick?: () => void }> | null = null;
+  if (childrenArray.length > 1 && isValidElement(childrenArray[1])) {
+    triggerElement = childrenArray[1] as ReactElement<{ onClick?: () => void }>;
+  }
 
   const handleBackdropClick = () => {
     setIsOpen(false);
@@ -61,26 +58,12 @@ function Modal({
 
       {isOpen && modalElement && (
         <div
-          className="fixed top-0 left-0 z-[9998] flex h-screen w-screen items-center justify-center bg-black/50"
+          className="fixed top-0 left-0 z-[9998] p-4 flex h-screen w-screen items-center justify-center bg-black/50"
           onClick={handleBackdropClick}
         >
-          {cloneElement(modalElement, { closeModal })}
+          {cloneElement(modalElement, { closeModal: closeModal })}
         </div>
       )}
     </>
   );
 }
-
-const ModalTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
-  return <>{children}</>;
-};
-ModalTrigger.displayName = "ModalTrigger";
-Modal.Trigger = ModalTrigger;
-
-const ModalContent: React.FC<{ children: ReactNode }> = ({ children }) => {
-  return <>{children}</>;
-};
-ModalContent.displayName = "ModalContent";
-Modal.Content = ModalContent;
-
-export default Modal;

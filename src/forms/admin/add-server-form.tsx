@@ -42,7 +42,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormElement
           control={form.control}
           name={"name"}
@@ -50,6 +50,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           description="The name of the server."
           placeholder="Enter server name"
           error={form.formState.errors.name}
+          isRequired
         />
 
         <FormElement
@@ -68,6 +69,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           description="The host of the server."
           placeholder="Enter server host"
           error={form.formState.errors.host}
+          isRequired
         />
 
         <FormElement
@@ -78,25 +80,29 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           placeholder="Enter server XMLRPC port"
           error={form.formState.errors.xmlrpcPort}
           type="number"
+          isRequired
         />
 
         <FormElement
           control={form.control}
           name={"user"}
           label="User"
-          description="The user of the server."
-          placeholder="Enter server user"
+          description="The XMLRPC user."
+          placeholder="Enter user"
           error={form.formState.errors.user}
+          isRequired
         />
 
         <FormElement
           control={form.control}
           name={"pass"}
           label="Password"
-          description="The password of the server."
-          placeholder="Enter server password"
+          description="The XMLRPC password."
+          placeholder="Enter password"
           error={form.formState.errors.pass}
           type="password"
+          className="w-full"
+          isRequired
         />
 
         <Button

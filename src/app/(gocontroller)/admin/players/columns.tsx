@@ -131,9 +131,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
           />
 
           <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
-            <Modal.Content>
-              <EditPlayerModal data={player} />
-            </Modal.Content>
+            <EditPlayerModal data={player} />
           </Modal>
         </div>
       );

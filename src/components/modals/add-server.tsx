@@ -12,7 +12,7 @@ export default function AddServerModal({
   };
 
   return (
-    <Card onClick={stopPropagation} className="p-6 gap-6 min-w-[400px]">
+    <Card onClick={stopPropagation} className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Add Server</h1>
         <IconX

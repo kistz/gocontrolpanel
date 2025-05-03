@@ -1,6 +1,6 @@
 import { getAllMaps } from "./actions/database/map";
+import { setupCallbacks } from "./actions/gbxconnector/servers";
 import { authenticate, getTokens } from "./lib/api/nadeo";
-import { setupCallbacks } from "./lib/gbxclient";
 
 export async function register() {
   setupCallbacks();

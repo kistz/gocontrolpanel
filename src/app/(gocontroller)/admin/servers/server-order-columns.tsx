@@ -1,6 +1,7 @@
 "use client";
 
 import { removeMap } from "@/actions/gbx/map";
+import { removeServer } from "@/actions/gbxconnector/servers";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DndListColumn } from "@/components/dnd/dnd-list";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { removeServer } from "@/lib/gbxclient";
 import { getErrorMessage } from "@/lib/utils";
 import { OrderMap } from "@/types/map";
 import { Server } from "@/types/server";

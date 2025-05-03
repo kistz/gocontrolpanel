@@ -1,11 +1,6 @@
 "use server";
-import { setupJukeboxCallbacks } from "@/actions/gbx/map";
-import config from "@/lib/config";
-import { ServerError, ServerResponse } from "@/types/responses";
+import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
-import { Server } from "../types/server";
-import { doServerAction } from "./actions";
-import redis from "./redis";
 
 const cachedClients: {
   [key: number]: GbxClient;
@@ -49,49 +44,4 @@ export async function connectToGbxClient(id: number) {
 export async function getGbxClient(id: number) {
   const client = await connectToGbxClient(id);
   return client;
-}
-
-// Sync the servers
-export async function syncServers(): Promise<Server[]> {
-  const res = await fetch(`${config.CONNECTOR_URL}/servers`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!res.ok) {
-    throw new ServerError("Failed to get servers");
-  }
-
-  const servers: Server[] = await res.json();
-
-  await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
-  return servers;
-}
-
-export async function getServers(): Promise<Server[]> {
-  return await syncServers();
-}
-
-export async function removeServer(id: number): Promise<ServerResponse> {
-  return doServerAction(async () => {
-    const res = await fetch(`${config.CONNECTOR_URL}/servers/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      throw new ServerError("Failed to remove server");
-    }
-
-    await syncServers();
-  });
-}
-
-export async function setupCallbacks(): Promise<void> {
-  await syncServers();
-  await setupJukeboxCallbacks();
 }

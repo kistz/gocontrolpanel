@@ -1,10 +1,11 @@
 "use server";
 
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
-import { getGbxClient, getServers } from "@/lib/gbxclient";
+import { getGbxClient } from "@/lib/gbxclient";
 import redis from "@/lib/redis";
 import { JukeboxMap, Map, MapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
+import { getServers } from "../gbxconnector/servers";
 
 const getKey = (server: number) => `jukebox:${server}`;
 
