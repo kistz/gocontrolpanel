@@ -25,6 +25,7 @@ import {
   IconServer,
 } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -48,30 +49,41 @@ interface ServerNavGroup {
 
 export default function NavServers() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
 
   const serverId = useCurrentServerId(pathname);
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-    if (!url) {
-      setTimeout(() => toast.error("Can't connect to the server"));
-      return;
-    }
+    const fetchData = async () => {
+      if (!session) {
+        setLoading(false);
+        return;
+      }
 
-    const socket = new WebSocket(`${url}/ws/servers`);
+      const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
+      if (!url) {
+        setTimeout(() => toast.error("Can't connect to the server"));
+        return;
+      }
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setServers(data);
-      setLoading(false);
+      console.log(session);
+      const socket = new WebSocket(`${url}/ws/servers?token=${session?.jwt}`);
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        setServers(data);
+        setLoading(false);
+      };
+
+      return () => {
+        socket.close();
+      };
     };
 
-    return () => {
-      socket.close();
-    };
-  }, []);
+    fetchData();
+  }, [session]);
 
   const group: ServerNavGroup = {
     name: "Servers",

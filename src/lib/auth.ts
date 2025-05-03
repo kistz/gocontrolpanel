@@ -84,6 +84,8 @@ export const authOptions: NextAuthOptions = {
         ubiId: token.ubiId,
       };
 
+      session.jwt = token.jwt;
+
       return session;
     },
     async jwt({ token, user }) {
@@ -118,12 +120,20 @@ export const authOptions: NextAuthOptions = {
         ({ data: dbUser } = await createPlayerAuth({
           login: token.login,
           nickName: token.displayName,
-          roles: config.DEFAULT_ADMINS.includes(token.login)
-            ? ["admin"]
-            : [],
+          roles: config.DEFAULT_ADMINS.includes(token.login) ? ["admin"] : [],
           path: "",
           ubiUid,
         }));
+      }
+
+      if (!dbUser) {
+        throw new Error("Failed to fetch user from database");
+      }
+
+      try {
+        token.jwt = await getConnectorToken(dbUser);
+      } catch (error) {
+        console.error("Failed to fetch connector token", error);
       }
 
       token._id = dbUser._id;
@@ -158,4 +168,25 @@ export async function withAuth(roles?: string[]): Promise<Session> {
     throw new Error("Not authorized");
   }
   return session;
+}
+
+async function getConnectorToken(user: Player): Promise<string> {
+  const res = await fetch(config.CONNECTOR_URL + "/auth", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch connector token");
+  }
+
+  const data = await res.json();
+  if (!data.token) {
+    throw new Error("Failed to fetch connector token");
+  }
+
+  return data.token;
 }

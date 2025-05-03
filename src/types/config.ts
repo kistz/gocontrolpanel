@@ -7,6 +7,7 @@ export interface Config {
   PORT: number;
   CONNECTOR_URL: string;
   DEFAULT_ADMINS: string[];
+  JWT_SECRET: string;
   NADEO: {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
