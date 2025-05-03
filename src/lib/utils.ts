@@ -1,3 +1,4 @@
+import { routes } from "@/routes";
 import { ServerError } from "@/types/responses";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -60,4 +61,22 @@ export function toReadableTitle(field: string): string {
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+// Utility: Convert route pattern to RegExp
+function pathToRegex(path: string) {
+  return new RegExp("^" + path.replace(/:[^/]+/g, "([^/]+)") + "$");
+}
+
+// Use in a React client component
+export function useCurrentServerId(pathname: string): number | null {
+  for (const route of Object.values(routes.servers)) {
+    const regex = pathToRegex(route);
+    const match = pathname?.match(regex);
+    if (match) {
+      return parseInt(match[1], 10); // Return the captured `:id`
+    }
+  }
+
+  return null;
 }

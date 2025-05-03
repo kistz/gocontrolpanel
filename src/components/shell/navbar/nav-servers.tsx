@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -16,7 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { generatePath } from "@/lib/utils";
+import { generatePath, useCurrentServerId } from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
 import {
@@ -27,6 +26,7 @@ import {
 } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface ServerNavGroup {
@@ -46,8 +46,11 @@ interface ServerNavGroup {
 }
 
 export default function NavServers() {
+  const pathname = usePathname();
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const serverId = useCurrentServerId(pathname);
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
@@ -76,7 +79,7 @@ export default function NavServers() {
       name: server.name,
       isConnected: server.isConnected,
       icon: IconServer,
-      isActive: false,
+      isActive: serverId === server.id,
       items: [
         {
           name: "Settings",
