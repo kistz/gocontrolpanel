@@ -3,12 +3,16 @@ import { getServerSettings, saveServerSettings } from "@/actions/gbx/server";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ServerSettingsSchema, ServerSettingsSchemaType } from "./settings-schema";
+import {
+  ServerSettingsSchema,
+  ServerSettingsSchemaType,
+} from "./settings-schema";
 
 export default function SettingsForm({ serverId }: { serverId: number }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,10 +40,21 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
     }
   }
 
+  // Return skeleton if loading
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
-        <p className="text-muted-foreground">Loading...</p>
+      <div
+        className="gap-6 lg:gap-x-8 2xl:gap-x-16 grid grid-rows-18 lg:grid-rows-9 
+        2xl:grid-rows-6 grid-flow-col"
+      >
+        {Array.from({ length: 18 }).map((_, index) => (
+          <div className="flex flex-col gap-2" key={index}>
+            <Skeleton className="w-2/3 min-w-64 h-2" />
+            <Skeleton className="w-full min-w-64 h-2" />
+
+            <Skeleton className="w-1/3 min-w-64 h-8 mt-2" />
+          </div>
+        ))}
       </div>
     );
   }
