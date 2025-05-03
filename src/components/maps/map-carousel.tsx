@@ -109,7 +109,7 @@ export default function MapCarousel({
     return () => {
       socket.close();
     };
-  }, [serverId, maps]);
+  }, [serverId, maps, session]);
 
   return (
     <div className="flex flex-col gap-2">
