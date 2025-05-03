@@ -73,13 +73,13 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 
 #### Modify the `servers.json` File as Follows:
 
-- **id**: Unique identifier for each server.
+- **id**: Unique identifier for each server (number).
 - **name**: Name of the server.
 - **description**: Short description of the server (optional).
 - **host**: The hostname or IP address of the server.
 - **xmlrpcPort**: The XML-RPC port of the server.
-- **user**: Username for authentication on the server.
-- **pass**: Password for authentication on the server.
+- **user**: Username for XMLRPC authentication.
+- **pass**: Password for XMLRPC authentication.
 
 Make sure to adjust the values based on your setup.
 
