@@ -1,5 +1,4 @@
 "use server";
-
 import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
 import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
 import { doServerAction } from "@/lib/actions";
@@ -8,21 +7,17 @@ import redis from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
 import { setupJukeboxCallbacks } from "../gbx/map";
+import { axiosAuth } from "@/lib/interceptor";
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
-  const res = await fetch(`${config.CONNECTOR_URL}/servers`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const res = await axiosAuth.get("/servers");
 
-  if (!res.ok) {
+  if (res.status !== 200) {
     throw new ServerError("Failed to get servers");
   }
 
-  const servers: Server[] = await res.json();
+  const servers: Server[] = res.data;
 
   await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
   return servers;
@@ -36,15 +31,9 @@ export async function addServer(
   server: AddServerSchemaType,
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
-    const res = await fetch(`${config.CONNECTOR_URL}/servers`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(server),
-    });
+    const res = await axiosAuth.post(`${config.CONNECTOR_URL}/servers`, server);
 
-    if (!res.ok) {
+    if (res.status !== 200) {
       throw new ServerError("Failed to add server");
     }
 
@@ -57,16 +46,9 @@ export async function editServer(
   server: EditServerSchemaType,
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
-    const res = await fetch(`${config.CONNECTOR_URL}/servers/${serverId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(server),
-    });
+    const res = await axiosAuth.put(`/servers/${serverId}`, server);
 
-    if (!res.ok) {
+    if (res.status !== 200) {
       throw new ServerError("Failed to edit server");
     }
 
@@ -76,14 +58,9 @@ export async function editServer(
 
 export async function removeServer(id: number): Promise<ServerResponse> {
   return doServerAction(async () => {
-    const res = await fetch(`${config.CONNECTOR_URL}/servers/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await axiosAuth.delete(`/servers/${id}`);
 
-    if (!res.ok) {
+    if (res.status !== 200) {
       throw new ServerError("Failed to remove server");
     }
 
@@ -95,15 +72,12 @@ export async function orderServers(
   servers: Server[],
 ): Promise<ServerResponse<Server[]>> {
   return doServerAction(async () => {
-    const res = await fetch(`${config.CONNECTOR_URL}/servers/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(servers.map((server) => server.id)),
-    });
+    const res = await axiosAuth.put(
+      "/servers/order",
+      servers.map((server) => server.id),
+    );
 
-    if (!res.ok) {
+    if (res.status !== 200) {
       throw new ServerError("Failed to order servers");
     }
 

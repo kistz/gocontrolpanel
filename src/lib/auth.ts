@@ -14,6 +14,7 @@ import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
+import { axiosAuth } from "./interceptor";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -171,19 +172,13 @@ export async function withAuth(roles?: string[]): Promise<Session> {
 }
 
 async function getConnectorToken(user: Player): Promise<string> {
-  const res = await fetch(config.CONNECTOR_URL + "/auth", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
-  });
+  const res = await axiosAuth.post("/auth", user);
 
-  if (!res.ok) {
+  if (res.status !== 200) {
     throw new Error("Failed to fetch connector token");
   }
 
-  const data = await res.json();
+  const data = res.data;
   if (!data.token) {
     throw new Error("Failed to fetch connector token");
   }
