@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GoController Panel",
-  description: "A simple controller panel",
+  title: "GoControlPanel",
+  description: "Manage your trackmania servers with ease.",
 };
 
 export default function RootLayout({

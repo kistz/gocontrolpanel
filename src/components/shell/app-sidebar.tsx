@@ -20,7 +20,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <div className="flex items-center gap-2 p-2">
               <IconDeviceGamepad2 className="!size-5" />
-              <span className="text-base font-semibold">GoController</span>
+              <span className="text-base font-semibold">GoControlPanel</span>
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
