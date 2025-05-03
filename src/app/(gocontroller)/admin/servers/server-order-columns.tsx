@@ -1,6 +1,5 @@
 "use client";
 
-import { removeMap } from "@/actions/gbx/map";
 import { removeServer } from "@/actions/gbxconnector/servers";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { DndListColumn } from "@/components/dnd/dnd-list";
@@ -12,12 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage } from "@/lib/utils";
-import { OrderMap } from "@/types/map";
 import { Server } from "@/types/server";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { parseTmTags } from "tmtags";
 
 const ServerActionsCell = memo(function ServerActionsCell({
   server,
@@ -89,9 +86,7 @@ export const createColumns = (
   {
     id: "name",
     cell: ({ data }) => (
-      <span
-        className="overflow-hidden overflow-ellipsis whitespace-nowrap"
-      >
+      <span className="overflow-hidden overflow-ellipsis whitespace-nowrap">
         {data.name}
       </span>
     ),
@@ -99,9 +94,7 @@ export const createColumns = (
   {
     id: "description",
     cell: ({ data }) => (
-      <span
-        className="overflow-hidden overflow-ellipsis whitespace-nowrap"
-      >
+      <span className="overflow-hidden overflow-ellipsis whitespace-nowrap">
         {data.description}
       </span>
     ),
@@ -115,10 +108,7 @@ export const createColumns = (
   {
     id: "actions",
     cell: ({ data }) => (
-      <ServerActionsCell
-        server={data}
-        onRemoveServer={onRemoveServer}
-      />
+      <ServerActionsCell server={data} onRemoveServer={onRemoveServer} />
     ),
   },
 ];

@@ -4,7 +4,7 @@ import { ServerError, ServerResponse } from "@/types/responses";
 import { setupJukeboxCallbacks } from "../gbx/map";
 import { doServerAction } from "@/lib/actions";
 import config from "@/lib/config";
-import { Server } from "@/types/server";
+import { AddServer, Server } from "@/types/server";
 import redis from "@/lib/redis";
 
 
@@ -29,6 +29,24 @@ export async function syncServers(): Promise<Server[]> {
 
 export async function getServers(): Promise<Server[]> {
   return await syncServers();
+}
+
+export async function addServer(server: AddServer): Promise<ServerResponse> {
+  return doServerAction(async () => {
+    const res = await fetch(`${config.CONNECTOR_URL}/servers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(server),
+    });
+
+    if (!res.ok) {
+      throw new ServerError("Failed to add server");
+    }
+
+    await syncServers();
+  });
 }
 
 export async function removeServer(id: number): Promise<ServerResponse> {

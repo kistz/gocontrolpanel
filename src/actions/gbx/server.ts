@@ -1,12 +1,13 @@
 "use server";
 
 import { doServerActionWithAuth } from "@/lib/actions";
-import { getGbxClient, getServers } from "@/lib/gbxclient";
+import { getGbxClient } from "@/lib/gbxclient";
 import { getFiles } from "@/lib/server-utils";
 import { LocalMapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { ServerSettings } from "@/types/server";
 import path from "path";
+import { getServers } from "../gbxconnector/servers";
 
 export async function getServerSettings(
   server: number,

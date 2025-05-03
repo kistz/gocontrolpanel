@@ -1,10 +1,10 @@
 import { getMapList } from "@/actions/database/map";
 import { getJukebox } from "@/actions/gbx/map";
+import { getServers } from "@/actions/gbxconnector/servers";
 import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getServers } from "@/lib/gbxclient";
 
 export default async function ServerMapsPage({
   params,

@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddServerSchema } from "./add-server-schema";
+import { addServer } from "@/actions/gbxconnector/servers";
 
 export default function AddServerForm({ callback }: { callback?: () => void }) {
   const form = useForm<AddServer>({
@@ -24,11 +25,10 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
 
   async function onSubmit(values: AddServer) {
     try {
-      // Call the API to add the server
-      // const { error } = await addServer(values);
-      // if (error) {
-      //   throw new Error(error);
-      // }
+      const { error } = await addServer(values);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Server added successfully");
       if (callback) {
         callback();
@@ -100,8 +100,6 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           description="The XMLRPC password."
           placeholder="Enter password"
           error={form.formState.errors.pass}
-          type="password"
-          className="w-full"
           isRequired
         />
 
