@@ -28,6 +28,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface ServerNavGroup {
   name: string;
@@ -55,7 +56,7 @@ export default function NavServers() {
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
     if (!url) {
-      console.error("Connector URL is not defined");
+      setTimeout(() => toast.error("Can't connect to the server"));
       return;
     }
 
