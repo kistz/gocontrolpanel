@@ -14,7 +14,7 @@ export default async function AdminServersPage() {
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">Manage Servers</h1>
           <h4 className="text-muted-foreground">
-            Manage the servers and their settings.
+            Manage the servers and their order.
           </h4>
         </div>
 
