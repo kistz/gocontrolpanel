@@ -7,6 +7,7 @@ import {
   IconLock,
   IconLockOpen,
 } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -34,6 +35,7 @@ export default function MapCarousel({
   startIndex = 0,
   className,
 }: MapCarouselProps) {
+  const { data: session } = useSession();
   const [api, setApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState<number>(startIndex);
   const [follow, setFollow] = useState<boolean>(true);
@@ -53,13 +55,19 @@ export default function MapCarousel({
   }, [api]);
 
   useEffect(() => {
+    if (!session) {
+      return;
+    }
+
     const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
     if (!baseUrl) {
       console.error("NEXT_PUBLIC_CONNECTOR_URL is not defined");
       return;
     }
 
-    const socket = new WebSocket(`${baseUrl}/ws/listeners/${serverId}`);
+    const socket = new WebSocket(
+      `${baseUrl}/ws/listeners/${serverId}?token=${session.jwt}`,
+    );
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
