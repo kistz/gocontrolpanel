@@ -1,18 +1,29 @@
 "use client";
 import AddServerForm from "@/forms/admin/add-server-form";
 import { IconX } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function AddServerModal({
   closeModal,
 }: DefaultModalProps<void>) {
+  const router = useRouter();
+
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
+  const handleSubmit = () => {
+    closeModal?.();
+    router.refresh();
+  };
+
   return (
-    <Card onClick={stopPropagation} className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto">
+    <Card
+      onClick={stopPropagation}
+      className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
+    >
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Add Server</h1>
         <IconX
@@ -21,7 +32,7 @@ export default function AddServerModal({
         />
       </div>
 
-      <AddServerForm callback={closeModal} />
+      <AddServerForm callback={handleSubmit} />
     </Card>
   );
 }

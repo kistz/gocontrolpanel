@@ -4,7 +4,7 @@ import { createColumns } from "@/app/(gocontroller)/admin/servers/server-order-c
 import DndListHeaders from "@/components/dnd/dnd-list-headers";
 import { getErrorMessage } from "@/lib/utils";
 import { Server } from "@/types/server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
 import { Button } from "../ui/button";
@@ -12,6 +12,11 @@ import { Button } from "../ui/button";
 export default function ServerOrder({ servers }: { servers: Server[] }) {
   const [defaultServers, setDefaultServers] = useState<Server[]>(servers);
   const [serverOrder, setServerOrder] = useState<Server[]>(servers);
+
+  useEffect(() => {
+    setDefaultServers(servers);
+    setServerOrder(servers);
+  }, [servers]);
 
   async function saveServerOrder() {
     try {
