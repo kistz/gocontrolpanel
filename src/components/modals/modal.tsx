@@ -1,11 +1,9 @@
 "use client";
-
 import {
   Children,
   cloneElement,
   Dispatch,
   isValidElement,
-  PropsWithChildren,
   ReactElement,
   ReactNode,
   useState,
@@ -20,7 +18,7 @@ function Modal({
   isOpen: controlledIsOpen,
   setIsOpen: controlledSetIsOpen,
   children,
-}: ModalProps & PropsWithChildren) {
+}: ModalProps & { children: ReactNode }) {
   const isControlled =
     controlledIsOpen !== undefined && controlledSetIsOpen !== undefined;
   const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
@@ -31,7 +29,8 @@ function Modal({
   let triggerElement: ReactElement | null = null;
   let modalElement: ReactElement | null = null;
 
-  console.log(Children.toArray(children));
+  // Process children to extract ModalTrigger and ModalContent
+  console.log("Children:", children);
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
 
@@ -39,11 +38,9 @@ function Modal({
       child.type && (child.type as React.ComponentType<any>).displayName;
 
     if (displayName === "ModalTrigger") {
-      triggerElement = (child as ReactElement<{ children: ReactElement }>).props
-        .children;
+      triggerElement = child;
     } else if (displayName === "ModalContent") {
-      modalElement = (child as ReactElement<{ children: ReactElement }>).props
-        .children;
+      modalElement = child;
     }
   });
 

@@ -3,7 +3,7 @@
 import { deletePlayerById } from "@/actions/database/player";
 import ConfirmDialog from "@/components/confirm-dialog";
 import EditPlayerModal from "@/components/modals/edit-player";
-import { Modal } from "@/components/modals/modal";
+import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
