@@ -21,9 +21,11 @@ import { toast } from "sonner";
 const ServerActionsCell = memo(function ServerActionsCell({
   server,
   onRemoveServer,
+  refetch,
 }: {
   server: Server;
   onRemoveServer: (server: Server) => void;
+  refetch: () => void;
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +39,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
           throw new Error(error);
         }
         onRemoveServer(server);
+        refetch();
         toast.success("Server successfully removed");
       } catch (error) {
         toast.error("Error removing server", {
@@ -78,7 +81,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
         cancelText="Cancel"
       />
 
-      <Modal isOpen={editIsOpen} setIsOpen={setEditIsOpen}>
+      <Modal isOpen={editIsOpen} setIsOpen={setEditIsOpen} onClose={refetch}>
         <EditServerModal data={server} />
       </Modal>
     </div>
@@ -87,6 +90,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
 
 export const createColumns = (
   onRemoveServer: (server: Server) => void,
+  refetch: () => void,
 ): DndListColumn<Server>[] => [
   {
     id: "id",
@@ -118,7 +122,7 @@ export const createColumns = (
   {
     id: "actions",
     cell: ({ data }) => (
-      <ServerActionsCell server={data} onRemoveServer={onRemoveServer} />
+      <ServerActionsCell server={data} onRemoveServer={onRemoveServer} refetch={refetch} />
     ),
   },
 ];

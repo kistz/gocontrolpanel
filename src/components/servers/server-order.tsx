@@ -1,7 +1,8 @@
 "use client";
+import { getServers, orderServers } from "@/actions/gbxconnector/servers";
 import { createColumns } from "@/app/(gocontroller)/admin/servers/server-order-columns";
 import DndListHeaders from "@/components/dnd/dnd-list-headers";
-import { getDivergingList, getErrorMessage } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils";
 import { Server } from "@/types/server";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,15 +15,14 @@ export default function ServerOrder({ servers }: { servers: Server[] }) {
 
   async function saveServerOrder() {
     try {
-      const ids = getDivergingList(defaultServers, serverOrder, "id")[1].map(
-        (server) => server.id,
-      );
-
-      if (!ids.length || ids.length == 0) return;
-
       // Update order
+      const { data, error } = await orderServers(serverOrder);
+      if (error) {
+        throw new Error(error);
+      }
 
-      setDefaultServers(serverOrder);
+      setDefaultServers(data);
+      setServerOrder(data);
 
       toast.success("Server order saved successfully");
     } catch (error) {
@@ -36,13 +36,22 @@ export default function ServerOrder({ servers }: { servers: Server[] }) {
     setServerOrder(defaultServers);
   }
 
+  async function refetchServers() {
+    const updatedServers = await getServers();
+    const updatedServerOrder = serverOrder.map((server) => {
+      const updatedServer = updatedServers.find((s) => s.id === server.id);
+      return updatedServer ? { ...server, ...updatedServer } : server;
+    });
+    setServerOrder(updatedServerOrder);
+  }
+
   async function onRemoveServer(server: Server) {
     const newServerOrder = serverOrder.filter((m) => m.id !== server.id);
     setServerOrder(newServerOrder);
     setDefaultServers(newServerOrder);
   }
 
-  const columns = createColumns(onRemoveServer);
+  const columns = createColumns(onRemoveServer, refetchServers);
 
   return (
     <div className="flex flex-col gap-3">
