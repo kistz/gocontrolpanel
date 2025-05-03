@@ -38,20 +38,16 @@ export default function ServerOrder({ servers }: { servers: Server[] }) {
 
   async function refetchServers() {
     const updatedServers = await getServers();
-    const updatedServerOrder = serverOrder.map((server) => {
-      const updatedServer = updatedServers.find((s) => s.id === server.id);
-      return updatedServer ? { ...server, ...updatedServer } : server;
-    });
+    const updatedServerOrder = serverOrder
+      .filter((server) => updatedServers.some((s) => s.id == server.id))
+      .map((server) => {
+        const updatedServer = updatedServers.find((s) => s.id === server.id);
+        return updatedServer ? { ...server, ...updatedServer } : server;
+      });
     setServerOrder(updatedServerOrder);
   }
 
-  async function onRemoveServer(server: Server) {
-    const newServerOrder = serverOrder.filter((m) => m.id !== server.id);
-    setServerOrder(newServerOrder);
-    setDefaultServers(newServerOrder);
-  }
-
-  const columns = createColumns(onRemoveServer, refetchServers);
+  const columns = createColumns(refetchServers);
 
   return (
     <div className="flex flex-col gap-3">
