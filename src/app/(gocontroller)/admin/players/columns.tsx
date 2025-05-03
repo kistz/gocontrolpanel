@@ -1,7 +1,7 @@
 "use client";
 
 import { deletePlayerById } from "@/actions/database/player";
-import ConfirmDialog from "@/components/confirm-dialog";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import EditPlayerModal from "@/components/modals/edit-player";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
@@ -120,7 +120,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmDialog
+          <ConfirmModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onConfirm={handleDelete}

@@ -1,8 +1,8 @@
 "use client";
 
 import { removeServer } from "@/actions/gbxconnector/servers";
-import ConfirmDialog from "@/components/confirm-dialog";
 import { DndListColumn } from "@/components/dnd/dnd-list";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import EditServerModal from "@/components/modals/edit-server";
 import Modal from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ConfirmDialog
+      <ConfirmModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleRemove}

@@ -1,8 +1,8 @@
 "use client";
 
 import { removeMapFromJukebox } from "@/actions/gbx/map";
-import ConfirmDialog from "@/components/confirm-dialog";
 import { DndListColumn } from "@/components/dnd/dnd-list";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -67,7 +67,7 @@ const MapActionsCell = memo(function MapActionsCell({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ConfirmDialog
+      <ConfirmModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleRemove}

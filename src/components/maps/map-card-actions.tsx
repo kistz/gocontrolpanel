@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { stripTmTags } from "tmtags";
-import ConfirmDialog from "../confirm-dialog";
+import ConfirmModal from "../modals/confirm-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -111,7 +111,7 @@ export default function MapCardActions({
         </DropdownMenu>
       </div>
 
-      <ConfirmDialog
+      <ConfirmModal
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={async () => {

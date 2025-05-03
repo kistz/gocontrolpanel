@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteRecordById } from "@/actions/database/record";
-import ConfirmDialog from "@/components/confirm-dialog";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import TimeDisplay from "@/components/time-display";
 import { Button } from "@/components/ui/button";
@@ -108,7 +108,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmDialog
+          <ConfirmModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onConfirm={handleDelete}
