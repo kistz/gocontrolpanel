@@ -1,16 +1,3 @@
-import { AddServerSchema } from "@/forms/admin/add-server-schema";
-import {
-  MatchSettingsSchema,
-  ModeScriptSettingsSchema,
-  PlaylistSchema,
-  ScriptNameSchema,
-  ShowOpponentsSchema,
-} from "@/forms/server/game/game-schema";
-import { ServerSettingsSchema } from "@/forms/server/settings/settings-schema";
-import { z } from "zod";
-
-export type ServerSettings = z.infer<typeof ServerSettingsSchema>;
-
 export interface ModeScriptInfo {
   Name: string;
   CompatibleMapTypes: string;
@@ -33,18 +20,6 @@ export interface ScriptCommandDescs {
   Type: string;
   Default: string;
 }
-
-export type ShowOpponents = z.infer<typeof ShowOpponentsSchema>;
-
-export type ScriptName = z.infer<typeof ScriptNameSchema>;
-
-export type MatchSettings = z.infer<typeof MatchSettingsSchema>;
-
-export type Playlist = z.infer<typeof PlaylistSchema>;
-
-export type ModeScriptSettings = z.infer<typeof ModeScriptSettingsSchema>;
-
-export type AddServer = z.infer<typeof AddServerSchema>;
 
 export interface Server {
   id: number;

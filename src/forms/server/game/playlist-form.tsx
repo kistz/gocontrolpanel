@@ -5,14 +5,13 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { Playlist } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { PlaylistSchema } from "./game-schema";
+import { PlaylistSchema, PlaylistSchemaType } from "./game-schema";
 
 export default function PlaylistForm({ serverId }: { serverId: number }) {
-  const playlistForm = useForm<Playlist>({
+  const playlistForm = useForm<PlaylistSchemaType>({
     resolver: zodResolver(PlaylistSchema),
     defaultValues: {
       filename: "",

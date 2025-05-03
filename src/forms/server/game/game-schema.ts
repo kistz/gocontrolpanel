@@ -19,3 +19,11 @@ export const PlaylistSchema = z.object({
 export const ModeScriptSettingsSchema = z.record(
   z.union([z.string(), z.number(), z.boolean()]),
 );
+
+export type ShowOpponentsSchemaType = z.infer<typeof ShowOpponentsSchema>;
+export type ScriptNameSchemaType = z.infer<typeof ScriptNameSchema>;
+export type MatchSettingsSchemaType = z.infer<typeof MatchSettingsSchema>;
+export type PlaylistSchemaType = z.infer<typeof PlaylistSchema>;
+export type ModeScriptSettingsSchemaType = z.infer<
+  typeof ModeScriptSettingsSchema
+>;

@@ -5,14 +5,13 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { MatchSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { MatchSettingsSchema } from "./game-schema";
+import { MatchSettingsSchema, MatchSettingsSchemaType } from "./game-schema";
 
 export default function MatchSettingsForm({ serverId }: { serverId: number }) {
-  const matchSettingsForm = useForm<MatchSettings>({
+  const matchSettingsForm = useForm<MatchSettingsSchemaType>({
     resolver: zodResolver(MatchSettingsSchema),
     defaultValues: {
       filename: "",

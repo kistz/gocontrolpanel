@@ -43,3 +43,5 @@ export const ServerSettingsSchema = z.object({
   uploadRate: z.coerce.number().int().min(1, "Upload Rate is required"),
   profileSkins: z.boolean(),
 });
+
+export type ServerSettingsSchemaType = z.infer<typeof ServerSettingsSchema>;

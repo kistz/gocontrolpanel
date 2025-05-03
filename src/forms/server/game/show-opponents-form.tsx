@@ -5,11 +5,10 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { ShowOpponents } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ShowOpponentsSchema } from "./game-schema";
+import { ShowOpponentsSchema, ShowOpponentsSchemaType } from "./game-schema";
 
 export default function ShowOpponentsForm({
   serverId,
@@ -18,14 +17,14 @@ export default function ShowOpponentsForm({
   serverId: number;
   showOpponents: number;
 }) {
-  const showOpponentsForm = useForm<ShowOpponents>({
+  const showOpponentsForm = useForm<ShowOpponentsSchemaType>({
     resolver: zodResolver(ShowOpponentsSchema),
     defaultValues: {
       showOpponents,
     },
   });
 
-  async function onSubmitShowOpponents(values: ShowOpponents) {
+  async function onSubmitShowOpponents(values: ShowOpponentsSchemaType) {
     try {
       const { error } = await setShowOpponents(serverId, values.showOpponents);
       if (error) {

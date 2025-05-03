@@ -5,11 +5,10 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { ScriptName } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ScriptNameSchema } from "./game-schema";
+import { ScriptNameSchema, ScriptNameSchemaType } from "./game-schema";
 
 export default function ScriptNameForm({
   scriptName,
@@ -20,14 +19,14 @@ export default function ScriptNameForm({
   scripts: string[];
   serverId: number;
 }) {
-  const scriptNameForm = useForm<ScriptName>({
+  const scriptNameForm = useForm<ScriptNameSchemaType>({
     resolver: zodResolver(ScriptNameSchema),
     defaultValues: {
       scriptName,
     },
   });
 
-  async function onSubmitScriptName(values: ScriptName) {
+  async function onSubmitScriptName(values: ScriptNameSchemaType) {
     try {
       const { error } = await setScriptName(serverId, values.scriptName);
       if (error) {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const AddServerSchema = z.object({
+export const EditServerSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   description: z.string().optional(),
   host: z.string().min(1, { message: "Host is required" }),
@@ -11,4 +11,4 @@ export const AddServerSchema = z.object({
   pass: z.string().min(1, { message: "Password is required" }),
 });
 
-export type AddServerSchemaType = z.infer<typeof AddServerSchema>;
+export type EditServerSchemaType = z.infer<typeof EditServerSchema>;

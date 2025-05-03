@@ -1,17 +1,17 @@
 "use server";
 
+import { ServerSettingsSchemaType } from "@/forms/server/settings/settings-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { getFiles } from "@/lib/server-utils";
 import { LocalMapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
-import { ServerSettings } from "@/types/server";
 import path from "path";
 import { getServers } from "../gbxconnector/servers";
 
 export async function getServerSettings(
   server: number,
-): Promise<ServerResponse<ServerSettings>> {
+): Promise<ServerResponse<ServerSettingsSchemaType>> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(server);
     const settings = await client.multicall([
@@ -39,7 +39,7 @@ export async function getServerSettings(
       const profileSkinsDisabled = settings[6];
       const mapDownloadAllowed = settings[7];
 
-      const serverSettings: ServerSettings = {
+      const serverSettings: ServerSettingsSchemaType = {
         defaultOptions: {
           Name: serverOptions.Name,
           Comment: serverOptions.Comment,
@@ -71,7 +71,7 @@ export async function getServerSettings(
 
 export async function saveServerSettings(
   server: number,
-  serverSettings: ServerSettings,
+  serverSettings: ServerSettingsSchemaType,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(server);

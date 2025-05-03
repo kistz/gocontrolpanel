@@ -5,12 +5,15 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { ModeScriptInfo, ModeScriptSettings } from "@/types/server";
+import { ModeScriptInfo } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ModeScriptSettingsSchema } from "./game-schema";
+import {
+  ModeScriptSettingsSchema,
+  ModeScriptSettingsSchemaType,
+} from "./game-schema";
 
 export default function ModeScriptSettingsForm({
   serverId,
@@ -21,13 +24,13 @@ export default function ModeScriptSettingsForm({
   modeScriptSettings: Record<string, unknown>;
   modeScriptInfo: ModeScriptInfo;
 }) {
-  const modeScriptSettingsForm = useForm<ModeScriptSettings>({
+  const modeScriptSettingsForm = useForm<ModeScriptSettingsSchemaType>({
     resolver: zodResolver(ModeScriptSettingsSchema),
-    defaultValues: modeScriptSettings as ModeScriptSettings,
+    defaultValues: modeScriptSettings as ModeScriptSettingsSchemaType,
   });
 
   const onSubmitModeScriptSettings = useCallback(
-    async (values: ModeScriptSettings) => {
+    async (values: ModeScriptSettingsSchemaType) => {
       try {
         const parsedValues = Object.fromEntries(
           Object.entries(values).map(([key, value]) => {

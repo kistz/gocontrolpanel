@@ -4,17 +4,16 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { ServerSettings } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ServerSettingsSchema } from "./settings-schema";
+import { ServerSettingsSchema, ServerSettingsSchemaType } from "./settings-schema";
 
 export default function SettingsForm({ serverId }: { serverId: number }) {
   const [isLoading, setIsLoading] = useState(true);
 
-  const form = useForm<ServerSettings>({
+  const form = useForm<ServerSettingsSchemaType>({
     resolver: zodResolver(ServerSettingsSchema),
     defaultValues: async () => {
       const { data: settings } = await getServerSettings(serverId);
@@ -23,7 +22,7 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
     },
   });
 
-  async function onSubmit(values: ServerSettings) {
+  async function onSubmit(values: ServerSettingsSchemaType) {
     try {
       const { error } = await saveServerSettings(serverId, values);
       if (error) {
