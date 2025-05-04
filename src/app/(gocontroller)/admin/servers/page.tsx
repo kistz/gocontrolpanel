@@ -34,3 +34,5 @@ export default async function AdminServersPage() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
