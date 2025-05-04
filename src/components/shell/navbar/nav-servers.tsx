@@ -1,5 +1,4 @@
 "use client";
-import { getHealthStatus } from "@/actions/gbxconnector/servers";
 import {
   Collapsible,
   CollapsibleContent,
@@ -60,33 +59,28 @@ export default function NavServers() {
   useEffect(() => {
     const fetchData = async () => {
       if (!session) {
-        setLoading(false);
         return;
       }
 
       const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
       if (!url) {
         setTimeout(() => toast.error("Can't connect to the server"));
+        setLoading(false);
         return;
       }
 
       if (!session.jwt) {
         setTimeout(() => toast.error("Can't connect to the server"));
+        setLoading(false);
         return;
       }
 
       try {
-        const health = await getHealthStatus();
-        setHealthStatus(health);
-        if (!health) {
-          setLoading(false);
-          return;
-        }
-
         const socket = new WebSocket(`${url}/ws/servers?token=${session.jwt}`);
 
         socket.onmessage = (event) => {
           const data = JSON.parse(event.data);
+          setHealthStatus(true);
           setServers(data);
           setLoading(false);
         };

@@ -105,9 +105,7 @@ export default async function NavAdmin() {
               </Collapsible>
             ) : item.healthStatus ? (
               <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton
-                  asChild
-                >
+                <SidebarMenuButton asChild>
                   <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
                     {item.icon && <item.icon />}
                     <span>{item.healthStatus}</span>
