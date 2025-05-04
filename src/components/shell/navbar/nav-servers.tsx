@@ -88,7 +88,7 @@ export default function NavServers() {
         return () => {
           socket.close();
         };
-      } catch (err) {
+      } catch {
         setLoading(false);
       }
     };

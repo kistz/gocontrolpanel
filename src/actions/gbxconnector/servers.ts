@@ -46,7 +46,7 @@ export async function getHealthStatus(): Promise<boolean> {
 
     healthStatus = true;
     return healthStatus;
-  } catch (error) {
+  } catch {
     healthStatus = false;
     return healthStatus;
   }
