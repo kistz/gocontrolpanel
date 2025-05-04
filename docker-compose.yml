@@ -5,15 +5,15 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - CONNECTOR_URL=http://gbxconnector:6980
+        - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
+        - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980 # Use the external URL for the frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       MONGODB_URI: mongodb://gocontrol:GoControl123!@mongo:27017
       MONGODB_DB: gocontroller
-      CONNECTOR_URL: http://gbxconnector:6980
-      NEXT_PUBLIC_CONNECTOR_URL: http://localhost:6980
+      CONNECTOR_URL: http://gbxconnector:6980 # Use the internal Docker network for communication
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET:
       CONNECTOR_API_KEY:
