@@ -101,7 +101,7 @@ export async function setupJukeboxCallbacks(): Promise<void> {
     await redis.del(key);
 
     const client = await getGbxClient(server.id);
-    client.on("callback", (method, data) => {
+    client.on("callback", (method: string, data: any) => {
       if (method !== "ManiaPlanet.ModeScriptCallbackArray") return;
       if (!data || data.length === 0) return;
 
