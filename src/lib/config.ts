@@ -23,16 +23,4 @@ const config: Config = {
   REDISURI: process.env.REDIS_URI || "",
 };
 
-if (!config.MONGODB.URI) {
-  throw new Error("Please define the MONGODB_URI environment variable");
-}
-
-if (
-  !config.NADEO.CLIENT_ID ||
-  !config.NADEO.CLIENT_SECRET ||
-  !config.NADEO.REDIRECT_URI
-) {
-  throw new Error("Please define the needed NADEO environment variables");
-}
-
 export default config;
