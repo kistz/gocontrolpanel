@@ -4,7 +4,6 @@ export interface Config {
     DB: string;
   };
   NODE_ENV: string;
-  PORT: number;
   CONNECTOR_URL: string;
   DEFAULT_ADMINS: string[];
   CONNECTOR_API_KEY: string;

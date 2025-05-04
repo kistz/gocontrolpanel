@@ -12,12 +12,11 @@ services:
     environment:
       MONGODB_URI: mongodb://gocontrol:GoControl123!@mongo:27017
       MONGODB_DB: gocontroller
-      NODE_ENV: production
-      PORT: 3000
-      CONNECTOR_URL: http://gbxconnector:6980
+      NEXT_PUBLIC_CONNECTOR_URL: http://localhost:6980
       NEXTAUTH_URL: http://localhost:3000
-      DEFAULT_ADMINS:
       NEXTAUTH_SECRET:
+      CONNECTOR_API_KEY:
+      DEFAULT_ADMINS:
       NADEO_CLIENT_ID:
       NADEO_CLIENT_SECRET:
       NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
@@ -38,9 +37,24 @@ services:
       PORT: 6980
       CORS_ORIGINS: "http://localhost:3000"
       SERVER_RECONNECT_INTERVAL: 15
+      JWT_SECRET: ""
+      INTERNAL_API_KEY: "" # Same as the one in gocontrolpanel
       LOG_LEVEL: DEBUG
     volumes:
       - ./servers.json:/app/servers.json
+
+  # Uncomment the following lines to enable the dedicated server
+  # This is a placeholder and should be replaced with your own configuration
+  # --------------------------------------
+  # dedicated-server:
+  #   image: evoesports/trackmania:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - 2350:2350/udp
+  #     - 2350:2350/tcp
+  #   environment:
+  #     TM_MASTERSERVER_LOGIN: ""
+  #     TM_MASTERSERVER_PASSWORD: ""
 
   mongo:
     image: mongo:latest

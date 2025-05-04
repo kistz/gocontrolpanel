@@ -4,6 +4,7 @@ This repository provides a **Docker Compose** configuration to set up and run **
 
 - **GoControlPanel** service
 - **GBXConnector** service
+- **Dedicated Server** service (optional)
 - **MongoDB** service
 - **Redis** service
 
@@ -33,16 +34,19 @@ Make sure to update the environment variables in the `docker-compose.yml` file t
 
   - `MONGODB_URI`: MongoDB URI for GoControlPanel to connect to the MongoDB service.
   - `MONGODB_DB`: The database name for GoControlPanel in MongoDB.
-  - `NODE_ENV`: The environment for your application (`production` or `development`).
-  - `CONNECTOR_URL`: URL for the GBXConnector service.
+  - `NEXT_PUBLIC_CONNECTOR_URL`: URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
+  - `CONNECTOR_API_KEY`: API key for the GBXConnector.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
-  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, and `NADEO_SERVER_LOGIN` with your valid NADEO API credentials.
+  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials.
   - `REDIS_URI`: Redis URI for caching.
 
 - **GBXConnector Environment Variables**:
+  - `PORT`: Port for the GBXConnector service.
   - `CORS_ORIGINS`: Make sure this is set to allow your frontend (e.g., `http://localhost:3000`).
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
+  - `JWT_SECRET`: Secret key for JWT authentication.
+  - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
 
 ### 3. Modify the `servers.json` File
@@ -95,8 +99,9 @@ This will start the following services:
 
 1. **GoControlPanel** on port `3000` (accessible at http://localhost:3000).
 2. **GBXConnector** on port `6980` (accessible at http://localhost:6980).
-3. **MongoDB** (for database storage).
-4. **Redis** (for caching).
+3. **Dedicated Server** (if configured) on port `2350`.
+4. **MongoDB** (for database storage).
+5. **Redis** (for caching).
 
 > **Note:** The `--build` flag ensures that Docker rebuilds the images from the provided Dockerfiles before starting the services.
 
@@ -132,10 +137,17 @@ This is the main service for controlling and managing your application. It conne
 
 ### **GBXConnector** (`gbxconnector`)
 
-The GBXConnector is an API that serves as a bridge for your application to interact with the **NADEO** server. It listens for incoming connections from GoControlPanel and sends/receives data.
+The GBXConnector is an API that serves as a bridge for your application to interact with the server. It listens for incoming connections from GoControlPanel and sends/receives data.
 
 - **Ports**: `6980:6980` (accessible at `http://localhost:6980`)
 - **Configuration File**: `./servers.json` (used for server configuration)
+
+### **Dedicated Server** (`dedicated-server`)
+
+This service runs a dedicated trackmania server. It is optional and can be configured to run on a specific port.
+
+- **Ports**: `2350:2350` (accessible at `http://localhost:2350`)
+- **Environment Variables**: `TM_MASTER_LOGIN`, `TM_MASTER_PASSWORD` (for server configuration)
 
 ### **MongoDB** (`mongo`)
 
@@ -161,15 +173,19 @@ Each service has specific environment variables. Refer to the `docker-compose.ym
 
   - `MONGODB_URI`: MongoDB connection URI.
   - `MONGODB_DB`: MongoDB database name.
-  - `CONNECTOR_URL`: URL of the GBXConnector.
+  - `NEXT_PUBLIC_CONNECTOR_URL`: URL of the GBXConnector.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: For NextAuth authentication.
+  - `CONNECTOR_API_KEY`: API key for GBXConnector.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
-  - **NADEO** credentials: `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, etc.
+  - **NADEO** credentials: `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT`.
   - `REDIS_URI`: Redis connection string.
 
 - **GBXConnector**:
   - `CORS_ORIGINS`: List of allowed CORS origins for frontend.
   - `SERVER_RECONNECT_INTERVAL`: Interval between reconnect attempts if the server is disconnected.
+  - `JWT_SECRET`: Secret key for JWT authentication.
+  - `INTERNAL_API_KEY`: Internal API key for GBXConnector.
+  - `LOG_LEVEL`: Logging level (e.g., `DEBUG`, `INFO`, `ERROR`).
 
 ---
 

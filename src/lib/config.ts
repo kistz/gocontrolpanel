@@ -7,7 +7,6 @@ const config: Config = {
     DB: process.env.MONGODB_DB || "nadeo",
   },
   NODE_ENV: process.env.NODE_ENV || "development",
-  PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
   CONNECTOR_URL: process.env.CONNECTOR_URL || "http://localhost:6980",
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
