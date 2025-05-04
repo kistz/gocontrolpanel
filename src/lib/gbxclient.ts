@@ -17,7 +17,10 @@ export async function connectToGbxClient(id: number) {
     throw new Error(`Server ${id} not found in cached servers`);
   }
 
-  const client = new GbxClient();
+  const client = new GbxClient({
+    showErrors: true,
+    throwErrors: true,
+  });
   try {
     const status = await client.connect(server.host, server.xmlrpcPort);
     if (!status) {
