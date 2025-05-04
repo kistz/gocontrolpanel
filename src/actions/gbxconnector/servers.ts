@@ -3,14 +3,23 @@ import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
 import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
 import { doServerAction } from "@/lib/actions";
 import config from "@/lib/config";
+import { axiosAuth } from "@/lib/interceptor";
 import redis from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
 import { setupJukeboxCallbacks } from "../gbx/map";
-import { axiosAuth } from "@/lib/interceptor";
+
+let healthStatus: boolean | null = null;
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
+  if (!healthStatus) {
+    const health = await getHealthStatus();
+    if (!health) {
+      throw new ServerError("Failed to get servers");
+    }
+  }
+
   const res = await axiosAuth.get("/servers");
 
   if (res.status !== 200) {
@@ -25,6 +34,29 @@ export async function syncServers(): Promise<Server[]> {
 
 export async function getServers(): Promise<Server[]> {
   return await syncServers();
+}
+
+export async function getHealthStatus(): Promise<boolean> {
+  if (healthStatus !== null) {
+    return healthStatus;
+  }
+
+  try {
+    const res = await axiosAuth.get("/health", {
+      timeout: 3000,
+    });
+
+    if (res.status !== 200) {
+      healthStatus = false;
+      return healthStatus;
+    }
+
+    healthStatus = true;
+    return healthStatus;
+  } catch (error) {
+    healthStatus = false;
+    return healthStatus;
+  }
 }
 
 export async function addServer(

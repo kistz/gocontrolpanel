@@ -1,4 +1,5 @@
 "use client";
+import { getHealthStatus } from "@/actions/gbxconnector/servers";
 import {
   Collapsible,
   CollapsibleContent,
@@ -52,6 +53,7 @@ export default function NavServers() {
   const { data: session } = useSession();
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
+  const [healthStatus, setHealthStatus] = useState(false);
 
   const serverId = useCurrentServerId(pathname);
 
@@ -68,17 +70,33 @@ export default function NavServers() {
         return;
       }
 
-      const socket = new WebSocket(`${url}/ws/servers?token=${session?.jwt}`);
+      if (!session.jwt) {
+        setTimeout(() => toast.error("Can't connect to the server"));
+        return;
+      }
 
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        setServers(data);
+      try {
+        const health = await getHealthStatus();
+        setHealthStatus(health);
+        if (!health) {
+          setLoading(false);
+          return;
+        }
+
+        const socket = new WebSocket(`${url}/ws/servers?token=${session?.jwt}`);
+
+        socket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          setServers(data);
+          setLoading(false);
+        };
+
+        return () => {
+          socket.close();
+        };
+      } catch (err) {
         setLoading(false);
-      };
-
-      return () => {
-        socket.close();
-      };
+      }
     };
 
     fetchData();
@@ -135,17 +153,26 @@ export default function NavServers() {
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ) : (
+          ) : healthStatus ? (
             group.servers.length === 0 && (
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
                     <IconServer />
                     <span>No servers found</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )
+          ) : (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
+                  <IconServer />
+                  <span>Connector offline</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           )}
           {group.servers.map((server) =>
             server.items && server.items.length > 0 ? (

@@ -1,3 +1,4 @@
+import { getHealthStatus } from "@/actions/gbxconnector/servers";
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,7 +21,9 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NavGroup } from ".";
 
-export default function NavAdmin() {
+export default async function NavAdmin() {
+  const healthStatus = await getHealthStatus();
+
   const group: NavGroup = {
     name: "Admin",
     items: [
@@ -33,6 +36,7 @@ export default function NavAdmin() {
         name: "Servers",
         url: routes.admin.servers,
         icon: IconServerCog,
+        healthStatus: !healthStatus ? "Connector offline" : undefined,
       },
     ],
   };
@@ -99,6 +103,17 @@ export default function NavAdmin() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
+            ) : item.healthStatus ? (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  asChild
+                >
+                  <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
+                    {item.icon && <item.icon />}
+                    <span>{item.healthStatus}</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             ) : (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild>

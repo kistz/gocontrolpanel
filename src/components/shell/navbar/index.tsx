@@ -11,6 +11,7 @@ export interface NavItem {
   icon: Icon;
   items?: NavItem[];
   isActive?: boolean;
+  healthStatus?: string;
 }
 
 export interface NavGroup {
