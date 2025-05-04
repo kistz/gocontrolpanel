@@ -1,6 +1,6 @@
 services:
   gocontrolpanel:
-    image: gocontroller/gocontrolpanel:latest
+    image: gotrackmania/gocontrolpanel:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -43,7 +43,7 @@ services:
     volumes:
       - ./servers.json:/app/servers.json
 
-  # Uncomment the following lines to enable the dedicated server
+  # Uncomment the following lines to run a dedicated server
   # This is a placeholder and should be replaced with your own configuration
   # --------------------------------------
   # dedicated-server:
