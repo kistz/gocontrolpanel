@@ -1,17 +1,17 @@
+# Base image with Node.js
 FROM node:23-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+# Install additional dependencies
 RUN apk add --no-cache libc6-compat curl bash
 ENV PATH="/root/.bun/bin:$PATH"
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Install dependencies based on the preferred package manager (Bun)
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 RUN curl -fsSL https://bun.sh/install | bash \
   && /root/.bun/bin/bun install --no-save
-
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -23,26 +23,28 @@ ENV PATH="/root/.bun/bin:$PATH"
 
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED=1
+# Copy the wait-for.sh script (you should have this file in your project)
+COPY wait-for.sh /usr/local/bin/wait-for.sh
+RUN chmod +x /usr/local/bin/wait-for.sh
+
+# Wait for Redis to be available before starting the build
 ARG NEXT_PUBLIC_CONNECTOR_URL
 ENV NEXT_PUBLIC_CONNECTOR_URL=$NEXT_PUBLIC_CONNECTOR_URL
+ARG REDIS_URI
+ENV REDIS_URI=$REDIS_URI
 
-RUN bun run build;
+RUN /usr/local/bin/wait-for.sh redis:6379 -- bun run build
 
-# Production image, copy all the files and run next
+# Production image, copy all the files and run Next.js
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Copy build artifacts from builder stage
 COPY --from=builder /app/public ./public
 
 # Automatically leverage output traces to reduce image size
@@ -57,6 +59,5 @@ EXPOSE 3000
 ENV PORT=3000
 
 # server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]

@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980
+        - REDIS_URI=redis://redis:6379
     restart: unless-stopped
     ports:
       - "3000:3000"
