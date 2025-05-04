@@ -4,7 +4,7 @@ import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
 import { doServerAction } from "@/lib/actions";
 import config from "@/lib/config";
 import { axiosAuth } from "@/lib/interceptor";
-import redis from "@/lib/redis";
+import { getRedisClient } from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
 import { isAxiosError } from "axios";
@@ -22,6 +22,8 @@ export async function syncServers(): Promise<Server[]> {
     }
     throw new ServerError("Failed to get servers");
   }
+
+  const redis = await getRedisClient();
 
   const servers: Server[] = res.data;
 

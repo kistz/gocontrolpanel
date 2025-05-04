@@ -2,7 +2,7 @@
 
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
-import redis from "@/lib/redis";
+import { getRedisClient } from "@/lib/redis";
 import { JukeboxMap, Map, MapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { getServers } from "../gbxconnector/servers";
@@ -13,6 +13,7 @@ export async function getJukebox(
   server: number,
 ): Promise<ServerResponse<JukeboxMap[]>> {
   return doServerAction(async () => {
+    const redis = await getRedisClient();
     const key = getKey(server);
     const items = await redis.lrange(key, 0, -1);
     return items.map((item) => JSON.parse(item));
@@ -24,6 +25,7 @@ export async function setJukebox(
   jukebox: JukeboxMap[],
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
+    const redis = await getRedisClient();
     const key = getKey(server);
     await redis.del(key);
     if (jukebox.length > 0) {
@@ -34,6 +36,7 @@ export async function setJukebox(
 
 export async function clearJukebox(server: number): Promise<ServerResponse> {
   return doServerAction(async () => {
+    const redis = await getRedisClient();
     const key = getKey(server);
     await redis.del(key);
   });
@@ -44,6 +47,7 @@ export async function addMapToJukebox(
   map: Map,
 ): Promise<ServerResponse<JukeboxMap>> {
   return doServerActionWithAuth(["admin"], async (session) => {
+    const redis = await getRedisClient();
     const newMap: JukeboxMap = {
       ...map,
       id: new Date().toISOString(),
@@ -64,6 +68,7 @@ export async function removeMapFromJukebox(
   id: string,
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
+    const redis = await getRedisClient();
     const key = getKey(server);
     const items = await redis.lrange(key, 0, -1);
 
@@ -80,6 +85,7 @@ export async function removeMapFromJukebox(
 }
 
 async function onPodiumStart(server: number) {
+  const redis = await getRedisClient();
   const key = getKey(server);
   const items = await redis.lrange(key, 0, -1);
 
@@ -95,6 +101,7 @@ async function onPodiumStart(server: number) {
 }
 
 export async function setupJukeboxCallbacks(): Promise<void> {
+  const redis = await getRedisClient();
   const servers = await getServers();
   for (const server of servers) {
     const key = getKey(server.id);

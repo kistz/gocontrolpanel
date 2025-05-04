@@ -1,9 +1,9 @@
 "use server";
 import config from "@/lib/config";
-import redis from "@/lib/redis";
 import { MapInfo, NadeoTokens, WebIdentity } from "@/types/api/nadeo";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { doServerAction } from "../actions";
+import { getRedisClient } from "../redis";
 
 const TOKEN_KEY = "nadeo:tokens";
 
@@ -36,11 +36,14 @@ export async function authenticate(
     );
   }
 
+  const redis = await getRedisClient();
+
   const tokens: NadeoTokens = await response.json();
   await redis.set(TOKEN_KEY, JSON.stringify(tokens), "EX", 3600); // Store tokens for 1 hour
 }
 
 export async function getTokens(): Promise<NadeoTokens | null> {
+  const redis = await getRedisClient();
   const raw = await redis.get(TOKEN_KEY);
   return raw ? JSON.parse(raw) : null;
 }
