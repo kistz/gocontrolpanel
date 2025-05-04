@@ -7,7 +7,7 @@ const config: Config = {
     DB: process.env.MONGODB_DB || "nadeo",
   },
   NODE_ENV: process.env.NODE_ENV || "development",
-  CONNECTOR_URL: process.env.CONNECTOR_URL || "http://localhost:6980",
+  CONNECTOR_URL: process.env.NEXT_PUBLIC_CONNECTOR_URL || "http://localhost:6980",
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
     : [],
