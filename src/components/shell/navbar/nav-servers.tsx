@@ -83,7 +83,7 @@ export default function NavServers() {
           return;
         }
 
-        const socket = new WebSocket(`${url}/ws/servers?token=${session?.jwt}`);
+        const socket = new WebSocket(`${url}/ws/servers?token=${session.jwt}`);
 
         socket.onmessage = (event) => {
           const data = JSON.parse(event.data);

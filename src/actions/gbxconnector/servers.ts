@@ -7,22 +7,19 @@ import { axiosAuth } from "@/lib/interceptor";
 import redis from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
+import { isAxiosError } from "axios";
 import { setupJukeboxCallbacks } from "../gbx/map";
 
 let healthStatus: boolean | null = null;
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
-  if (!healthStatus) {
-    const health = await getHealthStatus();
-    if (!health) {
-      throw new ServerError("Failed to get servers");
-    }
-  }
-
   const res = await axiosAuth.get("/servers");
 
   if (res.status !== 200) {
+    if (isAxiosError(res) && res.code === "ECONNREFUSED") {
+      healthStatus = false;
+    }
     throw new ServerError("Failed to get servers");
   }
 
@@ -37,10 +34,6 @@ export async function getServers(): Promise<Server[]> {
 }
 
 export async function getHealthStatus(): Promise<boolean> {
-  if (healthStatus !== null) {
-    return healthStatus;
-  }
-
   try {
     const res = await axiosAuth.get("/health", {
       timeout: 3000,
