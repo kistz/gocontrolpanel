@@ -9,7 +9,12 @@ export async function connectToRedis() {
   }
 
   try {
-    const client = new Redis(config.REDISURI);
+    const client = new Redis(config.REDISURI, {
+      retryStrategy: () => null,
+      maxRetriesPerRequest: 1,
+      reconnectOnError: () => false
+    });
+
     cachedClient = client;
     return client;
   } catch (error) {

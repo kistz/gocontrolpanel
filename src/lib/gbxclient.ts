@@ -21,6 +21,7 @@ export async function connectToGbxClient(id: number) {
     showErrors: true,
     throwErrors: true,
   });
+
   try {
     const status = await client.connect(server.host, server.xmlrpcPort);
     if (!status) {
@@ -47,4 +48,12 @@ export async function connectToGbxClient(id: number) {
 export async function getGbxClient(id: number) {
   const client = await connectToGbxClient(id);
   return client;
+}
+
+export async function closeGbxClient(id: number) {
+  const client = cachedClients[id];
+  if (client) {
+    await client.disconnect();
+    delete cachedClients[id];
+  }
 }
