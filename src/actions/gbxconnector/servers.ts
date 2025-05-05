@@ -3,7 +3,7 @@ import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
 import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
 import { doServerAction } from "@/lib/actions";
 import config from "@/lib/config";
-import { closeGbxClient } from "@/lib/gbxclient";
+import { connectToGbxClient } from "@/lib/gbxclient";
 import { axiosAuth } from "@/lib/interceptor";
 import { getRedisClient } from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
@@ -109,11 +109,17 @@ export async function orderServers(
       throw new ServerError("Failed to order servers");
     }
 
-    for (const server of servers) {
-      await closeGbxClient(server.id);
+    const orderedServers: Server[] = res.data;
+
+    for (const server of orderedServers) {
+      try {
+        await connectToGbxClient(server.id);
+      } catch (error) {
+        console.error("Failed to connect to server", error);
+      }
     }
 
-    return await syncServers();
+    return orderedServers;
   });
 }
 

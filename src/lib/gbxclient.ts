@@ -1,20 +1,22 @@
 "use server";
 import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
+import { withTimeout } from "./server-utils";
 
-const cachedClients: {
+let cachedClients: {
   [key: number]: GbxClient;
 } = {};
 
-export async function connectToGbxClient(id: number) {
-  if (cachedClients[id]) {
-    return cachedClients[id];
-  }
-
+export async function connectToGbxClient(id: number): Promise<GbxClient> {
   const servers = await getServers();
   const server = servers.find((server) => server.id == id);
+
   if (!server) {
     throw new Error(`Server ${id} not found in cached servers`);
+  }
+
+  if (!server.isConnected) {
+    throw new Error(`Server ${id} is not connected`);
   }
 
   const client = new GbxClient({
@@ -23,7 +25,11 @@ export async function connectToGbxClient(id: number) {
   });
 
   try {
-    const status = await client.connect(server.host, server.xmlrpcPort);
+    const status = await withTimeout(
+      client.connect(server.host, server.xmlrpcPort),
+      3000,
+      "Connection to GBX client timed out",
+    );
     if (!status) {
       throw new Error("Failed to connect to GBX client");
     }
@@ -45,15 +51,10 @@ export async function connectToGbxClient(id: number) {
   return client;
 }
 
-export async function getGbxClient(id: number) {
-  const client = await connectToGbxClient(id);
-  return client;
-}
-
-export async function closeGbxClient(id: number) {
-  const client = cachedClients[id];
-  if (client) {
-    await client.disconnect();
-    delete cachedClients[id];
+export async function getGbxClient(id: number): Promise<GbxClient> {
+  if (cachedClients[id]) {
+    return cachedClients[id];
   }
+
+  return await connectToGbxClient(id);
 }
