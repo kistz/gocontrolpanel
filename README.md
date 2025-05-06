@@ -131,7 +131,8 @@ docker-compose down --volumes
 ### **GoControlPanel** (`gocontrolpanel`)
 
 This is the main service for controlling and managing your application. It connects to MongoDB for data storage and Redis for caching. It uses the environment variables listed earlier for configuration.
-The file management like uploading and deleting files is only possible with a server running the **[marijnregterschot/trackmania-plus](https://hub.docker.com/r/marijnregterschot/trackmania-plus)** image.
+
+> **Note:** The file management like uploading and deleting files is only possible with a server running the **[marijnregterschot/trackmania-plus](https://hub.docker.com/r/marijnregterschot/trackmania-plus)** image.
 
 - **Ports**: `3000:3000` (accessible at `http://localhost:3000`)
 - **Depends on**: `mongo`, `redis`
