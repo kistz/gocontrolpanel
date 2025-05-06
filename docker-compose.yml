@@ -56,6 +56,7 @@ services:
   #   environment:
   #     TM_MASTERSERVER_LOGIN: ""
   #     TM_MASTERSERVER_PASSWORD: ""
+  #     TM_SYSTEM_XMLRPC_ALLOWREMOTE: True
 
   mongo:
     image: mongo:latest
