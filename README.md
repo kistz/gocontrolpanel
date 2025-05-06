@@ -61,6 +61,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
     "description": "This is a local server for testing purposes.",
     "host": "localhost",
     "xmlrpcPort": 5000,
+    "fmPort": 3300,
     "user": "SuperAdmin",
     "pass": "SuperAdmin"
   },
@@ -69,6 +70,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
     "name": "Server 2",
     "host": "localhost",
     "xmlrpcPort": 5001,
+    "fmPort": 3301,
     "user": "SuperAdmin",
     "pass": "SuperAdmin"
   }
