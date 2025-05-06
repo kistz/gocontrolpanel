@@ -1,13 +1,7 @@
 // src/components/multi-select.tsx
 
 import { cva, type VariantProps } from "class-variance-authority";
-import {
-  CheckIcon,
-  ChevronDown,
-  WandSparkles,
-  XCircle,
-  XIcon,
-} from "lucide-react";
+import { CheckIcon, ChevronDown, WandSparkles, XCircle } from "lucide-react";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +64,8 @@ interface MultiSelectProps
     value: string;
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>;
+    /** Optional flag to indicate if the option is removable. */
+    removable?: boolean;
   }[];
 
   /**
@@ -81,6 +77,7 @@ interface MultiSelectProps
   /** The default selected values when the component mounts. */
   defaultValue?: string[];
 
+  originalValue?: string[];
   /**
    * Placeholder text to be displayed when no values are selected.
    * Optional, defaults to "Select options".
@@ -123,6 +120,7 @@ export const MultiSelect = React.forwardRef<
       onValueChange,
       variant,
       defaultValue = [],
+      originalValue = [],
       placeholder = "Select options",
       animation = 0,
       maxCount = 3,
@@ -151,6 +149,16 @@ export const MultiSelect = React.forwardRef<
     };
 
     const toggleOption = (option: string) => {
+      const opt = options.find((o) => o.value === option);
+      const isSelected = selectedValues.includes(option);
+
+      if (
+        isSelected &&
+        opt?.removable === false &&
+        originalValue.includes(opt.value)
+      )
+        return;
+
       const newSelectedValues = selectedValues.includes(option)
         ? selectedValues.filter((value) => value !== option)
         : [...selectedValues, option];
@@ -205,12 +213,16 @@ export const MultiSelect = React.forwardRef<
                   {selectedValues.slice(0, maxCount).map((value) => {
                     const option = options.find((o) => o.value === value);
                     const IconComponent = option?.icon;
+                    const isRemovable =
+                      option?.removable !== false ||
+                      !originalValue.includes(value);
                     return (
                       <Badge
                         key={value}
                         className={cn(
                           isAnimating ? "animate-bounce" : "",
                           multiSelectVariants({ variant }),
+                          !isRemovable && "opacity-50 cursor-not-allowed",
                         )}
                         style={{ animationDuration: `${animation}s` }}
                       >
@@ -218,13 +230,15 @@ export const MultiSelect = React.forwardRef<
                           <IconComponent className="h-4 w-4 mr-2" />
                         )}
                         {option?.label}
-                        <XCircle
-                          className="ml-2 h-4 w-4 cursor-pointer"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            toggleOption(value);
-                          }}
-                        />
+                        {isRemovable && (
+                          <XCircle
+                            className="ml-2 h-4 w-4 cursor-pointer"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              toggleOption(value);
+                            }}
+                          />
+                        )}
                       </Badge>
                     );
                   })}
@@ -238,24 +252,24 @@ export const MultiSelect = React.forwardRef<
                       style={{ animationDuration: `${animation}s` }}
                     >
                       {`+ ${selectedValues.length - maxCount} more`}
-                      <XCircle
+                      {/* <XCircle
                         className="ml-2 h-4 w-4 cursor-pointer"
                         onClick={(event) => {
                           event.stopPropagation();
                           clearExtraOptions();
                         }}
-                      />
+                      /> */}
                     </Badge>
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <XIcon
+                  {/* <XIcon
                     className="h-4 mx-2 cursor-pointer text-muted-foreground"
                     onClick={(event) => {
                       event.stopPropagation();
                       handleClear();
                     }}
-                  />
+                  /> */}
                   <Separator
                     orientation="vertical"
                     className="flex min-h-6 h-full"
@@ -286,7 +300,7 @@ export const MultiSelect = React.forwardRef<
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>
-                <CommandItem
+                {/* <CommandItem
                   key="all"
                   onSelect={toggleAll}
                   className="cursor-pointer"
@@ -302,14 +316,24 @@ export const MultiSelect = React.forwardRef<
                     <CheckIcon className="h-4 w-4" />
                   </div>
                   <span>(Select All)</span>
-                </CommandItem>
+                </CommandItem> */}
                 {options.map((option) => {
                   const isSelected = selectedValues.includes(option.value);
+                  const isRemovable =
+                    !isSelected ||
+                    option.removable !== false ||
+                    !originalValue.includes(option.value);
                   return (
                     <CommandItem
                       key={option.value}
-                      onSelect={() => toggleOption(option.value)}
-                      className="cursor-pointer"
+                      onSelect={() => {
+                        if (isRemovable) toggleOption(option.value);
+                      }}
+                      className={cn(
+                        "cursor-pointer",
+                        !isRemovable &&
+                          "opacity-50 pointer-events-none cursor-not-allowed",
+                      )}
                     >
                       <div
                         className={cn(
@@ -332,7 +356,7 @@ export const MultiSelect = React.forwardRef<
               <CommandSeparator />
               <CommandGroup>
                 <div className="flex items-center justify-between">
-                  {selectedValues.length > 0 && (
+                  {/* {selectedValues.length > 0 && (
                     <>
                       <CommandItem
                         onSelect={handleClear}
@@ -345,7 +369,7 @@ export const MultiSelect = React.forwardRef<
                         className="flex min-h-6 h-full"
                       />
                     </>
-                  )}
+                  )} */}
                   <CommandItem
                     onSelect={() => setIsPopoverOpen(false)}
                     className="flex-1 justify-center cursor-pointer max-w-full"

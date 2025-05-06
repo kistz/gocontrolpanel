@@ -16,7 +16,8 @@ interface FormElementProps<TControl extends FieldValues> {
   description?: string;
   placeholder?: string;
   type?: string;
-  options?: { label: string; value: string }[];
+  options?: { label: string; value: string; removable?: boolean }[];
+  defaultValues?: string[];
   isRequired?: boolean;
   isDisabled?: boolean;
   isHidden?: boolean;
@@ -35,6 +36,7 @@ export default function FormElement<TControl extends FieldValues>({
   placeholder,
   type = "text",
   options,
+  defaultValues,
   isRequired = false,
   isDisabled = false,
   isHidden = false,
@@ -92,6 +94,7 @@ export default function FormElement<TControl extends FieldValues>({
                 label={label}
                 placeholder={placeholder}
                 options={options}
+                defaultValues={defaultValues}
                 isDisabled={isDisabled || isLoading}
                 isLoading={isLoading}
                 step={step}

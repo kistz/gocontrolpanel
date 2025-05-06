@@ -174,6 +174,21 @@ export async function updatePlayer(
 
     const db = await getDatabase();
     const collection = db.collection<DBPlayer>(collections.PLAYERS);
+
+    const existingPlayer = await collection.findOne({
+      _id: new ObjectId(playerId),
+    });
+    if (!existingPlayer) {
+      throw new ServerError(`Player not found`);
+    }
+
+    const isRemovingAdmin =
+      existingPlayer.roles?.includes("admin") && !data.roles?.includes("admin");
+
+    if (isRemovingAdmin) {
+      throw new ServerError("Cannot remove admin role");
+    }
+
     const result = await collection.updateOne(
       { _id: new ObjectId(playerId) },
       { $set: data },

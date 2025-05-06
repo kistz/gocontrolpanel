@@ -1,7 +1,7 @@
 "use server";
 import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
-import { withTimeout } from "./server-utils";
+import { withTimeout } from "./utils";
 
 let cachedClients: {
   [key: number]: GbxClient;

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { EditPlayerSchema, EditPlayerSchemaType } from "./edit-player-schema";
 
 const rolesOptions = [
-  { label: "Admin", value: "admin" },
+  { label: "Admin", value: "admin", removable: false },
   { label: "Moderator", value: "moderator" },
 ];
 
@@ -55,6 +55,7 @@ export default function EditPlayerForm({
           control={form.control}
           name={"roles"}
           options={rolesOptions}
+          defaultValues={player.roles}
           label="Roles"
           description="The roles of the player."
           placeholder="Select roles"

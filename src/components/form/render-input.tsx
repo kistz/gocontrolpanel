@@ -27,7 +27,8 @@ interface RenderInputProps<TControl extends FieldValues> {
   label?: string;
   description?: string;
   placeholder?: string;
-  options?: { label: string; value: string }[];
+  options?: { label: string; value: string; removable?: boolean }[];
+  defaultValues?: string[];
   isRequired?: boolean;
   isDisabled?: boolean;
   isLoading?: boolean;
@@ -43,6 +44,7 @@ export default function RenderInput<TControl extends FieldValues>({
   label,
   placeholder,
   options,
+  defaultValues,
   isDisabled = false,
   isLoading = false,
   step,
@@ -157,6 +159,7 @@ export default function RenderInput<TControl extends FieldValues>({
         <MultiSelect
           options={options || []}
           defaultValue={field.value}
+          originalValue={defaultValues}
           onValueChange={field.onChange}
           placeholder={placeholder}
           animation={2}
