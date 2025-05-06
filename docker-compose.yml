@@ -48,7 +48,7 @@ services:
   # This is a placeholder and should be replaced with your own configuration
   # --------------------------------------
   # dedicated-server:
-  #   image: evoesports/trackmania:latest
+  #   image: marijnregterschot/trackmania-plus:latest
   #   restart: unless-stopped
   #   ports:
   #     - 2350:2350/udp
@@ -57,6 +57,8 @@ services:
   #     TM_MASTERSERVER_LOGIN: ""
   #     TM_MASTERSERVER_PASSWORD: ""
   #     TM_SYSTEM_XMLRPC_ALLOWREMOTE: True
+  #   volumes:
+  #     - UserData:/server/UserData
 
   mongo:
     image: mongo:latest
