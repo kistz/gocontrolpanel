@@ -5,6 +5,7 @@ This repository provides a **Docker Compose** configuration to set up and run **
 - **GoControlPanel** service
 - **GBXConnector** service
 - **Dedicated Server** service (optional)
+- **File Management** service (optional)
 - **MongoDB** service
 - **Redis** service
 
@@ -106,6 +107,7 @@ This will start the following services:
 1. **GoControlPanel** on port `3000` (accessible at http://localhost:3000).
 2. **GBXConnector** on port `6980` (accessible at http://localhost:6980).
 3. **Dedicated Server** (if configured) on port `2350`.
+4. **File Management** (if configured) on port `3300`.
 4. **MongoDB** (for database storage).
 5. **Redis** (for caching).
 
@@ -157,6 +159,13 @@ This service runs a dedicated trackmania server. It is optional and can be confi
 - **Ports**: `2350:2350` (accessible at `http://localhost:2350`)
 - **Environment Variables**: `TM_MASTER_LOGIN`, `TM_MASTER_PASSWORD` (for server configuration)
 - **Volumes**: `UserData` (for persistent data)
+
+### **File Management** (`file-management`)
+
+This service handles file uploads and deletions for the application.
+
+- **Ports**: `3300:3300` (accessible at `http://localhost:3300`)
+- **Volumes**: `UserData` (to be mounted to the dedicated server for file management)
 
 ### **MongoDB** (`mongo`)
 

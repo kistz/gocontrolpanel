@@ -9,7 +9,7 @@ services:
         - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980 # Use the external URL for the frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
       MONGODB_URI: mongodb://gocontrol:GoControl123!@mongo:27017
       MONGODB_DB: gocontroller
@@ -33,13 +33,13 @@ services:
     image: marijnregterschot/gbxconnector:latest
     restart: unless-stopped
     ports:
-      - "6980:6980"
+      - 6980:6980
     environment:
       PORT: 6980
       CORS_ORIGINS: "http://localhost:3000"
       SERVER_RECONNECT_INTERVAL: 15
-      JWT_SECRET: ""
-      INTERNAL_API_KEY: "" # Same as the one in gocontrolpanel
+      JWT_SECRET:
+      INTERNAL_API_KEY:  # Same as the one in gocontrolpanel
       LOG_LEVEL: DEBUG
     volumes:
       - ./servers.json:/app/servers.json
@@ -54,11 +54,22 @@ services:
   #     - 2350:2350/udp
   #     - 2350:2350/tcp
   #   environment:
-  #     TM_MASTERSERVER_LOGIN: ""
-  #     TM_MASTERSERVER_PASSWORD: ""
+  #     TM_MASTERSERVER_LOGIN:
+  #     TM_MASTERSERVER_PASSWORD:
   #     TM_SYSTEM_XMLRPC_ALLOWREMOTE: True
   #   volumes:
   #     - UserData:/server/UserData
+
+  # Uncomment the following lines to run a file manager
+  # This is a placeholder and should be replaced with your own configuration
+  # ------------------------------------------------------
+  # filemanager:
+  #   image: marijnregterschot/trackmania-server-fm:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - 3300:3300/tcp
+  #   volumes:
+  #     - UserData:/app/UserData
 
   mongo:
     image: mongo:latest
@@ -78,3 +89,10 @@ services:
 volumes:
   mongo-data:
   redis-data:
+  # Uncomment the following lines to use a local directory for UserData
+  # UserData:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /path/to/your/UserData
+  #     o: bind
