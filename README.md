@@ -61,6 +61,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
     "description": "This is a local server for testing purposes.",
     "host": "localhost",
     "xmlrpcPort": 5000,
+    "fmHost": "localhost",
     "fmPort": 3300,
     "user": "SuperAdmin",
     "pass": "SuperAdmin"
@@ -70,6 +71,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
     "name": "Server 2",
     "host": "localhost",
     "xmlrpcPort": 5001,
+    "fmHost": "localhost",
     "fmPort": 3301,
     "user": "SuperAdmin",
     "pass": "SuperAdmin"
@@ -84,6 +86,8 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 - **description**: Short description of the server (optional).
 - **host**: The hostname or IP address of the server.
 - **xmlrpcPort**: The XML-RPC port of the server.
+- **fmHost**: The hostname or IP address of the File Management server.
+- **fmPort**: The port of the File Management server.
 - **user**: Username for XMLRPC authentication.
 - **pass**: Password for XMLRPC authentication.
 
@@ -134,7 +138,7 @@ docker-compose down --volumes
 
 This is the main service for controlling and managing your application. It connects to MongoDB for data storage and Redis for caching. It uses the environment variables listed earlier for configuration.
 
-> **Note:** The file management like uploading and deleting files is only possible with a server running the **[marijnregterschot/trackmania-plus](https://hub.docker.com/r/marijnregterschot/trackmania-plus)** image.
+> **Note:** The file management like uploading and deleting files is only possible if you have the `trackmania-server-filemanager` running next to a dedicated server. The volumes for the file manager are mounted to the dedicated server.
 
 - **Ports**: `3000:3000` (accessible at `http://localhost:3000`)
 - **Depends on**: `mongo`, `redis`

@@ -48,7 +48,7 @@ services:
   # This is a placeholder and should be replaced with your own configuration
   # --------------------------------------
   # dedicated-server:
-  #   image: marijnregterschot/trackmania-plus:latest
+  #   image: evoesports/trackmania:latest
   #   restart: unless-stopped
   #   ports:
   #     - 2350:2350/udp
