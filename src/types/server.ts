@@ -27,10 +27,10 @@ export interface Server {
   description?: string;
   host: string;
   xmlrpcPort: number;
-  fmHost?: string;
-  fmPort?: number;
   user: string;
   pass: string;
+  fmHost?: string;
+  fmPort?: number;
   isLocal: boolean;
   isConnected: boolean;
 }

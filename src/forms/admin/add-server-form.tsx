@@ -15,7 +15,6 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
     resolver: zodResolver(AddServerSchema),
     defaultValues: {
       name: "",
-      description: "",
       host: "",
       xmlrpcPort: 0,
       user: "",
@@ -104,6 +103,25 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           placeholder="Enter password"
           error={form.formState.errors.pass}
           isRequired
+        />
+
+        <FormElement
+          control={form.control}
+          name={"fmHost"}
+          label="Filemanager Host"
+          description="The host of the filemanager."
+          placeholder="Enter filemanager host"
+          error={form.formState.errors.fmHost}
+        />
+
+        <FormElement
+          control={form.control}
+          name={"fmPort"}
+          label="Filemanager Port"
+          description="The port of the filemanager."
+          placeholder="Enter filemanager port"
+          error={form.formState.errors.fmPort}
+          type="number"
         />
 
         <Button

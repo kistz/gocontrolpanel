@@ -95,25 +95,21 @@ export const createColumns = (
   },
   {
     id: "name",
-    cell: ({ data }) => (
-      <span className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-        {data.name}
-      </span>
-    ),
   },
   {
     id: "description",
-    cell: ({ data }) => (
-      <span className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-        {data.description}
-      </span>
-    ),
   },
   {
     id: "host",
   },
   {
     id: "xmlrpcPort",
+  },
+  {
+    id: "fmHost",
+  },
+  {
+    id: "fmPort",
   },
   {
     id: "actions",

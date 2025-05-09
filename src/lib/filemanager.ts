@@ -28,6 +28,8 @@ export async function syncFileManager(id: number): Promise<FileManager> {
     },
   });
 
+  console.log(res, server.fmHost, server.fmPort);
+
   const fileManager = {
     host: server.fmHost,
     port: server.fmPort,
