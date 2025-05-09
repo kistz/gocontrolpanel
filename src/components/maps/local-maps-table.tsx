@@ -12,8 +12,8 @@ export default function LocalMapsTable({ serverId }: { serverId: number }) {
 
   useEffect(() => {
     async function fetchLocalMaps() {
-      const { data: localMaps } = await getLocalMaps(serverId);
-      setData(localMaps);
+      const { data } = await getLocalMaps(serverId);
+      setData(data);
       setIsLoading(false);
     }
 
@@ -28,6 +28,7 @@ export default function LocalMapsTable({ serverId }: { serverId: number }) {
       columns={columns}
       isLoading={isLoading}
       filter={true}
+      pagination
     />
   );
 }

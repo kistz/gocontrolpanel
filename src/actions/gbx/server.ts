@@ -2,6 +2,7 @@
 
 import { ServerSettingsSchemaType } from "@/forms/server/settings/settings-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
+import { getFileManager } from "@/lib/filemanager";
 import { getGbxClient } from "@/lib/gbxclient";
 import { getFiles } from "@/lib/server-utils";
 import { LocalMapInfo } from "@/types/map";
@@ -115,58 +116,6 @@ export async function saveServerSettings(
   });
 }
 
-export async function getLocalScripts(
-  server: number,
-): Promise<ServerResponse<string[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const defaultScripts = [
-      "Trackmania/TM_TimeAttack_Online.Script.txt",
-      "Trackmania/TM_Laps_Online.Script.txt",
-      "Trackmania/TM_Rounds_Online.Script.txt",
-      "Trackmania/TM_Cup_Online.Script.txt",
-      "Trackmania/TM_Teams_Online.Script.txt",
-      "Trackmania/TM_Knockout_Online.Script.txt",
-      "Trackmania/Deprecated/TM_Champion_Online.Script.txt",
-      "Trackmania/TM_RoyalTimeAttack_Online.Script.txt",
-      "Trackmania/TM_StuntMulti_Online.Script.txt",
-      "Trackmania/TM_Platform_Online.Script.txt",
-      "TrackMania/TM_TMWC2023_Online.Script.txt",
-      "TrackMania/TM_TMWTTeams_Online.Script.txt",
-    ];
-
-    const servers = await getServers();
-
-    if (!servers.find((s) => s.id == server)?.isLocal) {
-      return defaultScripts;
-    }
-
-    try {
-      const client = await getGbxClient(server);
-      const userDataDirectory = await client.call("GameDataDirectory");
-
-      if (!userDataDirectory) {
-        throw new ServerError("Failed to get UserData directory");
-      }
-
-      const scriptsDirectory = userDataDirectory + "Scripts/Modes/";
-      const scripts = await getFiles(scriptsDirectory, /.*\.Script\.txt$/);
-
-      const validScripts = scripts
-        .map((script: string) => {
-          return script.replace(scriptsDirectory, "");
-        })
-        .filter((path) => path !== undefined);
-
-      const allScripts = [...validScripts, ...defaultScripts];
-
-      return [...new Set(allScripts)];
-    } catch (error) {
-      console.error("Error getting scripts:", error);
-      return defaultScripts;
-    }
-  });
-}
-
 export async function getLocalMaps(
   server: number,
 ): Promise<ServerResponse<LocalMapInfo[]>> {
@@ -177,23 +126,31 @@ export async function getLocalMaps(
     }
 
     const client = await getGbxClient(server);
-    const mapsDirectory = await client.call("GetMapsDirectory");
 
-    if (!mapsDirectory) {
-      throw new ServerError("Failed to get UserData directory");
+    const fileManager = await getFileManager(server);
+    if (!fileManager.health) {
+      throw new ServerError("Could not connect to file manager");
     }
 
-    const maps = await getFiles(mapsDirectory, /\.(Map|Challenge).*\.Gbx$/i);
+    const res = await fetch(`${fileManager.url}/maps`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    const validMaps = maps
-      .map((map: string) => {
-        return map.replace(mapsDirectory, "");
-      })
-      .filter((path) => path !== undefined);
+    if (res.status !== 200) {
+      throw new ServerError("Failed to get maps");
+    }
+
+    const maps = await res.json();
+    if (!maps) {
+      throw new ServerError("Failed to get maps");
+    }
 
     const mapInfoList: LocalMapInfo[] = [];
 
-    for (const map of validMaps) {
+    for (const map of maps) {
       try {
         const mapInfo = await client.call("GetMapInfo", map);
 
