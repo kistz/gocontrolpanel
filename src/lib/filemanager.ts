@@ -13,23 +13,14 @@ export async function syncFileManager(id: number): Promise<FileManager> {
     throw new Error(`Server ${id} not found`);
   }
 
-  if (!server.fmHost || !server.fmPort) {
+  if (!server.fmUrl) {
     return {
-      host: server.fmHost,
-      port: server.fmPort,
+      url: server.fmUrl,
       health: false,
     };
   }
 
-  let baseUrl = server.fmHost;
-
-  if (!/^https?:\/\//i.test(baseUrl)) {
-    baseUrl = `http://${baseUrl}`; // Default to http
-  }
-
-  const url = new URL(`/health`, `${baseUrl}:${server.fmPort}`);
-
-  const res = await fetch(url, {
+  const res = await fetch(`${server.fmUrl}/health`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -37,8 +28,7 @@ export async function syncFileManager(id: number): Promise<FileManager> {
   });
 
   const fileManager = {
-    host: server.fmHost,
-    port: server.fmPort,
+    url: server.fmUrl,
     health: res.status === 200,
   };
 

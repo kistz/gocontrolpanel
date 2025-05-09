@@ -26,8 +26,7 @@ export default function EditServerForm({
       xmlrpcPort: server.xmlrpcPort,
       user: server.user,
       pass: server.pass,
-      fmHost: server.fmHost,
-      fmPort: server.fmPort,
+      fmUrl: server.fmUrl,
     },
   });
 
@@ -116,21 +115,11 @@ export default function EditServerForm({
 
         <FormElement
           control={form.control}
-          name={"fmHost"}
-          label="Filemanager Host"
-          description="The host of the filemanager."
-          placeholder="Enter filemanager host"
-          error={form.formState.errors.fmHost}
-        />
-
-        <FormElement
-          control={form.control}
-          name={"fmPort"}
-          label="Filemanager Port"
-          description="The port of the filemanager."
-          placeholder="Enter filemanager port"
-          error={form.formState.errors.fmPort}
-          type="number"
+          name={"fmUrl"}
+          label="Filemanager url"
+          description="The url of the filemanager."
+          placeholder="Enter filemanager url"
+          error={form.formState.errors.fmUrl}
         />
 
         <Button

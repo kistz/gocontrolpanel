@@ -15,7 +15,7 @@ export async function getUserData(
     }
 
     const res = await fetch(
-      `${fileManager.host}:${fileManager.port}/UserData`,
+      `${fileManager.url}/UserData`,
       {
         method: "GET",
         headers: {

@@ -1,6 +1,5 @@
 export interface FileManager {
-  host?: string;
-  port?: number;
+  url?: string;
   health: boolean;
 }
 

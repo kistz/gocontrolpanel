@@ -9,11 +9,7 @@ export const AddServerSchema = z.object({
     .min(1, { message: "Port must be greater than 0" }),
   user: z.string().min(1, { message: "User is required" }),
   pass: z.string().min(1, { message: "Password is required" }),
-  fmHost: z.string().optional(),
-  fmPort: z.coerce
-    .number()
-    .min(1, { message: "Port must be greater than 0" })
-    .optional(),
+  fmUrl: z.string().optional(),
 });
 
 export type AddServerSchemaType = z.infer<typeof AddServerSchema>;

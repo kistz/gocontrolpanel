@@ -106,10 +106,7 @@ export const createColumns = (
     id: "xmlrpcPort",
   },
   {
-    id: "fmHost",
-  },
-  {
-    id: "fmPort",
+    id: "fmUrl",
   },
   {
     id: "actions",

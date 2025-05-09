@@ -7,11 +7,10 @@ import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AddServerSchema } from "./add-server-schema";
-import { EditServerSchemaType } from "./edit-server-schema";
+import { AddServerSchema, AddServerSchemaType } from "./add-server-schema";
 
 export default function AddServerForm({ callback }: { callback?: () => void }) {
-  const form = useForm<EditServerSchemaType>({
+  const form = useForm<AddServerSchemaType>({
     resolver: zodResolver(AddServerSchema),
     defaultValues: {
       name: "",
@@ -22,7 +21,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
     },
   });
 
-  async function onSubmit(values: EditServerSchemaType) {
+  async function onSubmit(values: AddServerSchemaType) {
     try {
       const { error } = await addServer(values);
       if (error) {
@@ -107,21 +106,11 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
 
         <FormElement
           control={form.control}
-          name={"fmHost"}
-          label="Filemanager Host"
-          description="The host of the filemanager."
-          placeholder="Enter filemanager host"
-          error={form.formState.errors.fmHost}
-        />
-
-        <FormElement
-          control={form.control}
-          name={"fmPort"}
-          label="Filemanager Port"
-          description="The port of the filemanager."
-          placeholder="Enter filemanager port"
-          error={form.formState.errors.fmPort}
-          type="number"
+          name={"fmUrl"}
+          label="Filemanager url"
+          description="The url of the filemanager."
+          placeholder="Enter filemanager url"
+          error={form.formState.errors.fmUrl}
         />
 
         <Button
