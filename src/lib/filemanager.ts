@@ -21,14 +21,20 @@ export async function syncFileManager(id: number): Promise<FileManager> {
     };
   }
 
-  const res = await fetch(`${server.fmHost}:${server.fmPort}/health`, {
+  let baseUrl = server.fmHost;
+
+  if (!/^https?:\/\//i.test(baseUrl)) {
+    baseUrl = `http://${baseUrl}`; // Default to http
+  }
+
+  const url = new URL(`/health`, `${baseUrl}:${server.fmPort}`);
+
+  const res = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-
-  console.log(res, server.fmHost, server.fmPort);
 
   const fileManager = {
     host: server.fmHost,
