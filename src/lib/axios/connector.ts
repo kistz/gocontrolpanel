@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from "./config";
+import config from "@/lib/config";
 
 export const axiosAuth = axios.create({
   baseURL: config.CONNECTOR_URL,

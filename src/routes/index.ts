@@ -9,6 +9,7 @@ export const routes = {
     settings: "/server/:id/settings",
     game: "/server/:id/game",
     maps: "/server/:id/maps",
+    files: "/server/:id/files",
   },
   admin: {
     players: "/admin/players",

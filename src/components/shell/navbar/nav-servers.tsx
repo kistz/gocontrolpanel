@@ -21,6 +21,7 @@ import { Server } from "@/types/server";
 import {
   IconAdjustmentsAlt,
   IconDeviceGamepad,
+  IconFileDescription,
   IconMap,
   IconServer,
 } from "@tabler/icons-react";
@@ -126,6 +127,17 @@ export default function NavServers() {
           }),
           icon: IconMap,
         },
+        ...(session?.user.roles.includes("admin")
+          ? [
+              {
+                name: "Files",
+                url: generatePath(routes.servers.files, {
+                  id: server.id,
+                }),
+                icon: IconFileDescription,
+              },
+            ]
+          : []),
       ],
     })),
   };

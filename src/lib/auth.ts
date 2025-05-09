@@ -13,8 +13,8 @@ import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
+import { axiosAuth } from "./axios/connector";
 import config from "./config";
-import { axiosAuth } from "./interceptor";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
