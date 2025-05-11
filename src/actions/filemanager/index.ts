@@ -39,6 +39,41 @@ export async function getUserData(
   });
 }
 
+export async function getRoute(
+  server: number,
+  path: string,
+): Promise<ServerResponse<FileEntry[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const fileManager = await getFileManager(server);
+    if (!fileManager.health) {
+      throw new ServerError("Could not connect to file manager");
+    }
+
+    const res = await fetch(fileManager.url + path, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.status !== 200) {
+      throw new ServerError("Failed to get files");
+    }
+
+    const data = await res.json();
+    if (!data) {
+      throw new ServerError("Failed to get files");
+    }
+
+    const parsedData = data.map((entry: any) => ({
+      ...entry,
+      lastModified: new Date(entry.lastModified),
+    }));
+
+    return parsedData;
+  });
+}
+
 export async function getScripts(
   server: number,
 ): Promise<ServerResponse<string[]>> {

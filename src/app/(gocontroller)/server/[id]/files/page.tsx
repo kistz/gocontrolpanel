@@ -1,16 +1,19 @@
-import { getUserData } from "@/actions/filemanager";
+import { getRoute } from "@/actions/filemanager";
 import FileCard from "@/components/filemanager/file-card";
 import FolderCard from "@/components/filemanager/folder-card";
 import { FileEntry } from "@/types/filemanager";
 
 export default async function ServerFilesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: number }>;
+  searchParams: Promise<{ path: string }>;
 }) {
   const { id } = await params;
+  const { path } = await searchParams;
 
-  const { data, error } = await getUserData(id);
+  const { data, error } = await getRoute(id, path || "/UserData");
 
   if (error) {
     return (
@@ -40,7 +43,11 @@ export default async function ServerFilesPage({
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
               {folders.map((fileEntry: FileEntry) => (
-                <FolderCard key={fileEntry.path} fileEntry={fileEntry} />
+                <FolderCard
+                  key={fileEntry.path}
+                  fileEntry={fileEntry}
+                  serverId={id}
+                />
               ))}
             </div>
           </>
