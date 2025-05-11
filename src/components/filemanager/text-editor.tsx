@@ -1,7 +1,7 @@
 "use client";
 
 import { saveFileText } from "@/actions/filemanager";
-import { getErrorMessage } from "@/lib/utils";
+import { generatePath, getErrorMessage } from "@/lib/utils";
 import { xml } from "@codemirror/lang-xml";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { useTheme } from "next-themes";
@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { routes } from "@/routes";
 
 export default function TextEditor({
   path,
@@ -27,7 +28,7 @@ export default function TextEditor({
 
   const handleCancel = () => {
     const parentPath = path.split("/").slice(0, -1).join("/");
-    router.push(`/server/${serverId}/files?path=${parentPath}`);
+    router.push(`${generatePath(routes.servers.files, { id: serverId })}?path=${parentPath}`);
   };
 
   const handleSave = async () => {
@@ -68,7 +69,7 @@ export default function TextEditor({
       opacity: 0.5,
     },
     "&dark .cm-activeLine": {
-      backgroundColor: "#111 !important",
+      backgroundColor: "#111",
     },
     "&dark .cm-selectionBackground": {
       backgroundColor: "#444 !important",

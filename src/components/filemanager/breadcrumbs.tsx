@@ -51,7 +51,7 @@ export default function FilesBreadcrumbs({
                         className="max-w-20 truncate md:max-w-none"
                       >
                         <Link
-                          href={`/server/${serverId}/files?path=${item.path}`}
+                          href={`${generatePath(routes.servers.files, { id: serverId })}?path=${item.path}`}
                         >
                           {item.label}
                         </Link>

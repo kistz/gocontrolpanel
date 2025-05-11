@@ -1,5 +1,6 @@
 "use client";
-import { formatBytes, formatTimeToAgo } from "@/lib/utils";
+import { formatBytes, formatTimeToAgo, generatePath } from "@/lib/utils";
+import { routes } from "@/routes";
 import { FileEntry } from "@/types/filemanager";
 import { IconFile } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
@@ -14,7 +15,9 @@ export default function FileCard({
   const router = useRouter();
 
   const handleDoubleClick = () => {
-    router.push(`/server/${serverId}/files/editor?path=${fileEntry.path}`);
+    router.push(
+      `${generatePath(routes.servers.editor, { id: serverId })}?path=${fileEntry.path}`,
+    );
   };
 
   return (
@@ -28,7 +31,7 @@ export default function FileCard({
         <p className="text-sm text-muted-foreground">
           {formatBytes(fileEntry.size || 0, 2)}
         </p>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground" suppressHydrationWarning>
           {fileEntry.lastModified
             ? formatTimeToAgo(fileEntry.lastModified)
             : "No last modified date"}
