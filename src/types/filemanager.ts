@@ -10,3 +10,8 @@ export interface FileEntry {
   size?: number;
   lastModified?: Date;
 }
+
+export interface File {
+  value: string | ArrayBuffer;
+  type: string;
+}

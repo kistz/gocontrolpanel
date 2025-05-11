@@ -2,7 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getFileManager } from "@/lib/filemanager";
-import { FileEntry } from "@/types/filemanager";
+import { FileEntry, File } from "@/types/filemanager";
 import { ServerError, ServerResponse } from "@/types/responses";
 
 export async function getUserData(
@@ -84,7 +84,7 @@ export async function getRoute(
 export async function getFile(
   server: number,
   path: string,
-): Promise<ServerResponse<string>> {
+): Promise<ServerResponse<File>> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
     if (!fileManager.health) {
@@ -102,13 +102,21 @@ export async function getFile(
       throw new ServerError("Failed to get files");
     }
 
-    const data = await res.text();
+    const contentType = res.headers.get("Content-Type");
+    const fileType = contentType ? contentType.split("/")[0] : "text";
+
+    const data = fileType === "image"
+      ? await res.arrayBuffer()
+      : await res.text();
 
     if (!data) {
       throw new ServerError("Failed to get files");
     }
 
-    return data;
+    return {
+      value: data,
+      type: fileType,
+    };
   });
 }
 
