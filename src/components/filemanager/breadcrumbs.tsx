@@ -28,12 +28,14 @@ export default function FilesBreadcrumbs({
     <Breadcrumb className={className}>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink
-            href={generatePath(routes.servers.files, {
-              id: serverId,
-            })}
-          >
-            <IconHome size={24} />
+          <BreadcrumbLink asChild>
+            <Link
+              href={generatePath(routes.servers.files, {
+                id: serverId,
+              })}
+            >
+              <IconHome size={24} />
+            </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         {crumbs.length > 0 && (
@@ -48,14 +50,16 @@ export default function FilesBreadcrumbs({
                         asChild
                         className="max-w-20 truncate md:max-w-none"
                       >
-                        <Link href={`/server/${serverId}/files?path=${item.path}`}>{item.label}</Link>
+                        <Link
+                          href={`/server/${serverId}/files?path=${item.path}`}
+                        >
+                          {item.label}
+                        </Link>
                       </BreadcrumbLink>
                     </>
                   ) : (
                     <BreadcrumbPage
-                      className={cn(
-                        "max-w-20 truncate md:max-w-none",
-                      )}
+                      className={cn("max-w-20 truncate md:max-w-none")}
                     >
                       {item.label}
                     </BreadcrumbPage>
