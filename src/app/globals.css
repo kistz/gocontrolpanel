@@ -3,6 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Editor styling */
+.cm-editor {
+  background-color: var(--color-background) !important;
+  color: var(--color-foreground) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 14px !important;
+}
+
 /* Scrollbar styling */
 /* For Firefox */
 * {

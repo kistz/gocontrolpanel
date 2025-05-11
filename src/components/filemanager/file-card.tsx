@@ -19,7 +19,7 @@ export default function FileCard({
 
   return (
     <div
-      className="flex w-full p-2 gap-2 border rounded-lg items-center"
+      className="flex w-full p-2 gap-2 border rounded-lg items-center cursor-pointer select-none"
       onDoubleClick={handleDoubleClick}
     >
       <IconFile size={48} className="min-w-12" />

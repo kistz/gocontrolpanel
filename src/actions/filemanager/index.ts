@@ -112,6 +112,31 @@ export async function getFile(
   });
 }
 
+export async function saveFileText(
+  server: number,
+  path: string,
+  text: string,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const fileManager = await getFileManager(server);
+    if (!fileManager.health) {
+      throw new ServerError("Could not connect to file manager");
+    }
+
+    const res = await fetch(fileManager.url + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(text),
+    });
+
+    if (res.status !== 200) {
+      throw new ServerError("Failed to save file");
+    }
+  });
+}
+
 export async function getScripts(
   server: number,
 ): Promise<ServerResponse<string[]>> {
