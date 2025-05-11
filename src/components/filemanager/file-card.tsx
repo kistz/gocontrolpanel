@@ -1,10 +1,27 @@
+"use client";
 import { formatBytes, formatTimeToAgo } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 import { IconFile } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 
-export default function FileCard({ fileEntry }: { fileEntry: FileEntry }) {
+export default function FileCard({
+  fileEntry,
+  serverId,
+}: {
+  fileEntry: FileEntry;
+  serverId: number;
+}) {
+  const router = useRouter();
+
+  const handleDoubleClick = () => {
+    router.push(`/server/${serverId}/files/editor?path=${fileEntry.path}`);
+  };
+
   return (
-    <div className="flex w-full p-2 gap-2 border rounded-lg items-center">
+    <div
+      className="flex w-full p-2 gap-2 border rounded-lg items-center"
+      onDoubleClick={handleDoubleClick}
+    >
       <IconFile size={48} className="min-w-12" />
       <div className="flex flex-col min-w-0">
         <h1 className="text-md font-bold truncate">{fileEntry.name}</h1>

@@ -60,7 +60,14 @@ export async function getRoute(
       throw new ServerError("Failed to get files");
     }
 
-    const data = await res.json();
+    let data: FileEntry[] | undefined;
+
+    try {
+      data = await res.json();
+    } catch {
+      throw new ServerError("Route is a file");
+    }
+
     if (!data) {
       throw new ServerError("Failed to get files");
     }
@@ -71,6 +78,37 @@ export async function getRoute(
     }));
 
     return parsedData;
+  });
+}
+
+export async function getFile(
+  server: number,
+  path: string,
+): Promise<ServerResponse<string>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const fileManager = await getFileManager(server);
+    if (!fileManager.health) {
+      throw new ServerError("Could not connect to file manager");
+    }
+
+    const res = await fetch(fileManager.url + path, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.status !== 200) {
+      throw new ServerError("Failed to get files");
+    }
+
+    const data = await res.text();
+
+    if (!data) {
+      throw new ServerError("Failed to get files");
+    }
+
+    return data;
   });
 }
 

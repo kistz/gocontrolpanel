@@ -2,7 +2,6 @@ import { getRoute } from "@/actions/filemanager";
 import FilesBreadcrumbs from "@/components/filemanager/breadcrumbs";
 import FileCard from "@/components/filemanager/file-card";
 import FolderCard from "@/components/filemanager/folder-card";
-import Breadcrumbs, { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 
@@ -31,7 +30,10 @@ export default async function ServerFilesPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <FilesBreadcrumbs crumbs={pathToBreadcrumbs(path).slice(1)} serverId={id} />
+      <FilesBreadcrumbs
+        crumbs={pathToBreadcrumbs(path).slice(1)}
+        serverId={id}
+      />
 
       {data.length === 0 && (
         <div className="flex items-center justify-center w-full h-full">
@@ -64,7 +66,11 @@ export default async function ServerFilesPage({
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
               {files.map((fileEntry: FileEntry) => (
-                <FileCard key={fileEntry.path} fileEntry={fileEntry} />
+                <FileCard
+                  key={fileEntry.path}
+                  fileEntry={fileEntry}
+                  serverId={id}
+                />
               ))}
             </div>
           </>
