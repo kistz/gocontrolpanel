@@ -30,7 +30,7 @@ export default function FilesBreadcrumbs({
         <BreadcrumbItem>
           <BreadcrumbLink
             href={generatePath(routes.servers.files, {
-              serverId: serverId,
+              id: serverId,
             })}
           >
             <IconHome size={24} />

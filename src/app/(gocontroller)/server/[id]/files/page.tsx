@@ -33,6 +33,12 @@ export default async function ServerFilesPage({
     <div className="flex flex-col gap-6">
       <FilesBreadcrumbs crumbs={pathToBreadcrumbs(path).slice(1)} serverId={id} />
 
+      {data.length === 0 && (
+        <div className="flex items-center justify-center w-full h-full">
+          <h1 className="text-2xl font-bold">No files found.</h1>
+        </div>
+      )}
+
       <div className="flex flex-col gap-2">
         {folders.length > 0 && (
           <>
