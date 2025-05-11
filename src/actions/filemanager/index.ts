@@ -49,7 +49,6 @@ export async function getRoute(
       throw new ServerError("Could not connect to file manager");
     }
 
-    console.log("Fetching files from", fileManager.url + path);
     const res = await fetch(fileManager.url + path, {
       method: "GET",
       headers: {

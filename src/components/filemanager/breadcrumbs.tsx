@@ -44,7 +44,7 @@ export default function FilesBreadcrumbs({
             {crumbs.map((item, index) => (
               <React.Fragment key={index}>
                 <BreadcrumbItem>
-                  {item.path ? (
+                  {item.path && index !== crumbs.length - 1 ? (
                     <>
                       <BreadcrumbLink
                         asChild
