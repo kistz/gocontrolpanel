@@ -34,7 +34,7 @@ export default function FilesBreadcrumbs({
                 id: serverId,
               })}
             >
-              <IconHome size={24} />
+              <IconHome size={20} />
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
