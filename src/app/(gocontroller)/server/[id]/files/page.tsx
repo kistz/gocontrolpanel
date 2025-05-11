@@ -35,7 +35,7 @@ export default async function ServerFilesPage({
       <div className="flex flex-col gap-2">
         {folders.length > 0 && (
           <>
-            <div className="flex w-full border-b-2">
+            <div className="flex w-full border-b-1">
               <h1 className="font-bold">Folders</h1>
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
@@ -48,7 +48,7 @@ export default async function ServerFilesPage({
 
         {files.length > 0 && (
           <>
-            <div className="flex w-full border-b-2">
+            <div className="flex w-full border-b-1">
               <h1 className="font-bold">Files</h1>
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">

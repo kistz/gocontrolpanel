@@ -30,7 +30,12 @@ export async function getUserData(
       throw new ServerError("Failed to get files");
     }
 
-    return data;
+    const parsedData = data.map((entry: any) => ({
+      ...entry,
+      lastModified: new Date(entry.lastModified),
+    }));
+
+    return parsedData;
   });
 }
 

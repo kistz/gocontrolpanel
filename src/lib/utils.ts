@@ -81,10 +81,48 @@ export function useCurrentServerId(pathname: string): number | null {
   return null;
 }
 
-
-export async function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage = "Operation timed out"): Promise<T> {
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  errorMessage = "Operation timed out",
+): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error(errorMessage)), ms)
+    setTimeout(() => reject(new Error(errorMessage)), ms),
   );
   return Promise.race([promise, timeout]);
+}
+
+export function formatBytes(bytes: number, decimals = 2): string {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+
+export function formatTimeToAgo(date: Date): string {
+  const now = new Date();
+  const diff = (date.getTime() - now.getTime()) / 1000; // in seconds
+
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+  const ranges: { [K: string]: number } = {
+    year: 60 * 60 * 24 * 365, // 365 days
+    month: 60 * 60 * 24 * 30, // 30 days
+    week: 60 * 60 * 24 * 7, // 7 days
+    day: 60 * 60 * 24, // 24 hours
+    hour: 60 * 60, // 60 minutes
+    minute: 60, // 60 seconds
+    second: 1, // 1 second
+  };
+
+  for (const [unit, secondsInUnit] of Object.entries(ranges)) {
+    const delta = diff / secondsInUnit;
+    if (Math.abs(delta) >= 1 || unit === "second") {
+      return rtf.format(Math.round(delta), unit as Intl.RelativeTimeFormatUnit);
+    }
+  }
+
+  return "just now";
 }

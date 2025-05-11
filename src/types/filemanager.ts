@@ -8,4 +8,5 @@ export interface FileEntry {
   path: string;
   isDir: boolean;
   size?: number;
+  lastModified?: Date;
 }

@@ -127,7 +127,7 @@ export default function NavServers() {
           }),
           icon: IconMap,
         },
-        ...(session?.user.roles.includes("admin")
+        ...(session?.user.roles.includes("admin") && server.fmUrl
           ? [
               {
                 name: "Files",
