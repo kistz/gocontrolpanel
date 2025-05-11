@@ -51,7 +51,7 @@ export default function DndListRow<TData>({
           {column.cell ? (
             createElement(column.cell, { data: row, serverId })
           ) : (
-            <span className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm">
+            <span className="truncate text-sm">
               {row[column.id as keyof TData] as string}
             </span>
           )}

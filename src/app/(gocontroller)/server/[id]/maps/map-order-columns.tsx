@@ -92,7 +92,7 @@ export const createColumns = (
     id: "name",
     cell: ({ data }) => (
       <span
-        className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+        className="truncate"
         dangerouslySetInnerHTML={{ __html: parseTmTags(data.name) }}
       />
     ),
@@ -101,7 +101,7 @@ export const createColumns = (
     id: "authorNickname",
     cell: ({ data }) => (
       <span
-        className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+        className="truncate"
         dangerouslySetInnerHTML={{ __html: parseTmTags(data.authorNickname) }}
       />
     ),

@@ -111,14 +111,14 @@ export default function CarouselMapCard({
         )}
         <div className="flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40">
           <h3
-            className="overflow-hidden overflow-ellipsis text-nowrap text-lg font-semibold text-white"
+            className="truncate text-lg font-semibold text-white"
             dangerouslySetInnerHTML={{ __html: parseTmTags(map.name) }}
           ></h3>
 
           <div className="flex items-center gap-2">
             <IconUser className="!size-5 flex-shrink-0" />
             <span
-              className="text-sm overflow-hidden overflow-ellipsis max-w-[150px]"
+              className="text-sm truncate"
               dangerouslySetInnerHTML={{
                 __html: parseTmTags(map.authorNickname),
               }}
