@@ -1,6 +1,9 @@
 import { getRoute } from "@/actions/filemanager";
+import FilesBreadcrumbs from "@/components/filemanager/breadcrumbs";
 import FileCard from "@/components/filemanager/file-card";
 import FolderCard from "@/components/filemanager/folder-card";
+import Breadcrumbs, { TBreadcrumb } from "@/components/shell/breadcrumbs";
+import { pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 
 export default async function ServerFilesPage({
@@ -28,12 +31,7 @@ export default async function ServerFilesPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Manage Server Files</h1>
-        <h4 className="text-muted-foreground">
-          Manage the files of the server.
-        </h4>
-      </div>
+      <FilesBreadcrumbs crumbs={pathToBreadcrumbs(path).slice(1)} serverId={id} />
 
       <div className="flex flex-col gap-2">
         {folders.length > 0 && (

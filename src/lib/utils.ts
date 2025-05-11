@@ -1,3 +1,4 @@
+import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { routes } from "@/routes";
 import { ServerError } from "@/types/responses";
 import { clsx, type ClassValue } from "clsx";
@@ -125,4 +126,24 @@ export function formatTimeToAgo(date: Date): string {
   }
 
   return "just now";
+}
+
+export function pathToBreadcrumbs(path?: string): TBreadcrumb[] {
+  if (!path) {
+    return [];
+  }
+
+  const segments = path.split("/").filter(Boolean);
+  const crumbs: TBreadcrumb[] = [];
+  let currentPath = "";
+
+  for (let i = 0; i < segments.length; i++) {
+    currentPath += "/" + segments[i];
+    crumbs.push({
+      label: segments[i],
+      path: currentPath,
+    });
+  }
+
+  return crumbs;
 }
