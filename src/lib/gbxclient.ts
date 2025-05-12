@@ -3,7 +3,7 @@ import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
 
-let cachedClients: {
+const cachedClients: {
   [key: number]: GbxClient;
 } = {};
 

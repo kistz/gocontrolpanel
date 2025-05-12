@@ -1,7 +1,7 @@
 import { getServers } from "@/actions/gbxconnector/servers";
 import { FileManager } from "@/types/filemanager";
 
-let cachedFileManagers: {
+const cachedFileManagers: {
   [key: number]: FileManager;
 } = {};
 

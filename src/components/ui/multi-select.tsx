@@ -166,30 +166,30 @@ export const MultiSelect = React.forwardRef<
       onValueChange(newSelectedValues);
     };
 
-    const handleClear = () => {
-      setSelectedValues([]);
-      onValueChange([]);
-    };
+    // const handleClear = () => {
+    //   setSelectedValues([]);
+    //   onValueChange([]);
+    // };
 
     const handleTogglePopover = () => {
       setIsPopoverOpen((prev) => !prev);
     };
 
-    const clearExtraOptions = () => {
-      const newSelectedValues = selectedValues.slice(0, maxCount);
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
-    };
+    // const clearExtraOptions = () => {
+    //   const newSelectedValues = selectedValues.slice(0, maxCount);
+    //   setSelectedValues(newSelectedValues);
+    //   onValueChange(newSelectedValues);
+    // };
 
-    const toggleAll = () => {
-      if (selectedValues.length === options.length) {
-        handleClear();
-      } else {
-        const allValues = options.map((option) => option.value);
-        setSelectedValues(allValues);
-        onValueChange(allValues);
-      }
-    };
+    // const toggleAll = () => {
+    //   if (selectedValues.length === options.length) {
+    //     handleClear();
+    //   } else {
+    //     const allValues = options.map((option) => option.value);
+    //     setSelectedValues(allValues);
+    //     onValueChange(allValues);
+    //   }
+    // };
 
     return (
       <Popover
