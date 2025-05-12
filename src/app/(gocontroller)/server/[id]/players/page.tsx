@@ -1,3 +1,4 @@
+import BanlistList from "@/components/players/banlist-list";
 import BlacklistList from "@/components/players/blacklist-list";
 import GuestlistList from "@/components/players/guestlist-list";
 import PlayerList from "@/components/players/player-list";
@@ -28,6 +29,9 @@ export default async function ServerPlayersPage({
 
         <TabsContent value="players" className="flex flex-col gap-6">
           <PlayerList serverId={id} />
+        </TabsContent>
+        <TabsContent value="banlist" className="flex flex-col gap-6">
+          <BanlistList serverId={id} />
         </TabsContent>
         <TabsContent value="blacklist" className="flex flex-col gap-6">
           <BlacklistList serverId={id} />
