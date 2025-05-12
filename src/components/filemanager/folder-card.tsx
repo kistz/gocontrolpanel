@@ -8,9 +8,11 @@ import { useRouter } from "next/navigation";
 export default function FolderCard({
   fileEntry,
   serverId,
+  onClick,
 }: {
   fileEntry: FileEntry;
   serverId: number;
+  onClick: () => void;
 }) {
   const router = useRouter();
 
@@ -24,6 +26,7 @@ export default function FolderCard({
     <div
       className="flex w-full p-2 gap-2 border rounded-lg items-center cursor-pointer select-none"
       onDoubleClick={handleDoubleClick}
+      onClick={onClick}
     >
       <IconFolder size={48} className="min-w-12" />
       <div className="flex flex-col min-w-0">

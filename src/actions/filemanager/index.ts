@@ -148,6 +148,30 @@ export async function saveFileText(
   });
 }
 
+export async function deleteEntry(
+  server: number,
+  path: string,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const fileManager = await getFileManager(server);
+    if (!fileManager.health) {
+      throw new ServerError("Could not connect to file manager");
+    }
+
+    const res = await fetch(fileManager.url + "/delete", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([path]),
+    });
+
+    if (res.status !== 200) {
+      throw new ServerError("Failed to delete item");
+    }
+  });
+}
+
 export async function getScripts(
   server: number,
 ): Promise<ServerResponse<string[]>> {
