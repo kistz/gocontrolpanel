@@ -3,9 +3,11 @@
 import { deleteEntry } from "@/actions/filemanager";
 import { getErrorMessage, pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
-import { IconTrash } from "@tabler/icons-react";
+import { IconTrash, IconUpload } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import ConfirmModal from "../modals/confirm-modal";
+import { Button } from "../ui/button";
 import FilesBreadcrumbs from "./breadcrumbs";
 import FileCard from "./file-card";
 import FolderCard from "./folder-card";
@@ -25,6 +27,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
   );
 
   const [selectedItem, setSelectedItem] = useState<FileEntry | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setFolders(data.filter((fileEntry: FileEntry) => fileEntry.isDir));
@@ -59,24 +62,51 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     }
   };
 
+  const handleSelect = (fileEntry: FileEntry) => {
+    if (selectedItem?.path === fileEntry.path) {
+      setSelectedItem(null);
+    } else {
+      setSelectedItem(fileEntry);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
           serverId={serverId}
         />
 
-        {selectedItem && (
-          <div className="flex items-center gap-2">
-            <IconTrash
-              size={20}
-              color="#9d4042"
-              className="cursor-pointer"
-              onClick={handleDelete}
-            />
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {selectedItem && (
+            <>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => setIsDeleting(true)}
+              >
+                <IconTrash size={20} />
+                <span className="sr-only">Delete</span>
+              </Button>
+
+              <ConfirmModal
+                isOpen={isDeleting}
+                onClose={() => setIsDeleting(false)}
+                onConfirm={handleDelete}
+                title="Delete item"
+                description={`Are you sure you want to delete ${selectedItem?.name}?`}
+                confirmText="Delete"
+                cancelText="Cancel"
+              />
+            </>
+          )}
+
+          <Button size="icon">
+            <IconUpload />
+            <span className="sr-only">Upload</span>
+          </Button>
+        </div>
       </div>
 
       {data.length === 0 && (
@@ -99,7 +129,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
                   serverId={serverId}
                   active={selectedItem?.path === fileEntry.path}
                   onClick={() => {
-                    setSelectedItem(fileEntry);
+                    handleSelect(fileEntry);
                   }}
                 />
               ))}
@@ -120,7 +150,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
                   serverId={serverId}
                   active={selectedItem?.path === fileEntry.path}
                   onClick={() => {
-                    setSelectedItem(fileEntry);
+                    handleSelect(fileEntry);
                   }}
                 />
               ))}
