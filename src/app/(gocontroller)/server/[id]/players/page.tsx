@@ -1,3 +1,5 @@
+import { getBlacklist } from "@/actions/gbx/player";
+import BlacklistList from "@/components/players/blacklist-list";
 import PlayerList from "@/components/players/player-list";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -8,6 +10,8 @@ export default async function ServerPlayersPage({
   params: Promise<{ id: number }>;
 }) {
   const { id } = await params;
+
+  const { data: blacklist } = await getBlacklist(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,7 +46,7 @@ export default async function ServerPlayersPage({
           <PlayerList serverId={id} />
         </TabsContent>
         <TabsContent value="blacklist" className="flex flex-col gap-6">
-          blacklist
+          <BlacklistList serverId={id} defaultBlacklist={blacklist} />
         </TabsContent>
         <TabsContent value="guestlist" className="flex flex-col gap-6">
           guestlist

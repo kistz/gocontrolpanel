@@ -2,6 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
+import { PlayerInfo } from "@/types/player";
 import { ServerResponse } from "@/types/responses";
 
 export async function banPlayer(
@@ -75,5 +76,28 @@ export async function forceSpectator(
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverId);
     await client.call("ForceSpectator", login, status);
+  });
+}
+
+export async function getBlacklist(
+  serverId: number,
+): Promise<ServerResponse<PlayerInfo[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const client = await getGbxClient(serverId);
+    const blacklist = await client.call("GetBlackList", 1000, 0);
+
+    let playerList: PlayerInfo[] = [];
+    for (const player of blacklist) {
+      const playerInfo = await client.call("GetPlayerInfo", player.Login);
+      playerList.push({
+        nickName: playerInfo.NickName,
+        login: playerInfo.Login,
+        playerId: playerInfo.PlayerId,
+        spectatorStatus: playerInfo.SpectatorStatus,
+        teamId: playerInfo.TeamId,
+      });
+    }
+
+    return playerList;
   });
 }

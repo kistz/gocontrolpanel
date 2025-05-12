@@ -84,9 +84,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description: `Player ${player.nickName} has been banned.`,
           });
         } catch (error) {
-          toast.error(getErrorMessage(error));
-        } finally {
-          setConfirmBan(false);
+          toast.error("Error banning player", {
+            description: getErrorMessage(error),
+          });
         }
       };
 
@@ -101,9 +101,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description: `Player ${player.nickName} has been blacklisted.`,
           });
         } catch (error) {
-          toast.error(getErrorMessage(error));
-        } finally {
-          setConfirmBlacklist(false);
+          toast.error("Error blacklisting player", {
+            description: getErrorMessage(error),
+          });
         }
       };
 
@@ -118,9 +118,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description: `Player ${player.nickName} has been added as a guest.`,
           });
         } catch (error) {
-          toast.error(getErrorMessage(error));
-        } finally {
-          setConfirmAddGuest(false);
+          toast.error("Error adding player as guest", {
+            description: getErrorMessage(error),
+          });
         }
       };
 
@@ -135,9 +135,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description: `Player ${player.nickName} has been removed from the guest list.`,
           });
         } catch (error) {
-          toast.error(getErrorMessage(error));
-        } finally {
-          setConfirmRemoveGuest(false);
+          toast.error("Error removing player from guest list", {
+            description: getErrorMessage(error),
+          });
         }
       };
 
@@ -156,9 +156,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description: `Player ${player.nickName} has been kicked.`,
           });
         } catch (error) {
-          toast.error(getErrorMessage(error));
-        } finally {
-          setConfirmKick(false);
+          toast.error("Error kicking player", {
+            description: getErrorMessage(error),
+          });
         }
       };
 
@@ -173,9 +173,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description: `Player ${player.nickName} has been forced to spectator.`,
           });
         } catch (error) {
-          toast.error(getErrorMessage(error));
-        } finally {
-          setConfirmForceSpectator(false);
+          toast.error("Error forcing player to spectator", {
+            description: getErrorMessage(error),
+          });
         }
       };
 
