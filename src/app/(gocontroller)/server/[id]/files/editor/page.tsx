@@ -26,7 +26,7 @@ export default async function EditorPage({
 
   if (data.type === "image" || data.type === "video") {
     return (
-      <div>
+      <>
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
           serverId={id}
@@ -50,7 +50,7 @@ export default async function EditorPage({
             </video>
           )}
         </div>
-      </div>
+      </>
     );
   }
 
