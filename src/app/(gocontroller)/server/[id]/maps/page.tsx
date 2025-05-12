@@ -1,10 +1,10 @@
 import { getMapList } from "@/actions/database/map";
 import { getJukebox } from "@/actions/gbx/map";
-import { getServers } from "@/actions/gbxconnector/servers";
 import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getFileManager } from "@/lib/filemanager";
 
 export default async function ServerMapsPage({
   params,
@@ -15,8 +15,7 @@ export default async function ServerMapsPage({
 
   const { data: maps } = await getMapList(id);
   const { data: jukebox } = await getJukebox(id);
-  const servers = await getServers();
-  const server = servers.find((server) => server.id === id);
+  const filemanager = await getFileManager(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,7 +43,7 @@ export default async function ServerMapsPage({
         <TabsContent value="maps" className="flex flex-col gap-6">
           <MapOrder mapList={maps} serverId={id} />
 
-          {server?.fmUrl && <LocalMapsTable serverId={id} />}
+          {filemanager.health && <LocalMapsTable serverId={id} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">
