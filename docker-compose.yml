@@ -39,7 +39,7 @@ services:
       CORS_ORIGINS: "http://localhost:3000"
       SERVER_RECONNECT_INTERVAL: 15
       JWT_SECRET:
-      INTERNAL_API_KEY:  # Same as the one in gocontrolpanel
+      INTERNAL_API_KEY: # Same as the one in gocontrolpanel
       LOG_LEVEL: DEBUG
     volumes:
       - ./servers.json:/app/servers.json
@@ -67,7 +67,7 @@ services:
   #   image: marijnregterschot/trackmania-server-fm:latest
   #   restart: unless-stopped
   #   ports:
-  #     - 3300:3300/tcp
+  #     #- 3300:3300/tcp (Only expose if you need to access the file manager externally)
   #   volumes:
   #     - UserData:/app/UserData
 
