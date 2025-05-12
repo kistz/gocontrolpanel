@@ -66,7 +66,7 @@ export default function MapCarousel({
     }
 
     const socket = new WebSocket(
-      `${baseUrl}/ws/listeners/${serverId}?token=${session.jwt}`,
+      `${baseUrl}/ws/map/${serverId}?token=${session.jwt}`,
     );
     wsRef.current = socket;
 
