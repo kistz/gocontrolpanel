@@ -164,7 +164,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
           <div className="flex flex-col items-center justify-center w-full h-full">
             <div className="flex flex-col items-center justify-center w-full h-full rounded-lg shadow-lg">
               <IconUpload size={92} />
-              
+
               <h1 className="text-2xl font-bold mt-4">Drop files here</h1>
               <p className="text-lg">to upload</p>
             </div>

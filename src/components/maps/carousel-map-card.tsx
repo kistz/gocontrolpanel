@@ -10,12 +10,12 @@ import {
   IconRotateClockwise,
   IconUser,
 } from "@tabler/icons-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import { parseTmTags, stripTmTags } from "tmtags";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import Image from "next/image";
 
 interface CarouselMapCardProps {
   map: Map;

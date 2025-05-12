@@ -13,9 +13,9 @@ import { JukeboxMap, Map } from "@/types/map";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
+import DndListHeaders from "../dnd/dnd-list-headers";
 import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
-import DndListHeaders from "../dnd/dnd-list-headers";
 
 interface JukeboxProps {
   serverId: number;

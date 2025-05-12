@@ -16,7 +16,10 @@ export default function EditPlayerModal({
   };
 
   return (
-    <Card onClick={stopPropagation} className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto">
+    <Card
+      onClick={stopPropagation}
+      className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
+    >
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Edit {data.nickName}</h1>
         <IconX

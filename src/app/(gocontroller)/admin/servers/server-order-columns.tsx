@@ -85,9 +85,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
   );
 });
 
-export const createColumns = (
-  refetch: () => void,
-): DndListColumn<Server>[] => [
+export const createColumns = (refetch: () => void): DndListColumn<Server>[] => [
   {
     id: "id",
     cell: () => <></>,
@@ -110,8 +108,6 @@ export const createColumns = (
   },
   {
     id: "actions",
-    cell: ({ data }) => (
-      <ServerActionsCell server={data} refetch={refetch} />
-    ),
+    cell: ({ data }) => <ServerActionsCell server={data} refetch={refetch} />,
   },
 ];
