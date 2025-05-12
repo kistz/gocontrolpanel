@@ -26,10 +26,11 @@ export default async function EditorPage({
 
   if (data.type === "image" || data.type === "video") {
     return (
-      <>
+      <div className="flex flex-col w-full h-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
           serverId={id}
+          className="h-9 flex items-center"
         />
 
         <div className="flex items-center justify-center h-full pt-4">
@@ -38,10 +39,10 @@ export default async function EditorPage({
               src={`data:image/png;base64,${arrayBufferToBase64(data.value as ArrayBuffer)}`}
               alt={path.split("/").pop() || "Image"}
               fill
-              className="object-contain static! max-h-[calc(100vh-10rem)]"
+              className="object-contain static! max-h-[calc(100vh-11rem)]"
             />
           ) : (
-            <video controls className="max-h-[calc(100vh-10rem)] max-w-full">
+            <video controls className="max-h-[calc(100vh-11rem)] max-w-full">
               <source
                 src={`data:video/mp4;base64,${arrayBufferToBase64(data.value as ArrayBuffer)}`}
                 type="video/mp4"
@@ -50,7 +51,7 @@ export default async function EditorPage({
             </video>
           )}
         </div>
-      </>
+      </div>
     );
   }
 
