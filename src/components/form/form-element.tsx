@@ -12,7 +12,7 @@ import RenderInput from "./render-input";
 interface FormElementProps<TControl extends FieldValues> {
   control: Control<TControl>;
   name: Path<TControl>;
-  label: string;
+  label?: string;
   description?: string;
   placeholder?: string;
   type?: string;
@@ -74,17 +74,27 @@ export default function FormElement<TControl extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <div>
-            <FormLabel className="text-sm flex items-end" data-error={false}>
-              {label}{" "}
-              {isRequired && (
-                <span className="text-xs text-muted-foreground">
-                  (Required)
-                </span>
-              )}
-            </FormLabel>
-            {description && <FormDescription>{description}</FormDescription>}
-          </div>
+          {label ||
+            (description && (
+              <div>
+                {label && (
+                  <FormLabel
+                    className="text-sm flex items-end"
+                    data-error={false}
+                  >
+                    {label}{" "}
+                    {isRequired && (
+                      <span className="text-xs text-muted-foreground">
+                        (Required)
+                      </span>
+                    )}
+                  </FormLabel>
+                )}
+                {description && (
+                  <FormDescription>{description}</FormDescription>
+                )}
+              </div>
+            ))}
           <FormControl>
             <div className="flex gap-2">
               <RenderInput

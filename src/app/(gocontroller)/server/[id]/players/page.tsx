@@ -27,16 +27,16 @@ export default async function ServerPlayersPage({
           <TabsTrigger value="guestlist">Guestlist</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="players" className="flex flex-col gap-6">
+        <TabsContent value="players" className="flex flex-col gap-2">
           <PlayerList serverId={id} />
         </TabsContent>
         <TabsContent value="banlist" className="flex flex-col gap-2">
           <BanlistList serverId={id} />
         </TabsContent>
-        <TabsContent value="blacklist" className="flex flex-col gap-6">
+        <TabsContent value="blacklist" className="flex flex-col gap-2">
           <BlacklistList serverId={id} />
         </TabsContent>
-        <TabsContent value="guestlist" className="flex flex-col gap-6">
+        <TabsContent value="guestlist" className="flex flex-col gap-2">
           <GuestlistList serverId={id} />
         </TabsContent>
       </Tabs>
