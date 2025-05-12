@@ -30,7 +30,7 @@ export default async function ServerPlayersPage({
         <TabsContent value="players" className="flex flex-col gap-6">
           <PlayerList serverId={id} />
         </TabsContent>
-        <TabsContent value="banlist" className="flex flex-col gap-6">
+        <TabsContent value="banlist" className="flex flex-col gap-2">
           <BanlistList serverId={id} />
         </TabsContent>
         <TabsContent value="blacklist" className="flex flex-col gap-6">
