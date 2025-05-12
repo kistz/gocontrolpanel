@@ -111,14 +111,24 @@ export async function getGuestlist(
 
     const playerList: PlayerInfo[] = [];
     for (const player of guestlist) {
-      const playerInfo = await client.call("GetPlayerInfo", player.Login);
-      playerList.push({
-        nickName: playerInfo.NickName,
-        login: playerInfo.Login,
-        playerId: playerInfo.PlayerId,
-        spectatorStatus: playerInfo.SpectatorStatus,
-        teamId: playerInfo.TeamId,
-      });
+      try {
+        const playerInfo = await client.call("GetPlayerInfo", player.Login);
+        playerList.push({
+          nickName: playerInfo.NickName,
+          login: playerInfo.Login,
+          playerId: playerInfo.PlayerId,
+          spectatorStatus: playerInfo.SpectatorStatus,
+          teamId: playerInfo.TeamId,
+        });
+      } catch (error) {
+        playerList.push({
+          nickName: "-",
+          login: player.Login,
+          playerId: 0,
+          spectatorStatus: 0,
+          teamId: 0,
+        });
+      }
     }
 
     return playerList;

@@ -1,7 +1,7 @@
 "use client";
 
 import { getGuestlist } from "@/actions/gbx/player";
-import { createColumns } from "@/app/(gocontroller)/server/[id]/players/blacklist-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[id]/players/guestlist-columns";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
 import { useEffect, useState } from "react";
