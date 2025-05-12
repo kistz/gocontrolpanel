@@ -101,3 +101,26 @@ export async function getBlacklist(
     return playerList;
   });
 }
+
+export async function getGuestlist(
+  serverId: number,
+): Promise<ServerResponse<PlayerInfo[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const client = await getGbxClient(serverId);
+    const guestlist = await client.call("GetGuestList", 1000, 0);
+
+    let playerList: PlayerInfo[] = [];
+    for (const player of guestlist) {
+      const playerInfo = await client.call("GetPlayerInfo", player.Login);
+      playerList.push({
+        nickName: playerInfo.NickName,
+        login: playerInfo.Login,
+        playerId: playerInfo.PlayerId,
+        spectatorStatus: playerInfo.SpectatorStatus,
+        teamId: playerInfo.TeamId,
+      });
+    }
+
+    return playerList;
+  });
+}

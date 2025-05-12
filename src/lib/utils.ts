@@ -22,7 +22,7 @@ export function getErrorMessage(error: unknown): string {
   const errorMessage =
     error instanceof Error || error instanceof ServerError
       ? error.message
-      : "Unknown error";
+      : "Something went wrong";
 
   const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
   return match ? match[1] : errorMessage;

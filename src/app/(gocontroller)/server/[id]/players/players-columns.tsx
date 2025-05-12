@@ -251,6 +251,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description={`Are you sure you want to add ${player.nickName} as a guest?`}
             confirmText="Add Guest"
             cancelText="Cancel"
+            variant="default"
           />
 
           <ConfirmModal
@@ -281,6 +282,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             description={`Are you sure you want to force ${player.nickName} to spectator?`}
             confirmText="Force Spectator"
             cancelText="Cancel"
+            variant="default"
           />
         </div>
       );

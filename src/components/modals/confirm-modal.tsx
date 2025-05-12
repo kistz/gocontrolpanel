@@ -11,6 +11,13 @@ interface ConfirmModalProps {
   description: string;
   confirmText: string;
   cancelText: string;
+  variant?:
+    | "destructive"
+    | "default"
+    | "link"
+    | "outline"
+    | "secondary"
+    | "ghost";
 }
 
 export default function ConfirmModal({
@@ -21,6 +28,7 @@ export default function ConfirmModal({
   description,
   confirmText,
   cancelText,
+  variant = "destructive",
 }: ConfirmModalProps) {
   // Close on ESC key
   useEffect(() => {
@@ -54,7 +62,7 @@ export default function ConfirmModal({
             {cancelText}
           </Button>
           <Button
-            variant="destructive"
+            variant={variant}
             onClick={() => {
               onConfirm();
               onClose();

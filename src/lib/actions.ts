@@ -1,5 +1,5 @@
 "use server";
-import { ServerError, ServerResponse } from "@/types/responses";
+import { ServerResponse } from "@/types/responses";
 import { Session } from "next-auth";
 import { withAuth } from "./auth";
 import { getErrorMessage } from "./utils";
@@ -13,16 +13,11 @@ export async function doServerAction<T>(
       data: result,
     };
   } catch (error) {
-    console.error("Error during server action with auth:", error);
-
-    const errorMessage =
-      error instanceof ServerError
-        ? getErrorMessage(error)
-        : "Something went wrong";
+    console.error("Error during server action", error);
 
     return {
       data: undefined as T,
-      error: errorMessage,
+      error: getErrorMessage(error),
     };
   }
 }
@@ -50,14 +45,9 @@ export async function doServerActionWithAuth<T>(
   } catch (error) {
     console.error("Error during server action with auth:", error);
 
-    const errorMessage =
-      error instanceof ServerError
-        ? getErrorMessage(error)
-        : "Something went wrong";
-
     return {
       data: undefined as T,
-      error: errorMessage,
+      error: getErrorMessage(error),
     };
   }
 }
