@@ -16,7 +16,7 @@ export default async function ServerMapsPage({
   const { data: maps } = await getMapList(id);
   const { data: jukebox } = await getJukebox(id);
   const servers = await getServers();
-  const isLocal = servers.find((s) => s.id == id)?.isLocal;
+  const server = servers.find((server) => server.id === id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,7 +44,7 @@ export default async function ServerMapsPage({
         <TabsContent value="maps" className="flex flex-col gap-6">
           <MapOrder mapList={maps} serverId={id} />
 
-          {isLocal && <LocalMapsTable serverId={id} />}
+          {server?.fmUrl && <LocalMapsTable serverId={id} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">

@@ -4,11 +4,9 @@ import { ServerSettingsSchemaType } from "@/forms/server/settings/settings-schem
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getFileManager } from "@/lib/filemanager";
 import { getGbxClient } from "@/lib/gbxclient";
-import { getFiles } from "@/lib/server-utils";
 import { LocalMapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
 import path from "path";
-import { getServers } from "../gbxconnector/servers";
 
 export async function getServerSettings(
   server: number,
@@ -120,11 +118,6 @@ export async function getLocalMaps(
   server: number,
 ): Promise<ServerResponse<LocalMapInfo[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const servers = await getServers();
-    if (!servers.find((s) => s.id == server)?.isLocal) {
-      return [];
-    }
-
     const client = await getGbxClient(server);
 
     const fileManager = await getFileManager(server);

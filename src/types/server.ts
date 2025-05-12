@@ -30,6 +30,5 @@ export interface Server {
   user: string;
   pass: string;
   fmUrl?: string;
-  isLocal: boolean;
   isConnected: boolean;
 }
