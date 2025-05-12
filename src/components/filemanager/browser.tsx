@@ -1,10 +1,10 @@
 "use client";
 
-import { deleteEntry } from "@/actions/filemanager";
+import { deleteEntry, uploadFiles } from "@/actions/filemanager";
 import { getErrorMessage, pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 import { IconTrash, IconUpload } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
 import { Button } from "../ui/button";
@@ -33,6 +33,46 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     setFolders(data.filter((fileEntry: FileEntry) => fileEntry.isDir));
     setFiles(data.filter((fileEntry: FileEntry) => !fileEntry.isDir));
   }, [data]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+      formData.append("paths[]", path);
+    }
+
+    try {
+      const { data, error } = await uploadFiles(serverId, formData);
+      if (error) {
+        throw new Error(error);
+      }
+
+      setFolders((prev) => [
+        ...prev,
+        ...data.filter((fileEntry: FileEntry) => fileEntry.isDir),
+      ]);
+
+      setFiles((prev) => [
+        ...prev,
+        ...data.filter((fileEntry: FileEntry) => !fileEntry.isDir),
+      ]);
+
+      toast.success("Files uploaded successfully");
+    } catch (error) {
+      toast.error("Failed to upload files", {
+        description: getErrorMessage(error),
+      });
+    }
+  };
+
+  const triggerUpload = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleDelete = async () => {
     if (selectedItem) {
@@ -102,10 +142,18 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
             </>
           )}
 
-          <Button size="icon">
+          <Button size="icon" onClick={triggerUpload}>
             <IconUpload />
             <span className="sr-only">Upload</span>
           </Button>
+
+          <input
+            ref={fileInputRef}
+            multiple
+            type="file"
+            onChange={handleUpload}
+            className="hidden"
+          />
         </div>
       </div>
 

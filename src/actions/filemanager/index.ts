@@ -172,6 +172,39 @@ export async function deleteEntry(
   });
 }
 
+export async function uploadFiles(
+  server: number,
+  formData: FormData,
+): Promise<ServerResponse<FileEntry[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const fileManager = await getFileManager(server);
+    if (!fileManager.health) {
+      throw new ServerError("Could not connect to file manager");
+    }
+
+    const res = await fetch(fileManager.url + "/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.status !== 200) {
+      throw new ServerError("Failed to upload files");
+    }
+
+    const data = await res.json();
+    if (!data) {
+      throw new ServerError("Failed to upload files");
+    }
+
+    const parsedData = data.map((entry: any) => ({
+      ...entry,
+      lastModified: new Date(entry.lastModified),
+    }));
+
+    return parsedData;
+  });
+}
+
 export async function getScripts(
   server: number,
 ): Promise<ServerResponse<string[]>> {
