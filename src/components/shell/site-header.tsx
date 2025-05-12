@@ -58,8 +58,8 @@ export function SiteHeader() {
     transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)
     sticky! z-10 top-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40 rounded-t-xl"
       >
-        <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
-          <SidebarTrigger className="-ml-1" />
+        <div className="flex w-full items-center gap-1 px-2 lg:gap-2">
+          <SidebarTrigger />
           <Separator
             orientation="vertical"
             className="mx-2 data-[orientation=vertical]:h-4"

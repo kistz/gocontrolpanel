@@ -1,10 +1,8 @@
 import { getFile } from "@/actions/filemanager";
+import FilesBreadcrumbs from "@/components/filemanager/breadcrumbs";
 import TextEditor from "@/components/filemanager/text-editor";
-import { Button } from "@/components/ui/button";
-import { arrayBufferToBase64, generatePath } from "@/lib/utils";
-import { routes } from "@/routes";
+import { arrayBufferToBase64, pathToBreadcrumbs } from "@/lib/utils";
 import Image from "next/image";
-import Link from "next/link";
 
 export default async function EditorPage({
   params,
@@ -26,23 +24,31 @@ export default async function EditorPage({
     );
   }
 
-  if (data.type === "image") {
+  if (data.type === "image" || data.type === "video") {
     return (
       <div>
-        <Link
-          href={`${generatePath(routes.servers.files, { id })}?path=${path.split("/").slice(0, -1).join("/")}`}
-        >
-          <Button variant="outline" className="absolute top-16 left-4">
-            Back
-          </Button>
-        </Link>
-        <div className="flex items-center justify-center h-full">
-          <Image
-            src={`data:image/png;base64,${arrayBufferToBase64(data.value as ArrayBuffer)}`}
-            alt={path.split("/").pop() || "Image"}
-            fill
-            className="object-contain static! max-h-[calc(100vh-8rem)]"
-          />
+        <FilesBreadcrumbs
+          crumbs={pathToBreadcrumbs(path).slice(1)}
+          serverId={id}
+        />
+
+        <div className="flex items-center justify-center h-full pt-4">
+          {data.type === "image" ? (
+            <Image
+              src={`data:image/png;base64,${arrayBufferToBase64(data.value as ArrayBuffer)}`}
+              alt={path.split("/").pop() || "Image"}
+              fill
+              className="object-contain static! max-h-[calc(100vh-10rem)]"
+            />
+          ) : (
+            <video controls className="max-h-[calc(100vh-10rem)] max-w-full">
+              <source
+                src={`data:video/mp4;base64,${arrayBufferToBase64(data.value as ArrayBuffer)}`}
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          )}
         </div>
       </div>
     );

@@ -2,7 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getFileManager } from "@/lib/filemanager";
-import { FileEntry, File } from "@/types/filemanager";
+import { ContentType, File, FileEntry } from "@/types/filemanager";
 import { ServerError, ServerResponse } from "@/types/responses";
 
 export async function getUserData(
@@ -103,11 +103,14 @@ export async function getFile(
     }
 
     const contentType = res.headers.get("Content-Type");
-    const fileType = contentType ? contentType.split("/")[0] : "text";
+    const fileType: ContentType = contentType
+      ? (contentType.split("/")[0] as ContentType)
+      : "text";
 
-    const data = fileType === "image"
-      ? await res.arrayBuffer()
-      : await res.text();
+    const data =
+      fileType === "image" || fileType === "video"
+        ? await res.arrayBuffer()
+        : await res.text();
 
     if (!data) {
       throw new ServerError("Failed to get files");

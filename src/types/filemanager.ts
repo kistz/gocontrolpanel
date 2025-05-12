@@ -13,5 +13,7 @@ export interface FileEntry {
 
 export interface File {
   value: string | ArrayBuffer;
-  type: string;
+  type: ContentType;
 }
+
+export type ContentType = "image" | "text" | "video";
