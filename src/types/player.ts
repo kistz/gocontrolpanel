@@ -23,3 +23,11 @@ export interface Player {
   updatedAt: Date;
   deletedAt?: Date;
 }
+
+export interface PlayerInfo {
+  login: string;
+  nickName: string;
+  playerId: number;
+  spectatorStatus: number;
+  teamId: number;
+}

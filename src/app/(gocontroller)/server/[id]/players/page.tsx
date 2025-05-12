@@ -1,3 +1,4 @@
+import PlayerList from "@/components/players/player-list";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 
@@ -38,7 +39,7 @@ export default async function ServerPlayersPage({
         </TabsList>
 
         <TabsContent value="players" className="flex flex-col gap-6">
-          players
+          <PlayerList serverId={id} />
         </TabsContent>
         <TabsContent value="blacklist" className="flex flex-col gap-6">
           blacklist
