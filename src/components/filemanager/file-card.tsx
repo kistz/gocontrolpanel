@@ -1,5 +1,5 @@
 "use client";
-import { formatBytes, formatTimeToAgo, generatePath } from "@/lib/utils";
+import { cn, formatBytes, formatTimeToAgo, generatePath } from "@/lib/utils";
 import { routes } from "@/routes";
 import { FileEntry } from "@/types/filemanager";
 import { IconFile } from "@tabler/icons-react";
@@ -9,10 +9,12 @@ export default function FileCard({
   fileEntry,
   serverId,
   onClick,
+  active,
 }: {
   fileEntry: FileEntry;
   serverId: number;
-  onClick: () => void;
+  onClick?: () => void;
+  active?: boolean;
 }) {
   const router = useRouter();
 
@@ -24,7 +26,10 @@ export default function FileCard({
 
   return (
     <div
-      className="flex w-full p-2 gap-2 border rounded-lg items-center cursor-pointer select-none"
+      className={cn(
+        "flex w-full p-2 gap-2 border rounded-lg items-center cursor-pointer select-none",
+        active && "border-primary",
+      )}
       onDoubleClick={handleDoubleClick}
       onClick={onClick}
     >

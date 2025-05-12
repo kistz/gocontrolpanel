@@ -4,7 +4,7 @@ import { deleteEntry } from "@/actions/filemanager";
 import { getErrorMessage, pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 import { IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import FilesBreadcrumbs from "./breadcrumbs";
 import FileCard from "./file-card";
@@ -26,6 +26,11 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
 
   const [selectedItem, setSelectedItem] = useState<FileEntry | null>(null);
 
+  useEffect(() => {
+    setFolders(data.filter((fileEntry: FileEntry) => fileEntry.isDir));
+    setFiles(data.filter((fileEntry: FileEntry) => !fileEntry.isDir));
+  }, [data]);
+
   const handleDelete = async () => {
     if (selectedItem) {
       try {
@@ -43,6 +48,9 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
         );
 
         setSelectedItem(null);
+        toast.success("Item deleted successfully", {
+          description: `Deleted ${selectedItem.name}`,
+        });
       } catch (error) {
         toast.error("Failed to delete item", {
           description: getErrorMessage(error),
@@ -89,6 +97,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
                   key={fileEntry.path}
                   fileEntry={fileEntry}
                   serverId={serverId}
+                  active={selectedItem?.path === fileEntry.path}
                   onClick={() => {
                     setSelectedItem(fileEntry);
                   }}
@@ -109,6 +118,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
                   key={fileEntry.path}
                   fileEntry={fileEntry}
                   serverId={serverId}
+                  active={selectedItem?.path === fileEntry.path}
                   onClick={() => {
                     setSelectedItem(fileEntry);
                   }}
