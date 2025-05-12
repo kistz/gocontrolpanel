@@ -29,7 +29,7 @@ export default function ServerOrder({ servers }: { servers: Server[] }) {
       setDefaultServers(data);
       setServerOrder(data);
 
-      toast.success("Server order saved successfully");
+      toast.success("Server order successfully saved");
     } catch (error) {
       toast.error("Error saving server order", {
         description: getErrorMessage(error),

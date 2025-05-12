@@ -37,7 +37,7 @@ export default function EditPlayerForm({
       if (error) {
         throw new Error(error);
       }
-      toast.success("Player updated successfully");
+      toast.success("Player successfully updated");
       if (callback) {
         callback();
       }

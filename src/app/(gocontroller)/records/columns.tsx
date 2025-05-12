@@ -74,7 +74,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Record>[] => [
               throw new Error(error);
             }
             refetch();
-            toast.success("Record deleted successfully");
+            toast.success("Record successfully deleted");
           } catch (error) {
             toast.error("Error deleting record", {
               description: getErrorMessage(error),

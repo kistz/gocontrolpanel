@@ -51,7 +51,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
       }
       setDefaultJukebox(jukeboxOrder);
 
-      toast.success("Jukebox saved successfully");
+      toast.success("Jukebox successfully saved");
     } catch (error) {
       toast.error("Error saving jukebox", {
         description: getErrorMessage(error),
@@ -72,7 +72,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
       }
       setJukeboxOrder((prev) => [...prev, newMap]);
       setDefaultJukebox((prev) => [...prev, newMap]);
-      toast.success("Map added to jukebox successfully");
+      toast.success("Map successfully added to jukebox");
     } catch (error) {
       toast.error("Error adding map to jukebox", {
         description: getErrorMessage(error),
@@ -88,7 +88,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
       }
       setJukeboxOrder([]);
       setDefaultJukebox([]);
-      toast.success("Jukebox cleared successfully");
+      toast.success("Jukebox successfully cleared");
     } catch (error) {
       toast.error("Error clearing jukebox", {
         description: getErrorMessage(error),

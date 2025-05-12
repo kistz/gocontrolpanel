@@ -32,7 +32,7 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
       if (error) {
         throw new Error(error);
       }
-      toast.success("Settings saved successfully");
+      toast.success("Settings successfully saved");
     } catch (error) {
       toast.error("Failed to save settings", {
         description: getErrorMessage(error),

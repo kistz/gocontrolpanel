@@ -27,7 +27,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
       if (error) {
         throw new Error(error);
       }
-      toast.success("Server added successfully");
+      toast.success("Server successfully added");
       if (callback) {
         callback();
       }

@@ -46,7 +46,7 @@ export default function ModeScriptSettingsForm({
         if (error) {
           throw new Error(error);
         }
-        toast.success("Mode Script Settings updated successfully");
+        toast.success("Mode Script Settings successfully updated");
       } catch (error) {
         toast.error("Failed to update Mode Script Settings", {
           description: getErrorMessage(error),

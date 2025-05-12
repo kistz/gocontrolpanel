@@ -30,7 +30,7 @@ export default function ShowOpponentsForm({
       if (error) {
         throw new Error(error);
       }
-      toast.success("Show Opponents updated successfully");
+      toast.success("Show Opponents successfully updated");
     } catch (error) {
       toast.error("Failed to update Show Opponents", {
         description: getErrorMessage(error),

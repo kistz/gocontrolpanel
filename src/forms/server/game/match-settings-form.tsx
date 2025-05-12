@@ -29,7 +29,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
       if (error) {
         throw new Error(error);
       }
-      toast.success("Match settings loaded successfully");
+      toast.success("Match settings successfully loaded");
     } catch (error) {
       toast.error("Failed to load match settings", {
         description: getErrorMessage(error),

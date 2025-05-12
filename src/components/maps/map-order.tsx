@@ -44,7 +44,7 @@ export default function MapOrder({
 
       setDefaultMapList(mapOrder);
 
-      toast.success("Map order saved successfully");
+      toast.success("Map order successfully saved");
     } catch (error) {
       toast.error("Error saving map order", {
         description: getErrorMessage(error),

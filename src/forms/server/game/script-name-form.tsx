@@ -32,7 +32,7 @@ export default function ScriptNameForm({
       if (error) {
         throw new Error(error);
       }
-      toast.success("Script loaded successfully");
+      toast.success("Script successfully loaded");
     } catch (error) {
       toast.error("Failed to update Script Name", {
         description: getErrorMessage(error),

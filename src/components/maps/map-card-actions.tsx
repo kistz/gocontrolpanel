@@ -124,7 +124,7 @@ export default function MapCardActions({
             return;
           }
 
-          toast.success("Map deleted successfully");
+          toast.success("Map successfully deleted");
           if (refetch) {
             refetch();
           }

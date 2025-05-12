@@ -80,7 +80,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             throw new Error(error);
           }
 
-          toast.success("Player banned successfully", {
+          toast.success("Player successfully banned", {
             description: `Player ${player.nickName} has been banned.`,
           });
         } catch (error) {
@@ -97,7 +97,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             throw new Error(error);
           }
 
-          toast.success("Player blacklisted successfully", {
+          toast.success("Player successfully blacklisted", {
             description: `Player ${player.nickName} has been blacklisted.`,
           });
         } catch (error) {
@@ -114,7 +114,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             throw new Error(error);
           }
 
-          toast.success("Player added as guest successfully", {
+          toast.success("Player successfully added as guest", {
             description: `Player ${player.nickName} has been added as a guest.`,
           });
         } catch (error) {
@@ -131,7 +131,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             throw new Error(error);
           }
 
-          toast.success("Player removed from guest list successfully", {
+          toast.success("Player successfully removed from guest list", {
             description: `Player ${player.nickName} has been removed from the guest list.`,
           });
         } catch (error) {
@@ -152,7 +152,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             throw new Error(error);
           }
 
-          toast.success("Player kicked successfully", {
+          toast.success("Player successfully kicked", {
             description: `Player ${player.nickName} has been kicked.`,
           });
         } catch (error) {
@@ -169,7 +169,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
             throw new Error(error);
           }
 
-          toast.success("Player forced to spectator successfully", {
+          toast.success("Player successfully forced to spectator", {
             description: `Player ${player.nickName} has been forced to spectator.`,
           });
         } catch (error) {

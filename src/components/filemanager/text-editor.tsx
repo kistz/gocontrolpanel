@@ -52,7 +52,7 @@ export default function TextEditor({
         throw new Error("Failed to save file");
       }
 
-      toast.success("File saved successfully", {
+      toast.success("File successfully saved", {
         description: "Your changes have been saved.",
       });
     } catch (error) {

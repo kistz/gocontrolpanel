@@ -84,7 +84,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
           ...data.filter((fileEntry: FileEntry) => !fileEntry.isDir),
         ]);
 
-        toast.success("Files uploaded successfully");
+        toast.success("Files successfully uploaded");
       } catch (error) {
         toast.error("Failed to upload files", {
           description: getErrorMessage(error),
@@ -111,7 +111,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
         );
 
         setSelectedItem(null);
-        toast.success("Item deleted successfully", {
+        toast.success("Item successfully deleted", {
           description: `Deleted ${selectedItem.name}`,
         });
       } catch (error) {

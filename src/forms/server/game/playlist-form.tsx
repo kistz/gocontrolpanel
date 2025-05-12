@@ -26,7 +26,7 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
       if (error) {
         throw new Error(error);
       }
-      toast.success("Playlist appended successfully");
+      toast.success("Playlist successfully appended");
     } catch (error) {
       toast.error("Failed to append playlist", {
         description: getErrorMessage(error),
@@ -42,7 +42,7 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
       if (error) {
         throw new Error(error);
       }
-      toast.success("Playlist inserted successfully");
+      toast.success("Playlist successfully inserted");
     } catch (error) {
       toast.error("Failed to insert playlist", {
         description: getErrorMessage(error),

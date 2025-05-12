@@ -87,7 +87,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
               throw new Error(error);
             }
             refetch();
-            toast.success("Player deleted successfully");
+            toast.success("Player successfully deleted");
           } catch (error) {
             toast.error("Error deleting player", {
               description: getErrorMessage(error),

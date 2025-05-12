@@ -63,7 +63,7 @@ export const createColumns = (serverId: number): ColumnDef<LocalMapInfo>[] => [
             if (error) {
               throw new Error(error);
             }
-            toast.success("Map added successfully");
+            toast.success("Map successfully added");
           } catch (error) {
             toast.error("Error adding map", {
               description: getErrorMessage(error),

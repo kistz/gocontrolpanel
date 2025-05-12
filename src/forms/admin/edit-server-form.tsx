@@ -36,7 +36,7 @@ export default function EditServerForm({
       if (error) {
         throw new Error(error);
       }
-      toast.success("Server updated successfully");
+      toast.success("Server successfully updated");
       if (callback) {
         callback();
       }
