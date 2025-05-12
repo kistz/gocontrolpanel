@@ -11,6 +11,7 @@ export const routes = {
     maps: "/server/:id/maps",
     files: "/server/:id/files",
     editor: "/server/:id/files/editor",
+    players: "/server/:id/players",
   },
   admin: {
     players: "/admin/players",
@@ -96,6 +97,31 @@ export const breadCrumbs: {
       },
       {
         label: "Files",
+      },
+    ],
+  },
+  {
+    path: routes.servers.editor,
+    breadCrumbs: [
+      {
+        label: "Server",
+      },
+      {
+        label: "Files",
+      },
+      {
+        label: "Editor",
+      },
+    ],
+  },
+  {
+    path: routes.servers.players,
+    breadCrumbs: [
+      {
+        label: "Server",
+      },
+      {
+        label: "Players",
       },
     ],
   },

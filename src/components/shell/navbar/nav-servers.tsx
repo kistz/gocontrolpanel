@@ -24,6 +24,7 @@ import {
   IconFileDescription,
   IconMap,
   IconServer,
+  IconUsers,
 } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -126,6 +127,13 @@ export default function NavServers() {
             id: server.id,
           }),
           icon: IconMap,
+        },
+        {
+          name: "Players",
+          url: generatePath(routes.servers.players, {
+            id: server.id,
+          }),
+          icon: IconUsers,
         },
         ...(session?.user.roles.includes("admin") && server.fmUrl
           ? [
