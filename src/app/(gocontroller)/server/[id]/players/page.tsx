@@ -20,24 +20,10 @@ export default async function ServerPlayersPage({
 
       <Tabs defaultValue="players" className="w-full">
         <TabsList className="w-full">
-          <TabsTrigger
-            value="players"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Players
-          </TabsTrigger>
-          <TabsTrigger
-            value="blacklist"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Blacklist
-          </TabsTrigger>
-          <TabsTrigger
-            value="guestlist"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Guestlist
-          </TabsTrigger>
+          <TabsTrigger value="players">Players</TabsTrigger>
+          <TabsTrigger value="banlist">Banlist</TabsTrigger>
+          <TabsTrigger value="blacklist">Blacklist</TabsTrigger>
+          <TabsTrigger value="guestlist">Guestlist</TabsTrigger>
         </TabsList>
 
         <TabsContent value="players" className="flex flex-col gap-6">

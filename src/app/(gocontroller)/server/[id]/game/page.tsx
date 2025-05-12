@@ -47,18 +47,8 @@ export default async function ServerGamePage({
 
       <Tabs defaultValue="map" className="w-full">
         <TabsList className="w-full">
-          <TabsTrigger
-            value="map"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Map Rotation
-          </TabsTrigger>
-          <TabsTrigger
-            value="script"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Script Settings
-          </TabsTrigger>
+          <TabsTrigger value="map">Map Rotation</TabsTrigger>
+          <TabsTrigger value="script">Script Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="map" className="flex flex-col gap-6">

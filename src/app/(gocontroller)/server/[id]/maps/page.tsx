@@ -27,18 +27,8 @@ export default async function ServerMapsPage({
       </div>
       <Tabs defaultValue="maps" className="w-full">
         <TabsList className="w-full">
-          <TabsTrigger
-            value="maps"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Server Maps
-          </TabsTrigger>
-          <TabsTrigger
-            value="jukebox"
-            className="cursor-pointer data-[state=active]:bg-white dark:data-[state=active]:bg-black"
-          >
-            Jukebox
-          </TabsTrigger>
+          <TabsTrigger value="maps">Server Maps</TabsTrigger>
+          <TabsTrigger value="jukebox">Jukebox</TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
           <MapOrder mapList={maps} serverId={id} />
