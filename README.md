@@ -62,8 +62,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
     "description": "This is a local server for testing purposes.",
     "host": "localhost",
     "xmlrpcPort": 5000,
-    "fmHost": "localhost",
-    "fmPort": 3300,
+    "fmUrl": "http://localhost:3300",
     "user": "SuperAdmin",
     "pass": "SuperAdmin"
   },
@@ -72,8 +71,6 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
     "name": "Server 2",
     "host": "localhost",
     "xmlrpcPort": 5001,
-    "fmHost": "localhost",
-    "fmPort": 3301,
     "user": "SuperAdmin",
     "pass": "SuperAdmin"
   }
@@ -87,8 +84,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 - **description**: Short description of the server (optional).
 - **host**: The hostname or IP address of the server.
 - **xmlrpcPort**: The XML-RPC port of the server.
-- **fmHost**: The hostname or IP address of the File Management server.
-- **fmPort**: The port of the File Management server.
+- **fmUrl**: The URL for the file management service.
 - **user**: Username for XMLRPC authentication.
 - **pass**: Password for XMLRPC authentication.
 
@@ -107,7 +103,7 @@ This will start the following services:
 1. **GoControlPanel** on port `3000` (accessible at http://localhost:3000).
 2. **GBXConnector** on port `6980` (accessible at http://localhost:6980).
 3. **Dedicated Server** (if configured) on port `2350`.
-4. **File Management** (if configured) on port `3300`.
+4. **File Management** (if configured).
 4. **MongoDB** (for database storage).
 5. **Redis** (for caching).
 
@@ -164,7 +160,7 @@ This service runs a dedicated trackmania server. It is optional and can be confi
 
 This service handles file uploads and deletions for the application.
 
-- **Ports**: `3300:3300` (accessible at `http://localhost:3300`)
+- **Ports**: Not exposed directly
 - **Volumes**: `UserData` (to be mounted to the dedicated server for file management)
 
 ### **MongoDB** (`mongo`)
