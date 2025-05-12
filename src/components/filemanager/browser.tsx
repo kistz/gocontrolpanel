@@ -128,8 +128,24 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     }
   };
 
+  const handleDrop = useCallback(
+    async (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+
+      if (files.length > 0) {
+        await uploadFilesCallback(files);
+      }
+    },
+    [uploadFilesCallback],
+  );
+
   return (
-    <div className="flex flex-col gap-4" onDragOver={(e) => e.preventDefault()}>
+    <div
+      className="flex flex-col gap-4 h-full"
+      onDrop={handleDrop}
+      onDragOver={(e) => e.preventDefault()}
+    >
       <div className="flex justify-between items-center w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
