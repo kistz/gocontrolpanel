@@ -15,12 +15,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
-import {
-  IconDashboard,
-  IconMap,
-  IconStopwatch,
-  IconUsers,
-} from "@tabler/icons-react";
+import { IconDashboard, IconMap, IconUsers } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NavGroup } from ".";
@@ -37,11 +32,6 @@ export default function NavMain() {
         name: "Players",
         url: routes.players,
         icon: IconUsers,
-      },
-      {
-        name: "Records",
-        url: routes.records,
-        icon: IconStopwatch,
       },
       {
         name: "Maps",

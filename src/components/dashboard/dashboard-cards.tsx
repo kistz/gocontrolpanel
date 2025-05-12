@@ -2,7 +2,6 @@ import { IconTrendingUp } from "@tabler/icons-react";
 
 import { getMapCount, getNewMapsCount } from "@/actions/database/map";
 import { getNewPlayersCount, getPlayerCount } from "@/actions/database/player";
-import { getNewRecordsCount, getRecordCount } from "@/actions/database/record";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -15,9 +14,6 @@ import {
 export default async function DashboardCards() {
   const { data: totalPlayers } = await getPlayerCount();
   const { data: newPlayers } = await getNewPlayersCount(30);
-
-  const { data: totalRecords } = await getRecordCount();
-  const { data: newRecords } = await getNewRecordsCount(30);
 
   const { data: totalMaps } = await getMapCount();
   const { data: newMaps } = await getNewMapsCount(30);
@@ -33,19 +29,6 @@ export default async function DashboardCards() {
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />+{newPlayers}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-      </Card>
-      <Card className="@container/card gap-6 py-6">
-        <CardHeader>
-          <CardDescription>Records</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {totalRecords}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />+{newRecords}
             </Badge>
           </CardAction>
         </CardHeader>

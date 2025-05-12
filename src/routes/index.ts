@@ -4,7 +4,6 @@ export const routes = {
   dashboard: "/",
   players: "/players",
   maps: "/maps",
-  records: "/records",
   servers: {
     settings: "/server/:id/settings",
     game: "/server/:id/game",
@@ -45,14 +44,6 @@ export const breadCrumbs: {
     breadCrumbs: [
       {
         label: "Maps",
-      },
-    ],
-  },
-  {
-    path: routes.records,
-    breadCrumbs: [
-      {
-        label: "Records",
       },
     ],
   },

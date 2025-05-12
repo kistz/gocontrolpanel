@@ -38,6 +38,4 @@ export async function getDatabase() {
 export const collections = {
   PLAYERS: "players",
   MAPS: "maps",
-  RECORDINGS: "recordings",
-  RECORDS: "records",
 };
