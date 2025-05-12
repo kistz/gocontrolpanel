@@ -4,7 +4,7 @@ import { deleteEntry, uploadFiles } from "@/actions/filemanager";
 import { getErrorMessage, pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 import { IconTrash, IconUpload } from "@tabler/icons-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
 import { Button } from "../ui/button";
@@ -38,41 +38,59 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
 
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i]);
-      formData.append("paths[]", path);
-    }
-
-    try {
-      const { data, error } = await uploadFiles(serverId, formData);
-      if (error) {
-        throw new Error(error);
-      }
-
-      setFolders((prev) => [
-        ...prev,
-        ...data.filter((fileEntry: FileEntry) => fileEntry.isDir),
-      ]);
-
-      setFiles((prev) => [
-        ...prev,
-        ...data.filter((fileEntry: FileEntry) => !fileEntry.isDir),
-      ]);
-
-      toast.success("Files uploaded successfully");
-    } catch (error) {
-      toast.error("Failed to upload files", {
-        description: getErrorMessage(error),
-      });
-    }
+    uploadFilesCallback(files);
   };
 
   const triggerUpload = () => {
     fileInputRef.current?.click();
   };
+
+  const uploadFilesCallback = useCallback(
+    async (files: FileList | null) => {
+      if (!files) return;
+
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+        formData.append("paths[]", path);
+      }
+
+      try {
+        const { data, error } = await uploadFiles(serverId, formData);
+        if (error) {
+          throw new Error(error);
+        }
+
+        setFolders((prev) => [
+          ...prev.filter(
+            (item: FileEntry) =>
+              !data.some(
+                (fileEntry: FileEntry) => fileEntry.path === item.path,
+              ),
+          ),
+          ...data.filter((fileEntry: FileEntry) => fileEntry.isDir),
+        ]);
+
+        setFiles((prev) => [
+          ...prev.filter(
+            (item: FileEntry) =>
+              !data.some(
+                (fileEntry: FileEntry) => fileEntry.path === item.path,
+              ),
+          ),
+          ...data.filter((fileEntry: FileEntry) => !fileEntry.isDir),
+        ]);
+
+        toast.success("Files uploaded successfully");
+      } catch (error) {
+        toast.error("Failed to upload files", {
+          description: getErrorMessage(error),
+        });
+      }
+    },
+    [serverId, path],
+  );
 
   const handleDelete = async () => {
     if (selectedItem) {
@@ -111,7 +129,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" onDragOver={(e) => e.preventDefault()}>
       <div className="flex justify-between items-center w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
