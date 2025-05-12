@@ -29,6 +29,8 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
   const [selectedItem, setSelectedItem] = useState<FileEntry | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [dragActive, setDragActive] = useState(false);
+
   useEffect(() => {
     setFolders(data.filter((fileEntry: FileEntry) => fileEntry.isDir));
     setFiles(data.filter((fileEntry: FileEntry) => !fileEntry.isDir));
@@ -140,12 +142,36 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     [uploadFilesCallback],
   );
 
+  const handleDragOver = (e: React.DragEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setDragActive(false);
+  };
+
   return (
     <div
       className="flex flex-col gap-4 h-full"
       onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
+      {dragActive && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-full">
+            <div className="flex flex-col items-center justify-center w-full h-full rounded-lg shadow-lg">
+              <IconUpload size={92} />
+              
+              <h1 className="text-2xl font-bold mt-4">Drop files here</h1>
+              <p className="text-lg">to upload</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
