@@ -70,7 +70,7 @@ export default function PlayerList({ serverId }: PlayerListProps) {
     };
   }, [session, serverId]);
 
-  const columns = createColumns();
+  const columns = createColumns(serverId);
 
   return <DataTable columns={columns} data={playerList} pagination />;
 }
