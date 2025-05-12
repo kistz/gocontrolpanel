@@ -86,7 +86,7 @@ export async function getBlacklist(
     const client = await getGbxClient(serverId);
     const blacklist = await client.call("GetBlackList", 1000, 0);
 
-    let playerList: PlayerInfo[] = [];
+    const playerList: PlayerInfo[] = [];
     for (const player of blacklist) {
       const playerInfo = await client.call("GetPlayerInfo", player.Login);
       playerList.push({
@@ -109,7 +109,7 @@ export async function getGuestlist(
     const client = await getGbxClient(serverId);
     const guestlist = await client.call("GetGuestList", 1000, 0);
 
-    let playerList: PlayerInfo[] = [];
+    const playerList: PlayerInfo[] = [];
     for (const player of guestlist) {
       const playerInfo = await client.call("GetPlayerInfo", player.Login);
       playerList.push({
