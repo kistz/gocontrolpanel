@@ -132,6 +132,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
 
   const handleDrop = useCallback(
     async (e: React.DragEvent<HTMLDivElement>) => {
+      setDragActive(false);
       e.preventDefault();
       const files = e.dataTransfer.files;
 
