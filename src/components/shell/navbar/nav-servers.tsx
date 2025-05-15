@@ -19,6 +19,7 @@ import { generatePath, useCurrentServerId } from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
 import {
+  IconActivity,
   IconAdjustmentsAlt,
   IconDeviceGamepad,
   IconFileDescription,
@@ -134,6 +135,13 @@ export default function NavServers() {
             id: server.id,
           }),
           icon: IconUsers,
+        },
+        {
+          name: "Live",
+          url: generatePath(routes.servers.live, {
+            id: server.id,
+          }),
+          icon: IconActivity,
         },
         ...(session?.user.roles.includes("admin") && server.fmUrl
           ? [
