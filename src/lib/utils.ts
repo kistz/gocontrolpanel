@@ -9,6 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatTime(time: number): string {
+  if (time <= 0) {
+    return "--:--.---";
+  }
+
   if (time < 60000) {
     return (time / 1000).toFixed(3);
   }

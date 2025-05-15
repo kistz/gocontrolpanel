@@ -1,12 +1,19 @@
 "use client";
+import { getPlayerList } from "@/actions/gbx/player";
+import { getErrorMessage } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
+import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import LiveRound from "./live-round";
 import MapInfo from "./mapinfo";
+import TeamScores from "./team-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: number }) {
   const { data: session } = useSession();
 
+  const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
   const [liveInfo, setLiveInfo] = useState<LiveInfo | null>(null);
   const [mapInfo, setMapInfo] = useState<{
     map: string;
@@ -20,14 +27,14 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
       return;
     }
 
-    const baseUlr = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-    if (!baseUlr) {
+    const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
+    if (!baseUrl) {
       console.error("Connector URL is not defined");
       return;
     }
 
     const socket = new WebSocket(
-      `${baseUlr}/ws/live/${serverId}?token=${session.jwt}`,
+      `${baseUrl}/ws/live/${serverId}?token=${session.jwt}`,
     );
     wsRef.current = socket;
 
@@ -108,6 +115,15 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         } else if (message.warmUpStartRound) {
           // Returns LiveInfo
           setLiveInfo(message.warmUpStartRound);
+        } else if (message.playerInfoChanged) {
+          // Returns ActiveRound
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: message.playerInfoChanged,
+            };
+          });
         }
       } catch {
         console.error("Failed to parse message", event.data);
@@ -119,6 +135,29 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
     };
   }, [serverId, session]);
 
+  useEffect(() => {
+    if (!liveInfo?.players) {
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const { data, error } = await getPlayerList(serverId);
+        if (error) {
+          throw new Error(error);
+        }
+
+        setPlayerList(data);
+      } catch (error) {
+        toast.error("Error fetching player list", {
+          description: getErrorMessage(error),
+        });
+      }
+    };
+
+    fetchData();
+  }, [liveInfo?.players]);
+
   if (!liveInfo) {
     return <div className="text-sm text-gray-500">Loading...</div>;
   }
@@ -128,38 +167,10 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
       <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-bold">
-          Current Map: {liveInfo.currentMap}
-        </h2>
-        <p>Mode: {liveInfo.mode}</p>
-        <p>Warmup: {liveInfo.isWarmUp ? "Yes" : "No"}</p>
-        {liveInfo.isWarmUp && (
-          <p>
-            Warmup Round: {liveInfo.warmUpRound} / {liveInfo.warmUpTotalRounds}
-          </p>
-        )}
-        <p>Points Limit: {liveInfo.pointsLimit}</p>
-        <p>Rounds Limit: {liveInfo.roundsLimit}</p>
-        <p>Map Limit: {liveInfo.mapLimit}</p>
-        <h3 className="text-md font-semibold">Maps:</h3>
-        <ul className="list-disc pl-5">
-          {liveInfo.maps.map((map, index) => (
-            <li key={index}>{map}</li>
-          ))}
-        </ul>
+        <TeamScores liveInfo={liveInfo} />
+        <LiveRound activeRound={liveInfo.activeRound} playerList={playerList} />
       </div>
-      <div>
-        <h2 className="text-lg font-bold">Teams:</h2>
-        <ul className="list-disc pl-5">
-          {liveInfo.teams &&
-            Object.values(liveInfo.teams).map((team) => (
-              <li key={team.id}>
-                {team.name} - Round Points: {team.roundPoints}, Match Points:{" "}
-                {team.matchPoints}
-              </li>
-            ))}
-        </ul>
-      </div>
+
       <div>
         <h2 className="text-lg font-bold">Players:</h2>
         <ul className="list-disc pl-5">
@@ -168,20 +179,6 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               <li key={player.login}>
                 {player.name} - Team: {player.team}, Round Points:{" "}
                 {player.roundPoints}, Match Points: {player.matchPoints}
-              </li>
-            ))}
-        </ul>
-      </div>
-      <div>
-        <h2 className="text-lg font-bold">Active Round:</h2>
-        <ul className="list-disc pl-5">
-          {liveInfo.activeRound.players &&
-            Object.values(liveInfo.activeRound.players).map((player) => (
-              <li key={player.login}>
-                {player.login} - Time: {player.time}, Checkpoint:{" "}
-                {player.checkpoint}, Finished:{" "}
-                {player.hasFinished ? "Yes" : "No"}
-                {player.hasGivenUp ? " (Gave Up)" : ""}
               </li>
             ))}
         </ul>

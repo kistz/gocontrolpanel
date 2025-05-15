@@ -5,6 +5,38 @@ import { getGbxClient } from "@/lib/gbxclient";
 import { PlayerInfo } from "@/types/player";
 import { ServerResponse } from "@/types/responses";
 
+export async function getPlayerList(
+  serverId: number,
+): Promise<ServerResponse<PlayerInfo[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const client = await getGbxClient(serverId);
+    const playerList = await client.call("GetPlayerList", 1000, 0);
+
+    const players: PlayerInfo[] = [];
+    for (const player of playerList) {
+      try {
+        players.push({
+          nickName: player.NickName,
+          login: player.Login,
+          playerId: player.PlayerId,
+          spectatorStatus: player.SpectatorStatus,
+          teamId: player.TeamId,
+        });
+      } catch {
+        players.push({
+          nickName: "-",
+          login: player.Login,
+          playerId: 0,
+          spectatorStatus: 0,
+          teamId: 0,
+        });
+      }
+    }
+
+    return players;
+  });
+}
+
 export async function banPlayer(
   serverId: number,
   login: string,
