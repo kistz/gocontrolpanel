@@ -1,5 +1,7 @@
 export interface LiveInfo {
-  isWarmup: boolean;
+  isWarmUp: boolean;
+  warmUpRound?: number;
+  warmUpTotalRounds?: number;
   mode: string;
   currentMap: string;
   pointsLimit?: number;

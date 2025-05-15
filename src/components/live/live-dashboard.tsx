@@ -31,13 +31,11 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
       try {
         const message = JSON.parse(event.data);
 
-        // Returns LiveInfo
         if (message.beginMatch) {
+          // Returns LiveInfo
           setLiveInfo(message.beginMatch);
-        }
-
-        // Returns ActiveRound
-        if (message.finish) {
+        } else if (message.finish) {
+          // Returns ActiveRound
           setLiveInfo((prev) => {
             if (!prev) return null;
             return {
@@ -45,10 +43,8 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.finish,
             };
           });
-        }
-
-        // Returns ActiveRound
-        if (message.checkpoint) {
+        } else if (message.checkpoint) {
+          // Returns ActiveRound
           setLiveInfo((prev) => {
             if (!prev) return null;
             return {
@@ -56,25 +52,17 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.checkpoint,
             };
           });
-        }
-
-        // Returns LiveInfo
-        if (message.endRound) {
+        } else if (message.endRound) {
+          // Returns LiveInfo
           setLiveInfo(message.endRound);
-        }
-
-        // Returns string
-        if (message.beginMap) {
+        } else if (message.beginMap) {
+          // Returns string
           setCurrentMap(message.beginMap);
-        }
-
-        // Returns string
-        if (message.endMap) {
+        } else if (message.endMap) {
+          // Returns string
           setCurrentMap(message.endMap);
-        }
-
-        // Returns ActiveRound
-        if (message.giveUp) {
+        } else if (message.giveUp) {
+          // Returns ActiveRound
           setLiveInfo((prev) => {
             if (!prev) return null;
             return {
@@ -82,10 +70,8 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.giveUp,
             };
           });
-        }
-
-        // Returns ActiveRound
-        if (message.beginRound) {
+        } else if (message.beginRound) {
+          // Returns ActiveRound
           setLiveInfo((prev) => {
             if (!prev) return null;
             return {
@@ -93,6 +79,15 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.beginRound,
             };
           });
+        } else if (message.warmUpStart) {
+          // Returns LiveInfo
+          setLiveInfo(message.warmUpStart);
+        } else if (message.warmUpEnd) {
+          // Returns LiveInfo
+          setLiveInfo(message.warmUpEnd);
+        } else if (message.warmUpStartRound) {
+          // Returns LiveInfo
+          setLiveInfo(message.warmUpStartRound);
         }
       } catch {
         console.error("Failed to parse message", event.data);
@@ -115,7 +110,12 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           Current Map: {liveInfo.currentMap}
         </h2>
         <p>Mode: {liveInfo.mode}</p>
-        <p>Warmup: {liveInfo.isWarmup ? "Yes" : "No"}</p>
+        <p>Warmup: {liveInfo.isWarmUp ? "Yes" : "No"}</p>
+        {liveInfo.isWarmUp && (
+          <p>
+            Warmup Round: {liveInfo.warmUpRound} / {liveInfo.warmUpTotalRounds}
+          </p>
+        )}
         <p>Points Limit: {liveInfo.pointsLimit}</p>
         <p>Rounds Limit: {liveInfo.roundsLimit}</p>
         <p>Map Limit: {liveInfo.mapLimit}</p>
