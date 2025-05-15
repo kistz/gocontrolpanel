@@ -55,11 +55,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
     ),
     cell: ({ row }) => {
       const teamId = row.getValue("teamId");
-      return (
-        <span>
-          {teamId === -1 ? "No Team" : `Team ${teamId}`}
-        </span>
-      );
+      return <span>{teamId === -1 ? "No Team" : `Team ${teamId}`}</span>;
     },
   },
   {
@@ -71,9 +67,9 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
       const status = row.getValue("spectatorStatus");
       return (
         <BooleanDisplay
+          value={status !== 0}
           falseIcon={IconSteeringWheelFilled}
           trueIcon={IconCamera}
-          value={status !== 0}
         />
       );
     },
