@@ -61,7 +61,7 @@ export default function MapCarousel({
 
     const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
     if (!baseUrl) {
-      console.error("NEXT_PUBLIC_CONNECTOR_URL is not defined");
+      console.error("Connector URL is not defined");
       return;
     }
 
