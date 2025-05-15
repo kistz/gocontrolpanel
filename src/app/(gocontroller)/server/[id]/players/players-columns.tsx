@@ -8,6 +8,7 @@ import {
   kickPlayer,
   removeGuest,
 } from "@/actions/gbx/player";
+import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
+import { IconCamera, IconSteeringWheelFilled } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
@@ -51,12 +53,30 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Team"} />
     ),
+    cell: ({ row }) => {
+      const teamId = row.getValue("teamId");
+      return (
+        <span>
+          {teamId === -1 ? "No Team" : `Team ${teamId}`}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "spectatorStatus",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Spectator Status"} />
     ),
+    cell: ({ row }) => {
+      const status = row.getValue("spectatorStatus");
+      return (
+        <BooleanDisplay
+          falseIcon={IconSteeringWheelFilled}
+          trueIcon={IconCamera}
+          value={status !== 0}
+        />
+      );
+    },
   },
   {
     id: "actions",
