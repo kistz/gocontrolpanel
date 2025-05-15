@@ -219,6 +219,12 @@ docker-compose logs gocontrolpanel
 
 ---
 
+## **Contributing**
+
+Contributions are welcome! If you have suggestions or improvements, please create a pull request or open an issue. Feel free to fork the repository and make changes as needed.
+
+---
+
 ## **License**
 
 This project is licensed under the MIT License - see the [License](License) file for details.
