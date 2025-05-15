@@ -102,5 +102,5 @@ export default function MapInfo({ map, mode }: MapInfoProps) {
         </div>
       </div>
     </Card>
-  );s
+  );
 }
