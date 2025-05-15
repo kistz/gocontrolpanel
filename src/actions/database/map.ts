@@ -53,6 +53,25 @@ export async function getAllMaps(): Promise<ServerResponse<Map[]>> {
   });
 }
 
+export async function getMapByUid(
+  uid: string,
+): Promise<ServerResponse<Map | null>> {
+  return doServerAction(async () => {
+    const db = await getDatabase();
+    const collection = db.collection<DBMap>(collections.MAPS);
+    const map = await collection.findOne({
+      uid,
+      deletedAt: { $exists: false },
+    });
+
+    if (!map) {
+      return null;
+    }
+
+    return mapDBMapToMap(map);
+  });
+}
+
 export async function getMapCount(): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = await getDatabase();

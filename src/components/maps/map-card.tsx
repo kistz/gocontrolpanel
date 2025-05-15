@@ -37,7 +37,7 @@ export default function MapCard({ map, refetch }: MapCardProps) {
           ></h3>
 
           <div className="flex items-center gap-2">
-            <IconUser className="!size-5 flex-shrink-0" />
+            <IconUser size={20} />
             <span
               className="text-sm truncate"
               dangerouslySetInnerHTML={{

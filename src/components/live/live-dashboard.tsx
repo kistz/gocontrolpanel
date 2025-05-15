@@ -2,12 +2,16 @@
 import { LiveInfo } from "@/types/live";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import MapInfo from "./mapinfo";
 
 export default function LiveDashboard({ serverId }: { serverId: number }) {
   const { data: session } = useSession();
 
   const [liveInfo, setLiveInfo] = useState<LiveInfo | null>(null);
-  const [currentMap, setCurrentMap] = useState<string | null>(null);
+  const [mapInfo, setMapInfo] = useState<{
+    map: string;
+    mode: string;
+  } | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -34,6 +38,10 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         if (message.beginMatch) {
           // Returns LiveInfo
           setLiveInfo(message.beginMatch);
+          setMapInfo({
+            map: message.beginMatch.currentMap,
+            mode: message.beginMatch.mode,
+          });
         } else if (message.finish) {
           // Returns ActiveRound
           setLiveInfo((prev) => {
@@ -57,10 +65,22 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           setLiveInfo(message.endRound);
         } else if (message.beginMap) {
           // Returns string
-          setCurrentMap(message.beginMap);
+          setMapInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              map: message.beginMap,
+            };
+          });
         } else if (message.endMap) {
           // Returns string
-          setCurrentMap(message.endMap);
+          setMapInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              map: message.endMap,
+            };
+          });
         } else if (message.giveUp) {
           // Returns ActiveRound
           setLiveInfo((prev) => {
@@ -105,6 +125,8 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
 
   return (
     <div className="flex gap-8">
+      <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
+
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-bold">
           Current Map: {liveInfo.currentMap}
