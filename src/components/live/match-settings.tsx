@@ -11,7 +11,7 @@ export default function MatchSettings({
 }: MatchSettingsProps) {
   return (
     <div className="flex justify-center">
-      <div className="flex text-md font-bold">
+      <div className="flex text-lg font-bold">
         {[
           pointsLimit && `Points Limit ${pointsLimit}`,
           roundsLimit && `Rounds Limit ${roundsLimit}`,

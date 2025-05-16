@@ -180,28 +180,32 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
       </div>
 
-      <Card
-        className="flex flex-col gap-2 p-4 flex-1"
-        style={{
-          ...(liveInfo.isWarmUp && {
-            borderColor: "var(--warmup)",
-          }),
-        }}
-      >
-        <MatchSettings
-          pointsLimit={liveInfo.pointsLimit}
-          roundsLimit={liveInfo.roundsLimit}
-          mapLimit={liveInfo.mapLimit}
-        />
-        <TeamScores liveInfo={liveInfo} />
-        <LiveRound
-          activeRound={liveInfo.activeRound}
-          playerList={playerList}
-          isWarmUp={liveInfo.isWarmUp}
-          warmUpRound={liveInfo.warmUpRound}
-          warmUpTotalRounds={liveInfo.warmUpTotalRounds}
-        />
-      </Card>
+      <div className="flex flex-col gap-4 w-full">
+        <Card
+          className="flex flex-col gap-2 p-4 flex-1"
+          style={{
+            ...(liveInfo.isWarmUp && {
+              borderColor: "var(--warmup)",
+            }),
+          }}
+        >
+          <MatchSettings
+            pointsLimit={liveInfo.pointsLimit}
+            roundsLimit={liveInfo.roundsLimit}
+            mapLimit={liveInfo.mapLimit}
+          />
+          <TeamScores liveInfo={liveInfo} />
+        </Card>
+        <Card className="p-4">
+          <LiveRound
+            activeRound={liveInfo.activeRound}
+            playerList={playerList}
+            isWarmUp={liveInfo.isWarmUp}
+            warmUpRound={liveInfo.warmUpRound}
+            warmUpTotalRounds={liveInfo.warmUpTotalRounds}
+          />
+        </Card>
+      </div>
 
       <div className="w-[350px]">
         <Rankings players={liveInfo.players} teams={liveInfo.teams} />

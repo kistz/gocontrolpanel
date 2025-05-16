@@ -1,5 +1,8 @@
 import { formatTime } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 
 interface TeamScoresProps {
   liveInfo: LiveInfo;
@@ -15,37 +18,54 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
               key={team.id}
               className="flex flex-1 flex-col gap-2 items-center"
             >
-              <span
-                className="text-3xl font-bold"
-                style={{
-                  color: team.name.toLowerCase(),
-                }}
-              >
-                {team.name}
-              </span>
-              <span className="text-3xl font-bold">{team.matchPoints}</span>
+              <div className="flex flex-col gap-1 items-center">
+                <span
+                  className="text-3xl font-bold"
+                  style={{
+                    color: team.name.toLowerCase(),
+                  }}
+                >
+                  {team.name}
+                </span>
+                <span className="text-3xl font-bold">{team.matchPoints}</span>
+              </div>
 
-              {liveInfo.players &&
-                Object.values(liveInfo.players)
-                  .filter((player) => player.team === team.id)
-                  .map((player) => (
-                    <div key={player.login} className="flex gap-2 items-center">
-                      <span
-                        className="text-lg font-bold"
-                        style={{
-                          color: player.name.toLowerCase(),
-                        }}
-                      >
-                        {player.name}
-                      </span>
-                      <span className="text-lg font-bold">
-                        {player.matchPoints}
-                      </span>
-                      <span className="text-lg font-bold">
-                        {formatTime(player.bestTime)}
-                      </span>
-                    </div>
-                  ))}
+              <Separator />
+
+              <Table>
+                <TableBody>
+                  {liveInfo.players &&
+                    [
+                      ...Object.values(liveInfo.players),
+                      ...Object.values(liveInfo.players),
+                    ]
+                      .sort((a, b) => b.matchPoints - a.matchPoints)
+                      .map((player, i) => {
+                        if (player.team !== team.id) {
+                          return null;
+                        }
+
+                        return (
+                          <TableRow key={player.login}>
+                            <TableCell className="max-w-min">
+                              <Badge
+                                variant="outline"
+                                className="text-md font-bold"
+                              >
+                                {i + 1}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-lg">
+                              {player.name}
+                            </TableCell>
+                            <TableCell className="text-lg flex justify-end">
+                              {formatTime(player.bestTime)}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                </TableBody>
+              </Table>
             </div>
           ))}
       </div>
