@@ -1,4 +1,4 @@
-import { formatTime } from "@/lib/utils";
+import { cn, formatTime } from "@/lib/utils";
 import { ActiveRound } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { IconFlag, IconHash, IconPennant, IconX } from "@tabler/icons-react";
@@ -29,10 +29,15 @@ export default function LiveRound({
   warmUpTotalRounds,
 }: LiveRoundProps) {
   return (
-    <Card className="flex flex-1 flex-col gap-2 items-center p-4">
+    <Card
+      className={cn(
+        "flex flex-1 flex-col gap-2 items-center p-4",
+        isWarmUp && "border-warmup bg-muted-warmup",
+      )}
+    >
       {isWarmUp && (
         <div className="flex gap-2 items-center">
-          <span className="text-3xl font-bold text-warmup">
+          <span className="text-xl font-bold">
             {warmUpRound} / {warmUpTotalRounds}
           </span>
         </div>
