@@ -176,15 +176,15 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
 
   return (
     <div className="flex w-full justify-between gap-6">
+      <LiveRound
+        activeRound={liveInfo.activeRound}
+        playerList={playerList}
+        isWarmUp={liveInfo.isWarmUp}
+        warmUpRound={liveInfo.warmUpRound}
+        warmUpTotalRounds={liveInfo.warmUpTotalRounds}
+      />
       <div className="flex flex-col gap-4 w-full">
-        <Card
-          className="flex flex-col gap-2 p-4 flex-1"
-          style={{
-            ...(liveInfo.isWarmUp && {
-              borderColor: "var(--warmup)",
-            }),
-          }}
-        >
+        <Card className="flex flex-col gap-2 p-4 flex-1">
           <MatchSettings
             pointsLimit={liveInfo.pointsLimit}
             roundsLimit={liveInfo.roundsLimit}
@@ -192,14 +192,6 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           />
           <TeamScores liveInfo={liveInfo} />
         </Card>
-        
-        <LiveRound
-          activeRound={liveInfo.activeRound}
-          playerList={playerList}
-          isWarmUp={liveInfo.isWarmUp}
-          warmUpRound={liveInfo.warmUpRound}
-          warmUpTotalRounds={liveInfo.warmUpTotalRounds}
-        />
       </div>
       <div className="flex flex-col gap-2">
         <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
