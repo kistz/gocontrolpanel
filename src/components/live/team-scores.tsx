@@ -8,26 +8,6 @@ interface TeamScoresProps {
 export default function TeamScores({ liveInfo }: TeamScoresProps) {
   return (
     <div className="flex flex-col gap-2">
-      <div>
-        {liveInfo.isWarmUp && (
-          <div className="text-md font-bold">
-            Warmup Round {liveInfo.warmUpRound} of {liveInfo.warmUpTotalRounds}
-          </div>
-        )}
-        
-        <div className="flex gap-2 text-md font-bold">
-          {liveInfo.pointsLimit && (
-            <span>Points Limit {liveInfo.pointsLimit}</span>
-          )}
-
-          {liveInfo.roundsLimit && (
-            <span>Rounds Limit {liveInfo.roundsLimit}</span>
-          )}
-
-          {liveInfo.mapLimit && <span>Map Limit {liveInfo.mapLimit}</span>}
-        </div>
-      </div>
-
       <div className="flex gap-2 w-full">
         {liveInfo.teams &&
           Object.values(liveInfo.teams).map((team) => (

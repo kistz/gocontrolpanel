@@ -6,8 +6,11 @@ import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Card } from "../ui/card";
 import LiveRound from "./live-round";
 import MapInfo from "./mapinfo";
+import MatchSettings from "./match-settings";
+import Rankings from "./rankings";
 import TeamScores from "./team-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: number }) {
@@ -172,25 +175,36 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
   }
 
   return (
-    <div className="flex gap-8">
-      <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
-
-      <div className="flex flex-col gap-2">
-        <TeamScores liveInfo={liveInfo} />
-        <LiveRound activeRound={liveInfo.activeRound} playerList={playerList} />
+    <div className="flex w-full justify-between gap-6">
+      <div className="w-[350px]">
+        <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
       </div>
 
-      <div>
-        <h2 className="text-lg font-bold">Players:</h2>
-        <ul className="list-disc pl-5">
-          {liveInfo.players &&
-            Object.values(liveInfo.players).map((player) => (
-              <li key={player.login}>
-                {player.name} - Team: {player.team}, Round Points:{" "}
-                {player.roundPoints}, Match Points: {player.matchPoints}
-              </li>
-            ))}
-        </ul>
+      <Card
+        className="flex flex-col gap-2 p-4 flex-1"
+        style={{
+          ...(liveInfo.isWarmUp && {
+            borderColor: "var(--warmup)",
+          }),
+        }}
+      >
+        <MatchSettings
+          pointsLimit={liveInfo.pointsLimit}
+          roundsLimit={liveInfo.roundsLimit}
+          mapLimit={liveInfo.mapLimit}
+        />
+        <TeamScores liveInfo={liveInfo} />
+        <LiveRound
+          activeRound={liveInfo.activeRound}
+          playerList={playerList}
+          isWarmUp={liveInfo.isWarmUp}
+          warmUpRound={liveInfo.warmUpRound}
+          warmUpTotalRounds={liveInfo.warmUpTotalRounds}
+        />
+      </Card>
+
+      <div className="w-[350px]">
+        <Rankings players={liveInfo.players} teams={liveInfo.teams} />
       </div>
     </div>
   );

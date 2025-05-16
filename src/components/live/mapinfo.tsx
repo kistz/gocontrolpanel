@@ -56,7 +56,7 @@ export default function MapInfo({ map, mode }: MapInfoProps) {
   }
 
   return (
-    <Card className="flex h-min flex-col max-w-[300px]">
+    <Card className="flex h-min flex-col">
       <div className="relative">
         {mapInfo.thumbnailUrl ? (
           <Image
