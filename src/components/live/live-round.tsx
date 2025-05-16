@@ -36,7 +36,8 @@ export default function LiveRound({
       )}
     >
       {isWarmUp && (
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 justify-between w-full">
+          <span className="text-xl font-bold">Warm Up</span>
           <span className="text-xl font-bold">
             {warmUpRound} / {warmUpTotalRounds}
           </span>

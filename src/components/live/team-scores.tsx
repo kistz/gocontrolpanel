@@ -1,4 +1,4 @@
-import { formatTime } from "@/lib/utils";
+import { cn, formatTime } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
@@ -19,14 +19,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
               className="flex flex-1 flex-col gap-2 items-center"
             >
               <div className="flex flex-col gap-1 items-center">
-                <span
-                  className="text-3xl font-bold"
-                  style={{
-                    color: team.name.toLowerCase(),
-                  }}
-                >
-                  {team.name}
-                </span>
+                <span className="text-3xl font-bold">{team.name}</span>
                 <span className="text-3xl font-bold">{team.matchPoints}</span>
               </div>
 
@@ -49,7 +42,13 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                         }
 
                         return (
-                          <TableRow key={i}>
+                          <TableRow
+                            key={i}
+                            className={cn(
+                              "hover:bg-transparent",
+                              i % 2 === 0 && "bg-muted",
+                            )}
+                          >
                             <TableCell className="w-[50px]">
                               <Badge
                                 variant="outline"
@@ -58,9 +57,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                                 {i + 1}
                               </Badge>
                             </TableCell>
-                            <TableCell className="">
-                              {player.name}
-                            </TableCell>
+                            <TableCell className="">{player.name}</TableCell>
                             <TableCell className=" flex justify-end">
                               {formatTime(player.bestTime)}
                             </TableCell>
