@@ -176,10 +176,6 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
 
   return (
     <div className="flex w-full justify-between gap-6">
-      <div className="w-[350px]">
-        <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
-      </div>
-
       <div className="flex flex-col gap-4 w-full">
         <Card
           className="flex flex-col gap-2 p-4 flex-1"
@@ -196,18 +192,17 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           />
           <TeamScores liveInfo={liveInfo} />
         </Card>
-        <Card className="p-4">
-          <LiveRound
-            activeRound={liveInfo.activeRound}
-            playerList={playerList}
-            isWarmUp={liveInfo.isWarmUp}
-            warmUpRound={liveInfo.warmUpRound}
-            warmUpTotalRounds={liveInfo.warmUpTotalRounds}
-          />
-        </Card>
+        
+        <LiveRound
+          activeRound={liveInfo.activeRound}
+          playerList={playerList}
+          isWarmUp={liveInfo.isWarmUp}
+          warmUpRound={liveInfo.warmUpRound}
+          warmUpTotalRounds={liveInfo.warmUpTotalRounds}
+        />
       </div>
-
-      <div className="w-[350px]">
+      <div className="flex flex-col gap-2">
+        <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
         <Rankings players={liveInfo.players} teams={liveInfo.teams} />
       </div>
     </div>

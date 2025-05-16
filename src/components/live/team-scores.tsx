@@ -38,6 +38,9 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                     [
                       ...Object.values(liveInfo.players),
                       ...Object.values(liveInfo.players),
+                      ...Object.values(liveInfo.players),
+                      ...Object.values(liveInfo.players),
+                      ...Object.values(liveInfo.players),
                     ]
                       .sort((a, b) => b.matchPoints - a.matchPoints)
                       .map((player, i) => {
@@ -46,8 +49,8 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                         }
 
                         return (
-                          <TableRow key={player.login}>
-                            <TableCell className="max-w-min">
+                          <TableRow key={i}>
+                            <TableCell className="w-[50px]">
                               <Badge
                                 variant="outline"
                                 className="text-md font-bold"

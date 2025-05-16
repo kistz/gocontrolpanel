@@ -1,4 +1,5 @@
 import { PlayerRound, Team } from "@/types/live";
+import { Card } from "../ui/card";
 
 interface RankingsProps {
   players?: Record<string, PlayerRound>;
@@ -7,7 +8,7 @@ interface RankingsProps {
 
 export default function Rankings({ players, teams }: RankingsProps) {
   return (
-    <div>
+    <Card className="p-4">
       <h2 className="text-lg font-bold">Players:</h2>
       <ul className="list-disc pl-5">
         {players &&
@@ -25,6 +26,6 @@ export default function Rankings({ players, teams }: RankingsProps) {
               </li>
             ))}
       </ul>
-    </div>
+    </Card>
   );
 }
