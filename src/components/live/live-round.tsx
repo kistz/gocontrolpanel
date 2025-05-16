@@ -33,7 +33,14 @@ export default function LiveRound({ activeRound, playerList }: LiveRoundProps) {
                   player.login}
               </span>
               <span className="text-lg font-bold">
-                {formatTime(player.time)}
+                {player.checkpoint}
+              </span>
+              <span className="text-lg font-bold">
+                {player.hasGivenUp ? (
+                  <span className="text-red-500">Gave Up</span>
+                ) : (
+                  formatTime(player.time)
+                )}
               </span>
             </div>
           ))}
