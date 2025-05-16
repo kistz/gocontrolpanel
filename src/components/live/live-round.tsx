@@ -1,7 +1,7 @@
 import { formatTime } from "@/lib/utils";
 import { ActiveRound } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
-import { IconFlag, IconHash, IconX } from "@tabler/icons-react";
+import { IconFlag, IconHash, IconPennant, IconX } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import {
@@ -41,10 +41,14 @@ export default function LiveRound({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[50px] pl-4"><IconHash size={14} /></TableHead>
+            <TableHead className="w-[50px] pl-4">
+              <IconHash size={14} />
+            </TableHead>
             <TableHead className="font-bold">Player</TableHead>
             <TableHead className="font-bold text-end">Time</TableHead>
-            <TableHead className="w-9 font-bold text-center">CP</TableHead>
+            <TableHead className="font-bold text-center">
+              <IconPennant size={20} />
+            </TableHead>
           </TableRow>
         </TableHeader>
 
@@ -75,14 +79,14 @@ export default function LiveRound({
                       {i + 1}
                     </Badge>
                   </TableCell>
-                  <TableCell className="">
+                  <TableCell>
                     {playerList.find((p) => p.login === player.login)
                       ?.nickName || player.login}
                   </TableCell>
-                  <TableCell className=" min-w-[92px] text-end">
+                  <TableCell className="min-w-[92px] text-end">
                     {formatTime(player.time)}
                   </TableCell>
-                  <TableCell className=" w-9 text-center">
+                  <TableCell className="text-center">
                     {player.hasFinished ? (
                       <IconFlag size={20} />
                     ) : player.hasGivenUp ? (

@@ -14,7 +14,7 @@ export function formatTime(time: number): string {
   }
 
   if (time < 60000) {
-    return (time / 1000).toFixed(3);
+    return (time / 1000).toFixed(3).padStart(6, "0");
   }
 
   const minutes = Math.floor(time / 60000);
