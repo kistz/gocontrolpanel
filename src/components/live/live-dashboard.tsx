@@ -171,7 +171,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
   }, [liveInfo?.players]);
 
   if (!liveInfo) {
-    return <div className="text-sm text-gray-500">Loading...</div>;
+    return <div className="text-sm">Loading...</div>;
   }
 
   return (
