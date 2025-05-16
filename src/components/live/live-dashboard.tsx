@@ -119,7 +119,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           // Returns LiveInfo
           setLiveInfo(message.warmUpStartRound);
         } else if (message.playerInfoChanged) {
-          // Returns ActiveRound
+          // Returns LiveInfo
           setLiveInfo((prev) => {
             if (!prev) return null;
             return {
@@ -127,6 +127,9 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.playerInfoChanged,
             };
           });
+        } else if (message.playerConnect) {
+          // Returns LiveInfo
+          setLiveInfo(message.playerConnect);
         } else if (message.playerDisconnect) {
           // Returns ActiveRound
           setLiveInfo((prev) => {

@@ -62,15 +62,6 @@ export default function LiveRound({
           {activeRound.players &&
             [
               ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
-              ...Object.values(activeRound.players),
             ]
               .sort((a, b) => {
                 if (b.checkpoint !== a.checkpoint) {

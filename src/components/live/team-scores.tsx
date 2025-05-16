@@ -30,10 +30,6 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                   {liveInfo.players &&
                     [
                       ...Object.values(liveInfo.players),
-                      ...Object.values(liveInfo.players),
-                      ...Object.values(liveInfo.players),
-                      ...Object.values(liveInfo.players),
-                      ...Object.values(liveInfo.players),
                     ]
                       .sort((a, b) => b.matchPoints - a.matchPoints)
                       .map((player, i) => {
