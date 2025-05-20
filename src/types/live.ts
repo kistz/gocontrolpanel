@@ -3,7 +3,7 @@ export interface LiveInfo {
   warmUpRound?: number;
   warmUpTotalRounds?: number;
   mode: string;
-  useTeams: boolean;
+  type: string;
   currentMap: string;
   pointsLimit?: number;
   roundsLimit?: number;

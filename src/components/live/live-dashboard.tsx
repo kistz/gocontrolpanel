@@ -194,9 +194,10 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
             roundsLimit={liveInfo.roundsLimit}
             mapLimit={liveInfo.mapLimit}
           />
-          {liveInfo.useTeams && <TeamScores liveInfo={liveInfo} />}
+          
+          {liveInfo.type === "teams" && <TeamScores liveInfo={liveInfo} />}
 
-          {!liveInfo.useTeams && <RoundScores liveInfo={liveInfo} />}
+          {liveInfo.type === "rounds" && <RoundScores liveInfo={liveInfo} />}
         </Card>
       </div>
       <div className="flex flex-col gap-4">
@@ -204,7 +205,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         <Rankings
           players={liveInfo.players}
           teams={liveInfo.teams}
-          useTeams={liveInfo.useTeams}
+          type={liveInfo.type}
         />
       </div>
     </div>
