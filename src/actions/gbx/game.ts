@@ -138,6 +138,7 @@ export async function setModeScriptSettings(
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(server);
     await client.call("SetModeScriptSettings", settings);
+    client.call("Echo", "", "UpdatedSettings")
   });
 }
 

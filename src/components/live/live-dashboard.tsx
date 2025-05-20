@@ -140,6 +140,9 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.playerDisconnect,
             };
           });
+        } else if (message.updatedSettings) {
+          // Returns LiveInfo
+          setLiveInfo(message.updatedSettings);
         }
       } catch {
         console.error("Failed to parse message", event.data);
