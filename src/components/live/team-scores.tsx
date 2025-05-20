@@ -28,9 +28,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
               <Table>
                 <TableBody>
                   {liveInfo.players &&
-                    [
-                      ...Object.values(liveInfo.players),
-                    ]
+                    [...Object.values(liveInfo.players)]
                       .sort((a, b) => b.matchPoints - a.matchPoints)
                       .map((player, i) => {
                         if (player.team !== team.id) {
@@ -54,7 +52,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                               </Badge>
                             </TableCell>
                             <TableCell>{player.name}</TableCell>
-                            <TableCell className="flex justify-end max-sm:hidden">
+                            <TableCell className="text-end max-sm:hidden">
                               {formatTime(player.bestTime)}
                             </TableCell>
                           </TableRow>

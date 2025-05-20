@@ -46,7 +46,7 @@ export default function RoundScores({ liveInfo }: RoundScoresProps) {
                       {i + 1}
                     </Badge>
                   </TableCell>
-                  <TableCell className="">{player.name}</TableCell>
+                  <TableCell>{player.name}</TableCell>
                   <TableCell>
                     {player.winner ? (
                       <IconTrophyFilled size={20} />
