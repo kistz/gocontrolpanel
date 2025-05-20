@@ -182,7 +182,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
   }
 
   return (
-    <div className="grid w-full gap-4 grid-cols-1 min-[1200px]:grid-cols-2 min-[1600px]:grid-cols-[auto_1fr_auto]">
+    <div className="grid w-full gap-4 grid-cols-1 min-[1200px]:grid-cols-2 min-[1550px]:grid-cols-[auto_1fr_auto]">
       <LiveRound
         activeRound={liveInfo.activeRound}
         playerList={playerList}
@@ -208,7 +208,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         </Card>
       </div>
 
-      <div className="flex flex-col min-[1200px]:flex-row min-[1600px]:flex-col gap-4">
+      <div className="flex flex-col min-[1200px]:flex-row min-[1550px]:flex-col gap-4">
         <MapInfo
           serverId={serverId}
           map={mapInfo?.map}
