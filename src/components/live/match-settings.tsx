@@ -13,7 +13,7 @@ export default function MatchSettings({
 }: MatchSettingsProps) {
   return (
     <div className="flex justify-center">
-      <div className="flex text-lg font-bold">
+      <div className="text-lg font-bold">
         {[
           pointsLimit && `Points Limit ${pointsLimit}`,
           roundsLimit && `Rounds Limit ${roundsLimit}`,
@@ -22,7 +22,7 @@ export default function MatchSettings({
         ]
           .filter(Boolean)
           .map((item, idx, arr) => (
-            <span key={idx}>
+            <span key={idx} className="text-nowrap">
               {item}
               {idx < arr.length - 1 && <span className="mx-2">|</span>}
             </span>

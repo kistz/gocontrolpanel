@@ -179,7 +179,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
   }
 
   return (
-    <div className="flex w-full justify-between gap-4">
+    <div className="grid w-full gap-4 grid-cols-1 min-[1200px]:grid-cols-2 min-[1600px]:grid-cols-[auto_1fr_auto]">
       <LiveRound
         activeRound={liveInfo.activeRound}
         playerList={playerList}
@@ -188,7 +188,8 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         warmUpTotalRounds={liveInfo.warmUpTotalRounds}
         isPaused={liveInfo.isPaused}
       />
-      <div className="flex flex-col gap-4 w-full">
+
+      <div className="flex flex-col gap-4">
         <Card className="flex flex-col gap-2 p-4 flex-1">
           <MatchSettings
             pointsLimit={liveInfo.pointsLimit}
@@ -196,14 +197,22 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
             mapLimit={liveInfo.mapLimit}
             nbWinners={liveInfo.nbWinners}
           />
-          
-          {liveInfo.type === "teams" && <TeamScores liveInfo={liveInfo} />}
 
-          {liveInfo.type === "rounds" || liveInfo.type === "cup" && <RoundScores liveInfo={liveInfo} />}
+          {liveInfo.type === "teams" && <TeamScores liveInfo={liveInfo} />}
+          {(liveInfo.type === "rounds" || liveInfo.type === "cup") && (
+            <RoundScores liveInfo={liveInfo} />
+          )}
         </Card>
       </div>
-      <div className="flex flex-col gap-4">
-        <MapInfo serverId={serverId} map={mapInfo?.map} mode={mapInfo?.mode} pauseAvailable={liveInfo.pauseAvailable} isPaused={liveInfo.isPaused} />
+
+      <div className="flex flex-col min-[1200px]:flex-row min-[1600px]:flex-col gap-4">
+        <MapInfo
+          serverId={serverId}
+          map={mapInfo?.map}
+          mode={mapInfo?.mode}
+          pauseAvailable={liveInfo.pauseAvailable}
+          isPaused={liveInfo.isPaused}
+        />
         <Rankings
           players={liveInfo.players}
           teams={liveInfo.teams}

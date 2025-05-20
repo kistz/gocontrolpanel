@@ -53,8 +53,8 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                                 {i + 1}
                               </Badge>
                             </TableCell>
-                            <TableCell className="">{player.name}</TableCell>
-                            <TableCell className=" flex justify-end">
+                            <TableCell>{player.name}</TableCell>
+                            <TableCell className="flex justify-end max-sm:hidden">
                               {formatTime(player.bestTime)}
                             </TableCell>
                           </TableRow>
