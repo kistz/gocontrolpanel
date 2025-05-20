@@ -11,6 +11,7 @@ import LiveRound from "./live-round";
 import MapInfo from "./mapinfo";
 import MatchSettings from "./match-settings";
 import Rankings from "./rankings";
+import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: number }) {
@@ -193,12 +194,18 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
             roundsLimit={liveInfo.roundsLimit}
             mapLimit={liveInfo.mapLimit}
           />
-          <TeamScores liveInfo={liveInfo} />
+          {liveInfo.useTeams && <TeamScores liveInfo={liveInfo} />}
+
+          {!liveInfo.useTeams && <RoundScores liveInfo={liveInfo} />}
         </Card>
       </div>
       <div className="flex flex-col gap-4">
         <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
-        <Rankings players={liveInfo.players} teams={liveInfo.teams} />
+        <Rankings
+          players={liveInfo.players}
+          teams={liveInfo.teams}
+          useTeams={liveInfo.useTeams}
+        />
       </div>
     </div>
   );

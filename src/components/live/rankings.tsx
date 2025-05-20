@@ -14,9 +14,10 @@ import { IconHash } from "@tabler/icons-react";
 interface RankingsProps {
   players?: Record<string, PlayerRound>;
   teams?: Record<number, Team>;
+  useTeams: boolean;
 }
 
-export default function Rankings({ players, teams }: RankingsProps) {
+export default function Rankings({ players, teams, useTeams }: RankingsProps) {
   return (
     <Card className="p-4">
       <h2 className="text-lg font-bold">Rankings</h2>
@@ -25,7 +26,7 @@ export default function Rankings({ players, teams }: RankingsProps) {
           <TableRow>
             <TableHead className="w-[24px] font-bold"><IconHash size={14} /></TableHead>
             <TableHead className="font-bold">Player</TableHead>
-            <TableHead className="font-bold">Team</TableHead>
+            {useTeams && <TableHead className="font-bold">Team</TableHead>}
             <TableHead className="font-bold">Points</TableHead>
             <TableHead className="font-bold">Best Time</TableHead>
           </TableRow>
@@ -46,7 +47,7 @@ export default function Rankings({ players, teams }: RankingsProps) {
                     <span className="font-bold">{i + 1}</span>
                   </TableCell>
                   <TableCell>{player.name}</TableCell>
-                  <TableCell>{teams && teams[player.team]?.name}</TableCell>
+                  {useTeams && <TableCell>{teams && teams[player.team]?.name}</TableCell>}
                   <TableCell>{player.matchPoints}</TableCell>
                   <TableCell>{formatTime(player.bestTime)}</TableCell>
                 </TableRow>
