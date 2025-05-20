@@ -1,6 +1,6 @@
 import { cn, formatTime } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
-import { IconHash } from "@tabler/icons-react";
+import { IconHash, IconTrophy, IconTrophyFilled } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import {
   Table,
@@ -47,7 +47,16 @@ export default function RoundScores({ liveInfo }: RoundScoresProps) {
                     </Badge>
                   </TableCell>
                   <TableCell className="">{player.name}</TableCell>
-                  <TableCell>{player.matchPoints}</TableCell>
+                  <TableCell>
+                    {player.winner ? (
+                      <IconTrophyFilled size={20} />
+                    ) : player.finalist ? (
+                      <IconTrophy size={20} />
+                    ) : (
+                      <span>{player.matchPoints}</span>
+                    )}
+                  </TableCell>
+
                   <TableCell>{formatTime(player.bestTime)}</TableCell>
                 </TableRow>
               ))}

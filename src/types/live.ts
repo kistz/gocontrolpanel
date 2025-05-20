@@ -8,6 +8,7 @@ export interface LiveInfo {
   pointsLimit?: number;
   roundsLimit?: number;
   mapLimit?: number;
+  nbWinners?: number;
   maps: string[];
   teams?: Record<number, Team>;
   players?: Record<string, PlayerRound>;
@@ -27,6 +28,8 @@ export interface PlayerRound {
   name: string;
   team: number;
   rank: number;
+  finalist: boolean;
+  winner: boolean;
   roundPoints: number;
   matchPoints: number;
   bestTime: number;

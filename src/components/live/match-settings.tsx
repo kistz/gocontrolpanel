@@ -2,12 +2,14 @@ interface MatchSettingsProps {
   pointsLimit?: number;
   roundsLimit?: number;
   mapLimit?: number;
+  nbWinners?: number;
 }
 
 export default function MatchSettings({
   pointsLimit,
   roundsLimit,
   mapLimit,
+  nbWinners,
 }: MatchSettingsProps) {
   return (
     <div className="flex justify-center">
@@ -16,6 +18,7 @@ export default function MatchSettings({
           pointsLimit && `Points Limit ${pointsLimit}`,
           roundsLimit && `Rounds Limit ${roundsLimit}`,
           mapLimit && `Map Limit ${mapLimit}`,
+          nbWinners && `Winners ${nbWinners}`,
         ]
           .filter(Boolean)
           .map((item, idx, arr) => (
