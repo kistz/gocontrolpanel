@@ -201,8 +201,10 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
             nbWinners={liveInfo.nbWinners}
           />
 
-          {liveInfo.type === "teams" && <TeamScores liveInfo={liveInfo} />}
-          {(liveInfo.type === "rounds" || liveInfo.type === "cup") && (
+          {["teams", "tmwt", "tmwc"].includes(liveInfo.type) && (
+            <TeamScores liveInfo={liveInfo} />
+          )}
+          {["rounds", "cup"].includes(liveInfo.type) && (
             <RoundScores liveInfo={liveInfo} />
           )}
         </Card>
