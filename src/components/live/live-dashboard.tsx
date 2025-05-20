@@ -186,6 +186,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         isWarmUp={liveInfo.isWarmUp}
         warmUpRound={liveInfo.warmUpRound}
         warmUpTotalRounds={liveInfo.warmUpTotalRounds}
+        isPaused={liveInfo.isPaused}
       />
       <div className="flex flex-col gap-4 w-full">
         <Card className="flex flex-col gap-2 p-4 flex-1">
@@ -202,7 +203,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         </Card>
       </div>
       <div className="flex flex-col gap-4">
-        <MapInfo map={mapInfo?.map} mode={mapInfo?.mode} />
+        <MapInfo serverId={serverId} map={mapInfo?.map} mode={mapInfo?.mode} pauseAvailable={liveInfo.pauseAvailable} isPaused={liveInfo.isPaused} />
         <Rankings
           players={liveInfo.players}
           teams={liveInfo.teams}

@@ -19,6 +19,7 @@ interface LiveRoundProps {
   isWarmUp: boolean;
   warmUpRound?: number;
   warmUpTotalRounds?: number;
+  isPaused: boolean;
 }
 
 export default function LiveRound({
@@ -27,6 +28,7 @@ export default function LiveRound({
   isWarmUp,
   warmUpRound,
   warmUpTotalRounds,
+  isPaused,
 }: LiveRoundProps) {
   return (
     <Card
@@ -41,6 +43,12 @@ export default function LiveRound({
           <span className="text-xl font-bold">
             {warmUpRound} / {warmUpTotalRounds}
           </span>
+        </div>
+      )}
+
+      {isPaused && (
+        <div className="flex justify-center w-full">
+          <span className="text-xl font-bold">Paused</span>
         </div>
       )}
 
@@ -60,9 +68,7 @@ export default function LiveRound({
 
         <TableBody>
           {activeRound.players &&
-            [
-              ...Object.values(activeRound.players),
-            ]
+            [...Object.values(activeRound.players)]
               .sort((a, b) => {
                 if (b.checkpoint !== a.checkpoint) {
                   return b.checkpoint - a.checkpoint;

@@ -9,6 +9,8 @@ export interface LiveInfo {
   roundsLimit?: number;
   mapLimit?: number;
   nbWinners?: number;
+  pauseAvailable: boolean;
+  isPaused: boolean;
   maps: string[];
   teams?: Record<number, Team>;
   players?: Record<string, PlayerRound>;
