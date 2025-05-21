@@ -13,6 +13,7 @@ import MatchSettings from "./match-settings";
 import Rankings from "./rankings";
 import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
+import TimeAttackScores from "./time-attack-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: number }) {
   const { data: session } = useSession();
@@ -62,6 +63,9 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
               activeRound: message.finish,
             };
           });
+        } else if (message.personalBest) {
+          // Returns LiveInfo
+          setLiveInfo(message.personalBest);
         } else if (message.checkpoint) {
           // Returns ActiveRound
           setLiveInfo((prev) => {
@@ -194,18 +198,23 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
 
       <div className="flex flex-col gap-4">
         <Card className="flex flex-col gap-2 p-4 flex-1">
-          <MatchSettings
-            pointsLimit={liveInfo.pointsLimit}
-            roundsLimit={liveInfo.roundsLimit}
-            mapLimit={liveInfo.mapLimit}
-            nbWinners={liveInfo.nbWinners}
-          />
+          {!["timeattack"].includes(liveInfo.type) && (
+            <MatchSettings
+              pointsLimit={liveInfo.pointsLimit}
+              roundsLimit={liveInfo.roundsLimit}
+              mapLimit={liveInfo.mapLimit}
+              nbWinners={liveInfo.nbWinners}
+            />
+          )}
 
           {["teams", "tmwt", "tmwc"].includes(liveInfo.type) && (
             <TeamScores liveInfo={liveInfo} />
           )}
           {["rounds", "cup"].includes(liveInfo.type) && (
             <RoundScores liveInfo={liveInfo} />
+          )}
+          {["timeattack"].includes(liveInfo.type) && (
+            <TimeAttackScores liveInfo={liveInfo} />
           )}
         </Card>
       </div>
