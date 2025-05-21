@@ -13,13 +13,19 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
     <div className="flex flex-col gap-2">
       <div className="flex gap-2 w-full">
         {liveInfo.teams &&
-          Object.values(liveInfo.teams).map((team) => (
+          Object.values(liveInfo.teams).map((team, i) => (
             <div
               key={team.id}
               className="flex flex-1 flex-col gap-2 items-center"
             >
               <div className="flex flex-col gap-1 items-center">
-                <span className="text-3xl font-bold">{team.name}</span>
+                {["tmwt", "tmwc"].includes(liveInfo.type) ? (
+                  <span className="text-3xl font-bold">
+                    {team.name} - {team.matchPoints}
+                  </span>
+                ) : (
+                  <span className="text-3xl font-bold">{team.name}</span>
+                )}
                 <span className="text-3xl font-bold">{team.matchPoints}</span>
               </div>
 
