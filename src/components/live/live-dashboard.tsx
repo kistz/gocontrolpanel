@@ -217,6 +217,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           mode={mapInfo?.mode}
           pauseAvailable={liveInfo.pauseAvailable}
           isPaused={liveInfo.isPaused}
+          isWarmUp={liveInfo.isWarmUp}
         />
         <Rankings
           players={liveInfo.players}

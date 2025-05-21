@@ -24,6 +24,7 @@ interface MapInfoProps {
   mode?: string;
   pauseAvailable: boolean;
   isPaused: boolean;
+  isWarmUp: boolean;
 }
 
 export default function MapInfo({
@@ -32,6 +33,7 @@ export default function MapInfo({
   mode,
   pauseAvailable,
   isPaused,
+  isWarmUp,
 }: MapInfoProps) {
   const session = useSession();
   const [mapInfo, setMapInfo] = useState<Map | null>(null);
@@ -121,6 +123,7 @@ export default function MapInfo({
               serverId={serverId}
               pauseAvailable={pauseAvailable}
               isPaused={isPaused}
+              isWarmUp={isWarmUp}
             />
           </>
         )}
