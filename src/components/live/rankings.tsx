@@ -28,7 +28,7 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
               <IconHash size={14} />
             </TableHead>
             <TableHead className="font-bold">Player</TableHead>
-            {type === "teams" && (
+            {["teams", "tmwc", "tmwt"].includes(type) && (
               <TableHead className="font-bold">Team</TableHead>
             )}
             <TableHead className="font-bold">Points</TableHead>
