@@ -20,13 +20,22 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
             >
               <div className="flex flex-col gap-1 items-center">
                 {["tmwt", "tmwc"].includes(liveInfo.type) ? (
-                  <span className="text-3xl font-bold">
-                    {team.name} - {team.matchPoints}
-                  </span>
+                  <>
+                    <span className="text-3xl font-bold">
+                      {team.name} - {team.matchPoints}
+                    </span>
+                    <span className="text-3xl font-bold">
+                      {team.roundPoints}
+                    </span>
+                  </>
                 ) : (
-                  <span className="text-3xl font-bold">{team.name}</span>
+                  <>
+                    <span className="text-3xl font-bold">{team.name}</span>
+                    <span className="text-3xl font-bold">
+                      {team.matchPoints}
+                    </span>
+                  </>
                 )}
-                <span className="text-3xl font-bold">{team.matchPoints}</span>
               </div>
 
               <Separator />
@@ -46,7 +55,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                             key={i}
                             className={cn(
                               "hover:bg-transparent",
-                              i % 2 === 0 && "bg-muted",
+                              i % 2 === 0 && "bg-muted hover:bg-muted",
                             )}
                           >
                             <TableCell className="w-[50px]">

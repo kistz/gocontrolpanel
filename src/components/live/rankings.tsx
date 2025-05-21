@@ -51,7 +51,7 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
                     <span className="font-bold">{i + 1}</span>
                   </TableCell>
                   <TableCell>{player.name}</TableCell>
-                  {type === "teams" && (
+                  {["teams", "tmwt", "tmwc"].includes(type) && (
                     <TableCell>{teams && teams[player.team]?.name}</TableCell>
                   )}
                   <TableCell>

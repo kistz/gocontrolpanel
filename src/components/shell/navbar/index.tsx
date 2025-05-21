@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { Icon } from "@tabler/icons-react";
 import NavAdmin from "./nav-admin";
+import NavFooter from "./nav-footer";
 import NavMain from "./nav-main";
 import NavServers from "./nav-servers";
 
@@ -30,6 +31,7 @@ export default async function Navbar() {
           <NavServers />
         )}
       {session && session.user.roles.includes("admin") && <NavAdmin />}
+      <NavFooter />
     </>
   );
 }
