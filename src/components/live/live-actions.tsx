@@ -75,7 +75,7 @@ export default function LiveActions({
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 flex-wrap">
       {pauseAvailable && (
         <Button variant={"outline"} onClick={handlePause}>
           {isPaused ? "Resume" : "Pause"}
