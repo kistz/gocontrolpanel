@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { Icon } from "@tabler/icons-react";
 import NavAdmin from "./nav-admin";
 import NavFooter from "./nav-footer";
-import NavMain from "./nav-main";
 import NavServers from "./nav-servers";
 
 export interface NavItem {
@@ -25,7 +24,6 @@ export default async function Navbar() {
 
   return (
     <>
-      <NavMain />
       {session &&
         session.user.roles.some((r) => ["admin", "moderator"].includes(r)) && (
           <NavServers />

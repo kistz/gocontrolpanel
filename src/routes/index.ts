@@ -2,8 +2,6 @@ import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 
 export const routes = {
   dashboard: "/",
-  players: "/players",
-  maps: "/maps",
   servers: {
     settings: "/server/:id/settings",
     game: "/server/:id/game",
@@ -30,22 +28,6 @@ export const breadCrumbs: {
     breadCrumbs: [
       {
         label: "Dashboard",
-      },
-    ],
-  },
-  {
-    path: routes.players,
-    breadCrumbs: [
-      {
-        label: "Players",
-      },
-    ],
-  },
-  {
-    path: routes.maps,
-    breadCrumbs: [
-      {
-        label: "Maps",
       },
     ],
   },
