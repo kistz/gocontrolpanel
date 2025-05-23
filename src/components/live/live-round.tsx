@@ -54,7 +54,7 @@ export default function LiveRound({
 
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-transparent">
             <TableHead className="w-[50px] pl-4">
               <IconHash size={14} />
             </TableHead>
@@ -76,7 +76,7 @@ export default function LiveRound({
                 return a.time - b.time;
               })
               .map((player, i) => (
-                <TableRow key={i}>
+                <TableRow key={i} className="hover:bg-transparent">
                   <TableCell className="w-[50px]">
                     <Badge variant="outline" className="text-md font-bold">
                       {i + 1}

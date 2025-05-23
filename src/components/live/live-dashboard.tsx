@@ -148,6 +148,9 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
         } else if (message.updatedSettings) {
           // Returns LiveInfo
           setLiveInfo(message.updatedSettings);
+        } else if (message.elimination) {
+          // Returns LiveInfo
+          setLiveInfo(message.elimination);
         }
       } catch {
         console.error("Failed to parse message", event.data);

@@ -44,7 +44,14 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                 <TableBody>
                   {liveInfo.players &&
                     [...Object.values(liveInfo.players)]
-                      .sort((a, b) => b.matchPoints - a.matchPoints)
+                      .sort((a, b) => {
+                        if (a.rank !== b.rank) {
+                          return a.rank - b.rank;
+                        } else if (b.matchPoints !== a.matchPoints) {
+                          return b.matchPoints - a.matchPoints;
+                        }
+                        return a.bestTime - b.bestTime;
+                      })
                       .map((player, i) => {
                         if (player.team !== team.id) {
                           return null;

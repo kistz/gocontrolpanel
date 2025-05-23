@@ -33,6 +33,7 @@ export interface PlayerRound {
   rank: number;
   finalist: boolean;
   winner: boolean;
+  eliminated: boolean;
   roundPoints: number;
   matchPoints: number;
   bestTime: number;

@@ -21,7 +21,7 @@ export default function RoundScores({ liveInfo }: RoundScoresProps) {
       <div className="flex gap-2 w-full">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="hover:bg-transparent">
               <TableHead className="w-[50px] pl-4">
                 <IconHash size={14} />
               </TableHead>
@@ -33,33 +33,42 @@ export default function RoundScores({ liveInfo }: RoundScoresProps) {
 
           <TableBody>
             {liveInfo.players &&
-              Object.values(liveInfo.players).map((player, i) => (
-                <TableRow
-                  key={i}
-                  className={cn(
-                    "hover:bg-transparent",
-                    i % 2 === 0 && "bg-muted",
-                  )}
-                >
-                  <TableCell className="w-[50px]">
-                    <Badge variant="outline" className="text-md font-bold">
-                      {i + 1}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{player.name}</TableCell>
-                  <TableCell>
-                    {player.winner ? (
-                      <IconTrophyFilled size={20} />
-                    ) : player.finalist ? (
-                      <IconTrophy size={20} />
-                    ) : (
-                      <span>{player.matchPoints}</span>
+              Object.values(liveInfo.players)
+                .sort((a, b) => {
+                  if (a.rank !== b.rank) {
+                    return a.rank - b.rank;
+                  } else if (b.matchPoints !== a.matchPoints) {
+                    return b.matchPoints - a.matchPoints;
+                  }
+                  return a.bestTime - b.bestTime;
+                })
+                .map((player, i) => (
+                  <TableRow
+                    key={i}
+                    className={cn(
+                      "hover:bg-transparent",
+                      i % 2 === 0 && "bg-muted hover:bg-muted",
                     )}
-                  </TableCell>
+                  >
+                    <TableCell className="w-[50px]">
+                      <Badge variant="outline" className="text-md font-bold">
+                        {i + 1}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{player.name}</TableCell>
+                    <TableCell>
+                      {player.winner ? (
+                        <IconTrophyFilled size={20} />
+                      ) : player.finalist ? (
+                        <IconTrophy size={20} />
+                      ) : (
+                        <span>{player.matchPoints}</span>
+                      )}
+                    </TableCell>
 
-                  <TableCell>{formatTime(player.bestTime)}</TableCell>
-                </TableRow>
-              ))}
+                    <TableCell>{formatTime(player.bestTime)}</TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
       </div>

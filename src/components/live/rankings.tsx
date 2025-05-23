@@ -1,6 +1,7 @@
 import { formatTime } from "@/lib/utils";
 import { PlayerRound, Team } from "@/types/live";
 import { IconHash, IconTrophy, IconTrophyFilled } from "@tabler/icons-react";
+import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import {
   Table,
@@ -23,8 +24,8 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
       <h2 className="text-lg font-bold">Rankings</h2>
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-[24px] font-bold">
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-[50px] font-bold pl-4">
               <IconHash size={14} />
             </TableHead>
             <TableHead className="font-bold">Player</TableHead>
@@ -42,15 +43,19 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
           {players &&
             Object.values(players)
               .sort((a, b) => {
-                if (b.matchPoints !== a.matchPoints) {
+                if (a.rank !== b.rank) {
+                  return a.rank - b.rank;
+                } else if (b.matchPoints !== a.matchPoints) {
                   return b.matchPoints - a.matchPoints;
                 }
                 return a.bestTime - b.bestTime;
               })
               .map((player, i) => (
-                <TableRow key={i}>
+                <TableRow key={i} className="hover:bg-transparent">
                   <TableCell>
-                    <span className="font-bold">{i + 1}</span>
+                    <Badge variant="outline" className="text-md font-bold">
+                      {i + 1}
+                    </Badge>
                   </TableCell>
                   <TableCell>{player.name}</TableCell>
                   {["teams", "tmwt", "tmwc"].includes(type) && (
