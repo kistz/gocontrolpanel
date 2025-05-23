@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
     ],
     minimumCacheTTL: 60 * 60 * 24, // 1 day
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb"
+    }
+  }
 };
 
 export default nextConfig;
