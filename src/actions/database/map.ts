@@ -222,42 +222,48 @@ export async function getMapList(
     const missingMaps = allMapList.filter((map) => !existingUids.has(map.UId));
 
     if (missingMaps.length > 0) {
-      const { data: apiMapsInfo } = await getMapsInfo(
-        missingMaps.map((map) => map.UId),
-      );
+      const mapUids = missingMaps.map((map) => map.UId);
+      const BATCH_SIZE = 200;
 
       const now = new Date();
       const newDbMaps: DBMap[] = [];
 
-      for (const map of missingMaps) {
-        try {
-          const mapInfo: MapInfo = await client.call(
-            "GetMapInfo",
-            map.FileName,
-          );
-          const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.UId);
+      for (let i = 0; i < mapUids.length; i += BATCH_SIZE) {
+        const batch = mapUids.slice(i, i + BATCH_SIZE);
+        const { data: apiMapsInfo } = await getMapsInfo(batch);
 
-          newDbMaps.push({
-            _id: new ObjectId(),
-            name: mapInfo.Name || "Unknown",
-            uid: mapInfo.UId,
-            fileName: mapInfo.FileName || "",
-            author: mapInfo.Author || "",
-            authorNickname: mapInfo.AuthorNickname || "",
-            authorTime: mapInfo.AuthorTime || 0,
-            goldTime: mapInfo.GoldTime || 0,
-            silverTime: mapInfo.SilverTime || 0,
-            bronzeTime: mapInfo.BronzeTime || 0,
-            submitter: mapInfoFromApi?.submitter || "",
-            timestamp: mapInfoFromApi?.timestamp || new Date(),
-            fileUrl: mapInfoFromApi?.fileUrl || "",
-            thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
-            createdAt: now,
-            updatedAt: now,
-          });
-        } catch (err) {
-          console.warn(`Skipping map "${map.FileName}" due to error:`, err);
-          continue;
+        for (const map of missingMaps) {
+          try {
+            const mapInfo: MapInfo = await client.call(
+              "GetMapInfo",
+              map.FileName,
+            );
+            const mapInfoFromApi = apiMapsInfo?.find(
+              (m) => m.mapUid === map.UId,
+            );
+
+            newDbMaps.push({
+              _id: new ObjectId(),
+              name: mapInfo.Name || "Unknown",
+              uid: mapInfo.UId,
+              fileName: mapInfo.FileName || "",
+              author: mapInfo.Author || "",
+              authorNickname: mapInfo.AuthorNickname || "",
+              authorTime: mapInfo.AuthorTime || 0,
+              goldTime: mapInfo.GoldTime || 0,
+              silverTime: mapInfo.SilverTime || 0,
+              bronzeTime: mapInfo.BronzeTime || 0,
+              submitter: mapInfoFromApi?.submitter || "",
+              timestamp: mapInfoFromApi?.timestamp || new Date(),
+              fileUrl: mapInfoFromApi?.fileUrl || "",
+              thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
+              createdAt: now,
+              updatedAt: now,
+            });
+          } catch (err) {
+            console.warn(`Skipping map "${map.FileName}" due to error:`, err);
+            continue;
+          }
         }
       }
 
