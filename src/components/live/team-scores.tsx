@@ -13,7 +13,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
     <div className="flex flex-col gap-2">
       <div className="flex gap-2 w-full">
         {liveInfo.teams &&
-          Object.values(liveInfo.teams).map((team, i) => (
+          Object.values(liveInfo.teams).map((team) => (
             <div
               key={team.id}
               className="flex flex-1 flex-col gap-2 items-center"
