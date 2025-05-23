@@ -68,6 +68,33 @@ export async function getMapByUid(
       return null;
     }
 
+    if (!map.thumbnailUrl) {
+      const { data: apiMapsInfo } = await getMapsInfo([uid]);
+      const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === uid);
+      if (mapInfoFromApi) {
+        await collection.updateOne(
+          { _id: map._id },
+          {
+            $set: {
+              submitter: mapInfoFromApi.submitter,
+              timestamp: mapInfoFromApi.timestamp,
+              fileUrl: mapInfoFromApi.fileUrl,
+              thumbnailUrl: mapInfoFromApi.thumbnailUrl,
+            },
+          },
+        );
+      }
+    }
+
+    const mapDB = await collection.findOne({
+      uid,
+      deletedAt: { $exists: false },
+    });
+
+    if (!mapDB) {
+      return null;
+    }
+
     return mapDBMapToMap(map);
   });
 }
