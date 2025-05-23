@@ -21,6 +21,7 @@ import { Server } from "@/types/server";
 import {
   IconActivity,
   IconAdjustmentsAlt,
+  IconCode,
   IconDeviceGamepad,
   IconFileDescription,
   IconMap,
@@ -154,6 +155,13 @@ export default function NavServers() {
               },
             ]
           : []),
+          {
+            name: "Dev",
+            url: generatePath(routes.servers.dev, {
+              id: server.id,
+            }),
+            icon: IconCode,
+          }
       ],
     })),
   };

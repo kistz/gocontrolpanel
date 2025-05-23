@@ -14,6 +14,7 @@ import Rankings from "./rankings";
 import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
+import KnockoutScores from "./knockout-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: number }) {
   const { data: session } = useSession();
@@ -215,6 +216,9 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
           )}
           {["timeattack"].includes(liveInfo.type) && (
             <TimeAttackScores liveInfo={liveInfo} />
+          )}
+          {["knockout"].includes(liveInfo.type) && (
+            <KnockoutScores liveInfo={liveInfo} />
           )}
         </Card>
       </div>

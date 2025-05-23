@@ -9,6 +9,7 @@ export interface LiveInfo {
   roundsLimit?: number;
   mapLimit?: number;
   nbWinners?: number;
+  pointsRepartition: number[];
   pauseAvailable: boolean;
   isPaused: boolean;
   maps: string[];

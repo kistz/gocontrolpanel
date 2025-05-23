@@ -284,3 +284,10 @@ export async function forceSpectator(
     await client.call("ForceSpectator", login, status);
   });
 }
+
+export async function connectFakePlayer(serverId: number): Promise<ServerResponse> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const client = await getGbxClient(serverId);
+    await client.call("ConnectFakePlayer");
+  });
+}

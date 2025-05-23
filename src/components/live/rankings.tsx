@@ -31,7 +31,7 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
             {["teams", "tmwc", "tmwt"].includes(type) && (
               <TableHead className="font-bold">Team</TableHead>
             )}
-            {!["timeattack"].includes(type) && (
+            {!["timeattack", "knockout"].includes(type) && (
               <TableHead className="font-bold">Points</TableHead>
             )}
             <TableHead className="font-bold">Best Time</TableHead>
@@ -56,7 +56,7 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
                   {["teams", "tmwt", "tmwc"].includes(type) && (
                     <TableCell>{teams && teams[player.team]?.name}</TableCell>
                   )}
-                  {!["timeattack"].includes(type) && (
+                  {!["timeattack", "knockout"].includes(type) && (
                     <TableCell>
                       {player.winner ? (
                         <IconTrophyFilled size={20} />

@@ -1,0 +1,61 @@
+import { LiveInfo } from "@/types/live";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { IconHash, IconTrophy, IconTrophyFilled } from "@tabler/icons-react";
+import { cn, formatTime } from "@/lib/utils";
+import { Badge } from "../ui/badge";
+
+interface KnockoutScoresProps {
+  liveInfo: LiveInfo;
+}
+
+export default function KnockoutScores({ liveInfo }: KnockoutScoresProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2 w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px] pl-4">
+                <IconHash size={14} />
+              </TableHead>
+              <TableHead className="font-bold">Name</TableHead>
+              <TableHead className="font-bold">Points</TableHead>
+              <TableHead className="font-bold">Best Time</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {liveInfo.players &&
+              Object.values(liveInfo.players).map((player, i) => (
+                <TableRow
+                  key={i}
+                  className={cn(
+                    "hover:bg-transparent",
+                    i % 2 === 0 && "bg-muted",
+                  )}
+                >
+                  <TableCell className="w-[50px]">
+                    <Badge variant="outline" className="text-md font-bold">
+                      {i + 1}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{player.name}</TableCell>
+                  <TableCell>
+                    {player.winner ? (
+                      <IconTrophyFilled size={20} />
+                    ) : player.finalist ? (
+                      <IconTrophy size={20} />
+                    ) : (
+                      <span>{player.matchPoints}</span>
+                    )}
+                  </TableCell>
+
+                  <TableCell>{formatTime(player.bestTime)}</TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
