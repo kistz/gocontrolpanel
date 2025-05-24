@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DBMap {
+  id             String    @id @default(cuid())
+  name           String
+  uid            String    @unique
+  fileName       String
+  author         String
+  authorNickname String
+  authorTime     Int
+  goldTime       Int
+  silverTime     Int
+  bronzeTime     Int
+  submitter      String?
+  timestamp      DateTime?
+  fileUrl        String?
+  thumbnailUrl   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+}
+
+model DBPlayer {
+  id        String    @id @default(cuid())
+  login     String
+  nickName  String
+  path      String
+  roles     String[]
+  ubiUid    String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
