@@ -82,7 +82,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
       const handleDelete = () => {
         startTransition(async () => {
           try {
-            const { error } = await deletePlayerById(player._id);
+            const { error } = await deletePlayerById(player.id);
             if (error) {
               throw new Error(error);
             }

@@ -15,7 +15,7 @@ export const usePaginationAPI = <TData>(
     filter?: string,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>,
   pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string } = { field: "_id", order: "ASC" },
+  sorting: { field: string; order: string } = { field: "id", order: "ASC" },
   filter: string = "",
 ): PaginationAPIHook<TData> => {
   const [data, setData] = useState<TData[]>([]);

@@ -77,7 +77,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       session.user = {
-        _id: token._id,
+        id: token.id,
         accountId: token.accountId,
         login: token.login,
         displayName: token.displayName,
@@ -99,7 +99,7 @@ export const authOptions: NextAuthOptions = {
         token.login = login;
         token.displayName = user.displayName;
       } else {
-        ({ data: dbUser } = await getPlayerById(token._id));
+        ({ data: dbUser } = await getPlayerById(token.id));
       }
 
       if (!dbUser) {
@@ -137,7 +137,7 @@ export const authOptions: NextAuthOptions = {
         console.error("Failed to fetch connector token", error);
       }
 
-      token._id = dbUser._id;
+      token.id = dbUser.id;
       token.roles = dbUser.roles || [];
       token.ubiId = dbUser.ubiUid;
 

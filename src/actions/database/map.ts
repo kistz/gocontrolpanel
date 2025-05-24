@@ -2,19 +2,20 @@
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getGbxClient } from "@/lib/gbxclient";
-import { DBMap, Map, MapInfo, MapInfoMinimal } from "@/types/map";
+import { Map, MapInfo, MapInfoMinimal } from "@/types/map";
 import {
   PaginationResponse,
   ServerError,
   ServerResponse,
 } from "@/types/responses";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { collections, getDatabase } from "../../lib/mongodb";
+import { DBMap } from "@/types/db/map";
 
 export async function getAllMaps(): Promise<ServerResponse<Map[]>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
     const maps = await collection
       .find({
         deletedAt: { $exists: false },
@@ -58,7 +59,7 @@ export async function getMapByUid(
 ): Promise<ServerResponse<Map | null>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
     const map = await collection.findOne({
       uid,
       deletedAt: { $exists: false },
@@ -102,7 +103,7 @@ export async function getMapByUid(
 export async function getMapCount(): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
     const count = await collection.countDocuments({
       deletedAt: { $exists: false },
     });
@@ -115,7 +116,7 @@ export async function getNewMapsCount(
 ): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
     const date = new Date();
     date.setDate(date.getDate() - days);
     const count = await collection.countDocuments({
@@ -132,7 +133,7 @@ export async function getMapsPaginated(
 ): Promise<ServerResponse<PaginationResponse<Map>>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
     const totalCount = await collection.countDocuments({
       deletedAt: { $exists: false },
     });
@@ -157,7 +158,7 @@ export async function deleteMapById(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
     const result = await collection.updateOne(
       { _id: new ObjectId(mapId) },
       { $set: { deletedAt: new Date() } },
@@ -169,7 +170,7 @@ export async function deleteMapById(
   });
 }
 
-function mapDBMapToMap(dbMap: DBMap): Map {
+function mapDBMapToMap(dbMap: WithId<DBMap>): Map {
   return {
     ...dbMap,
     _id: dbMap._id.toString(),
@@ -212,7 +213,7 @@ export async function getMapList(
     const uids = allMapList.filter((map) => map.UId).map((map) => map.UId);
 
     const db = await getDatabase();
-    const collection = db.collection<DBMap>(collections.MAPS);
+    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
 
     const existingMaps = await collection
       .find({ uid: { $in: uids } })
@@ -226,7 +227,7 @@ export async function getMapList(
       const BATCH_SIZE = 200;
 
       const now = new Date();
-      const newDbMaps: DBMap[] = [];
+      const newDbMaps: WithId<DBMap>[] = [];
 
       for (let i = 0; i < mapUids.length; i += BATCH_SIZE) {
         const batch = mapUids.slice(i, i + BATCH_SIZE);

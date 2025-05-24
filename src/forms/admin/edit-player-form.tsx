@@ -31,7 +31,7 @@ export default function EditPlayerForm({
 
   async function onSubmit(values: EditPlayerSchemaType) {
     try {
-      const { error } = await updatePlayer(player._id, {
+      const { error } = await updatePlayer(player.id, {
         roles: values.roles,
       });
       if (error) {

@@ -5,14 +5,15 @@ import {
   ServerError,
   ServerResponse,
 } from "@/types/responses";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { collections, getDatabase } from "../../lib/mongodb";
-import { DBPlayer, Player } from "../../types/player";
+import { Player } from "../../types/player";
+import { DBPlayer } from "@/types/db/player";
 
 export async function getAllPlayers(): Promise<ServerResponse<Player[]>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
     const players = await collection
       .find({
         deletedAt: { $exists: false },
@@ -25,7 +26,7 @@ export async function getAllPlayers(): Promise<ServerResponse<Player[]>> {
 export async function getPlayerCount(): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
     return collection.countDocuments({
       deletedAt: { $exists: false },
     });
@@ -37,7 +38,7 @@ export async function getNewPlayersCount(
 ): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
     const date = new Date();
     date.setDate(date.getDate() - days);
     const count = await collection.countDocuments({
@@ -55,7 +56,8 @@ export async function getPlayersPaginated(
 ): Promise<ServerResponse<PaginationResponse<Player>>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
+
     const totalCount = await collection.countDocuments({
       deletedAt: { $exists: false },
       ...(filter && {
@@ -67,6 +69,11 @@ export async function getPlayersPaginated(
         ],
       }),
     });
+
+    if (sorting.field === "id") {
+      sorting.field = "_id"; // MongoDB uses _id for the default ID field
+    }
+
     const players = await collection
       .find({
         deletedAt: { $exists: false },
@@ -96,7 +103,7 @@ export async function getPlayerById(
 ): Promise<ServerResponse<Player>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
     const player = await collection.findOne({
       _id: new ObjectId(playerId),
       deletedAt: { $exists: false },
@@ -113,7 +120,7 @@ export async function getPlayerByLogin(
 ): Promise<ServerResponse<Player>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
     const player = await collection.findOne({
       login,
       deletedAt: { $exists: false },
@@ -126,11 +133,11 @@ export async function getPlayerByLogin(
 }
 
 export async function createPlayerAuth(
-  player: Omit<DBPlayer, "_id" | "createdAt" | "updatedAt">,
+  player: Omit<DBPlayer, "id" | "createdAt" | "updatedAt">,
 ): Promise<ServerResponse<Player>> {
   return doServerAction(async () => {
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
 
     const existingPlayer = await collection.findOne({
       $or: [
@@ -165,15 +172,15 @@ export async function createPlayerAuth(
 
 export async function updatePlayer(
   playerId: ObjectId | string,
-  data: Partial<DBPlayer>,
+  data: Partial<WithId<DBPlayer>>,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
-    if (playerId === session.user._id) {
+    if (playerId === session.user.id) {
       throw new ServerError("Cannot update your own account");
     }
 
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
 
     const existingPlayer = await collection.findOne({
       _id: new ObjectId(playerId),
@@ -203,12 +210,12 @@ export async function deletePlayerById(
   playerId: ObjectId | string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
-    if (playerId === session.user._id) {
+    if (playerId === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }
 
     const db = await getDatabase();
-    const collection = db.collection<DBPlayer>(collections.PLAYERS);
+    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
     const result = await collection.updateOne(
       { _id: new ObjectId(playerId) },
       { $set: { deletedAt: new Date() } },
@@ -219,9 +226,10 @@ export async function deletePlayerById(
   });
 }
 
-function mapDBPlayerToPlayer(dbPlayer: DBPlayer): Player {
+function mapDBPlayerToPlayer(dbPlayer: WithId<DBPlayer>): Player {
+  const { _id, ...rest } = dbPlayer;
   return {
-    ...dbPlayer,
-    _id: dbPlayer._id.toString(),
+    ...rest,
+    id: _id.toString(),
   };
 }

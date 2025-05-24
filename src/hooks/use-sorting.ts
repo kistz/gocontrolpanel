@@ -9,7 +9,7 @@ interface SortingHook {
 }
 
 export const useSorting = (
-  initialField: string = "_id",
+  initialField: string = "id",
   initialOrder: string = "ASC",
 ): SortingHook => {
   const [sorting, setSorting] = useState<SortingState>([
@@ -22,7 +22,7 @@ export const useSorting = (
   return {
     sorting,
     setSorting,
-    field: sorting[0]?.id || "_id",
+    field: sorting[0]?.id || "id",
     order: sorting[0]?.desc ? "DESC" : "ASC",
   };
 };
