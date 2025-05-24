@@ -1,25 +1,5 @@
 import { Maps } from "@/lib/prisma/generated";
 
-export interface Map {
-  id: string;
-  name: string;
-  uid: string;
-  fileName: string;
-  author: string;
-  authorNickname: string;
-  authorTime: number;
-  goldTime: number;
-  silverTime: number;
-  bronzeTime: number;
-  submitter?: string;
-  timestamp?: Date;
-  fileUrl?: string;
-  thumbnailUrl?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-}
-
 export interface MapInfoMinimal {
   Name: string;
   UId: string;

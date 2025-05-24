@@ -10,8 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Maps } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { Map } from "@/types/map";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -22,9 +22,9 @@ const MapActionsCell = memo(function MapActionsCell({
   serverId,
   onRemoveMap,
 }: {
-  data: Map;
+  data: Maps;
   serverId?: number;
-  onRemoveMap: (map: Map) => void;
+  onRemoveMap: (map: Maps) => void;
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
@@ -81,8 +81,8 @@ const MapActionsCell = memo(function MapActionsCell({
 });
 
 export const createColumns = (
-  onRemoveMap: (map: Map) => void,
-): DndListColumn<Map>[] => [
+  onRemoveMap: (map: Maps) => void,
+): DndListColumn<Maps>[] => [
   {
     id: "id",
     cell: () => <></>,

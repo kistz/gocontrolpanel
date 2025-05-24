@@ -8,8 +8,9 @@ import {
 } from "@/actions/gbx/map";
 import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/server/[id]/maps/jukebox-columns";
 import { createColumns as createMapColumns } from "@/app/(gocontroller)/server/[id]/maps/server-maps-columns";
+import { Maps } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { JukeboxMap, Map } from "@/types/map";
+import { JukeboxMap } from "@/types/map";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
@@ -20,7 +21,7 @@ import { Button } from "../ui/button";
 interface JukeboxProps {
   serverId: number;
   jukebox: JukeboxMap[];
-  maps: Map[];
+  maps: Maps[];
 }
 
 export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
@@ -64,7 +65,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
     setJukeboxOrder(newJukebox);
   }
 
-  async function onAddMap(map: Map) {
+  async function onAddMap(map: Maps) {
     try {
       const { data: newMap, error } = await addMapToJukebox(serverId, map);
       if (error) {

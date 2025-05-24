@@ -2,14 +2,14 @@
 
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { Map } from "@/types/map";
+import { Maps } from "@/lib/prisma/generated";
 import { ColumnDef } from "@tanstack/react-table";
 import { useTransition } from "react";
 import { parseTmTags } from "tmtags";
 
 export const createColumns = (
-  onAddMap: (map: Map) => void,
-): ColumnDef<Map>[] => [
+  onAddMap: (map: Maps) => void,
+): ColumnDef<Maps>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
