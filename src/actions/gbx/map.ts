@@ -2,8 +2,9 @@
 
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
+import { Maps } from "@/lib/prisma/generated";
 import { getRedisClient } from "@/lib/redis";
-import { JukeboxMap, Map, MapInfo } from "@/types/map";
+import { JukeboxMap, MapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { getServers } from "../gbxconnector/servers";
 
@@ -44,13 +45,12 @@ export async function clearJukebox(server: number): Promise<ServerResponse> {
 
 export async function addMapToJukebox(
   server: number,
-  map: Map,
+  map: Maps,
 ): Promise<ServerResponse<JukeboxMap>> {
   return doServerActionWithAuth(["admin"], async (session) => {
     const redis = await getRedisClient();
     const newMap: JukeboxMap = {
       ...map,
-      id: new Date().toISOString(),
       QueuedAt: new Date(),
       QueuedBy: session.user.login,
       QueuedByDisplayName: session.user.displayName,

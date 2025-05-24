@@ -1,8 +1,8 @@
 "use client";
 import { addMapList, removeMapList } from "@/actions/gbx/map";
 import { createColumns } from "@/app/(gocontroller)/server/[id]/maps/map-order-columns";
+import { Maps } from "@/lib/prisma/generated";
 import { getDivergingList, getErrorMessage } from "@/lib/utils";
-import { Map } from "@/types/map";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
@@ -13,11 +13,11 @@ export default function MapOrder({
   mapList,
   serverId,
 }: {
-  mapList: Map[];
+  mapList: Maps[];
   serverId: number;
 }) {
-  const [defaultMapList, setDefaultMapList] = useState<Map[]>(mapList);
-  const [mapOrder, setMapOrder] = useState<Map[]>(defaultMapList);
+  const [defaultMapList, setDefaultMapList] = useState<Maps[]>(mapList);
+  const [mapOrder, setMapOrder] = useState<Maps[]>(defaultMapList);
 
   async function saveMapOrder() {
     try {
@@ -51,7 +51,7 @@ export default function MapOrder({
     setMapOrder(defaultMapList);
   }
 
-  async function onRemoveMap(map: Map) {
+  async function onRemoveMap(map: Maps) {
     const newMapOrder = mapOrder.filter((m) => m.uid !== map.uid);
     setMapOrder(newMapOrder);
     setDefaultMapList(newMapOrder);

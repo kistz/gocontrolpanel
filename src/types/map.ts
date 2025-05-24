@@ -1,3 +1,5 @@
+import { Maps } from "@/lib/prisma/generated";
+
 export interface Map {
   id: string;
   name: string;
@@ -55,7 +57,7 @@ export interface LocalMapInfo extends MapInfo {
   Path: string;
 }
 
-export interface JukeboxMap extends Map {
+export interface JukeboxMap extends Maps {
   QueuedBy: string;
   QueuedByDisplayName: string;
   QueuedAt: Date;

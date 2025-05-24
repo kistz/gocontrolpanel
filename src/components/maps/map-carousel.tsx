@@ -1,7 +1,7 @@
 "use client";
 
+import { Maps } from "@/lib/prisma/generated";
 import { cn } from "@/lib/utils";
-import { Map } from "@/types/map";
 import {
   IconArrowForwardUp,
   IconLock,
@@ -22,7 +22,7 @@ import CarouselMapCard from "./carousel-map-card";
 
 interface MapCarouselProps {
   serverId: number;
-  maps: Map[];
+  maps: Maps[];
   loop?: boolean;
   startIndex?: number;
   className?: string;

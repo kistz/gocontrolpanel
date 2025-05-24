@@ -1,7 +1,7 @@
 import { nextMap, restartMap } from "@/actions/gbx/game";
 import { jumpToMap } from "@/actions/gbx/map";
+import { Maps } from "@/lib/prisma/generated";
 import { cn, getErrorMessage } from "@/lib/utils";
-import { Map } from "@/types/map";
 import {
   IconBounceRight,
   IconPhoto,
@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 
 interface CarouselMapCardProps {
-  map: Map;
+  map: Maps;
   index: number;
   isCurrent?: boolean;
   isSwitching?: boolean;
