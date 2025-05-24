@@ -167,7 +167,7 @@ export default function NavServers() {
 
   return (
     <SidebarGroup
-      className="group-data-[collapsible=icon]:hidden"
+      className="group-data-[collapsible=icon]:hidden select-none"
       key={group.name || "default"}
     >
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
@@ -216,7 +216,7 @@ export default function NavServers() {
                     <>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton tooltip={server.name} asChild>
-                          <div>
+                          <div className="select-none cursor-pointer">
                             {server.icon && <server.icon />}
                             <span className="overflow-hidden text-ellipsis text-nowrap">
                               {server.name}

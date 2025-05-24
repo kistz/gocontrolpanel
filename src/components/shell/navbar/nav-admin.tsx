@@ -43,7 +43,7 @@ export default async function NavAdmin() {
 
   return (
     <SidebarGroup
-      className="group-data-[collapsible=icon]:hidden"
+      className="group-data-[collapsible=icon]:hidden select-none"
       key={group.name || "default"}
     >
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}

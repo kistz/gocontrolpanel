@@ -18,7 +18,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-2 p-2">
+            <div className="flex items-center gap-2 p-2 select-none">
               <IconDeviceGamepad2 className="!size-5" />
               <span className="text-base font-semibold">GoControlPanel</span>
             </div>

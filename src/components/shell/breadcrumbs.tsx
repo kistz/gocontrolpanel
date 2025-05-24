@@ -26,7 +26,7 @@ export default function Breadcrumbs({ crumbs, className }: BreadcrumbsProps) {
     <Breadcrumb className={className}>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href={routes.dashboard}>Home</BreadcrumbLink>
+          <BreadcrumbLink href={routes.dashboard} className="select-none">Home</BreadcrumbLink>
         </BreadcrumbItem>
         {crumbs.length > 0 && (
           <>
@@ -38,7 +38,7 @@ export default function Breadcrumbs({ crumbs, className }: BreadcrumbsProps) {
                     <>
                       <BreadcrumbLink
                         asChild
-                        className="max-w-20 truncate md:max-w-none"
+                        className="max-w-20 truncate md:max-w-none select-none"
                       >
                         <Link href={item.path}>{item.label}</Link>
                       </BreadcrumbLink>
@@ -46,7 +46,7 @@ export default function Breadcrumbs({ crumbs, className }: BreadcrumbsProps) {
                   ) : (
                     <BreadcrumbPage
                       className={cn(
-                        "max-w-20 truncate md:max-w-none",
+                        "max-w-20 truncate md:max-w-none select-none",
                         index !== crumbs.length - 1 && "text-muted-foreground",
                       )}
                     >
