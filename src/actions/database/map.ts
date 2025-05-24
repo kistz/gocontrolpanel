@@ -171,9 +171,10 @@ export async function deleteMapById(
 }
 
 function mapDBMapToMap(dbMap: WithId<DBMap>): Map {
+  const { _id, ...rest } = dbMap;
   return {
-    ...dbMap,
-    _id: dbMap._id.toString(),
+    ...rest,
+    id: _id.toString(),
   };
 }
 

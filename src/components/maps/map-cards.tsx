@@ -72,7 +72,7 @@ export default function MapCards({
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 grid-rows-2">
         {data.map((map) => (
-          <MapCard map={map} key={map._id} refetch={refetch} />
+          <MapCard map={map} key={map.id} refetch={refetch} />
         ))}
         {!loading && data.length === 0 && (
           <div className="col-span-full flex items-center justify-center">

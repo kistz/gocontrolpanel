@@ -1,5 +1,5 @@
 export interface Map {
-  _id: string;
+  id: string;
   name: string;
   uid: string;
   fileName: string;
@@ -16,10 +16,6 @@ export interface Map {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
-}
-
-export interface OrderMap extends Map {
-  id: string;
 }
 
 export interface MapInfoMinimal {
@@ -60,7 +56,6 @@ export interface LocalMapInfo extends MapInfo {
 }
 
 export interface JukeboxMap extends Map {
-  id: string;
   QueuedBy: string;
   QueuedByDisplayName: string;
   QueuedAt: Date;

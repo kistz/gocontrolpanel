@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage } from "@/lib/utils";
-import { OrderMap } from "@/types/map";
+import { Map } from "@/types/map";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -22,9 +22,9 @@ const MapActionsCell = memo(function MapActionsCell({
   serverId,
   onRemoveMap,
 }: {
-  data: OrderMap;
+  data: Map;
   serverId?: number;
-  onRemoveMap: (map: OrderMap) => void;
+  onRemoveMap: (map: Map) => void;
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
@@ -81,8 +81,8 @@ const MapActionsCell = memo(function MapActionsCell({
 });
 
 export const createColumns = (
-  onRemoveMap: (map: OrderMap) => void,
-): DndListColumn<OrderMap>[] => [
+  onRemoveMap: (map: Map) => void,
+): DndListColumn<Map>[] => [
   {
     id: "id",
     cell: () => <></>,

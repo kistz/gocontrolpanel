@@ -116,7 +116,7 @@ export default function MapCardActions({
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={async () => {
           setIsDeleteDialogOpen(false);
-          const { error } = await deleteMapById(map._id);
+          const { error } = await deleteMapById(map.id);
           if (error) {
             toast.error("Error deleting map", {
               description: error,

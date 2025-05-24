@@ -2,7 +2,7 @@
 import { addMapList, removeMapList } from "@/actions/gbx/map";
 import { createColumns } from "@/app/(gocontroller)/server/[id]/maps/map-order-columns";
 import { getDivergingList, getErrorMessage } from "@/lib/utils";
-import { Map, OrderMap } from "@/types/map";
+import { Map } from "@/types/map";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
@@ -17,12 +17,7 @@ export default function MapOrder({
   serverId: number;
 }) {
   const [defaultMapList, setDefaultMapList] = useState<Map[]>(mapList);
-  const [mapOrder, setMapOrder] = useState<OrderMap[]>(
-    defaultMapList.map((map) => ({
-      ...map,
-      id: map.uid,
-    })),
-  );
+  const [mapOrder, setMapOrder] = useState<Map[]>(defaultMapList);
 
   async function saveMapOrder() {
     try {
@@ -53,15 +48,10 @@ export default function MapOrder({
   }
 
   async function resetMapOrder() {
-    setMapOrder(
-      defaultMapList.map((map) => ({
-        ...map,
-        id: map.uid,
-      })),
-    );
+    setMapOrder(defaultMapList);
   }
 
-  async function onRemoveMap(map: OrderMap) {
+  async function onRemoveMap(map: Map) {
     const newMapOrder = mapOrder.filter((m) => m.uid !== map.uid);
     setMapOrder(newMapOrder);
     setDefaultMapList(newMapOrder);
