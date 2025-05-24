@@ -7,6 +7,7 @@ import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 import GridPagination from "../grid/grid-pagination";
 import MapCard from "./map-card";
+import { Maps } from "@/lib/prisma/generated";
 
 interface MapCardsProps {
   fetchData?: (
@@ -18,7 +19,7 @@ interface MapCardsProps {
       field: string;
       order: string;
     },
-  ) => Promise<ServerResponse<PaginationResponse<Map>>>;
+  ) => Promise<ServerResponse<PaginationResponse<Maps>>>;
 }
 
 export default function MapCards({

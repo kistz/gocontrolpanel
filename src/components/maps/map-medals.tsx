@@ -1,10 +1,10 @@
-import { Map } from "@/types/map";
+import { Maps } from "@/lib/prisma/generated";
 import { IconMedal } from "@tabler/icons-react";
 import TimeDisplay from "../time-display";
 import { Card } from "../ui/card";
 
 interface MapMedalsProps {
-  map: Map;
+  map: Maps;
 }
 
 export default function MapMedals({ map }: MapMedalsProps) {

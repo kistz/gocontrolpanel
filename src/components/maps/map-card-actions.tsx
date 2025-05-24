@@ -1,6 +1,6 @@
 import { deleteMapById } from "@/actions/database/map";
 import { Button } from "@/components/ui/button";
-import { Map } from "@/types/map";
+import { Maps } from "@/lib/prisma/generated";
 import { IconDownload, IconHeartbeat } from "@tabler/icons-react";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -18,7 +18,7 @@ import {
 } from "../ui/dropdown-menu";
 
 interface MapCardActionsProps {
-  map: Map;
+  map: Maps;
   ref: React.RefObject<HTMLDivElement | null>;
   refetch?: () => void;
 }

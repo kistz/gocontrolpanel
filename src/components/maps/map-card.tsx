@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Map } from "@/types/map";
+import { Maps } from "@/lib/prisma/generated";
 import { IconPhoto, IconUser } from "@tabler/icons-react";
 import Image from "next/image";
 import { useRef } from "react";
@@ -8,7 +8,7 @@ import MapCardActions from "./map-card-actions";
 import MapMedals from "./map-medals";
 
 interface MapCardProps {
-  map: Map;
+  map: Maps;
   refetch?: () => void;
 }
 
