@@ -18,8 +18,8 @@ export async function connectToDatabase() {
     if (process.env.NODE_ENV === "production") {
       console.warn("MongoDB not available during build, continuing...");
     } else {
-      console.error("Error connecting to Redis:", error);
-      throw new Error("Failed to connect to Redis");
+      console.error("Error connecting to MongoDB:", error);
+      throw new Error("Failed to connect to MongoDB");
     }
   }
 }
