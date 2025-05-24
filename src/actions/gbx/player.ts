@@ -12,6 +12,10 @@ export async function getPlayerList(
     const client = await getGbxClient(serverId);
     const playerList = await client.call("GetPlayerList", 1000, 0);
 
+    if (!playerList || !Array.isArray(playerList)) {
+      return [];
+    }
+
     const players: PlayerInfo[] = [];
     for (const player of playerList) {
       try {
