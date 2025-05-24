@@ -1,8 +1,8 @@
 "use client";
 
 import { getMapByUid } from "@/actions/database/map";
+import { Maps } from "@/lib/prisma/generated";
 import { formatTime, getErrorMessage } from "@/lib/utils";
-import { Map } from "@/types/map";
 import {
   IconPhoto,
   IconScript,
@@ -36,7 +36,7 @@ export default function MapInfo({
   isWarmUp,
 }: MapInfoProps) {
   const session = useSession();
-  const [mapInfo, setMapInfo] = useState<Map | null>(null);
+  const [mapInfo, setMapInfo] = useState<Maps | null>(null);
 
   useEffect(() => {
     if (!map) return;
