@@ -1,26 +1,25 @@
 "use server";
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getMapsInfo } from "@/lib/api/nadeo";
+import { getClient } from "@/lib/dbclient";
 import { getGbxClient } from "@/lib/gbxclient";
-import { Map, MapInfo, MapInfoMinimal } from "@/types/map";
+import { Maps } from "@/lib/prisma/generated";
+import { MapInfo, MapInfoMinimal } from "@/types/map";
 import {
   PaginationResponse,
   ServerError,
   ServerResponse,
 } from "@/types/responses";
-import { ObjectId, WithId } from "mongodb";
-import { collections, getDatabase } from "../../lib/mongodb";
-import { DBMap } from "@/types/db/map";
+import { ObjectId } from "mongodb";
 
-export async function getAllMaps(): Promise<ServerResponse<Map[]>> {
+export async function getAllMaps(): Promise<ServerResponse<Maps[]>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
-    const maps = await collection
-      .find({
-        deletedAt: { $exists: false },
-      })
-      .toArray();
+    const db = getClient();
+    const maps = await db.maps.findMany({
+      where: {
+        deletedAt: null,
+      },
+    });
 
     const mapsMissingApiInfo = maps.filter((map) => !map.thumbnailUrl);
     if (mapsMissingApiInfo.length > 0) {
@@ -34,35 +33,31 @@ export async function getAllMaps(): Promise<ServerResponse<Map[]>> {
         for (const map of mapsMissingApiInfo) {
           const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.uid);
           if (mapInfoFromApi) {
-            await collection.updateOne(
-              { _id: map._id },
-              {
-                $set: {
-                  submitter: mapInfoFromApi.submitter,
-                  timestamp: mapInfoFromApi.timestamp,
-                  fileUrl: mapInfoFromApi.fileUrl,
-                  thumbnailUrl: mapInfoFromApi.thumbnailUrl,
-                },
+            await db.maps.update({
+              where: { id: map.id },
+              data: {
+                submitter: mapInfoFromApi.submitter,
+                timestamp: mapInfoFromApi.timestamp,
+                fileUrl: mapInfoFromApi.fileUrl,
+                thumbnailUrl: mapInfoFromApi.thumbnailUrl,
               },
-            );
+            });
           }
         }
       }
     }
 
-    return maps.map((map) => mapDBMapToMap(map));
+    return maps;
   });
 }
 
 export async function getMapByUid(
   uid: string,
-): Promise<ServerResponse<Map | null>> {
+): Promise<ServerResponse<Maps | null>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
-    const map = await collection.findOne({
-      uid,
-      deletedAt: { $exists: false },
+    const db = getClient();
+    let map = await db.maps.findFirst({
+      where: { uid, deletedAt: null },
     });
 
     if (!map) {
@@ -73,39 +68,31 @@ export async function getMapByUid(
       const { data: apiMapsInfo } = await getMapsInfo([uid]);
       const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === uid);
       if (mapInfoFromApi) {
-        await collection.updateOne(
-          { _id: map._id },
-          {
-            $set: {
-              submitter: mapInfoFromApi.submitter,
-              timestamp: mapInfoFromApi.timestamp,
-              fileUrl: mapInfoFromApi.fileUrl,
-              thumbnailUrl: mapInfoFromApi.thumbnailUrl,
-            },
+        await db.maps.update({
+          where: { id: map.id },
+          data: {
+            submitter: mapInfoFromApi.submitter,
+            timestamp: mapInfoFromApi.timestamp,
+            fileUrl: mapInfoFromApi.fileUrl,
+            thumbnailUrl: mapInfoFromApi.thumbnailUrl,
           },
-        );
+        });
       }
+
+      map = await db.maps.findFirst({
+        where: { uid, deletedAt: null },
+      });
     }
 
-    const mapDB = await collection.findOne({
-      uid,
-      deletedAt: { $exists: false },
-    });
-
-    if (!mapDB) {
-      return null;
-    }
-
-    return mapDBMapToMap(map);
+    return map;
   });
 }
 
 export async function getMapCount(): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
-    const count = await collection.countDocuments({
-      deletedAt: { $exists: false },
+    const db = getClient();
+    const count = await db.maps.count({
+      where: { deletedAt: null },
     });
     return count;
   });
@@ -115,13 +102,14 @@ export async function getNewMapsCount(
   days: number,
 ): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
+    const db = getClient();
     const date = new Date();
     date.setDate(date.getDate() - days);
-    const count = await collection.countDocuments({
-      createdAt: { $gte: date },
-      deletedAt: { $exists: false },
+    const count = await db.maps.count({
+      where: {
+        createdAt: { gt: date },
+        deletedAt: null,
+      },
     });
     return count;
   });
@@ -130,59 +118,46 @@ export async function getNewMapsCount(
 export async function getMapsPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
-): Promise<ServerResponse<PaginationResponse<Map>>> {
+): Promise<ServerResponse<PaginationResponse<Maps>>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
-    const totalCount = await collection.countDocuments({
-      deletedAt: { $exists: false },
+    const db = getClient();
+    const totalCount = await db.maps.count({
+      where: { deletedAt: null },
     });
-    const maps = await collection
-      .find({
-        deletedAt: { $exists: false },
-      })
-      .skip(pagination.skip)
-      .limit(pagination.limit)
-      .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
-      .toArray();
+
+    const maps = await db.maps.findMany({
+      where: {
+        deletedAt: null,
+      },
+      skip: pagination.skip,
+      take: pagination.limit,
+      orderBy: {
+        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc", // 'asc' | 'desc'
+      },
+    });
 
     return {
-      data: maps.map((map) => mapDBMapToMap(map)),
+      data: maps,
       totalCount,
     };
   });
 }
 
-export async function deleteMapById(
-  mapId: ObjectId | string,
-): Promise<ServerResponse> {
+export async function deleteMapById(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
-    const result = await collection.updateOne(
-      { _id: new ObjectId(mapId) },
-      { $set: { deletedAt: new Date() } },
-    );
-
-    if (result.matchedCount === 0) {
-      throw new ServerError(`Map not found`);
-    }
+    const db = getClient();
+    await db.maps.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
   });
-}
-
-function mapDBMapToMap(dbMap: WithId<DBMap>): Map {
-  const { _id, ...rest } = dbMap;
-  return {
-    ...rest,
-    id: _id.toString(),
-  };
 }
 
 export async function getMapList(
   server: number,
   count?: number,
   start: number = 0,
-): Promise<ServerResponse<Map[]>> {
+): Promise<ServerResponse<Maps[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(server);
     const pageSize = 100;
@@ -213,12 +188,15 @@ export async function getMapList(
 
     const uids = allMapList.filter((map) => map.UId).map((map) => map.UId);
 
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBMap>>(collections.MAPS);
+    const db = getClient();
 
-    const existingMaps = await collection
-      .find({ uid: { $in: uids } })
-      .toArray();
+    const existingMaps = await db.maps.findMany({
+      where: {
+        uid: { in: uids },
+        deletedAt: null,
+      },
+    });
+
     const existingUids = new Set(existingMaps.map((m) => m.uid));
 
     const missingMaps = allMapList.filter((map) => !existingUids.has(map.UId));
@@ -228,7 +206,7 @@ export async function getMapList(
       const BATCH_SIZE = 200;
 
       const now = new Date();
-      const newDbMaps: WithId<DBMap>[] = [];
+      const newMaps: Maps[] = [];
 
       for (let i = 0; i < mapUids.length; i += BATCH_SIZE) {
         const batch = mapUids.slice(i, i + BATCH_SIZE);
@@ -244,8 +222,8 @@ export async function getMapList(
               (m) => m.mapUid === map.UId,
             );
 
-            newDbMaps.push({
-              _id: new ObjectId(),
+            newMaps.push({
+              id: new ObjectId().toString(),
               name: mapInfo.Name || "Unknown",
               uid: mapInfo.UId,
               fileName: mapInfo.FileName || "",
@@ -261,6 +239,7 @@ export async function getMapList(
               thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
               createdAt: now,
               updatedAt: now,
+              deletedAt: null,
             });
           } catch (err) {
             console.warn(`Skipping map "${map.FileName}" due to error:`, err);
@@ -269,16 +248,16 @@ export async function getMapList(
         }
       }
 
-      await collection.insertMany(newDbMaps);
-      existingMaps.push(...newDbMaps);
+      await db.maps.createMany({ data: newMaps });
+      existingMaps.push(...newMaps);
     }
 
     const orderedMaps = allMapList
       .map((map) => {
         const foundMap = existingMaps.find((m) => m.uid === map.UId);
-        return foundMap ? mapDBMapToMap(foundMap) : null;
+        return foundMap ? foundMap : null;
       })
-      .filter((map: Map | null): map is Map => map !== null);
+      .filter((map: Maps | null): map is Maps => map !== null);
 
     return orderedMaps;
   });

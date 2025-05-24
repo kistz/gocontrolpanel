@@ -1,34 +1,34 @@
 "use server";
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
+import { getClient } from "@/lib/dbclient";
+import { Players } from "@/lib/prisma/generated";
 import {
   PaginationResponse,
   ServerError,
   ServerResponse,
 } from "@/types/responses";
-import { ObjectId, WithId } from "mongodb";
-import { collections, getDatabase } from "../../lib/mongodb";
-import { Player } from "../../types/player";
-import { DBPlayer } from "@/types/db/player";
+import { ObjectId } from "mongodb";
 
-export async function getAllPlayers(): Promise<ServerResponse<Player[]>> {
+export async function getAllPlayers(): Promise<ServerResponse<Players[]>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
-    const players = await collection
-      .find({
-        deletedAt: { $exists: false },
-      })
-      .toArray();
-    return players.map((player) => mapDBPlayerToPlayer(player));
+    const db = getClient();
+    const players = await db.players.findMany({
+      where: {
+        deletedAt: null,
+      },
+    });
+
+    return players;
   });
 }
 
 export async function getPlayerCount(): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
-    return collection.countDocuments({
-      deletedAt: { $exists: false },
+    const db = getClient();
+    return db.players.count({
+      where: {
+        deletedAt: null,
+      },
     });
   });
 }
@@ -37,13 +37,14 @@ export async function getNewPlayersCount(
   days: number,
 ): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
+    const db = getClient();
     const date = new Date();
     date.setDate(date.getDate() - days);
-    const count = await collection.countDocuments({
-      createdAt: { $gte: date },
-      deletedAt: { $exists: false },
+    const count = await db.players.count({
+      where: {
+        createdAt: { gt: date },
+        deletedAt: null,
+      },
     });
     return count;
   });
@@ -53,98 +54,96 @@ export async function getPlayersPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
   filter?: string,
-): Promise<ServerResponse<PaginationResponse<Player>>> {
+): Promise<ServerResponse<PaginationResponse<Players>>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
+    const db = getClient();
 
-    const totalCount = await collection.countDocuments({
-      deletedAt: { $exists: false },
-      ...(filter && {
-        $or: [
-          { login: { $regex: filter, $options: "i" } },
-          { nickname: { $regex: filter, $options: "i" } },
-          { ubiUid: { $regex: filter, $options: "i" } },
-          { path: { $regex: filter, $options: "i" } },
-        ],
-      }),
-    });
-
-    if (sorting.field === "id") {
-      sorting.field = "_id"; // MongoDB uses _id for the default ID field
-    }
-
-    const players = await collection
-      .find({
-        deletedAt: { $exists: false },
+    const totalCount = await db.players.count({
+      where: {
+        deletedAt: null,
         ...(filter && {
-          $or: [
-            { login: { $regex: filter, $options: "i" } },
-            { nickname: { $regex: filter, $options: "i" } },
-            { ubiUid: { $regex: filter, $options: "i" } },
-            { path: { $regex: filter, $options: "i" } },
+          OR: [
+            { login: { contains: filter, mode: "insensitive" } },
+            { nickName: { contains: filter, mode: "insensitive" } },
+            { ubiUid: { contains: filter, mode: "insensitive" } },
+            { path: { contains: filter, mode: "insensitive" } },
           ],
         }),
-      })
-      .skip(pagination.skip)
-      .limit(pagination.limit)
-      .sort({ [sorting.field]: sorting.order === "ASC" ? 1 : -1 })
-      .toArray();
+      },
+    });
+
+    const players = await db.players.findMany({
+      where: {
+        deletedAt: null,
+        ...(filter && {
+          OR: [
+            { login: { contains: filter, mode: "insensitive" } },
+            { nickName: { contains: filter, mode: "insensitive" } },
+            { ubiUid: { contains: filter, mode: "insensitive" } },
+            { path: { contains: filter, mode: "insensitive" } },
+          ],
+        }),
+      },
+      skip: pagination.skip,
+      take: pagination.limit,
+      orderBy: {
+        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc",
+      },
+    });
 
     return {
-      data: players.map((player) => mapDBPlayerToPlayer(player)),
+      data: players,
       totalCount,
     };
   });
 }
 
 export async function getPlayerById(
-  playerId: ObjectId | string,
-): Promise<ServerResponse<Player>> {
+  id: string,
+): Promise<ServerResponse<Players>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
-    const player = await collection.findOne({
-      _id: new ObjectId(playerId),
-      deletedAt: { $exists: false },
+    const db = getClient();
+    const player = await db.players.findUniqueOrThrow({
+      where: {
+        id,
+        deletedAt: null,
+      },
     });
-    if (!player) {
-      throw new ServerError(`Player not found`);
-    }
-    return mapDBPlayerToPlayer(player);
+
+    return player;
   });
 }
 
 export async function getPlayerByLogin(
   login: string,
-): Promise<ServerResponse<Player>> {
+): Promise<ServerResponse<Players>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
-    const player = await collection.findOne({
-      login,
-      deletedAt: { $exists: false },
+    const db = getClient();
+    const player = await db.players.findFirstOrThrow({
+      where: {
+        login,
+        deletedAt: null,
+      },
     });
-    if (!player) {
-      throw new ServerError(`Player not found`);
-    }
-    return mapDBPlayerToPlayer(player);
+
+    return player;
   });
 }
 
 export async function createPlayerAuth(
-  player: Omit<DBPlayer, "id" | "createdAt" | "updatedAt">,
-): Promise<ServerResponse<Player>> {
+  player: Omit<Players, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+): Promise<ServerResponse<Players>> {
   return doServerAction(async () => {
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
+    const db = getClient();
 
-    const existingPlayer = await collection.findOne({
-      $or: [
-        { login: player.login },
-        { nickname: player.nickName },
-        { ubiUid: player.ubiUid },
-      ],
+    const existingPlayer = await db.players.findFirst({
+      where: {
+        OR: [
+          { login: player.login },
+          { nickName: player.nickName },
+          { ubiUid: player.ubiUid },
+        ],
+      },
     });
 
     if (existingPlayer) {
@@ -155,39 +154,40 @@ export async function createPlayerAuth(
 
     const newPlayer = {
       ...player,
-      _id: new ObjectId(),
+      id: new ObjectId().toString(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
     };
 
-    const result = await collection.insertOne(newPlayer);
+    const result = await db.players.create({
+      data: newPlayer,
+    });
 
-    if (!result.acknowledged) {
+    if (!result) {
       throw new ServerError("Failed to create player");
     }
 
-    return mapDBPlayerToPlayer({ ...newPlayer, _id: result.insertedId });
+    return result;
   });
 }
 
 export async function updatePlayer(
-  playerId: ObjectId | string,
-  data: Partial<WithId<DBPlayer>>,
+  id: string,
+  data: Players,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
-    if (playerId === session.user.id) {
+    if (id === session.user.id) {
       throw new ServerError("Cannot update your own account");
     }
 
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
+    const db = getClient();
 
-    const existingPlayer = await collection.findOne({
-      _id: new ObjectId(playerId),
+    const existingPlayer = await db.players.findUniqueOrThrow({
+      where: {
+        id,
+      },
     });
-    if (!existingPlayer) {
-      throw new ServerError(`Player not found`);
-    }
 
     const isRemovingAdmin =
       existingPlayer.roles?.includes("admin") && !data.roles?.includes("admin");
@@ -196,40 +196,30 @@ export async function updatePlayer(
       throw new ServerError("Cannot remove admin role");
     }
 
-    const result = await collection.updateOne(
-      { _id: new ObjectId(playerId) },
-      { $set: data },
-    );
-    if (result.matchedCount === 0) {
-      throw new ServerError(`Player not found`);
-    }
+    await db.players.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+    });
   });
 }
 
-export async function deletePlayerById(
-  playerId: ObjectId | string,
-): Promise<ServerResponse> {
+export async function deletePlayerById(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
-    if (playerId === session.user.id) {
+    if (id === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }
 
-    const db = await getDatabase();
-    const collection = db.collection<WithId<DBPlayer>>(collections.PLAYERS);
-    const result = await collection.updateOne(
-      { _id: new ObjectId(playerId) },
-      { $set: { deletedAt: new Date() } },
-    );
-    if (result.matchedCount === 0) {
-      throw new ServerError(`Player not found`);
-    }
+    const db = getClient();
+    await db.players.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
   });
-}
-
-function mapDBPlayerToPlayer(dbPlayer: WithId<DBPlayer>): Player {
-  const { _id, ...rest } = dbPlayer;
-  return {
-    ...rest,
-    id: _id.toString(),
-  };
 }
