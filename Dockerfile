@@ -35,7 +35,7 @@ ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
 RUN bun run generate
-RUN bun run migrate:dev
+RUN bun run migrate:deploy
 
 RUN bun run build;
 

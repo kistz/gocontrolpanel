@@ -9,7 +9,8 @@
     "lint": "next lint",
     "pretty": "prettier --write \"**/*.{ts,tsx,json,css}\"",
     "generate": "prisma generate --schema ./src/lib/prisma/schema.prisma",
-    "migrate:dev": "prisma migrate dev --name init --schema ./src/lib/prisma/schema.prisma"
+    "migrate:dev": "prisma migrate dev --name init --schema ./src/lib/prisma/schema.prisma",
+    "migrate:deploy": "prisma migrate deploy --schema ./src/lib/prisma/schema.prisma"
   },
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.2",
