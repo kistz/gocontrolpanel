@@ -1,4 +1,3 @@
-import config from "./config";
 import { PrismaClient } from "./prisma/generated";
 
 let cachedClient: PrismaClient | null = null;
