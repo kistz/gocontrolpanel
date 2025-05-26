@@ -36,10 +36,14 @@ export async function syncFileManager(id: number): Promise<FileManager> {
   return fileManager;
 }
 
-export async function getFileManager(id: number): Promise<FileManager> {
+export async function getFileManager(id: number): Promise<FileManager | null> {
   if (cachedFileManagers[id]) {
     return cachedFileManagers[id];
   }
 
-  return await syncFileManager(id);
+  try {
+    return await syncFileManager(id);
+  } catch {
+    return null;
+  }
 }

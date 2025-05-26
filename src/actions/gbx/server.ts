@@ -121,7 +121,7 @@ export async function getLocalMaps(
     const client = await getGbxClient(server);
 
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 

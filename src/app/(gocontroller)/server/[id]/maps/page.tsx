@@ -15,6 +15,7 @@ export default async function ServerMapsPage({
 
   const { data: maps } = await getMapList(id);
   const { data: jukebox } = await getJukebox(id);
+
   const filemanager = await getFileManager(id);
 
   return (
@@ -33,7 +34,7 @@ export default async function ServerMapsPage({
         <TabsContent value="maps" className="flex flex-col gap-6">
           <MapOrder mapList={maps} serverId={id} />
 
-          {filemanager.health && <LocalMapsTable serverId={id} />}
+          {filemanager?.health && <LocalMapsTable serverId={id} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">

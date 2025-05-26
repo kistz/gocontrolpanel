@@ -10,7 +10,7 @@ export async function getUserData(
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 
@@ -45,7 +45,7 @@ export async function getRoute(
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 
@@ -87,7 +87,7 @@ export async function getFile(
 ): Promise<ServerResponse<File>> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 
@@ -130,7 +130,7 @@ export async function saveFileText(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 
@@ -154,7 +154,7 @@ export async function deleteEntry(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 
@@ -178,7 +178,7 @@ export async function uploadFiles(
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(server);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
 
@@ -226,7 +226,7 @@ export async function getScripts(
 
     try {
       const fileManager = await getFileManager(server);
-      if (!fileManager.health) {
+      if (!fileManager?.health) {
         throw new ServerError("Could not connect to file manager");
       }
 

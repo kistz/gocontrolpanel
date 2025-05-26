@@ -19,7 +19,7 @@ export default async function FilesLayout({
 
   try {
     const fileManager = await getFileManager(id);
-    if (!fileManager.health) {
+    if (!fileManager?.health) {
       throw new Error("File Manager is not available");
     }
 
