@@ -186,7 +186,7 @@ export async function getMapList(
       throw new ServerError("Failed to get map list");
     }
 
-    const uids = allMapList.filter((map) => map.UId).map((map) => map.UId);
+    const uids = allMapList.filter((map) => map?.UId).map((map) => map.UId);
 
     const db = getClient();
 
