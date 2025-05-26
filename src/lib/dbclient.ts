@@ -1,3 +1,4 @@
+import config from "./config";
 import { PrismaClient } from "./prisma/generated";
 
 let cachedClient: PrismaClient | null = null;
@@ -8,10 +9,9 @@ export function getClient(): PrismaClient {
   }
 
   try {
-    const client = new PrismaClient();
+    cachedClient = new PrismaClient();
 
-    cachedClient = client;
-    return client;
+    return cachedClient;
   } catch (error) {
     if (process.env.NODE_ENV === "production") {
       console.warn("Prisma not available during build, continuing...");

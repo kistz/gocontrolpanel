@@ -1,15 +1,15 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/mongo"
+  output   = "./generated"
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Maps {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String   @id @default(uuid())
   name           String
   uid            String
   fileName       String
@@ -21,21 +21,20 @@ model Maps {
   bronzeTime     Int
 
   submitter      String?
-  timestamp      DateTime? @db.Date
+  timestamp      DateTime?
   fileUrl        String?
   thumbnailUrl   String?
-  
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime?
 
   @@index([deletedAt])
-
   @@map("maps")
 }
 
 model Players {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   login     String
   nickName  String
   path      String
@@ -47,6 +46,5 @@ model Players {
   deletedAt      DateTime?
 
   @@index([deletedAt])
-
   @@map("players")
 }

@@ -32,7 +32,7 @@ cd gocontrolpanel
 Make sure to update the environment variables in the `docker-compose.yml` file to match your setup:
 
 - **GoControlPanel Environment Variables**:
-  - `DATABASE_URL`: Database connection string (e.g. `mongodb://mongo:27017/gocontrolpanel`).
+  - `DATABASE_URL`: Database connection string (e.g. `postgresql://localhost:5432/gocontrolpanel`).
   - `NEXT_PUBLIC_CONNECTOR_URL`: URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector.
@@ -123,7 +123,7 @@ docker-compose down --volumes
 
 ### 6. Persistent Data
 
-- DB data is stored in a Docker volume (`db-data`) to ensure persistence.
+- Database data is stored in a Docker volume (`db-data`) to ensure persistence.
 - Redis data is stored in a Docker volume (`redis-data`) for caching persistence.
 
 ---
@@ -161,7 +161,7 @@ This service handles file uploads and deletions for the application.
 - **Ports**: Not exposed directly
 - **Volumes**: `UserData` (to be mounted to the dedicated server for file management)
 
-### **DB** (`db`)
+### **DB** (`database`)
 
 A database service for storing the GoControlPanel application data.
 

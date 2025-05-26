@@ -72,11 +72,12 @@ services:
   #     - UserData:/app/UserData
 
   db:
-    image: mongo:latest
+    image: postgres:latest
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: gocontrol
-      MONGO_INITDB_ROOT_PASSWORD: GoControl123!
+      POSTGRES_USER: gocontrolpanel
+      POSTGRES_PASSWORD: VettePanel123
+      POSTGRES_DB: gocontrolpanel
     volumes:
       - db-data:/data/db
 
