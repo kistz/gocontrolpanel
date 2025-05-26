@@ -3,8 +3,8 @@ import { updatePlayer } from "@/actions/database/player";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Players } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { Player } from "@/types/player";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export default function EditPlayerForm({
   player,
   callback,
 }: {
-  player: Player;
+  player: Players;
   callback?: () => void;
 }) {
   const form = useForm<EditPlayerSchemaType>({

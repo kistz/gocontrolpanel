@@ -3,7 +3,6 @@ import {
   getPlayerById,
   getPlayerByLogin,
 } from "@/actions/database/player";
-import { Player } from "@/types/player";
 import {
   GetServerSidePropsContext,
   NextApiRequest,
@@ -15,6 +14,7 @@ import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import { axiosAuth } from "./axios/connector";
 import config from "./config";
+import { Players } from "./prisma/generated";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      let dbUser: Player | null;
+      let dbUser: Players | null;
       if (user) {
         const login = slugid.encode(user.accountId);
         ({ data: dbUser } = await getPlayerByLogin(login));
@@ -171,7 +171,7 @@ export async function withAuth(roles?: string[]): Promise<Session> {
   return session;
 }
 
-async function getConnectorToken(user: Player): Promise<string> {
+async function getConnectorToken(user: Players): Promise<string> {
   const res = await axiosAuth.post("/auth", user);
 
   if (res.status !== 200) {

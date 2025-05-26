@@ -1,6 +1,6 @@
 "use client";
 import EditPlayerForm from "@/forms/admin/edit-player-form";
-import { Player } from "@/types/player";
+import { Players } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
@@ -8,7 +8,7 @@ import { DefaultModalProps } from "./default-props";
 export default function EditPlayerModal({
   closeModal,
   data,
-}: DefaultModalProps<Player>) {
+}: DefaultModalProps<Players>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {

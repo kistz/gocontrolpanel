@@ -6,7 +6,7 @@ This repository provides a **Docker Compose** configuration to set up and run **
 - **GBXConnector** service
 - **Dedicated Server** service (optional)
 - **File Management** service (optional)
-- **MongoDB** service
+- **DB** service
 - **Redis** service
 
 ## **Prerequisites**
@@ -32,9 +32,7 @@ cd gocontrolpanel
 Make sure to update the environment variables in the `docker-compose.yml` file to match your setup:
 
 - **GoControlPanel Environment Variables**:
-
-  - `MONGODB_URI`: MongoDB URI for GoControlPanel to connect to the MongoDB service.
-  - `MONGODB_DB`: The database name for GoControlPanel in MongoDB.
+  - `DATABASE_URL`: Database connection string (e.g. `mongodb://mongo:27017/gocontrolpanel`).
   - `NEXT_PUBLIC_CONNECTOR_URL`: URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector.
@@ -104,7 +102,7 @@ This will start the following services:
 2. **GBXConnector** on port `6980` (accessible at http://localhost:6980).
 3. **Dedicated Server** (if configured) on port `2350`.
 4. **File Management** (if configured).
-4. **MongoDB** (for database storage).
+4. **DB** (for database storage).
 5. **Redis** (for caching).
 
 > **Note:** The `--build` flag ensures that Docker rebuilds the images from the provided Dockerfiles before starting the services.
@@ -125,7 +123,7 @@ docker-compose down --volumes
 
 ### 6. Persistent Data
 
-- MongoDB data is stored in a Docker volume (`mongo-data`) to ensure persistence.
+- DB data is stored in a Docker volume (`db-data`) to ensure persistence.
 - Redis data is stored in a Docker volume (`redis-data`) for caching persistence.
 
 ---
@@ -163,12 +161,12 @@ This service handles file uploads and deletions for the application.
 - **Ports**: Not exposed directly
 - **Volumes**: `UserData` (to be mounted to the dedicated server for file management)
 
-### **MongoDB** (`mongo`)
+### **DB** (`db`)
 
 A database service for storing the GoControlPanel application data.
 
 - **Ports**: Not exposed directly
-- **Volumes**: `mongo-data` (persistent data)
+- **Volumes**: `db-data` (persistent data)
 
 ### **Redis** (`redis`)
 
@@ -185,8 +183,7 @@ Each service has specific environment variables. Refer to the `docker-compose.ym
 
 - **GoControlPanel**:
 
-  - `MONGODB_URI`: MongoDB connection URI.
-  - `MONGODB_DB`: MongoDB database name.
+  - `DATABASE_URL`: Database connection string.
   - `NEXT_PUBLIC_CONNECTOR_URL`: URL of the GBXConnector.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: For NextAuth authentication.
   - `CONNECTOR_API_KEY`: API key for GBXConnector.

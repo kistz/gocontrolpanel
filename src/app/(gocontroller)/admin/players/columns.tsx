@@ -13,15 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Players } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { Player } from "@/types/player";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (refetch: () => void): ColumnDef<Player>[] => [
+export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (

@@ -1,8 +1,4 @@
 export interface Config {
-  MONGODB: {
-    URI: string;
-    DB: string;
-  };
   NODE_ENV: string;
   CONNECTOR_URL: string;
   DEFAULT_ADMINS: string[];

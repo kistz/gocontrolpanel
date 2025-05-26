@@ -71,14 +71,14 @@ services:
   #   volumes:
   #     - UserData:/app/UserData
 
-  mongo:
+  db:
     image: mongo:latest
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: gocontrol
       MONGO_INITDB_ROOT_PASSWORD: GoControl123!
     volumes:
-      - mongo-data:/data/db
+      - db-data:/data/db
 
   redis:
     image: redis:latest
@@ -87,7 +87,7 @@ services:
       - redis-data:/data
 
 volumes:
-  mongo-data:
+  db-data:
   redis-data:
   # Uncomment the following lines to use a local directory for UserData
   # UserData:

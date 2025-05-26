@@ -119,6 +119,7 @@ export async function getPlayerByLogin(
 ): Promise<ServerResponse<Players>> {
   return doServerAction(async () => {
     const db = getClient();
+    console.log(login);
     const player = await db.players.findFirstOrThrow({
       where: {
         login,
@@ -174,7 +175,17 @@ export async function createPlayerAuth(
 
 export async function updatePlayer(
   id: string,
-  data: Players,
+  data: Omit<
+    Players,
+    | "id"
+    | "login"
+    | "nickName"
+    | "path"
+    | "ubiUid"
+    | "createdAt"
+    | "updatedAt"
+    | "deletedAt"
+  >,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
     if (id === session.user.id) {

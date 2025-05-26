@@ -2,10 +2,6 @@ import { Config } from "@/types/config";
 import "dotenv/config";
 
 const config: Config = {
-  MONGODB: {
-    URI: process.env.MONGODB_URI || "",
-    DB: process.env.MONGODB_DB || "gocontrolpanel",
-  },
   NODE_ENV: process.env.NODE_ENV || "development",
   CONNECTOR_URL: process.env.CONNECTOR_URL || "http://localhost:6980",
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
