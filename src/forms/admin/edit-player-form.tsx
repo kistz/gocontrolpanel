@@ -4,7 +4,7 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Players } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, getRoles } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ export default function EditPlayerForm({
   const form = useForm<EditPlayerSchemaType>({
     resolver: zodResolver(EditPlayerSchema),
     defaultValues: {
-      roles: player.roles ?? [],
+      roles: getRoles(player.roles),
     },
   });
 
@@ -55,7 +55,7 @@ export default function EditPlayerForm({
           control={form.control}
           name={"roles"}
           options={rolesOptions}
-          defaultValues={player.roles}
+          defaultValues={getRoles(player.roles)}
           label="Roles"
           description="The roles of the player."
           placeholder="Select roles"

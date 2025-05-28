@@ -2,6 +2,7 @@
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Players } from "@/lib/prisma/generated";
+import { getRoles } from "@/lib/utils";
 import {
   PaginationResponse,
   ServerError,
@@ -156,7 +157,7 @@ export async function createPlayerAuth(
     const newPlayer = {
       ...player,
       id: new ObjectId().toString(),
-      roles: player.roles || [],
+      roles: getRoles(player.roles),
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
@@ -202,10 +203,8 @@ export async function updatePlayer(
     });
 
     const isRemovingAdmin =
-      Array.isArray(existingPlayer.roles) &&
-      existingPlayer.roles.includes("admin") &&
-      Array.isArray(data.roles) &&
-      !data.roles.includes("admin");
+      getRoles(existingPlayer.roles).includes("admin") &&
+      !getRoles(data.roles).includes("admin");
 
     if (isRemovingAdmin) {
       throw new ServerError("Cannot remove admin role");
@@ -215,7 +214,7 @@ export async function updatePlayer(
       where: { id },
       data: {
         ...data,
-        roles: data.roles || [],
+        roles: getRoles(data.roles),
         updatedAt: new Date(),
         deletedAt: null,
       },

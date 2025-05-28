@@ -155,3 +155,14 @@ export function pathToBreadcrumbs(path?: string): TBreadcrumb[] {
 export function arrayBufferToBase64(buffer: ArrayBuffer) {
   return Buffer.from(buffer).toString("base64");
 }
+
+export function getRoles(roles: any): string[] {
+  if (Array.isArray(roles)) {
+    return roles.map(String);
+  } else if (typeof roles === "string") {
+    return [roles];
+  } else if (typeof roles === "object" && roles !== null) {
+    return Object.keys(roles);
+  }
+  return [];
+}

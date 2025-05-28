@@ -15,6 +15,7 @@ import { getWebIdentities } from "./api/nadeo";
 import { axiosAuth } from "./axios/connector";
 import config from "./config";
 import { Players } from "./prisma/generated";
+import { getRoles } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -138,7 +139,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       token.id = dbUser.id;
-      token.roles = dbUser.roles || [];
+      token.roles = getRoles(dbUser.roles);
       token.ubiId = dbUser.ubiUid;
 
       return token;
