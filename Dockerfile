@@ -32,6 +32,8 @@ ARG NEXT_PUBLIC_CONNECTOR_URL
 ENV NEXT_PUBLIC_CONNECTOR_URL=$NEXT_PUBLIC_CONNECTOR_URL
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
+ARG DB_TYPE
+ENV DB=$DB_TYPE
 
 RUN bun run generate
 
@@ -68,6 +70,11 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT=3000
+
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+ARG DB_TYPE
+ENV DB=$DB_TYPE
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
