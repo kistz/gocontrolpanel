@@ -12,7 +12,6 @@ COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 RUN curl -fsSL https://bun.sh/install | bash \
   && /root/.bun/bin/bun install --no-save
 
-
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
@@ -34,12 +33,12 @@ ENV NEXT_PUBLIC_CONNECTOR_URL=$NEXT_PUBLIC_CONNECTOR_URL
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
+RUN bun run generate
+
 RUN bun run build;
 
 # Production image, copy all the files and run next
 FROM base AS runner
-
-RUN apk add --no-cache tini
 
 WORKDIR /app
 
@@ -52,12 +51,17 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
-COPY start.sh /usr/local/bin
-
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Copy prisma files
+COPY --from=builder --chown=nextjs:nodejs /app/src/lib/prisma ./prisma
+
+COPY start.sh ./
+RUN chmod +x start.sh
 
 USER nextjs
 
@@ -68,4 +72,4 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-ENTRYPOINT [ "start.sh" ]
+ENTRYPOINT [ "./start.sh" ]
