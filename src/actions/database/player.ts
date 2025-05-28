@@ -63,10 +63,10 @@ export async function getPlayersPaginated(
         deletedAt: null,
         ...(filter && {
           OR: [
-            { login: { contains: filter, mode: "insensitive" } },
-            { nickName: { contains: filter, mode: "insensitive" } },
-            { ubiUid: { contains: filter, mode: "insensitive" } },
-            { path: { contains: filter, mode: "insensitive" } },
+            { login: { contains: filter } },
+            { nickName: { contains: filter } },
+            { ubiUid: { contains: filter } },
+            { path: { contains: filter } },
           ],
         }),
       },
@@ -77,10 +77,10 @@ export async function getPlayersPaginated(
         deletedAt: null,
         ...(filter && {
           OR: [
-            { login: { contains: filter, mode: "insensitive" } },
-            { nickName: { contains: filter, mode: "insensitive" } },
-            { ubiUid: { contains: filter, mode: "insensitive" } },
-            { path: { contains: filter, mode: "insensitive" } },
+            { login: { contains: filter } },
+            { nickName: { contains: filter } },
+            { ubiUid: { contains: filter } },
+            { path: { contains: filter } },
           ],
         }),
       },
@@ -156,6 +156,7 @@ export async function createPlayerAuth(
     const newPlayer = {
       ...player,
       id: new ObjectId().toString(),
+      roles: player.roles || [],
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
@@ -201,7 +202,10 @@ export async function updatePlayer(
     });
 
     const isRemovingAdmin =
-      existingPlayer.roles?.includes("admin") && !data.roles?.includes("admin");
+      Array.isArray(existingPlayer.roles) &&
+      existingPlayer.roles.includes("admin") &&
+      Array.isArray(data.roles) &&
+      !data.roles.includes("admin");
 
     if (isRemovingAdmin) {
       throw new ServerError("Cannot remove admin role");
@@ -211,6 +215,7 @@ export async function updatePlayer(
       where: { id },
       data: {
         ...data,
+        roles: data.roles || [],
         updatedAt: new Date(),
         deletedAt: null,
       },
