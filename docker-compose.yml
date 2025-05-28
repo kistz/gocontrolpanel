@@ -1,6 +1,6 @@
 services:
   gocontrolpanel:
-    image: gotrackmania/gocontrolpanel:latest
+    image: marijnregterschot/gocontrolpanel:latest
     build:
       context: .
       dockerfile: Dockerfile
