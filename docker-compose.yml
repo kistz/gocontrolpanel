@@ -7,11 +7,12 @@ services:
       args:
         - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
         - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980 # Use the external URL for the frontend
-        - DATABASE_URL=postgresql://gocontrolpanel:VettePanel123@database:5432/gocontrolpanel
+        - DATABASE_URL=postgresql://gocontrolpanel:VettePanel123@db:5432/gocontrolpanel
     restart: unless-stopped
     ports:
       - 3000:3000
     environment:
+      DATABASE_URL: postgresql://gocontrolpanel:VettePanel123@db:5432/gocontrolpanel
       CONNECTOR_URL: http://gbxconnector:6980 # Use the internal Docker network for communication
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET:
