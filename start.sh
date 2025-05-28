@@ -6,4 +6,4 @@ if [ -z "$DB" ]; then
   exit 1
 fi
 
-npx prisma migrate deploy --schema ./prisma/$DB.schema.prisma && exec node server.js
+npx prisma migrate deploy --schema ./prisma/$DB/schema.prisma && exec node server.js
