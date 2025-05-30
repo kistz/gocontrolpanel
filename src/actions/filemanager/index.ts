@@ -1,5 +1,6 @@
 "use server";
 
+import { CreateFileEntrySchemaType } from "@/forms/server/files/create-file-entry-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getFileManager } from "@/lib/filemanager";
 import { ContentType, File, FileEntry } from "@/types/filemanager";
@@ -248,5 +249,36 @@ export async function getScripts(
       console.error("Error getting scripts:", error);
       return defaultScripts;
     }
+  });
+}
+
+export async function createFileEntry(
+  server: number,
+  request: CreateFileEntrySchemaType,
+): Promise<ServerResponse<FileEntry>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const fileManager = await getFileManager(server);
+    if (!fileManager?.health) {
+      throw new ServerError("Could not connect to file manager");
+    }
+
+    const res = await fetch(fileManager.url + "/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (res.status !== 200) {
+      throw new ServerError("Failed to create file entry");
+    }
+
+    const data = await res.json();
+    if (!data) {
+      throw new ServerError("Failed to create file entry");
+    }
+
+    return data;
   });
 }

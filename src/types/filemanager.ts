@@ -16,10 +16,4 @@ export interface File {
   type: ContentType;
 }
 
-export interface CreateItemRequest {
-  path: string;
-  isDir: boolean;
-  content?: string;
-}
-
 export type ContentType = "image" | "text" | "video";

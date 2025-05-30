@@ -22,6 +22,7 @@ interface FormElementProps<TControl extends FieldValues> {
   isDisabled?: boolean;
   isHidden?: boolean;
   isLoading?: boolean;
+  autoFocus?: boolean;
   step?: string;
   error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
@@ -41,6 +42,7 @@ export default function FormElement<TControl extends FieldValues>({
   isDisabled = false,
   isHidden = false,
   isLoading = false,
+  autoFocus = false,
   step,
   error,
   className,
@@ -109,6 +111,7 @@ export default function FormElement<TControl extends FieldValues>({
                 isLoading={isLoading}
                 step={step}
                 error={error}
+                autoFocus={autoFocus}
                 className={className}
               />
 

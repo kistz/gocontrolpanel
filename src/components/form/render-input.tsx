@@ -32,6 +32,7 @@ interface RenderInputProps<TControl extends FieldValues> {
   isRequired?: boolean;
   isDisabled?: boolean;
   isLoading?: boolean;
+  autoFocus?: boolean;
   step?: string;
   error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
@@ -47,6 +48,7 @@ export default function RenderInput<TControl extends FieldValues>({
   defaultValues,
   isDisabled = false,
   isLoading = false,
+  autoFocus = false,
   step,
   error,
   className,
@@ -65,6 +67,7 @@ export default function RenderInput<TControl extends FieldValues>({
           className={className}
           error={!!error}
           step={step}
+          autoFocus={autoFocus}
         />
       );
     case "password":
@@ -77,6 +80,7 @@ export default function RenderInput<TControl extends FieldValues>({
             {...field}
             className={"pr-10"}
             error={!!error}
+            autoFocus={autoFocus}
           />
           <Button
             variant={null}
@@ -174,6 +178,7 @@ export default function RenderInput<TControl extends FieldValues>({
           {...field}
           error={!!error}
           className={className}
+          autoFocus={autoFocus}
         />
       );
   }
