@@ -2,7 +2,7 @@
 import { deleteEntry } from "@/actions/filemanager";
 import { getErrorMessage } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
-import { IconTrash, IconUpload } from "@tabler/icons-react";
+import { IconPlus, IconTrash, IconUpload } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
@@ -73,11 +73,10 @@ export default function Actions({
         <>
           <Button
             variant="destructive"
-            size="icon"
             onClick={() => setIsDeleting(true)}
           >
             <IconTrash size={20} />
-            <span className="sr-only">Delete</span>
+            <span className="max-lg:sr-only">Delete</span>
           </Button>
 
           <ConfirmModal
@@ -92,9 +91,19 @@ export default function Actions({
         </>
       )}
 
-      <Button size="icon" onClick={triggerUpload}>
+      <Button variant={"outline"}>
+        <IconPlus />
+        <span>Folder</span>
+      </Button>
+
+      <Button variant={"outline"}>
+        <IconPlus />
+        <span>File</span>
+      </Button>
+
+      <Button onClick={triggerUpload}>
         <IconUpload />
-        <span className="sr-only">Upload</span>
+        <span className="max-lg:sr-only">Upload</span>
       </Button>
 
       <input
