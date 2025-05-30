@@ -166,3 +166,10 @@ export function getRoles(roles: any): string[] {
   }
   return [];
 }
+
+export function removePrefix(str: string, prefix: string): string {
+  if (str.startsWith(prefix)) {
+    return str.slice(prefix.length);
+  }
+  return str;
+}

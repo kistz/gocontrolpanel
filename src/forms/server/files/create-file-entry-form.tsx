@@ -12,6 +12,7 @@ import {
   CreateFileEntrySchema,
   CreateFileEntrySchemaType,
 } from "./create-file-entry-schema";
+import { FileEntry } from "@/types/filemanager";
 
 export default function CreateFileEntryForm({
   serverId,
@@ -22,7 +23,7 @@ export default function CreateFileEntryForm({
   serverId: number;
   path: string;
   isDir?: boolean;
-  callback?: () => void;
+  callback?: (fileEntry: FileEntry) => void;
 }) {
   const form = useForm<CreateFileEntrySchemaType>({
     resolver: zodResolver(CreateFileEntrySchema),
@@ -35,7 +36,7 @@ export default function CreateFileEntryForm({
 
   async function onSubmit(values: CreateFileEntrySchemaType) {
     try {
-      const { error } = await createFileEntry(serverId, values);
+      const { data, error } = await createFileEntry(serverId, values);
       if (error) {
         throw new Error(error);
       }
@@ -43,7 +44,7 @@ export default function CreateFileEntryForm({
       toast.success("File entry successfully created");
       console.log("Creating file entry:", values);
       if (callback) {
-        callback();
+        callback(data);
       }
     } catch (error) {
       toast.error("Failed to create file entry", {

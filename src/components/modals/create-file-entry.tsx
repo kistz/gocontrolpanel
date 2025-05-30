@@ -1,24 +1,29 @@
 "use client";
 import CreateFileEntryForm from "@/forms/server/files/create-file-entry-form";
+import { FileEntry } from "@/types/filemanager";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
+import { DefaultModalProps } from "./default-props";
 
 export default function CreateFileEntryModal({
   serverId,
   path,
   isDir = false,
   closeModal,
+  onSubmit,
 }: {
   serverId: number;
   path: string;
   isDir?: boolean;
-  closeModal: () => void;
-}) {
+} & DefaultModalProps<void, FileEntry>) {
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (fileEntry: FileEntry) => {
+    if (onSubmit) {
+      onSubmit(fileEntry);
+    }
     closeModal?.();
   };
 

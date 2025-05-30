@@ -1,11 +1,13 @@
 "use client";
 import { deleteEntry } from "@/actions/filemanager";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, removePrefix } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 import { IconPlus, IconTrash, IconUpload } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
+import CreateFileEntryModal from "../modals/create-file-entry";
+import Modal from "../modals/modal";
 import { Button } from "../ui/button";
 
 interface ActionsProps {
@@ -14,6 +16,7 @@ interface ActionsProps {
   setFolders: Dispatch<SetStateAction<FileEntry[]>>;
   setFiles: Dispatch<SetStateAction<FileEntry[]>>;
   serverId: number;
+  path: string;
   uploadFilesCallback: (files: FileList | null) => void;
 }
 
@@ -23,6 +26,7 @@ export default function Actions({
   setFolders,
   setFiles,
   serverId,
+  path,
   uploadFilesCallback,
 }: ActionsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -71,10 +75,7 @@ export default function Actions({
     <div className="flex items-center gap-2">
       {selectedItem && (
         <>
-          <Button
-            variant="destructive"
-            onClick={() => setIsDeleting(true)}
-          >
+          <Button variant="destructive" onClick={() => setIsDeleting(true)}>
             <IconTrash size={20} />
             <span className="max-sm:sr-only">Delete</span>
           </Button>
@@ -91,15 +92,39 @@ export default function Actions({
         </>
       )}
 
-      <Button variant={"outline"}>
-        <IconPlus />
-        <span>Folder</span>
-      </Button>
+      <Modal>
+        <CreateFileEntryModal
+          path={removePrefix(path, "/UserData")}
+          serverId={serverId}
+          isDir={true}
+          onSubmit={(fileEntry?: FileEntry) => {
+            if (!fileEntry) return;
+            setFolders((prev) => [...prev, fileEntry]);
+            setSelectedItem(fileEntry);
+          }}
+        />
+        <Button variant={"outline"}>
+          <IconPlus />
+          <span>Folder</span>
+        </Button>
+      </Modal>
 
-      <Button variant={"outline"}>
-        <IconPlus />
-        <span>File</span>
-      </Button>
+      <Modal>
+        <CreateFileEntryModal
+          path={removePrefix(path, "/UserData")}
+          serverId={serverId}
+          isDir={false}
+          onSubmit={(fileEntry?: FileEntry) => {
+            if (!fileEntry) return;
+            setFiles((prev) => [...prev, fileEntry]);
+            setSelectedItem(fileEntry);
+          }}
+        />
+        <Button variant={"outline"}>
+          <IconPlus />
+          <span>File</span>
+        </Button>
+      </Modal>
 
       <Button onClick={triggerUpload}>
         <IconUpload />

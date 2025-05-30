@@ -271,7 +271,9 @@ export async function createFileEntry(
     });
 
     if (res.status !== 200) {
-      throw new ServerError("Failed to create file entry");
+      throw new ServerError(
+        res.status === 500 ? "Something went wrong" : await res.text(),
+      );
     }
 
     const data = await res.json();
@@ -279,6 +281,9 @@ export async function createFileEntry(
       throw new ServerError("Failed to create file entry");
     }
 
-    return data;
+    return  {
+      ...data,
+      lastModified: new Date(data.lastModified),
+    }
   });
 }

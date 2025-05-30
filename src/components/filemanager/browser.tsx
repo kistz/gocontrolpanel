@@ -142,6 +142,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
           setFolders={setFolders}
           setFiles={setFiles}
           serverId={serverId}
+          path={path}
           uploadFilesCallback={uploadFilesCallback}
         />
       </div>

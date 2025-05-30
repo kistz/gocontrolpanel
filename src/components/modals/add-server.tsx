@@ -7,7 +7,7 @@ import { DefaultModalProps } from "./default-props";
 
 export default function AddServerModal({
   closeModal,
-}: DefaultModalProps<void>) {
+}: DefaultModalProps) {
   const router = useRouter();
 
   const stopPropagation = (e: React.MouseEvent) => {
