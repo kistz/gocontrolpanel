@@ -7,13 +7,12 @@ services:
       args:
         - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
         - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980 # Use the external URL for the frontend
-        - DATABASE_URL=postgresql://gocontrolpanel:VettePanel123@db:5432/gocontrolpanel
-        - DB_TYPE=postgres # Specify the database type
+        - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
+        - DB_TYPE=mysql
     restart: unless-stopped
     ports:
       - 3000:3000
     environment:
-      CONNECTOR_URL: http://gbxconnector:6980 # Use the internal Docker network for communication
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET:
       CONNECTOR_API_KEY:
@@ -66,8 +65,6 @@ services:
   # filemanager:
   #   image: marijnregterschot/trackmania-server-fm:latest
   #   restart: unless-stopped
-  #   ports:
-  #     #- 3300:3300/tcp (Only expose if you need to access the file manager externally)
   #   volumes:
   #     - UserData:/app/UserData
 
