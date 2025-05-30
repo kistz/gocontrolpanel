@@ -112,10 +112,6 @@ export async function getFile(
         ? await res.arrayBuffer()
         : await res.text();
 
-    if (!data) {
-      throw new ServerError("Failed to get files");
-    }
-
     return {
       value: data,
       type: fileType,
