@@ -68,7 +68,7 @@ export default function NavServers() {
   useEffect(() => {
     for (const server of servers) {
       if (!servers.find((s) => s.id === server.id)?.isConnected) {
-        (async () => disconnectGbxClient(server.id))();
+        (async () => await disconnectGbxClient(server.id))();
       }
     }
 
