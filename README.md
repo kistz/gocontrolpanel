@@ -36,7 +36,6 @@ cd gocontrolpanel
 Make sure to update the environment variables in the `docker-compose.yml` file to match your setup:
 
 - **GoControlPanel Environment Variables**:
-
   - `NEXT_PUBLIC_CONNECTOR_URL`: Public URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
