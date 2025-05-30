@@ -31,7 +31,7 @@ import {
 import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -54,11 +54,31 @@ interface ServerNavGroup {
 export default function NavServers() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const router = useRouter();
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
   const [healthStatus, setHealthStatus] = useState(false);
+  const [serverId, setServerId] = useState<number | null>(null);
 
-  const serverId = useCurrentServerId(pathname);
+  useEffect(() => {
+    const id = useCurrentServerId(pathname);
+    setServerId(id);
+  }, [pathname]);
+
+  useEffect(() => {
+    for (const server of servers) {
+      if (!servers.find((s) => s.id === server.id)?.isConnected) {
+        (async () => disconnectGbxClient(server.id))();
+      }
+    }
+
+    for (const server of servers) {
+      if (server.id === useCurrentServerId(pathname)) {
+        toast.error(`Server ${server.name} is offline`);
+        router.push("/");
+      }
+    }
+  }, [servers]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,14 +106,8 @@ export default function NavServers() {
           const data: Server[] = JSON.parse(event.data);
 
           setHealthStatus(true);
-          setServers((prev) => {
-            for (const server of prev) {
-              if (!data.find((s) => s.id === server.id)?.isConnected) {
-                disconnectGbxClient(server.id);
-              }
-            }
-            return data;
-          });
+          setServers(data);
+
           setLoading(false);
         };
 
