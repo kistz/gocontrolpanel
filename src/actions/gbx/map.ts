@@ -6,7 +6,6 @@ import { Maps } from "@/lib/prisma/generated";
 import { getRedisClient } from "@/lib/redis";
 import { JukeboxMap, MapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
-import { getServers } from "../gbxconnector/servers";
 
 const getKey = (server: number) => `jukebox:${server}`;
 
