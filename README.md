@@ -302,7 +302,7 @@ This is the main service for controlling and managing your application. It conne
 > **Note:** The file management like uploading and deleting files is only possible if you have the `trackmania-server-filemanager` running next to a dedicated server. The volumes for the file manager are mounted to the dedicated server.
 
 - **Ports**: `3000:3000` (accessible at `http://localhost:3000`)
-- **Depends on**: `mongo`, `redis`
+- **Depends on**: `db`, `redis`
 
 ### **GBXConnector** (`gbxconnector`)
 
@@ -370,13 +370,13 @@ Each service has specific environment variables. Refer to the `docker-compose.ym
 If you encounter any issues, check the logs of a specific service by running:
 
 ```bash
-docker-compose logs <service-name>
+docker compose logs <service-name>
 ```
 
 For example, to view the logs of the **GoControlPanel** service:
 
 ```bash
-docker-compose logs gocontrolpanel
+docker compose logs gocontrolpanel
 ```
 
 ---
