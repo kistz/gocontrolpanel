@@ -3,9 +3,11 @@ import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
 
-const cachedClients: {
-  [key: number]: GbxClient;
-} = {};
+const globalForGbx = globalThis as unknown as {
+  cachedClients?: { [key: number]: GbxClient };
+};
+
+const cachedClients = globalForGbx.cachedClients ??= {};
 
 export async function connectToGbxClient(id: number): Promise<GbxClient> {
   const servers = await getServers();
@@ -57,4 +59,11 @@ export async function getGbxClient(id: number): Promise<GbxClient> {
   }
 
   return await connectToGbxClient(id);
+}
+
+export async function disconnectGbxClient(id: number): Promise<void> {
+  if (cachedClients[id]) {
+    await cachedClients[id].disconnect();
+    delete cachedClients[id];
+  }
 }

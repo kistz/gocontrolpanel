@@ -15,6 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { disconnectGbxClient } from "@/lib/gbxclient";
 import { generatePath, useCurrentServerId } from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
@@ -81,10 +82,18 @@ export default function NavServers() {
       try {
         const socket = new WebSocket(`${url}/ws/servers?token=${session.jwt}`);
 
-        socket.onmessage = (event) => {
-          const data = JSON.parse(event.data);
+        socket.onmessage = async (event) => {
+          const data: Server[] = JSON.parse(event.data);
+
           setHealthStatus(true);
-          setServers(data);
+          setServers((prev) => {
+            for (const server of prev) {
+              if (!data.find((s) => s.id === server.id)?.isConnected) {
+                disconnectGbxClient(server.id);
+              }
+            }
+            return data;
+          });
           setLoading(false);
         };
 
