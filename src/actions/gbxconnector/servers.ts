@@ -9,7 +9,6 @@ import { getRedisClient } from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
 import { isAxiosError } from "axios";
-import { setupJukeboxCallbacks } from "../gbx/map";
 
 let healthStatus: boolean | null = null;
 
@@ -121,9 +120,4 @@ export async function orderServers(
 
     return orderedServers;
   });
-}
-
-export async function setupCallbacks(): Promise<void> {
-  await syncServers();
-  await setupJukeboxCallbacks();
 }

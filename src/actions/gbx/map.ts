@@ -84,7 +84,7 @@ export async function removeMapFromJukebox(
   });
 }
 
-async function onPodiumStart(server: number) {
+export async function onPodiumStart(server: number) {
   const redis = await getRedisClient();
   const key = getKey(server);
   const items = await redis.lrange(key, 0, -1);
@@ -98,25 +98,6 @@ async function onPodiumStart(server: number) {
   await client.call("ChooseNextMap", nextMap.fileName);
 
   await redis.lpop(key);
-}
-
-export async function setupJukeboxCallbacks(): Promise<void> {
-  const redis = await getRedisClient();
-  const servers = await getServers();
-  for (const server of servers) {
-    const key = getKey(server.id);
-    await redis.del(key);
-
-    const client = await getGbxClient(server.id);
-    client.on("callback", (method: string, data: any) => {
-      if (method !== "ManiaPlanet.ModeScriptCallbackArray") return;
-      if (!data || data.length === 0) return;
-
-      if (data[0] === "Maniaplanet.Podium_Start") {
-        onPodiumStart(server.id);
-      }
-    });
-  }
 }
 
 export async function getCurrentMapInfo(

@@ -1,9 +1,9 @@
 import { getAllMaps } from "./actions/database/map";
-import { setupCallbacks } from "./actions/gbxconnector/servers";
+import { syncServers } from "./actions/gbxconnector/servers";
 import { authenticate, getTokens } from "./lib/api/nadeo";
 
 export async function register() {
-  setupCallbacks();
+  syncServers();
   const tokens = await getTokens();
   if (!tokens) {
     await authenticate();

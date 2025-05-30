@@ -2,6 +2,7 @@
 import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
+import { onPodiumStart } from "@/actions/gbx/map";
 
 const globalForGbx = globalThis as unknown as {
   cachedClients?: { [key: number]: GbxClient };
@@ -48,6 +49,7 @@ export async function connectToGbxClient(id: number): Promise<GbxClient> {
   await client.call("SetApiVersion", "2023-04-24");
   await client.call("EnableCallbacks", true);
   await client.callScript("XmlRpc.EnableCallbacks", "true");
+  await setupListeners(client, server.id);
 
   cachedClients[server.id] = client;
   return client;
@@ -65,4 +67,16 @@ export async function disconnectGbxClient(id: number): Promise<void> {
   if (cachedClients[id]) {
     delete cachedClients[id];
   }
+}
+
+export async function setupListeners(client: GbxClient, id: number): Promise<void> {
+  client.on("callback", (method: string, data: any) => {
+    if (method === "ManiaPlanet.ModeScriptCallbackArray") {
+      if (!data || data.length === 0) return;
+
+      if (data[0] === "Maniaplanet.Podium_Start") {
+        onPodiumStart(id);
+      }
+    }
+  });
 }
