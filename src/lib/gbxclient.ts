@@ -63,7 +63,6 @@ export async function getGbxClient(id: number): Promise<GbxClient> {
 
 export async function disconnectGbxClient(id: number): Promise<void> {
   if (cachedClients[id]) {
-    await cachedClients[id].disconnect();
     delete cachedClients[id];
   }
 }
