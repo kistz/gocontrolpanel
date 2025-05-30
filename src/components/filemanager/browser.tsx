@@ -1,13 +1,11 @@
 "use client";
-
-import { deleteEntry, uploadFiles } from "@/actions/filemanager";
+import { uploadFiles } from "@/actions/filemanager";
 import { getErrorMessage, pathToBreadcrumbs } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
-import { IconTrash, IconUpload } from "@tabler/icons-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { IconUpload } from "@tabler/icons-react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import ConfirmModal from "../modals/confirm-modal";
-import { Button } from "../ui/button";
+import Actions from "./actions";
 import FilesBreadcrumbs from "./breadcrumbs";
 import FileCard from "./file-card";
 import FolderCard from "./folder-card";
@@ -27,7 +25,6 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
   );
 
   const [selectedItem, setSelectedItem] = useState<FileEntry | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const [dragActive, setDragActive] = useState(false);
 
@@ -35,18 +32,6 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     setFolders(data.filter((fileEntry: FileEntry) => fileEntry.isDir));
     setFiles(data.filter((fileEntry: FileEntry) => !fileEntry.isDir));
   }, [data]);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-
-    uploadFilesCallback(files);
-  };
-
-  const triggerUpload = () => {
-    fileInputRef.current?.click();
-  };
 
   const uploadFilesCallback = useCallback(
     async (files: FileList | null) => {
@@ -93,34 +78,6 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     },
     [serverId, path],
   );
-
-  const handleDelete = async () => {
-    if (selectedItem) {
-      try {
-        const { error } = await deleteEntry(serverId, selectedItem.path);
-        if (error) {
-          throw new Error(error);
-        }
-
-        setFolders((prev) =>
-          prev.filter((folder) => folder.path !== selectedItem.path),
-        );
-
-        setFiles((prev) =>
-          prev.filter((file) => file.path !== selectedItem.path),
-        );
-
-        setSelectedItem(null);
-        toast.success("Item successfully deleted", {
-          description: `Deleted ${selectedItem.name}`,
-        });
-      } catch (error) {
-        toast.error("Failed to delete item", {
-          description: getErrorMessage(error),
-        });
-      }
-    }
-  };
 
   const handleSelect = (fileEntry: FileEntry) => {
     if (selectedItem?.path === fileEntry.path) {
@@ -179,43 +136,14 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
           serverId={serverId}
         />
 
-        <div className="flex items-center gap-2">
-          {selectedItem && (
-            <>
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={() => setIsDeleting(true)}
-              >
-                <IconTrash size={20} />
-                <span className="sr-only">Delete</span>
-              </Button>
-
-              <ConfirmModal
-                isOpen={isDeleting}
-                onClose={() => setIsDeleting(false)}
-                onConfirm={handleDelete}
-                title="Delete item"
-                description={`Are you sure you want to delete ${selectedItem?.name}?`}
-                confirmText="Delete"
-                cancelText="Cancel"
-              />
-            </>
-          )}
-
-          <Button size="icon" onClick={triggerUpload}>
-            <IconUpload />
-            <span className="sr-only">Upload</span>
-          </Button>
-
-          <input
-            ref={fileInputRef}
-            multiple
-            type="file"
-            onChange={handleUpload}
-            className="hidden"
-          />
-        </div>
+        <Actions
+          selectedItem={selectedItem}
+          setSelectedItem={setSelectedItem}
+          setFolders={setFolders}
+          setFiles={setFiles}
+          serverId={serverId}
+          uploadFilesCallback={uploadFilesCallback}
+        />
       </div>
 
       {data.length === 0 && (
