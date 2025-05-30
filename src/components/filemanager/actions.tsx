@@ -76,7 +76,7 @@ export default function Actions({
             onClick={() => setIsDeleting(true)}
           >
             <IconTrash size={20} />
-            <span className="max-lg:sr-only">Delete</span>
+            <span className="max-sm:sr-only">Delete</span>
           </Button>
 
           <ConfirmModal
@@ -103,7 +103,7 @@ export default function Actions({
 
       <Button onClick={triggerUpload}>
         <IconUpload />
-        <span className="max-lg:sr-only">Upload</span>
+        <span className="max-sm:sr-only">Upload</span>
       </Button>
 
       <input
