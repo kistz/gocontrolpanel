@@ -73,7 +73,7 @@ export default function NavServers() {
     }
 
     for (const server of servers) {
-      if (server.id === useCurrentServerId(pathname)) {
+      if (server.id === serverId) {
         toast.error(`Server ${server.name} is offline`);
         router.push("/");
       }
