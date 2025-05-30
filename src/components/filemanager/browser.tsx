@@ -147,7 +147,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
         />
       </div>
 
-      {data.length === 0 && (
+      {files.length === 0 && folders.length === 0 && (
         <div className="flex items-center justify-center w-full h-full">
           <h1 className="text-2xl font-bold">No files found.</h1>
         </div>

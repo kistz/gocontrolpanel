@@ -5,6 +5,7 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
+import { FileEntry } from "@/types/filemanager";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,7 +13,6 @@ import {
   CreateFileEntrySchema,
   CreateFileEntrySchemaType,
 } from "./create-file-entry-schema";
-import { FileEntry } from "@/types/filemanager";
 
 export default function CreateFileEntryForm({
   serverId,
@@ -28,7 +28,7 @@ export default function CreateFileEntryForm({
   const form = useForm<CreateFileEntrySchemaType>({
     resolver: zodResolver(CreateFileEntrySchema),
     defaultValues: {
-      path,
+      path: "",
       isDir,
       content: "",
     },
@@ -36,13 +36,13 @@ export default function CreateFileEntryForm({
 
   async function onSubmit(values: CreateFileEntrySchemaType) {
     try {
+      values.path = path + "/" + values.path;
       const { data, error } = await createFileEntry(serverId, values);
       if (error) {
         throw new Error(error);
       }
 
       toast.success("File entry successfully created");
-      console.log("Creating file entry:", values);
       if (callback) {
         callback(data);
       }
@@ -62,11 +62,11 @@ export default function CreateFileEntryForm({
         <FormElement
           control={form.control}
           name={"path"}
-          label="Path"
+          label="Name"
           description={
-            isDir ? "The path of the directory." : "The path of the file."
+            isDir ? "The name of the directory." : "The name of the file."
           }
-          placeholder={isDir ? "Enter directory path" : "Enter file path"}
+          placeholder={isDir ? "Enter directory name" : "Enter file name"}
           error={form.formState.errors.path}
           isRequired
           autoFocus
