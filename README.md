@@ -1,13 +1,6 @@
 # **GoControlPanel Docker Compose Setup**
 
-This repository provides a **Docker Compose** configuration to set up and run **GoControlPanel** and its dependencies using Docker containers. The configuration includes:
-
-- **GoControlPanel** service
-- **GBXConnector** service
-- **Dedicated Server** service (optional)
-- **File Management** service (optional)
-- **DB** service
-- **Redis** service
+This repository provides a **Docker Compose** configuration to set up and run **GoControlPanel** and its dependencies using Docker containers.
 
 ## **Prerequisites**
 
@@ -33,14 +26,14 @@ cd gocontrolpanel
 
 ### 2. Modify the Configuration
 
-Make sure to update the environment variables in the `docker-compose.yml` file to match your setup:
+Make sure to update the environment variables for the services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
   - `NEXT_PUBLIC_CONNECTOR_URL`: Public URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
-  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your PyPlanet stack configuration under the dedicated service.
+  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
 
 - **GBXConnector Environment Variables**:
   - `CORS_ORIGINS`: Make sure this is set to allow your frontend (e.g., `http://localhost:3000`).
@@ -49,83 +42,21 @@ Make sure to update the environment variables in the `docker-compose.yml` file t
   - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
 
-### 3. Modify the `servers.json` File
+- **Dedicated Server Environment Variables**:
+  - `TM_MASTERSERVER_LOGIN`: Login for the dedicated server (same as `NADEO_SERVER_LOGIN` in GoControlPanel).
+  - `TM_MASTERSERVER_PASSWORD`: Password for the dedicated server (same as `NADEO_SERVER_PASSWORD` in GoControlPanel).
 
-The `servers.json` file is used by the **GBXConnector** to configure the servers it connects to. You will need to modify this file with the correct server details. Here’s the format of the `servers.json` file:
+### 3. Start the Services
 
-```json
-[
-  {
-    "id": 0,
-    "name": "Server 1",
-    "description": "This is a local server for testing purposes.",
-    "host": "localhost",
-    "xmlrpcPort": 5000,
-    "fmUrl": "http://localhost:3300",
-    "user": "SuperAdmin",
-    "pass": "SuperAdmin"
-  },
-  {
-    "id": 1,
-    "name": "Server 2",
-    "host": "localhost",
-    "xmlrpcPort": 5001,
-    "user": "SuperAdmin",
-    "pass": "SuperAdmin"
-  }
-]
-```
-
-#### Modify the `servers.json` File as Follows:
-
-- **id**: Unique identifier for each server (number).
-- **name**: Name of the server.
-- **description**: Short description of the server (optional).
-- **host**: The hostname or IP address of the server.
-- **xmlrpcPort**: The XML-RPC port of the server.
-- **fmUrl**: The URL for the file management service.
-- **user**: Username for XMLRPC authentication.
-- **pass**: Password for XMLRPC authentication.
-
-Make sure to adjust the values based on your setup.
-
-### 4. Build and Start the Services
-
-Run the following command to build and start all services defined in the `docker-compose.yml` file:
+Run the following command to start all services defined in the `docker-compose.yml` file:
 
 ```bash
-docker-compose up --build
+docker compose up -d
 ```
 
-This will start the following services:
+### 4. Access the GoControlPanel
 
-1. **GoControlPanel** on port `3000` (accessible at http://localhost:3000).
-2. **GBXConnector** on port `6980` (accessible at http://localhost:6980).
-3. **Dedicated Server** (if configured) on port `2350`.
-4. **File Management** (if configured).
-5. **DB** (for database storage).
-6. **Redis** (for caching).
-
-> **Note:** The `--build` flag ensures that Docker rebuilds the images from the provided Dockerfiles before starting the services.
-
-### 5. Stopping the Services
-
-To stop the running services, press `Ctrl + C` in the terminal or run the following command:
-
-```bash
-docker-compose down
-```
-
-This stops the containers without removing them. To remove the containers and associated volumes, use:
-
-```bash
-docker-compose down --volumes
-```
-
-### 6. Persistent Data
-
-- Database data is stored in a Docker volume (`db-data`) to ensure persistence.
-- Redis data is stored in a Docker volume (`redis-data`) for caching persistence.
+That's it! You can now access your **GoControlPanel** at `http://localhost:3000` or your own configured url.
 
 ---
 
@@ -285,82 +216,12 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 Run the following command to start the services.
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 7. Access the GoControlPanel
 
-That's it! You can now access your **GoControlPanel** at `http://localhost:3000`.
-
-## **Services Overview**
-
-### **GoControlPanel** (`gocontrolpanel`)
-
-This is the main service for controlling and managing your application. It connects to MongoDB for data storage and Redis for caching. It uses the environment variables listed earlier for configuration.
-
-> **Note:** The file management like uploading and deleting files is only possible if you have the `trackmania-server-filemanager` running next to a dedicated server. The volumes for the file manager are mounted to the dedicated server.
-
-- **Ports**: `3000:3000` (accessible at `http://localhost:3000`)
-- **Depends on**: `db`, `redis`
-
-### **GBXConnector** (`gbxconnector`)
-
-The GBXConnector is an API that serves as a bridge for your application to interact with the server. It listens for incoming connections from GoControlPanel and sends/receives data.
-
-- **Ports**: `6980:6980` (accessible at `http://localhost:6980`)
-- **Configuration File**: `./servers.json` (used for server configuration)
-
-### **Dedicated Server** (`dedicated-server`)
-
-This service runs a dedicated trackmania server. It is optional and can be configured to run on a specific port.
-
-- **Ports**: `2350:2350` (accessible at `http://localhost:2350`)
-- **Environment Variables**: `TM_MASTER_LOGIN`, `TM_MASTER_PASSWORD` (for server configuration)
-- **Volumes**: `UserData` (for persistent data)
-
-### **File Management** (`file-management`)
-
-This service handles file uploads and deletions for the application.
-
-- **Ports**: Not exposed directly
-- **Volumes**: `UserData` (to be mounted to the dedicated server for file management)
-
-### **DB** (`database`)
-
-A database service for storing the GoControlPanel application data.
-
-- **Ports**: Not exposed directly
-- **Volumes**: `db-data` (persistent data)
-
-### **Redis** (`redis`)
-
-A caching service for GoControlPanel to improve performance.
-
-- **Ports**: Not exposed directly
-- **Volumes**: `redis-data` (persistent data)
-
----
-
-## **Environment Variables**
-
-Each service has specific environment variables. Refer to the `docker-compose.yml` file for full details, but here’s a quick overview:
-
-- **GoControlPanel**:
-
-  - `DATABASE_URL`: Database connection string.
-  - `NEXT_PUBLIC_CONNECTOR_URL`: URL of the GBXConnector.
-  - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: For NextAuth authentication.
-  - `CONNECTOR_API_KEY`: API key for GBXConnector.
-  - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
-  - **NADEO** credentials: `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT`.
-  - `REDIS_URI`: Redis connection string.
-
-- **GBXConnector**:
-  - `CORS_ORIGINS`: List of allowed CORS origins for frontend.
-  - `SERVER_RECONNECT_INTERVAL`: Interval between reconnect attempts if the server is disconnected.
-  - `JWT_SECRET`: Secret key for JWT authentication.
-  - `INTERNAL_API_KEY`: Internal API key for GBXConnector.
-  - `LOG_LEVEL`: Logging level (e.g., `DEBUG`, `INFO`, `ERROR`).
+That's it! You can now access your **GoControlPanel** at `http://localhost:3000` or your own configured url.
 
 ---
 

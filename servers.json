@@ -1,23 +1,11 @@
 [
   {
     "id": 0,
-    "name": "Server 1",
-    "description": "This is a local server for testing purposes.",
-    "host": "localhost",
+    "name": "Dedicated Server",
+    "host": "dedicated-server",
     "xmlrpcPort": 5000,
-    "fmHost": "localhost",
-    "fmPort": 3300,
     "user": "SuperAdmin",
-    "pass": "SuperAdmin"
-  },
-  {
-    "id": 1,
-    "name": "Server 2",
-    "host": "localhost",
-    "xmlrpcPort": 5001,
-    "fmHost": "localhost",
-    "fmPort": 3301,
-    "user": "SuperAdmin",
-    "pass": "SuperAdmin"
+    "pass": "SuperAdmin",
+    "fmUrl": "http://filemanager:3300"
   }
 ]

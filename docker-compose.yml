@@ -14,14 +14,14 @@ services:
       - 3000:3000
     environment:
       NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET:
-      CONNECTOR_API_KEY:
-      DEFAULT_ADMINS:
-      NADEO_CLIENT_ID:
-      NADEO_CLIENT_SECRET:
+      NEXTAUTH_SECRET: 
+      CONNECTOR_API_KEY: 
+      DEFAULT_ADMINS: 
+      NADEO_CLIENT_ID: 
+      NADEO_CLIENT_SECRET:  
       NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
-      NADEO_SERVER_LOGIN:
-      NADEO_SERVER_PASSWORD:
+      NADEO_SERVER_LOGIN: 
+      NADEO_SERVER_PASSWORD: 
       NADEO_CONTACT: GoControlPanel / <your contact info>
       REDIS_URI: redis://redis:6379
     depends_on:
@@ -37,46 +37,41 @@ services:
       PORT: 6980
       CORS_ORIGINS: "http://localhost:3000"
       SERVER_RECONNECT_INTERVAL: 15
-      JWT_SECRET:
-      INTERNAL_API_KEY: # Same as the one in gocontrolpanel
+      JWT_SECRET: 
+      INTERNAL_API_KEY: 
       LOG_LEVEL: DEBUG
     volumes:
       - ./servers.json:/app/servers.json
 
-  # Uncomment the following lines to run a dedicated server
-  # This is a placeholder and should be replaced with your own configuration
-  # --------------------------------------
-  # dedicated-server:
-  #   image: evoesports/trackmania:latest
-  #   restart: unless-stopped
-  #   ports:
-  #     - 2350:2350/udp
-  #     - 2350:2350/tcp
-  #   environment:
-  #     TM_MASTERSERVER_LOGIN:
-  #     TM_MASTERSERVER_PASSWORD:
-  #     TM_SYSTEM_XMLRPC_ALLOWREMOTE: True
-  #   volumes:
-  #     - UserData:/server/UserData
+  dedicated-server:
+    image: evoesports/trackmania:latest
+    restart: unless-stopped
+    ports:
+      - 2350:2350/udp
+      - 2350:2350/tcp
+    environment:
+      TM_MASTERSERVER_LOGIN: 
+      TM_MASTERSERVER_PASSWORD: 
+      TM_SYSTEM_XMLRPC_ALLOWREMOTE: True
+    volumes:
+      - user-data:/server/UserData
 
-  # Uncomment the following lines to run a file manager
-  # This is a placeholder and should be replaced with your own configuration
-  # ------------------------------------------------------
-  # filemanager:
-  #   image: marijnregterschot/trackmania-server-fm:latest
-  #   restart: unless-stopped
-  #   volumes:
-  #     - UserData:/app/UserData
+  filemanager:
+    image: marijnregterschot/trackmania-server-fm:latest
+    restart: unless-stopped
+    volumes:
+      - user-data:/app/UserData
 
   db:
-    image: postgres:latest
+    image: mariadb:latest
     restart: unless-stopped
     environment:
-      POSTGRES_USER: gocontrolpanel
-      POSTGRES_PASSWORD: VettePanel123
-      POSTGRES_DB: gocontrolpanel
+      MARIADB_ROOT_PASSWORD: password_whatever
+      MARIADB_USER: gocontrolpanel
+      MARIADB_PASSWORD: VettePanel123
+      MARIADB_DATABASE: gocontrolpanel
     volumes:
-      - db-data:/data/db
+      - db-data:/var/lib/mysql
 
   redis:
     image: redis:latest
@@ -87,10 +82,4 @@ services:
 volumes:
   db-data:
   redis-data:
-  # Uncomment the following lines to use a local directory for UserData
-  # UserData:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: /path/to/your/UserData
-  #     o: bind
+  user-data:
