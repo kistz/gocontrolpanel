@@ -66,9 +66,7 @@ This section will guide you through setting up the **GoControlPanel** with an ex
 
 ### 1. Navigate to Your PyPlanet Stack
 
-First you need to navigate to your existing PyPlanet stack directory. If you don't have a PyPlanet stack yet, you can set one up by following the [PyPlanet documentation](https://wiki.trackmania.io/en/dedicated-server/Setup/Docker).
-
-Navigate to the directory where your `docker-compose.yml` file for PyPlanet is located.
+First you need to navigate to your existing PyPlanet stack directory. Navigate to the directory where your `docker-compose.yml` file for PyPlanet is located.
 
 ### 1. Clone the Repository
 
