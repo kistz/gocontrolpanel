@@ -11,7 +11,7 @@ Before using this `docker-compose.yml` file, ensure you have the following insta
 
 ## **Getting Started**
 
-This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanet-stack-setup) or EvoSC.
+This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup).
 
 ## New Stack Setup
 
@@ -60,13 +60,13 @@ That's it! You can now access your **GoControlPanel** at `http://localhost:3000`
 
 ---
 
-## PyPlanet Stack Setup
+## PyPlanet/EvoSC Stack Setup
 
-This section will guide you through setting up the **GoControlPanel** with an existing **PyPlanet** stack.
+This section will guide you through setting up the **GoControlPanel** with an existing **PyPlanet** or **EvoSC** stack.
 
-### 1. Navigate to Your PyPlanet Stack
+### 1. Navigate to Your Existing Stack Directory
 
-First you need to navigate to your existing PyPlanet stack directory. Navigate to the directory where your `docker-compose.yml` file for PyPlanet is located.
+First you need to navigate to your existing stack directory. Navigate to the directory where your `docker-compose.yml` file is located.
 
 ### 1. Clone the Repository
 
@@ -76,7 +76,8 @@ git clone https://github.com/MRegterschot/gocontrolpanel.git
 
 ### 2. Create Database
 
-Create a new database for GoControlPanel in your existing database service. For the default PyPlanet stack, this is usually a MariaDB database.
+Create a new database for GoControlPanel in your existing database service. For the default PyPlanet and EvoSC stacks, this is usually a MariaDB database.
+The container name is likely something like `<current-folder>-db-1`.
 
 1. Log into the database container.
 
@@ -153,6 +154,7 @@ filemanager:
   image: marijnregterschot/trackmania-server-fm:latest
   restart: unless-stopped
   volumes:
+    # for PyPlanet the volume name is 'tmserverData', for EvoSC it is 'serverData' change accordingly
     - tmserverData:/app/UserData
 
 redis:
@@ -166,11 +168,11 @@ Also add the redis volume to the list of volumes at the bottom of your `docker-c
 
 ```yaml
 volumes:
-  tmserverData: null
-  pyplanetData: null
-  mariadbData: null
+  ...
   redisData: null
 ```
+
+> **Note:** Make sure you are using the correct volume names for the filemanger service. For **PyPlanet**, the volume name is usually `tmserverData`, and for **EvoSC**, it is `serverData`.
 
 ### 4. Modify the environment variables
 
@@ -182,7 +184,7 @@ Make sure to update the environment variables for the added services in your `do
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
-  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your PyPlanet stack configuration under the dedicated service.
+  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
 
 - **GBXConnector Environment Variables**:
   - `CORS_ORIGINS`: Make sure this is set to allow your frontend (e.g., `http://localhost:3000`).
@@ -208,6 +210,8 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
   }
 ]
 ```
+
+> **Note:** Make sure you are using the correct service name for the dedicated server. For **PyPlanet**, the service name is usually `dedicated`, and for **EvoSC**, it is `trackmania`.
 
 ### 6. Start the Services
 
