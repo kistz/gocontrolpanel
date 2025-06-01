@@ -29,7 +29,6 @@ cd gocontrolpanel
 Make sure to update the environment variables for the services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
-  - `NEXT_PUBLIC_CONNECTOR_URL`: Public URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
@@ -113,12 +112,9 @@ gocontrolpanel:
     dockerfile: Dockerfile
     args:
       - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
-      - NEXT_PUBLIC_CONNECTOR_URL=http://localhost:6980 # Use the external URL for the frontend
       - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
       - DB_TYPE=mysql
   restart: unless-stopped
-  ports:
-    - 3000:3000
   environment:
     NEXTAUTH_URL: http://localhost:3000
     NEXTAUTH_SECRET:
@@ -138,17 +134,25 @@ gocontrolpanel:
 gbxconnector:
   image: marijnregterschot/gbxconnector:latest
   restart: unless-stopped
-  ports:
-    - 6980:6980
   environment:
     PORT: 6980
-    CORS_ORIGINS: "http://localhost:3000"
     SERVER_RECONNECT_INTERVAL: 15
     JWT_SECRET:
     INTERNAL_API_KEY: # Same as the one in gocontrolpanel
     LOG_LEVEL: DEBUG
   volumes:
     - ./gocontrolpanel/servers.json:/app/servers.json
+
+nginx:
+  image: nginx:latest
+  restart: unless-stopped
+  ports:
+    - 3000:80
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+  depends_on:
+    - gocontrolpanel
+    - gbxconnector
 
 filemanager:
   image: marijnregterschot/trackmania-server-fm:latest
@@ -180,7 +184,6 @@ Make sure to update the environment variables for the added services in your `do
 
 - **GoControlPanel Environment Variables**:
 
-  - `NEXT_PUBLIC_CONNECTOR_URL`: Public URL for the GBXConnector service.
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.

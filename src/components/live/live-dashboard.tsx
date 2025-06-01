@@ -33,14 +33,8 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
       return;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-    if (!baseUrl) {
-      console.error("Connector URL is not defined");
-      return;
-    }
-
     const socket = new WebSocket(
-      `${baseUrl}/ws/live/${serverId}?token=${session.jwt}`,
+      `/gbx/ws/live/${serverId}?token=${session.jwt}`,
     );
     wsRef.current = socket;
 

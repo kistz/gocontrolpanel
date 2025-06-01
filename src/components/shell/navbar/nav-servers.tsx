@@ -86,13 +86,6 @@ export default function NavServers() {
         return;
       }
 
-      const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-      if (!url) {
-        setTimeout(() => toast.error("Can't connect to the server"));
-        setLoading(false);
-        return;
-      }
-
       if (!session.jwt) {
         setTimeout(() => toast.error("Can't connect to the server"));
         setLoading(false);
@@ -100,7 +93,7 @@ export default function NavServers() {
       }
 
       try {
-        const socket = new WebSocket(`${url}/ws/servers?token=${session.jwt}`);
+        const socket = new WebSocket(`/gbx/ws/servers?token=${session.jwt}`);
 
         socket.onmessage = async (event) => {
           const data: Server[] = JSON.parse(event.data);

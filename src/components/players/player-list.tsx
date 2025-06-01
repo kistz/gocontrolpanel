@@ -21,14 +21,8 @@ export default function PlayerList({ serverId }: PlayerListProps) {
       return;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-    if (!baseUrl) {
-      console.error("NEXT_PUBLIC_CONNECTOR_URL is not defined");
-      return;
-    }
-
     const socket = new WebSocket(
-      `${baseUrl}/ws/players/${serverId}?token=${session.jwt}`,
+      `/gbx/ws/players/${serverId}?token=${session.jwt}`,
     );
     wsRef.current = socket;
 
