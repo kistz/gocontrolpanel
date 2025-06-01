@@ -1,7 +1,7 @@
 "use client";
 
 import { Maps } from "@/lib/prisma/generated";
-import { cn } from "@/lib/utils";
+import { cn, initGbxWebsocketClient } from "@/lib/utils";
 import {
   IconArrowForwardUp,
   IconLock,
@@ -59,9 +59,7 @@ export default function MapCarousel({
       return;
     }
 
-    const socket = new WebSocket(
-      `/gbx/ws/map/${serverId}?token=${session.jwt}`,
-    );
+    const socket = initGbxWebsocketClient(`/ws/map/${serverId}`, session.jwt as string);
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
