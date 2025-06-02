@@ -173,3 +173,9 @@ export function removePrefix(str: string, prefix: string): string {
   }
   return str;
 }
+
+export function initGbxWebsocketClient(path: string, token: string): WebSocket {
+  const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
+  const baseUri = envUrl && envUrl != "" ? envUrl : "/gbx";
+  return new WebSocket(`${baseUri}${path}?token=${token}`);
+}

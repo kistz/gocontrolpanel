@@ -1,6 +1,6 @@
 "use client";
 import { getPlayerList } from "@/actions/gbx/player";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, initGbxWebsocketClient } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
@@ -33,15 +33,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
       return;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-    if (!baseUrl) {
-      console.error("Connector URL is not defined");
-      return;
-    }
-
-    const socket = new WebSocket(
-      `${baseUrl}/ws/live/${serverId}?token=${session.jwt}`,
-    );
+    const socket = initGbxWebsocketClient(`/ws/live/${serverId}`, session.jwt as string);
     wsRef.current = socket;
 
     socket.onmessage = (event) => {

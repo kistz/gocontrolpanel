@@ -78,7 +78,7 @@ export async function doRequest<T>(
 
   const headers = new Headers(init.headers);
   headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
-  headers.set("User-Agent", config.NADEO.REDIRECT_URI);
+  headers.set("User-Agent", config.NADEO.CONTACT);
 
   console.log("Requesting Nadeo API:", url);
   let res = await fetch(url, { ...init, headers });

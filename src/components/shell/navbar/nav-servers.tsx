@@ -16,7 +16,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { disconnectGbxClient } from "@/lib/gbxclient";
-import { generatePath, useCurrentServerId } from "@/lib/utils";
+import { generatePath, useCurrentServerId, initGbxWebsocketClient } from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
 import {
@@ -86,13 +86,6 @@ export default function NavServers() {
         return;
       }
 
-      const url = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-      if (!url) {
-        setTimeout(() => toast.error("Can't connect to the server"));
-        setLoading(false);
-        return;
-      }
-
       if (!session.jwt) {
         setTimeout(() => toast.error("Can't connect to the server"));
         setLoading(false);
@@ -100,7 +93,7 @@ export default function NavServers() {
       }
 
       try {
-        const socket = new WebSocket(`${url}/ws/servers?token=${session.jwt}`);
+        const socket = initGbxWebsocketClient("/ws/servers", session.jwt as string);
 
         socket.onmessage = async (event) => {
           const data: Server[] = JSON.parse(event.data);

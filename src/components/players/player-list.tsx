@@ -2,6 +2,7 @@
 
 import { createColumns } from "@/app/(gocontroller)/server/[id]/players/players-columns";
 import { PlayerInfo } from "@/types/player";
+import { initGbxWebsocketClient } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "../table/data-table";
@@ -21,15 +22,7 @@ export default function PlayerList({ serverId }: PlayerListProps) {
       return;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-    if (!baseUrl) {
-      console.error("NEXT_PUBLIC_CONNECTOR_URL is not defined");
-      return;
-    }
-
-    const socket = new WebSocket(
-      `${baseUrl}/ws/players/${serverId}?token=${session.jwt}`,
-    );
+    const socket = initGbxWebsocketClient(`/ws/players/${serverId}`, session.jwt as string);
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
