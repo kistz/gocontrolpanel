@@ -36,7 +36,6 @@ Make sure to update the environment variables for the services in your `docker-c
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
 
 - **GBXConnector Environment Variables**:
-  - `CORS_ORIGINS`: Make sure this is set to allow your frontend (e.g., `http://localhost:3000`).
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
   - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
@@ -51,7 +50,7 @@ Make sure to update the environment variables for the services in your `docker-c
 Run the following command to start all services defined in the `docker-compose.yml` file:
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 ### 4. Access the GoControlPanel
@@ -150,7 +149,7 @@ nginx:
   ports:
     - 3000:80
   volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf
+    - ./gocontrolpanel/nginx.conf:/etc/nginx/nginx.conf
   depends_on:
     - gocontrolpanel
     - gbxconnector
@@ -184,7 +183,6 @@ volumes:
 Make sure to update the environment variables for the added services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
-
   - `NEXT_PUBLIC_CONNECTOR_URL`: Public URL for the GBXConnector service (don't set when using Nginx).
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
@@ -192,7 +190,6 @@ Make sure to update the environment variables for the added services in your `do
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
 
 - **GBXConnector Environment Variables**:
-  - `CORS_ORIGINS`: Make sure this is set to allow your frontend (e.g., `http://localhost:3000`).
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
   - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
@@ -223,7 +220,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 Run the following command to start the services.
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 ### 7. Access the GoControlPanel
