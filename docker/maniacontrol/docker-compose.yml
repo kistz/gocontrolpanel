@@ -84,7 +84,7 @@ services:
     ports:
       - 3000:80
     volumes:
-      - ./../../nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - gocontrolpanel
       - gbxconnector
