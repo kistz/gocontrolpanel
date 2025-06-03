@@ -26,13 +26,14 @@ services:
 
   maniacontrol:
     image: amzgbeu/trackmaniacontrol:latest
+    restart: unless-stopped
     environment:
-      - SERVER=dedicated-server
-      - MYSQL_HOST=db
-      - MYSQL_DATABASE=maniacontrol
-      - MYSQL_USER=maniacontrol
-      - MYSQL_PASSWORD=MCWithGCP123
-      - MASTERADMINS=
+      SERVER: dedicated-server
+      MYSQL_HOST: db
+      MYSQL_DATABASE: maniacontrol
+      MYSQL_USER: maniacontrol
+      MYSQL_PASSWORD: MCWithGCP123
+      MASTERADMINS:
     volumes:
       - user-data:/opt/Trackmania/UserData
     depends_on:
