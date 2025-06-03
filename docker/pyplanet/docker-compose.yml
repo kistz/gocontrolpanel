@@ -70,7 +70,7 @@ services:
       INTERNAL_API_KEY: 
       LOG_LEVEL: DEBUG
     volumes:
-      - ./servers.json:/app/servers.json
+      - ./../../servers.json:/app/servers.json
 
   nginx:
     image: nginx:latest
@@ -78,7 +78,7 @@ services:
     ports:
       - 3000:80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./../../nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - gocontrolpanel
       - gbxconnector
