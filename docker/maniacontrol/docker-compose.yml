@@ -76,7 +76,7 @@ services:
       INTERNAL_API_KEY: 
       LOG_LEVEL: DEBUG
     volumes:
-      - ./../../servers.json:/app/servers.json
+      - ./servers.json:/app/servers.json
 
   nginx:
     image: nginx:latest
