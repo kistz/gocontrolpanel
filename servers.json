@@ -2,7 +2,7 @@
   {
     "id": 0,
     "name": "Dedicated Server",
-    "host": "dedicated-server",
+    "host": "dedicated",
     "xmlrpcPort": 5000,
     "user": "SuperAdmin",
     "pass": "SuperAdmin",
