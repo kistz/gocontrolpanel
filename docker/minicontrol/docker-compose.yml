@@ -1,0 +1,114 @@
+services:
+  dedicated:
+    image: evoesports/trackmania:latest
+    restart: unless-stopped
+    ports:
+      - 2350:2350/udp
+      - 2350:2350/tcp
+    environment:
+      TM_MASTERSERVER_LOGIN: 
+      TM_MASTERSERVER_PASSWORD: 
+      TM_SYSTEM_XMLRPC_ALLOWREMOTE: True
+    volumes:
+      - user-data:/server/UserData
+
+  db:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: secret
+      MARIADB_USER: minicontrol
+      MARIADB_PASSWORD: minicontrol
+      MARIADB_DATABASE: minicontrol
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+
+  minicontrol:
+    image: evoesports/minicontrol:latest
+    restart: unless-stopped
+    environment:
+      XMLRPC_HOST: dedicated
+      XMLRPC_PORT: 5000
+      XMLRPC_USER: SuperAdmin
+      XMLRPC_PASSWORD: SuperAdmin
+      EXCLUDED_PLUGINS: 
+      ERROR_REPORTING: false
+      SERVER_LOGIN: 
+      SERVER_PASS: 
+      CONTACT_INFO: MiniControl / <your contact info>
+      IDENTIFIER: 
+      SECRET: 
+      DATABASE: mysql://minicontrol:minicontrol@db:3306/minicontrol
+      ADMINS: 
+    volumes:
+      - user-data:/server/UserData
+    depends_on:
+      - dedicated
+      - db
+  
+  gocontrolpanel:
+    image: marijnregterschot/gocontrolpanel:latest
+    build:
+      context: ./../..
+      dockerfile: Dockerfile
+      args:
+        - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
+        - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
+        - DB_TYPE=mysql
+    restart: unless-stopped
+    environment:
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: 
+      CONNECTOR_API_KEY: 
+      DEFAULT_ADMINS: 
+      NADEO_CLIENT_ID: 
+      NADEO_CLIENT_SECRET: 
+      NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
+      NADEO_SERVER_LOGIN: 
+      NADEO_SERVER_PASSWORD: 
+      NADEO_CONTACT: GoControlPanel / <your contact info>
+      REDIS_URI: redis://redis:6379
+    depends_on:
+      - db
+      - redis
+
+  gbxconnector:
+    image: marijnregterschot/gbxconnector:latest
+    restart: unless-stopped
+    environment:
+      PORT: 6980
+      SERVER_RECONNECT_INTERVAL: 15
+      JWT_SECRET: 
+      INTERNAL_API_KEY: 
+      LOG_LEVEL: DEBUG
+    volumes:
+      - ./../../servers.json:/app/servers.json
+
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - 3000:80
+    volumes:
+      - ./../../nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - gocontrolpanel
+      - gbxconnector
+
+  filemanager:
+    image: marijnregterschot/trackmania-server-fm:latest
+    restart: unless-stopped
+    volumes:
+      - user-data:/app/UserData
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+volumes:
+  user-data:
+  db-data:
+  redis-data:
