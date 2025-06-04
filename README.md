@@ -9,6 +9,8 @@ Before using this `docker-compose.yml` file, ensure you have the following insta
 - **Docker**: [Install Docker](https://www.docker.com/get-started)
 - **Docker Compose**: [Install Docker Compose](https://docs.docker.com/compose/install/)
 
+You will also need some credentials for the **Nadeo API** to configure the **GoControlPanel**. You can obtain these credentials from the [Nadeo API manager](https://api.trackmania.com/manager). Additionally, you will need a dedicated server login and password, which can be found in the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
+
 ## **Getting Started**
 
 This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup). There are also some boilerplate `docker-compose.yml` files available in the [docker](./docker/) folder for a variety of server controllers. Plug in your own configuration and you are good to go!
