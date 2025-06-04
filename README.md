@@ -1,8 +1,8 @@
-# **GoControlPanel Docker Compose Setup**
+# GoControlPanel Docker Compose Setup
 
 This repository provides a **Docker Compose** configuration to set up and run **GoControlPanel** and its dependencies using Docker containers.
 
-## **Prerequisites**
+## Prerequisites
 
 Before using this `docker-compose.yml` file, ensure you have the following installed on your system:
 
@@ -11,7 +11,7 @@ Before using this `docker-compose.yml` file, ensure you have the following insta
 
 You will also need some credentials for the **Nadeo API** to configure the **GoControlPanel**. You can obtain these credentials from the [Nadeo API manager](https://api.trackmania.com/manager). Additionally, you will need a dedicated server login and password, which can be found in the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
 
-## **Getting Started**
+## Getting Started
 
 This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup). There are also some boilerplate `docker-compose.yml` files available in the [docker](./docker/) folder for a variety of server controllers. Plug in your own configuration and you are good to go!
 
@@ -229,7 +229,7 @@ That's it! You can now access your **GoControlPanel** at `http://localhost:3000`
 
 ---
 
-## **Troubleshooting**
+## Troubleshooting
 
 If you encounter any issues, check the logs of a specific service by running:
 
@@ -245,12 +245,12 @@ docker compose logs gocontrolpanel
 
 ---
 
-## **Contributing**
+## Contributing
 
 Contributions are welcome! If you have suggestions or improvements, please create a pull request or open an issue. Feel free to fork the repository and make changes as needed.
 
 ---
 
-## **License**
+## License
 
 This project is licensed under the MIT License - see the [License](License) file for details.
