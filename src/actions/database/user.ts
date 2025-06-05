@@ -99,9 +99,7 @@ export async function getUsersPaginated(
   });
 }
 
-export async function getUserById(
-  id: string,
-): Promise<ServerResponse<Users>> {
+export async function getUserById(id: string): Promise<ServerResponse<Users>> {
   return doServerAction(async () => {
     const db = getClient();
     const user = await db.users.findUniqueOrThrow({
@@ -149,9 +147,7 @@ export async function createUserAuth(
     });
 
     if (existingUser) {
-      throw new ServerError(
-        "User with this login or nickname already exists",
-      );
+      throw new ServerError("User with this login or nickname already exists");
     }
 
     const newUser = {
@@ -189,7 +185,7 @@ export async function updateUser(
     | "deletedAt"
   >,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async (session) => {
+  return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
 
     const existingUser = await db.users.findUniqueOrThrow({
