@@ -16,12 +16,17 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { disconnectGbxClient } from "@/lib/gbxclient";
-import { generatePath, useCurrentServerId, initGbxWebsocketClient } from "@/lib/utils";
+import {
+  generatePath,
+  initGbxWebsocketClient,
+  useCurrentServerId,
+} from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
 import {
   IconActivity,
   IconAdjustmentsAlt,
+  IconDeviceDesktop,
   IconDeviceGamepad,
   IconFileDescription,
   IconMap,
@@ -93,7 +98,10 @@ export default function NavServers() {
       }
 
       try {
-        const socket = initGbxWebsocketClient("/ws/servers", session.jwt as string);
+        const socket = initGbxWebsocketClient(
+          "/ws/servers",
+          session.jwt as string,
+        );
 
         socket.onmessage = async (event) => {
           const data: Server[] = JSON.parse(event.data);
@@ -170,6 +178,13 @@ export default function NavServers() {
               },
             ]
           : []),
+        {
+          name: "Interface",
+          url: generatePath(routes.servers.interface, {
+            id: server.id,
+          }),
+          icon: IconDeviceDesktop,
+        },
         // {
         //   name: "Dev",
         //   url: generatePath(routes.servers.dev, {
