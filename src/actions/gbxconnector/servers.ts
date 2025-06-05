@@ -1,7 +1,7 @@
 "use server";
 import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
 import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
-import { doServerAction } from "@/lib/actions";
+import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosAuth } from "@/lib/axios/connector";
 import config from "@/lib/config";
 import { connectToGbxClient } from "@/lib/gbxclient";
@@ -14,7 +14,7 @@ let healthStatus: boolean | null = null;
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
-  const res = await axiosAuth.get("/servers");
+  const res = await axiosAuth.get<Server[]>("/servers");
 
   if (res.status !== 200) {
     if (isAxiosError(res) && res.code === "ECONNREFUSED") {
@@ -25,7 +25,7 @@ export async function syncServers(): Promise<Server[]> {
 
   const redis = await getRedisClient();
 
-  const servers: Server[] = res.data;
+  const servers = res.data;
 
   await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
   return servers;
@@ -57,7 +57,7 @@ export async function getHealthStatus(): Promise<boolean> {
 export async function addServer(
   server: AddServerSchemaType,
 ): Promise<ServerResponse> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth(["admin"], async () => {
     const res = await axiosAuth.post(`${config.CONNECTOR_URL}/servers`, server);
 
     if (res.status !== 200) {
@@ -72,7 +72,7 @@ export async function editServer(
   serverId: number,
   server: EditServerSchemaType,
 ): Promise<ServerResponse> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth(["admin"], async () => {
     const res = await axiosAuth.put(`/servers/${serverId}`, server);
 
     if (res.status !== 200) {
@@ -84,7 +84,7 @@ export async function editServer(
 }
 
 export async function removeServer(id: number): Promise<ServerResponse> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth(["admin"], async () => {
     const res = await axiosAuth.delete(`/servers/${id}`);
 
     if (res.status !== 200) {
@@ -98,7 +98,7 @@ export async function removeServer(id: number): Promise<ServerResponse> {
 export async function orderServers(
   servers: Server[],
 ): Promise<ServerResponse<Server[]>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth(["admin"], async () => {
     const res = await axiosAuth.put(
       "/servers/order",
       servers.map((server) => server.id),
