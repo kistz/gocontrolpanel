@@ -44,6 +44,16 @@ export default function ChatConfigForm({
     chatConfig.messageFormat ?? "",
   );
 
+  const connectMessageValue = form.watch(
+    "connectMessage",
+    chatConfig.connectMessage ?? "",
+  );
+
+  const disconnectMessageValue = form.watch(
+    "disconnectMessage",
+    chatConfig.disconnectMessage ?? "",
+  );
+
   function formatMessage(format: string): string {
     let msg = format
       .replaceAll(
@@ -71,22 +81,62 @@ export default function ChatConfigForm({
           isRequired
         />
 
-        <FormElement
-          control={form.control}
-          name={"messageFormat"}
-          label="Message Format"
-          description="Define the format for chat messages. Available variables: {login}, {nickName}, {message}."
-          error={form.formState.errors.messageFormat}
-          type="text"
-          placeholder="e.g. {nickName}: {message}"
-          className="max-w-128"
-        />
+        <div>
+          <FormElement
+            control={form.control}
+            name={"messageFormat"}
+            label="Message Format"
+            description="Define the format for chat messages. Available variables: {login}, {nickName}, {message}."
+            error={form.formState.errors.messageFormat}
+            type="text"
+            placeholder="{nickName}: {message}"
+            className="max-w-128"
+          />
 
-        {messageFormatValue && (
-          <span className="text-sm text-muted-foreground -mt-2">
-            {">"} {formatMessage(messageFormatValue)}
-          </span>
-        )}
+          {messageFormatValue && (
+            <span className="text-sm text-muted-foreground">
+              {">"} {formatMessage(messageFormatValue)}
+            </span>
+          )}
+        </div>
+
+        <div>
+          <FormElement
+            control={form.control}
+            name={"connectMessage"}
+            label="Connect Message"
+            description="Message sent when a player connects. Available variables: {login}, {nickName}."
+            error={form.formState.errors.connectMessage}
+            type="text"
+            placeholder="Welcome to the server {nickName}!"
+            className="max-w-128"
+          />
+
+          {connectMessageValue && (
+            <span className="text-sm text-muted-foreground">
+              {">"} {formatMessage(connectMessageValue)}
+            </span>
+          )}
+        </div>
+
+        <div>
+          <FormElement
+            control={form.control}
+            name={"disconnectMessage"}
+            label="Disconnect Message"
+            description="Message sent when a player disconnects. Available variables: {login}, {nickName}."
+            error={form.formState.errors.disconnectMessage}
+            type="text"
+            placeholder="Goodbye {nickName}!"
+            className="max-w-128"
+          />
+
+          {disconnectMessageValue && (
+            <span className="text-sm text-muted-foreground">
+              {">"} {formatMessage(disconnectMessageValue)}
+            </span>
+          )}
+        </div>
 
         <Button
           type="submit"
