@@ -36,6 +36,8 @@ export async function authenticate(
     );
   }
 
+  console.log("Authenticated successfully with Nadeo");
+
   const redis = await getRedisClient();
 
   const tokens: NadeoTokens = await response.json();
