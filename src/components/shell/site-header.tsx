@@ -6,6 +6,8 @@ import { breadCrumbs } from "@/routes";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Breadcrumbs, { TBreadcrumb } from "./breadcrumbs";
+import Link from "next/link";
+import { IconBrandGithub } from "@tabler/icons-react";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -66,6 +68,12 @@ export function SiteHeader() {
           />
 
           <Breadcrumbs crumbs={activeBreadCrumbs} />
+
+          <div className="ml-auto flex gap-2">
+            <Link href="https://github.com/MRegterschot/gocontrolpanel" target="_blank">
+              <IconBrandGithub />
+            </Link>
+          </div>
         </div>
       </header>
     )
