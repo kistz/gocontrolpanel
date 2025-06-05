@@ -190,10 +190,6 @@ export async function updateUser(
   >,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
-    if (id === session.user.id) {
-      throw new ServerError("Cannot update your own account");
-    }
-
     const db = getClient();
 
     const existingUser = await db.users.findUniqueOrThrow({
