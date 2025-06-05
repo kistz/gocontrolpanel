@@ -9,13 +9,12 @@ import {
 import { getCurrentMapIndex } from "@/actions/gbx/map";
 import MapCarousel from "@/components/maps/map-carousel";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MatchSettingsForm from "@/forms/server/game/match-settings-form";
 import ModeScriptSettingsForm from "@/forms/server/game/mode-script-settings-form";
 import PlaylistForm from "@/forms/server/game/playlist-form";
 import ScriptNameForm from "@/forms/server/game/script-name-form";
 import ShowOpponentsForm from "@/forms/server/game/show-opponents-form";
-import { TabsContent } from "@radix-ui/react-tabs";
 import { parseTmTags } from "tmtags";
 
 export default async function ServerGamePage({
