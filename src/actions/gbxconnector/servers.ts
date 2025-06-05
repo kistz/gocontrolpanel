@@ -58,7 +58,7 @@ export async function addServer(
   server: AddServerSchemaType,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const res = await axiosAuth.post(`${config.CONNECTOR_URL}/servers`, server);
+    const res = await axiosAuth.post("/servers", server);
 
     if (res.status !== 200) {
       throw new ServerError("Failed to add server");
