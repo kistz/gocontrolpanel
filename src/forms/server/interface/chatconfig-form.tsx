@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ChatConfigSchema, ChatConfigSchemaType } from "./chatconfig-schema";
-import { useSession } from "next-auth/react";
 
 export default function ChatConfigForm({
   serverId,
@@ -44,11 +44,12 @@ export default function ChatConfigForm({
     chatConfig.messageFormat ?? "",
   );
 
-  function formatMessage(
-    format: string,
-  ): string {
+  function formatMessage(format: string): string {
     let msg = format
-      .replaceAll("{login}", session.data?.user.login ?? "v8vgGbx_TuKkBabAyn7nsQ")
+      .replaceAll(
+        "{login}",
+        session.data?.user.login ?? "v8vgGbx_TuKkBabAyn7nsQ",
+      )
       .replaceAll("{nickName}", session.data?.user.displayName ?? "Marijntje04")
       .replaceAll("{message}", "Nice time!");
     return msg.trim();
@@ -83,11 +84,15 @@ export default function ChatConfigForm({
 
         {messageFormatValue && (
           <span className="text-sm text-muted-foreground -mt-2">
-            {'>'} {formatMessage(messageFormatValue)}
+            {">"} {formatMessage(messageFormatValue)}
           </span>
         )}
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className="max-w-24"
+        >
           Save
         </Button>
       </form>
