@@ -28,8 +28,8 @@ export default async function NavAdmin() {
     name: "Admin",
     items: [
       {
-        name: "Players",
-        url: routes.admin.players,
+        name: "Users",
+        url: routes.admin.users,
         icon: IconUserCog,
       },
       {

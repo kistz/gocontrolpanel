@@ -1,7 +1,7 @@
 "use server";
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { Players } from "@/lib/prisma/generated";
+import { Users } from "@/lib/prisma/generated";
 import { getRoles } from "@/lib/utils";
 import {
   PaginationResponse,
@@ -10,23 +10,23 @@ import {
 } from "@/types/responses";
 import { ObjectId } from "mongodb";
 
-export async function getAllPlayers(): Promise<ServerResponse<Players[]>> {
+export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
   return doServerAction(async () => {
     const db = getClient();
-    const players = await db.players.findMany({
+    const users = await db.users.findMany({
       where: {
         deletedAt: null,
       },
     });
 
-    return players;
+    return users;
   });
 }
 
-export async function getPlayerCount(): Promise<ServerResponse<number>> {
+export async function getUserCount(): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = getClient();
-    return db.players.count({
+    return db.users.count({
       where: {
         deletedAt: null,
       },
@@ -34,14 +34,14 @@ export async function getPlayerCount(): Promise<ServerResponse<number>> {
   });
 }
 
-export async function getNewPlayersCount(
+export async function getNewUsersCount(
   days: number,
 ): Promise<ServerResponse<number>> {
   return doServerAction(async () => {
     const db = getClient();
     const date = new Date();
     date.setDate(date.getDate() - days);
-    const count = await db.players.count({
+    const count = await db.users.count({
       where: {
         createdAt: { gt: date },
         deletedAt: null,
@@ -51,15 +51,15 @@ export async function getNewPlayersCount(
   });
 }
 
-export async function getPlayersPaginated(
+export async function getUsersPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
   filter?: string,
-): Promise<ServerResponse<PaginationResponse<Players>>> {
+): Promise<ServerResponse<PaginationResponse<Users>>> {
   return doServerAction(async () => {
     const db = getClient();
 
-    const totalCount = await db.players.count({
+    const totalCount = await db.users.count({
       where: {
         deletedAt: null,
         ...(filter && {
@@ -73,7 +73,7 @@ export async function getPlayersPaginated(
       },
     });
 
-    const players = await db.players.findMany({
+    const users = await db.users.findMany({
       where: {
         deletedAt: null,
         ...(filter && {
@@ -93,92 +93,92 @@ export async function getPlayersPaginated(
     });
 
     return {
-      data: players,
+      data: users,
       totalCount,
     };
   });
 }
 
-export async function getPlayerById(
+export async function getUserById(
   id: string,
-): Promise<ServerResponse<Players>> {
+): Promise<ServerResponse<Users>> {
   return doServerAction(async () => {
     const db = getClient();
-    const player = await db.players.findUniqueOrThrow({
+    const user = await db.users.findUniqueOrThrow({
       where: {
         id,
         deletedAt: null,
       },
     });
 
-    return player;
+    return user;
   });
 }
 
-export async function getPlayerByLogin(
+export async function getUserByLogin(
   login: string,
-): Promise<ServerResponse<Players>> {
+): Promise<ServerResponse<Users>> {
   return doServerAction(async () => {
     const db = getClient();
     console.log(login);
-    const player = await db.players.findFirstOrThrow({
+    const user = await db.users.findFirstOrThrow({
       where: {
         login,
         deletedAt: null,
       },
     });
 
-    return player;
+    return user;
   });
 }
 
-export async function createPlayerAuth(
-  player: Omit<Players, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<ServerResponse<Players>> {
+export async function createUserAuth(
+  user: Omit<Users, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+): Promise<ServerResponse<Users>> {
   return doServerAction(async () => {
     const db = getClient();
 
-    const existingPlayer = await db.players.findFirst({
+    const existingUser = await db.users.findFirst({
       where: {
         OR: [
-          { login: player.login },
-          { nickName: player.nickName },
-          { ubiUid: player.ubiUid },
+          { login: user.login },
+          { nickName: user.nickName },
+          { ubiUid: user.ubiUid },
         ],
       },
     });
 
-    if (existingPlayer) {
+    if (existingUser) {
       throw new ServerError(
-        "Player with this login or nickname already exists",
+        "User with this login or nickname already exists",
       );
     }
 
-    const newPlayer = {
-      ...player,
+    const newUser = {
+      ...user,
       id: new ObjectId().toString(),
-      roles: getRoles(player.roles),
+      roles: getRoles(user.roles),
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
     };
 
-    const result = await db.players.create({
-      data: newPlayer,
+    const result = await db.users.create({
+      data: newUser,
     });
 
     if (!result) {
-      throw new ServerError("Failed to create player");
+      throw new ServerError("Failed to create user");
     }
 
     return result;
   });
 }
 
-export async function updatePlayer(
+export async function updateUser(
   id: string,
   data: Omit<
-    Players,
+    Users,
     | "id"
     | "login"
     | "nickName"
@@ -196,21 +196,21 @@ export async function updatePlayer(
 
     const db = getClient();
 
-    const existingPlayer = await db.players.findUniqueOrThrow({
+    const existingUser = await db.users.findUniqueOrThrow({
       where: {
         id,
       },
     });
 
     const isRemovingAdmin =
-      getRoles(existingPlayer.roles).includes("admin") &&
+      getRoles(existingUser.roles).includes("admin") &&
       !getRoles(data.roles).includes("admin");
 
     if (isRemovingAdmin) {
       throw new ServerError("Cannot remove admin role");
     }
 
-    await db.players.update({
+    await db.users.update({
       where: { id },
       data: {
         ...data,
@@ -222,14 +222,14 @@ export async function updatePlayer(
   });
 }
 
-export async function deletePlayerById(id: string): Promise<ServerResponse> {
+export async function deleteUserById(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
     if (id === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }
 
     const db = getClient();
-    await db.players.update({
+    await db.users.update({
       where: { id },
       data: {
         deletedAt: new Date(),

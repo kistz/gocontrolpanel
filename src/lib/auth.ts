@@ -1,8 +1,8 @@
 import {
-  createPlayerAuth,
-  getPlayerById,
-  getPlayerByLogin,
-} from "@/actions/database/player";
+  createUserAuth,
+  getUserById,
+  getUserByLogin,
+} from "@/actions/database/user";
 import {
   GetServerSidePropsContext,
   NextApiRequest,
@@ -14,7 +14,7 @@ import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import { axiosAuth } from "./axios/connector";
 import config from "./config";
-import { Players } from "./prisma/generated";
+import { Users } from "./prisma/generated";
 import { getRoles } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
@@ -91,16 +91,16 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      let dbUser: Players | null;
+      let dbUser: Users | null;
       if (user) {
         const login = slugid.encode(user.accountId);
-        ({ data: dbUser } = await getPlayerByLogin(login));
+        ({ data: dbUser } = await getUserByLogin(login));
 
         token.accountId = user.accountId;
         token.login = login;
         token.displayName = user.displayName;
       } else {
-        ({ data: dbUser } = await getPlayerById(token.id));
+        ({ data: dbUser } = await getUserById(token.id));
       }
 
       if (!dbUser) {
@@ -119,7 +119,7 @@ export const authOptions: NextAuthOptions = {
           console.error("Failed to fetch web identities", error);
         }
 
-        ({ data: dbUser } = await createPlayerAuth({
+        ({ data: dbUser } = await createUserAuth({
           login: token.login,
           nickName: token.displayName,
           roles: config.DEFAULT_ADMINS.includes(token.login) ? ["admin"] : [],
@@ -172,7 +172,7 @@ export async function withAuth(roles?: string[]): Promise<Session> {
   return session;
 }
 
-async function getConnectorToken(user: Players): Promise<string> {
+async function getConnectorToken(user: Users): Promise<string> {
   const res = await axiosAuth.post("/auth", user);
 
   if (res.status !== 200) {

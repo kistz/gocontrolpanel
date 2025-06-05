@@ -13,7 +13,7 @@ export const routes = {
     dev: "/server/:id/dev",
   },
   admin: {
-    players: "/admin/players",
+    users: "/admin/users",
     servers: "/admin/servers",
   },
   login: "/login",
@@ -123,13 +123,13 @@ export const breadCrumbs: {
     ],
   },
   {
-    path: routes.admin.players,
+    path: routes.admin.users,
     breadCrumbs: [
       {
         label: "Admin",
       },
       {
-        label: "Players",
+        label: "Users",
       },
     ],
   },

@@ -1,48 +1,48 @@
 "use client";
-import { updatePlayer } from "@/actions/database/player";
+import { updateUser } from "@/actions/database/user";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Players } from "@/lib/prisma/generated";
+import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage, getRoles } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { EditPlayerSchema, EditPlayerSchemaType } from "./edit-player-schema";
+import { EditUserSchema, EditUserSchemaType } from "./edit-user-schema";
 
 const rolesOptions = [
   { label: "Admin", value: "admin", removable: false },
   { label: "Moderator", value: "moderator" },
 ];
 
-export default function EditPlayerForm({
-  player,
+export default function EditUserForm({
+  user,
   callback,
 }: {
-  player: Players;
+  user: Users;
   callback?: () => void;
 }) {
-  const form = useForm<EditPlayerSchemaType>({
-    resolver: zodResolver(EditPlayerSchema),
+  const form = useForm<EditUserSchemaType>({
+    resolver: zodResolver(EditUserSchema),
     defaultValues: {
-      roles: getRoles(player.roles),
+      roles: getRoles(user.roles),
     },
   });
 
-  async function onSubmit(values: EditPlayerSchemaType) {
+  async function onSubmit(values: EditUserSchemaType) {
     try {
-      const { error } = await updatePlayer(player.id, {
+      const { error } = await updateUser(user.id, {
         roles: values.roles,
       });
       if (error) {
         throw new Error(error);
       }
-      toast.success("Player successfully updated");
+      toast.success("User successfully updated");
       if (callback) {
         callback();
       }
     } catch (error) {
-      toast.error("Failed to update player", {
+      toast.error("Failed to update user", {
         description: getErrorMessage(error),
       });
     }
@@ -55,9 +55,9 @@ export default function EditPlayerForm({
           control={form.control}
           name={"roles"}
           options={rolesOptions}
-          defaultValues={getRoles(player.roles)}
+          defaultValues={getRoles(user.roles)}
           label="Roles"
-          description="The roles of the player."
+          description="The roles of the user."
           placeholder="Select roles"
           error={form.formState.errors.roles}
           className="w-full min-w-64"

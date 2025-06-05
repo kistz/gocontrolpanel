@@ -1,8 +1,8 @@
 "use client";
 
-import { deletePlayerById } from "@/actions/database/player";
+import { deleteUserById } from "@/actions/database/user";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditPlayerModal from "@/components/modals/edit-player";
+import EditUserModal from "@/components/modals/edit-user";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Players } from "@/lib/prisma/generated";
+import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -21,7 +21,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
+export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (
@@ -74,7 +74,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
   {
     id: "actions",
     cell: ({ row }) => {
-      const player = row.original;
+      const user = row.original;
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
@@ -82,14 +82,14 @@ export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
       const handleDelete = () => {
         startTransition(async () => {
           try {
-            const { error } = await deletePlayerById(player.id);
+            const { error } = await deleteUserById(user.id);
             if (error) {
               throw new Error(error);
             }
             refetch();
             toast.success("Player successfully deleted");
           } catch (error) {
-            toast.error("Error deleting player", {
+            toast.error("Error deleting user", {
               description: getErrorMessage(error),
             });
           }
@@ -106,16 +106,16 @@ export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>View player</DropdownMenuItem>
+              <DropdownMenuItem>View user</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit player
+                Edit user
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsOpen(true)}
               >
-                Delete player
+                Delete user
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -124,8 +124,8 @@ export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onConfirm={handleDelete}
-            title="Delete player"
-            description={`Are you sure you want to delete ${player.nickName}?`}
+            title="Delete user"
+            description={`Are you sure you want to delete ${user.nickName}?`}
             confirmText="Delete"
             cancelText="Cancel"
           />
@@ -135,7 +135,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Players>[] => [
             setIsOpen={setIsEditOpen}
             onClose={() => refetch()}
           >
-            <EditPlayerModal data={player} />
+            <EditUserModal data={user} />
           </Modal>
         </div>
       );

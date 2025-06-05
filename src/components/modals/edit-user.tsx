@@ -1,14 +1,14 @@
 "use client";
-import EditPlayerForm from "@/forms/admin/edit-player-form";
-import { Players } from "@/lib/prisma/generated";
+import EditUserForm from "@/forms/admin/edit-user-form";
+import { Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function EditPlayerModal({
+export default function EditUserModal({
   closeModal,
   data,
-}: DefaultModalProps<Players>) {
+}: DefaultModalProps<Users>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -27,7 +27,7 @@ export default function EditPlayerModal({
           onClick={closeModal}
         />
       </div>
-      <EditPlayerForm player={data} callback={closeModal} />
+      <EditUserForm user={data} callback={closeModal} />
     </Card>
   );
 }

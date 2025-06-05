@@ -33,7 +33,7 @@ model Maps {
   @@map("maps")
 }
 
-model Players {
+model Users {
   id        String   @id @default(uuid())
   login     String
   nickName  String
@@ -46,5 +46,5 @@ model Players {
   deletedAt      DateTime?
 
   @@index([deletedAt])
-  @@map("players")
+  @@map("users")
 }

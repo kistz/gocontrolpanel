@@ -1,12 +1,12 @@
-import { getPlayersPaginated } from "@/actions/database/player";
+import { getUsersPaginated } from "@/actions/database/user";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { createColumns } from "./columns";
 
-export default async function AdminPlayersPage() {
+export default async function AdminUsersPage() {
   return (
     <PaginationTable
       createColumns={createColumns}
-      fetchData={getPlayersPaginated}
+      fetchData={getUsersPaginated}
       filter={true}
     />
   );
