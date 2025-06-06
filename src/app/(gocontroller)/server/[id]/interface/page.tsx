@@ -1,10 +1,8 @@
 import { getChatConfig } from "@/actions/gbxconnector/chat";
-import { Editor } from "@/components/interface/puck/editor";
+import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
-import "@measured/puck/puck.css";
-import "./index.css";
 
 export default async function ServerInterfacePage({
   params,
@@ -31,7 +29,7 @@ export default async function ServerInterfacePage({
         </TabsList>
 
         <TabsContent value="widgets" className="flex flex-col gap-6">
-          <Editor />
+          <InterfaceEditor />
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
