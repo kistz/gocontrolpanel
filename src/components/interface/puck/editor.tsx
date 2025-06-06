@@ -11,7 +11,6 @@ type Components = {
   };
 };
 
-// Create Puck component config
 export const config: Config<Components> = {
   components: {
     HeadingBlock: {
@@ -32,14 +31,13 @@ export const config: Config<Components> = {
 
 const save = (data: Data) => {};
 
-// Render Puck editor
 export function Editor() {
   return (
     <Puck
       config={config}
       data={{}}
       overrides={{
-        headerActions: ({ children }) => {
+        headerActions: () => {
           const appState = usePuck((s) => s.appState);
 
           return (
