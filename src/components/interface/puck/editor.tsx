@@ -1,6 +1,9 @@
 "use client";
-import { Puck, type Config } from "@measured/puck";
+import { Button } from "@/components/ui/button";
+import { createUsePuck, Data, Puck, type Config } from "@measured/puck";
+import { IconDeviceDesktop, IconDeviceFloppy } from "@tabler/icons-react";
 
+const usePuck = createUsePuck();
 
 type Components = {
   HeadingBlock: {
@@ -27,12 +30,38 @@ export const config: Config<Components> = {
   },
 };
 
+const save = (data: Data) => {};
+
 // Render Puck editor
 export function Editor() {
   return (
     <Puck
       config={config}
       data={{}}
+      overrides={{
+        headerActions: ({ children }) => {
+          const appState = usePuck((s) => s.appState);
+
+          return (
+            <Button
+              onClick={() => {
+                save(appState.data);
+              }}
+            >
+              <IconDeviceFloppy />
+              Save
+            </Button>
+          );
+        },
+      }}
+      viewports={[
+        {
+          width: 1920 / 2,
+          height: 1080 / 2,
+          label: "Window",
+          icon: <IconDeviceDesktop size={16} />,
+        },
+      ]}
     />
   );
 }
