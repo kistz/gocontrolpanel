@@ -43,8 +43,6 @@ model Users {
   roles     String[]
   ubiUid    String
 
-  records   Records[]
-
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime?
@@ -58,8 +56,6 @@ model Records {
   mapId    String
   map Maps @relation(fields: [mapId], references: [id])
   login    String
-  userId String
-  user Users @relation(fields: [userId], references: [id])
   mapUid  String
   time   Int
 
@@ -69,6 +65,5 @@ model Records {
 
   @@index([deletedAt])
   @@index([mapId])
-  @@index([userId])
   @@map("records")
 }

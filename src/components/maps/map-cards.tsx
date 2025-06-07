@@ -1,5 +1,5 @@
 "use client";
-import { getMapsPaginated } from "@/actions/database/map";
+import { getMapsPaginated } from "@/actions/database/maps";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { Maps } from "@/lib/prisma/generated";

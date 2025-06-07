@@ -1,14 +1,16 @@
 "use server";
+import { onPlayerFinish } from "@/actions/gbx/listeners/records";
+import { onPodiumStart, syncMap } from "@/actions/gbx/map";
+import { syncPlayerList } from "@/actions/gbx/player";
 import { getServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
-import { onPodiumStart } from "@/actions/gbx/map";
 
 const globalForGbx = globalThis as unknown as {
   cachedClients?: { [key: number]: GbxClient };
 };
 
-const cachedClients = globalForGbx.cachedClients ??= {};
+const cachedClients = (globalForGbx.cachedClients ??= {});
 
 export async function connectToGbxClient(id: number): Promise<GbxClient> {
   const servers = await getServers();
@@ -50,6 +52,8 @@ export async function connectToGbxClient(id: number): Promise<GbxClient> {
   await client.call("EnableCallbacks", true);
   await client.callScript("XmlRpc.EnableCallbacks", "true");
   await setupListeners(client, server.id);
+  await syncPlayerList(client, server.id);
+  await syncMap(client, server.id);
 
   cachedClients[server.id] = client;
   return client;
@@ -69,13 +73,26 @@ export async function disconnectGbxClient(id: number): Promise<void> {
   }
 }
 
-export async function setupListeners(client: GbxClient, id: number): Promise<void> {
+export async function setupListeners(
+  client: GbxClient,
+  id: number,
+): Promise<void> {
   client.on("callback", (method: string, data: any) => {
     if (method === "ManiaPlanet.ModeScriptCallbackArray") {
       if (!data || data.length === 0) return;
 
-      if (data[0] === "Maniaplanet.Podium_Start") {
-        onPodiumStart(id);
+      const methodName = data[0];
+      const params = JSON.parse(data[1]) ?? data[1];
+
+      switch (methodName) {
+        case "Maniaplanet.Podium_Start":
+          onPodiumStart(id);
+          break;
+        case "Trackmania.Event.WayPoint":
+          if (params.isendrace) {
+            onPlayerFinish(id, params.login, params.racetime);
+          }
+          break;
       }
     }
   });

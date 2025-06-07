@@ -2,8 +2,10 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
+import { getKeyPlayers, getRedisClient } from "@/lib/redis";
 import { PlayerInfo } from "@/types/player";
 import { ServerResponse } from "@/types/responses";
+import { GbxClient } from "@evotm/gbxclient";
 
 export async function getPlayerList(
   serverId: number,
@@ -289,9 +291,44 @@ export async function forceSpectator(
   });
 }
 
-export async function connectFakePlayer(serverId: number): Promise<ServerResponse> {
+export async function connectFakePlayer(
+  serverId: number,
+): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverId);
     await client.call("ConnectFakePlayer");
   });
+}
+
+export async function syncPlayerList(client: GbxClient, serverId: number) {
+  const playerList = await client.call("GetPlayerList", 1000, 0);
+  if (!playerList || !Array.isArray(playerList)) {
+    throw new Error("Failed to retrieve player list");
+  }
+
+  const players: PlayerInfo[] = [];
+  for (const player of playerList) {
+    try {
+      players.push({
+        nickName: player.NickName,
+        login: player.Login,
+        playerId: player.PlayerId,
+        spectatorStatus: player.SpectatorStatus,
+        teamId: player.TeamId,
+      });
+    } catch {
+      players.push({
+        nickName: "-",
+        login: player.Login,
+        playerId: 0,
+        spectatorStatus: 0,
+        teamId: 0,
+      });
+    }
+  }
+
+  const redis = await getRedisClient();
+  const key = getKeyPlayers(serverId);
+
+  await redis.set(key, JSON.stringify(players));
 }

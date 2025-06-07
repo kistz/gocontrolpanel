@@ -1,6 +1,6 @@
 "use client";
 
-import { getMapByUid } from "@/actions/database/map";
+import { getMapByUid } from "@/actions/database/maps";
 import { Maps } from "@/lib/prisma/generated";
 import { formatTime, getErrorMessage } from "@/lib/utils";
 import {

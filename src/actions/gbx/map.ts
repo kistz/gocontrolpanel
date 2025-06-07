@@ -1,20 +1,19 @@
 "use server";
-
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Maps } from "@/lib/prisma/generated";
-import { getRedisClient } from "@/lib/redis";
+import { getKeyActiveMap, getKeyJukebox, getRedisClient } from "@/lib/redis";
 import { JukeboxMap, MapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
-
-const getKey = (server: number) => `jukebox:${server}`;
+import { GbxClient } from "@evotm/gbxclient";
+import { getMapByUid } from "../database/maps";
 
 export async function getJukebox(
   server: number,
 ): Promise<ServerResponse<JukeboxMap[]>> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKey(server);
+    const key = getKeyJukebox(server);
     const items = await redis.lrange(key, 0, -1);
     return items.map((item) => JSON.parse(item));
   });
@@ -26,7 +25,7 @@ export async function setJukebox(
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKey(server);
+    const key = getKeyJukebox(server);
     await redis.del(key);
     if (jukebox.length > 0) {
       await redis.rpush(key, ...jukebox.map((map) => JSON.stringify(map)));
@@ -37,7 +36,7 @@ export async function setJukebox(
 export async function clearJukebox(server: number): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKey(server);
+    const key = getKeyJukebox(server);
     await redis.del(key);
   });
 }
@@ -55,7 +54,7 @@ export async function addMapToJukebox(
       QueuedByDisplayName: session.user.displayName,
     };
 
-    const key = getKey(server);
+    const key = getKeyJukebox(server);
     await redis.rpush(key, JSON.stringify(newMap));
 
     return newMap;
@@ -68,7 +67,7 @@ export async function removeMapFromJukebox(
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKey(server);
+    const key = getKeyJukebox(server);
     const items = await redis.lrange(key, 0, -1);
 
     const filtered = items.filter((item) => {
@@ -85,7 +84,7 @@ export async function removeMapFromJukebox(
 
 export async function onPodiumStart(server: number) {
   const redis = await getRedisClient();
-  const key = getKey(server);
+  const key = getKeyJukebox(server);
   const items = await redis.lrange(key, 0, -1);
 
   if (items.length === 0) return;
@@ -226,4 +225,25 @@ export async function insertMapList(
 
     return res;
   });
+}
+
+export async function syncMap(
+  client: GbxClient,
+  server: number,
+): Promise<void> {
+  const mapInfo = await client.call("GetCurrentMapInfo");
+
+  if (!mapInfo) {
+    throw new ServerError("Failed to get current map info");
+  }
+
+  const { data: map } = await getMapByUid(mapInfo.uid);
+  if (!map) {
+    throw new ServerError(`Map with UID ${mapInfo.uid} not found`);
+  }
+
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(server);
+
+  await redis.set(key, JSON.stringify(map));
 }

@@ -1,4 +1,4 @@
-import { getMapList } from "@/actions/database/map";
+import { getMapList } from "@/actions/database/maps";
 import { getScripts } from "@/actions/filemanager";
 import {
   getModeScriptInfo,

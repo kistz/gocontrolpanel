@@ -1,5 +1,5 @@
 "use client";
-import { updateUser } from "@/actions/database/user";
+import { updateUser } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";

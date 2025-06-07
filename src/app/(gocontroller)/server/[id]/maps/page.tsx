@@ -1,4 +1,4 @@
-import { getMapList } from "@/actions/database/map";
+import { getMapList } from "@/actions/database/maps";
 import { getJukebox } from "@/actions/gbx/map";
 import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
