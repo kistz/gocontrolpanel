@@ -5,8 +5,8 @@ import { Rnd, RndDragCallback, RndResizeCallback } from "react-rnd";
 import { InterfaceComponent } from "../editor";
 
 export default function LocalRecordsWidget({
-  width,
-  height,
+  onClick,
+  boundaryRef,
 }: InterfaceComponent) {
   const [header, setHeader] = useState("Records");
 
@@ -56,10 +56,11 @@ export default function LocalRecordsWidget({
       }}
       minWidth={140}
       minHeight={210}
-      bounds="parent"
+      bounds={boundaryRef?.current ?? undefined}
       className="bg-black"
       onResizeStop={onResizeStop}
       onDragStop={onDragStop}
+      onClick={onClick}
     >
       {header && (
         <div className="bg-primary text-center font-bold text-sm">

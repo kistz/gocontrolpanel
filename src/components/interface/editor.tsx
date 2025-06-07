@@ -8,12 +8,12 @@ import { Separator } from "../ui/separator";
 import LocalRecordsWidget from "./widgets/local-records";
 
 export type InterfaceComponent = {
-  width: number;
-  height: number;
+  onClick?: () => void;
+  boundaryRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export default function InterfaceEditor() {
-  const editorRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const [components, setComponents] = useState<JSX.Element[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -38,16 +38,8 @@ export default function InterfaceEditor() {
     setSelectedIndex(null);
   };
 
-  const renderWidget = (
-    Widget: React.ComponentType<{ width: number; height: number }>,
-  ) => {
-    return (
-      <Widget
-        key={components.length}
-        width={editorSize.width}
-        height={editorSize.height}
-      />
-    );
+  const renderWidget = (Widget: React.ComponentType<InterfaceComponent>) => {
+    return <Widget key={components.length} boundaryRef={editorRef} />;
   };
 
   return (
@@ -61,23 +53,25 @@ export default function InterfaceEditor() {
         />
 
         {components.map((Component, index) => {
+          const scale = editorSize.width / 1169;
+
           const cloned = cloneElement(Component, {
-            width: editorSize.width,
-            height: editorSize.height,
+            onClick: () => {
+              setSelectedIndex(index);
+            },
           });
 
           return (
             <div
-              key={cloned.key ?? index}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedIndex(index);
+              key={index}
+              className="absolute cursor-pointer"
+              style={{
+                transform: `scale(${scale})`,
               }}
-              className="w-full h-full"
             >
               {cloned}
             </div>
-          );
+          )
         })}
       </div>
 
