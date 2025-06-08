@@ -1,7 +1,12 @@
 "use client";
 
 import { renderLocalRecordsWidget } from "@/actions/gbx/manialink/local-records";
-import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
+import {
+  getDefaultPosition,
+  getDefaultSize,
+  getManialinkPosition,
+  getManialinkSize,
+} from "@/lib/utils";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Rnd } from "react-rnd";
 import {
@@ -37,12 +42,12 @@ export type LocalRecordsWidgetComponentHandles = Omit<
   InterfaceComponentHandles,
   "render"
 > & {
-  render: (serverId: number) => Promise<{
+  render: () => {
     id: string;
     header: string;
     positionPercentage: { x: number; y: number };
     sizePercentage: { width: number; height: number };
-  }>;
+  };
 };
 
 const LocalRecordsWidgetComponent = forwardRef<
@@ -52,28 +57,22 @@ const LocalRecordsWidgetComponent = forwardRef<
   const id = "local-records-widget";
 
   const defaultHeader = defaultValues?.header ?? "Records";
-  const defaultPosition = defaultValues?.positionPercentage
-    ? {
-        x: (defaultValues.positionPercentage.x / 100) * EDITOR_DEFAULT_WIDTH,
-        y: (defaultValues.positionPercentage.y / 100) * EDITOR_DEFAULT_HEIGHT,
-      }
-    : { x: 0, y: 0 };
+  const defaultPosition = getDefaultPosition(
+    defaultValues?.positionPercentage,
+    { x: EDITOR_DEFAULT_WIDTH - 140, y: 100 },
+  );
 
-  const defaultSize = defaultValues?.sizePercentage
-    ? {
-        width:
-          (defaultValues.sizePercentage.width / 100) * EDITOR_DEFAULT_WIDTH,
-        height:
-          (defaultValues.sizePercentage.height / 100) * EDITOR_DEFAULT_HEIGHT,
-      }
-    : { width: 140, height: 210 };
+  const defaultSize = getDefaultSize(defaultValues?.sizePercentage, {
+    width: 140,
+    height: 210,
+  });
 
   const [header, setHeader] = useState(defaultHeader);
   const [position, setPosition] = useState(defaultPosition);
   const [size, setSize] = useState(defaultSize);
 
   useImperativeHandle(ref, () => ({
-    render: async (serverId: number) => {
+    render: () => {
       const positionPercentage = {
         x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
         y: (position.y / EDITOR_DEFAULT_HEIGHT) * 100,
@@ -83,23 +82,6 @@ const LocalRecordsWidgetComponent = forwardRef<
         width: (size.width / EDITOR_DEFAULT_WIDTH) * 100,
         height: (size.height / EDITOR_DEFAULT_HEIGHT) * 100,
       };
-
-      await renderLocalRecordsWidget(
-        serverId,
-        [
-          { player: "Player1", time: 123456 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-          { player: "Player2", time: 234567 },
-        ],
-        getManialinkPosition(positionPercentage),
-        getManialinkSize(sizePercentage),
-      );
 
       return {
         id,

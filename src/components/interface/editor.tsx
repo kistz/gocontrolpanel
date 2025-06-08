@@ -9,10 +9,13 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
-import LocalRecordsWidgetComponent from "./widgets/local-records";
+import LocalRecordsWidgetComponent, {
+  LocalRecordsWidgetComponentHandles,
+} from "./widgets/local-records";
 
 export type InterfaceComponent<T = InterfaceComponentHandles> = {
   onClick?: () => void;
@@ -21,13 +24,13 @@ export type InterfaceComponent<T = InterfaceComponentHandles> = {
 };
 
 export type InterfaceComponentHandles = {
-  render: (serverId: number) => Promise<void>;
+  render: () => void;
 };
 
 export const EDITOR_DEFAULT_WIDTH = 1169;
 export const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
-export default function InterfaceEditor({ serverId }: { serverId: number }) {
+export default function InterfaceEditor({ serverId, interfaceString }: { serverId: number, interfaceString?: string }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const widgetRefs = useRef<React.RefObject<any>[]>([]);
 
@@ -69,10 +72,51 @@ export default function InterfaceEditor({ serverId }: { serverId: number }) {
   };
 
   const onSave = async () => {
-    widgetRefs.current.map(
+    const data = widgetRefs.current.map(
       (ref) => ref.current && ref.current.render(serverId),
     );
+
+    console.log(JSON.stringify(data));
   };
+
+  const loadWidgets = (dataString: string) => {
+    try {
+      const data = JSON.parse(dataString);
+      const newComponents: JSX.Element[] = [];
+
+      data.forEach((widgetData: any, i: number) => {
+        switch (widgetData.id) {
+          case "local-records-widget":
+            const newRef = createRef<LocalRecordsWidgetComponentHandles>();
+            widgetRefs.current.push(newRef);
+
+            newComponents.push(
+              <LocalRecordsWidgetComponent
+                key={i}
+                ref={newRef}
+                defaultValues={{
+                  header: widgetData.header,
+                  positionPercentage: widgetData.positionPercentage,
+                  sizePercentage: widgetData.sizePercentage,
+                }}
+              />,
+            );
+            break;
+          default:
+            console.warn(`Unknown widget id: ${widgetData.id}`);
+        }
+      });
+
+      setComponents(newComponents);
+    } catch {
+      toast.error("Failed to load widgets");
+    }
+  };
+
+  useEffect(() => {
+    if (!interfaceString) return;
+    loadWidgets(interfaceString);
+  }, [interfaceString]);
 
   return (
     <div className="flex w-full gap-4 flex-col md:flex-row">

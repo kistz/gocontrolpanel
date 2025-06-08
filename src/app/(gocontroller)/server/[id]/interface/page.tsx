@@ -13,6 +13,8 @@ export default async function ServerInterfacePage({
 
   const { data } = await getChatConfig(id);
 
+  const interfaceString = "";
+
   return (
     <div className="flex flex-col gap-6 h-full">
       <div className="flex flex-col gap-1">
@@ -29,7 +31,7 @@ export default async function ServerInterfacePage({
         </TabsList>
 
         <TabsContent value="widgets" className="flex flex-col gap-6 h-full">
-          <InterfaceEditor serverId={id} />
+          <InterfaceEditor serverId={id} interfaceString={interfaceString} />
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
