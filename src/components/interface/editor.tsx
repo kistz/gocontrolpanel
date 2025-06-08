@@ -1,4 +1,6 @@
 "use client";
+import { renderLocalRecordsWidget } from "@/actions/gbx/manialink/local-records";
+import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { IconPlus } from "@tabler/icons-react";
 import Image from "next/image";
 import {
@@ -12,7 +14,7 @@ import {
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
-import LocalRecordsWidget from "./widgets/local-records";
+import LocalRecordsWidgetComponent from "./widgets/local-records";
 
 export type InterfaceComponent = {
   onClick?: () => void;
@@ -25,7 +27,7 @@ export type InterfaceComponent = {
 const EDITOR_DEFAULT_WIDTH = 1169;
 const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
-export default function InterfaceEditor() {
+export default function InterfaceEditor({ serverId }: { serverId: number }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const widgetRefs = useRef<React.RefObject<any>[]>([]);
 
@@ -64,12 +66,10 @@ export default function InterfaceEditor() {
     setSelectedIndex(null);
   };
 
-  const onSave = () => {
-    console.log(widgetRefs.current)
-
-    const allData = widgetRefs.current.map((ref) =>
-      ref.current ? ref.current.getData() : null,
-    ).filter(w => w !== null);
+  const onSave = async () => {
+    const allData = widgetRefs.current
+      .map((ref) => (ref.current ? ref.current.getData() : null))
+      .filter((w) => w !== null);
 
     const position = allData.map((data) => data.position)[0];
     const size = allData.map((data) => data.size)[0];
@@ -77,17 +77,29 @@ export default function InterfaceEditor() {
     const positionPercentage = {
       x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
       y: (position.y / EDITOR_DEFAULT_HEIGHT) * 100,
-    }
+    };
 
     const sizePercentage = {
       width: (size.width / EDITOR_DEFAULT_WIDTH) * 100,
       height: (size.height / EDITOR_DEFAULT_HEIGHT) * 100,
     };
 
-    console.log("Saving interface data:", {
-      position: positionPercentage,
-      size: sizePercentage,
-    });
+    await renderLocalRecordsWidget(
+      serverId,
+      [
+        { player: "Player1", time: 123456 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+        { player: "Player2", time: 234567 },
+      ],
+      getManialinkPosition(positionPercentage),
+      getManialinkSize(sizePercentage),
+    );
   };
 
   return (
@@ -131,7 +143,7 @@ export default function InterfaceEditor() {
         <div className="flex flex-col gap-4 p-4 h-full">
           <h2 className="text-lg font-semibold">Widgets</h2>
           <div className="flex flex-col gap-2">
-            <Button onClick={() => addWidget(LocalRecordsWidget)}>
+            <Button onClick={() => addWidget(LocalRecordsWidgetComponent)}>
               <IconPlus />
               Add Local Records Widget
             </Button>

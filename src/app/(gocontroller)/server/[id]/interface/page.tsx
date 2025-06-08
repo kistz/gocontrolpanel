@@ -29,7 +29,7 @@ export default async function ServerInterfacePage({
         </TabsList>
 
         <TabsContent value="widgets" className="flex flex-col gap-6 h-full">
-          <InterfaceEditor />
+          <InterfaceEditor serverId={id} />
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">

@@ -179,3 +179,28 @@ export function initGbxWebsocketClient(path: string, token: string): WebSocket {
   const baseUri = envUrl && envUrl != "" ? envUrl : "/gbx";
   return new WebSocket(`${baseUri}${path}?token=${token}`);
 }
+
+export function getManialinkPosition(positionPercentage: {
+  x: number;
+  y: number;
+}): { x: number; y: number } {
+  const width = 320;
+  const height = 180;
+
+  // 0, 0 is in the middle of the screen
+  const x = (positionPercentage.x / 100) * width - width / 2;
+  const y = ((positionPercentage.y / 100) * height - height / 2) * -1;
+  return { x, y };
+}
+
+export function getManialinkSize(sizePercentage: {
+  width: number;
+  height: number;
+}): { width: number; height: number } {
+  const maniaLinkWidth = 320;
+  const maniaLinkHeight = 180;
+
+  const width = (sizePercentage.width / 100) * maniaLinkWidth;
+  const height = (sizePercentage.height / 100) * maniaLinkHeight;
+  return { width, height };
+}

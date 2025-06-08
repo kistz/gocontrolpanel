@@ -1,0 +1,15 @@
+{% extends "../widget.xml.twig" %}
+
+{% block content %}
+  <frame pos="0 0">
+    <quad pos="0 0" size="{{ size.width }} {{ size.height }}" bgcolor="000" />
+    <quad pos="0 0" size="{{ size.width }} 4" bgcolor="0C6" />
+    <label text="Records" size="{{ size.width }} 4" halign="center" pos="{{ size.width / 2 }} 0" />
+    {% for record in records %}
+      <frame pos="0 -{{ loop.index * 4 }}">
+        <label text="Marijntje04" size="{{ size.width - 10 }} 4" pos="0 0" />
+        <label text="12.123" size="10 4" pos="{{ size.width - 10 }} 0" />
+      </frame>
+    {% endfor %}
+  </frame>
+{% endblock %}

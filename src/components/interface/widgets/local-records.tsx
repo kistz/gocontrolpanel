@@ -25,7 +25,7 @@ export type LocalRecordsWidgetHandles = {
   };
 };
 
-const LocalRecordsWidget = forwardRef<
+const LocalRecordsWidgetComponent = forwardRef<
   LocalRecordsWidgetHandles,
   InterfaceComponent
 >(({ scale, onClick }, ref) => {
@@ -84,4 +84,4 @@ const LocalRecordsWidget = forwardRef<
   );
 });
 
-export default LocalRecordsWidget;
+export default LocalRecordsWidgetComponent;
