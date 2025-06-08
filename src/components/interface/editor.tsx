@@ -18,7 +18,7 @@ export type InterfaceComponent = {
   onClick?: () => void;
   scale?: number;
   ref?: React.Ref<{
-    getData: () => any;
+    render: () => any;
   }>;
 };
 
