@@ -1,6 +1,4 @@
 "use client";
-import { renderLocalRecordsWidget } from "@/actions/gbx/manialink/local-records";
-import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { IconPlus } from "@tabler/icons-react";
 import Image from "next/image";
 import {
@@ -67,38 +65,14 @@ export default function InterfaceEditor({ serverId }: { serverId: number }) {
   };
 
   const onSave = async () => {
-    const allData = widgetRefs.current
-      .map((ref) => (ref.current ? ref.current.getData() : null))
-      .filter((w) => w !== null);
-
-    const position = allData.map((data) => data.position)[0];
-    const size = allData.map((data) => data.size)[0];
-
-    const positionPercentage = {
-      x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
-      y: (position.y / EDITOR_DEFAULT_HEIGHT) * 100,
-    };
-
-    const sizePercentage = {
-      width: (size.width / EDITOR_DEFAULT_WIDTH) * 100,
-      height: (size.height / EDITOR_DEFAULT_HEIGHT) * 100,
-    };
-
-    await renderLocalRecordsWidget(
-      serverId,
-      [
-        { player: "Player1", time: 123456 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-        { player: "Player2", time: 234567 },
-      ],
-      getManialinkPosition(positionPercentage),
-      getManialinkSize(sizePercentage),
+    widgetRefs.current.map(
+      (ref) =>
+        ref.current &&
+        ref.current.render(
+          serverId,
+          EDITOR_DEFAULT_WIDTH,
+          EDITOR_DEFAULT_HEIGHT,
+        ),
     );
   };
 

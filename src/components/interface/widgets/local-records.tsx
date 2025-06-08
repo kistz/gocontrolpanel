@@ -1,5 +1,7 @@
 "use client";
 
+import { renderLocalRecordsWidget } from "@/actions/gbx/manialink/local-records";
+import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Rnd } from "react-rnd";
 import { InterfaceComponent } from "../editor";
@@ -18,11 +20,7 @@ const records = [
 ];
 
 export type LocalRecordsWidgetHandles = {
-  getData: () => {
-    header: string;
-    position: { x: number; y: number };
-    size: { width: number; height: number };
-  };
+  render: (serverId: number, EDITOR_DEFAULT_WIDTH: number, EDITOR_DEFAULT_HEIGHT: number) => Promise<void>;
 };
 
 const LocalRecordsWidgetComponent = forwardRef<
@@ -34,11 +32,38 @@ const LocalRecordsWidgetComponent = forwardRef<
   const [size, setSize] = useState({ width: 140, height: 210 });
 
   useImperativeHandle(ref, () => ({
-    getData: () => ({
-      header,
-      position,
-      size,
-    }),
+    render: async (
+      serverId: number,
+      EDITOR_DEFAULT_WIDTH: number,
+      EDITOR_DEFAULT_HEIGHT: number,
+    ) => {
+      const positionPercentage = {
+        x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
+        y: (position.y / EDITOR_DEFAULT_HEIGHT) * 100,
+      };
+
+      const sizePercentage = {
+        width: (size.width / EDITOR_DEFAULT_WIDTH) * 100,
+        height: (size.height / EDITOR_DEFAULT_HEIGHT) * 100,
+      };
+
+      await renderLocalRecordsWidget(
+        serverId,
+        [
+          { player: "Player1", time: 123456 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+          { player: "Player2", time: 234567 },
+        ],
+        getManialinkPosition(positionPercentage),
+        getManialinkSize(sizePercentage),
+      );
+    },
   }));
 
   return (
