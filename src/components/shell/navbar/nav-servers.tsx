@@ -135,35 +135,35 @@ export default function NavServers() {
         {
           name: "Settings",
           url: generatePath(routes.servers.settings, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconAdjustmentsAlt,
         },
         {
           name: "Game",
           url: generatePath(routes.servers.game, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconDeviceGamepad,
         },
         {
           name: "Maps",
           url: generatePath(routes.servers.maps, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconMap,
         },
         {
           name: "Players",
           url: generatePath(routes.servers.players, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconUsers,
         },
         {
           name: "Live",
           url: generatePath(routes.servers.live, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconActivity,
         },
@@ -172,7 +172,7 @@ export default function NavServers() {
               {
                 name: "Files",
                 url: generatePath(routes.servers.files, {
-                  id: server.id,
+                  uuid: server.uuid,
                 }),
                 icon: IconFileDescription,
               },
@@ -181,14 +181,14 @@ export default function NavServers() {
         {
           name: "Interface",
           url: generatePath(routes.servers.interface, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconDeviceDesktop,
         },
         // {
         //   name: "Dev",
         //   url: generatePath(routes.servers.dev, {
-        //     id: server.id,
+        //     uuid: server.uuid,
         //   }),
         //   icon: IconCode,
         // }
