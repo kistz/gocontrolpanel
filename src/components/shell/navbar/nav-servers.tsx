@@ -19,7 +19,7 @@ import { disconnectGbxClient } from "@/lib/gbxclient";
 import {
   generatePath,
   initGbxWebsocketClient,
-  useCurrentServerId,
+  useCurrentServerUuid,
 } from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
@@ -43,7 +43,7 @@ import { toast } from "sonner";
 interface ServerNavGroup {
   name: string;
   servers: {
-    id: number;
+    uuid: string;
     name: string;
     isConnected: boolean;
     isActive: boolean;
@@ -63,22 +63,22 @@ export default function NavServers() {
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
   const [healthStatus, setHealthStatus] = useState(false);
-  const [serverId, setServerId] = useState<number | null>(null);
+  const [serverUuid, setServerUuid] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = useCurrentServerId(pathname);
-    setServerId(id);
+    const uuid = useCurrentServerUuid(pathname);
+    setServerUuid(uuid);
   }, [pathname]);
 
   useEffect(() => {
     for (const server of servers) {
-      if (!servers.find((s) => s.id === server.id)?.isConnected) {
-        (async () => await disconnectGbxClient(server.id))();
+      if (!servers.find((s) => s.uuid === server.uuid)?.isConnected) {
+        (async () => await disconnectGbxClient(server.uuid))();
       }
     }
 
     for (const server of servers) {
-      if (server.id === serverId && !server.isConnected) {
+      if (server.uuid === serverUuid && !server.isConnected) {
         toast.error(`Server ${server.name} is offline`);
         router.push("/");
       }
@@ -126,11 +126,11 @@ export default function NavServers() {
   const group: ServerNavGroup = {
     name: "Servers",
     servers: servers.map((server) => ({
-      id: server.id,
+      uuid: server.uuid,
       name: server.name,
       isConnected: server.isConnected,
       icon: IconServer,
-      isActive: serverId === server.id,
+      isActive: serverUuid === server.uuid,
       items: [
         {
           name: "Settings",
@@ -237,7 +237,7 @@ export default function NavServers() {
           {group.servers.map((server) =>
             server.items && server.items.length > 0 ? (
               <Collapsible
-                key={server.id || server.name}
+                key={server.uuid}
                 asChild
                 defaultOpen={server.isActive}
                 className="group/collapsible"

@@ -78,12 +78,12 @@ function pathToRegex(path: string) {
 }
 
 // Use in a React client component
-export function useCurrentServerId(pathname: string): number | null {
+export function useCurrentServerUuid(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);
     if (match) {
-      return parseInt(match[1], 10); // Return the captured `:id`
+      return match[1]; // Assuming the server UUID is the first captured group
     }
   }
 

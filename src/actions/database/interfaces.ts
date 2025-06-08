@@ -1,12 +1,12 @@
 "use server";
 
 export async function saveInterface(
-  serverId: number,
+  serverUuid: number,
   interfaceString: string,
 ): Promise<void> {
   // Here you would typically send the data to your backend API
   // For example, using fetch or axios:
-  // await fetch(`/api/servers/${serverId}/interface`, {
+  // await fetch(`/api/servers/${serverUuid}/interface`, {
   //   method: 'POST',
   //   headers: {
   //     'Content-Type': 'application/json',
@@ -14,5 +14,5 @@ export async function saveInterface(
   //   body: JSON.stringify({ interfaceString }),
   // });
 
-  console.log(`Saving interface for server ${serverId}:`, interfaceString);
+  console.log(`Saving interface for server ${serverUuid}:`, interfaceString);
 }

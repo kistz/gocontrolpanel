@@ -10,7 +10,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MatchSettingsSchema, MatchSettingsSchemaType } from "./game-schema";
 
-export default function MatchSettingsForm({ serverId }: { serverId: number }) {
+export default function MatchSettingsForm({
+  serverUuid,
+}: {
+  serverUuid: string;
+}) {
   const matchSettingsForm = useForm<MatchSettingsSchemaType>({
     resolver: zodResolver(MatchSettingsSchema),
     defaultValues: {
@@ -23,7 +27,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
       const { error } = await loadMatchSettings(
-        serverId,
+        serverUuid,
         "MatchSettings/" + filename,
       );
       if (error) {
@@ -42,7 +46,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
       const { error } = await saveMatchSettings(
-        serverId,
+        serverUuid,
         "MatchSettings/" + filename,
       );
       if (error) {

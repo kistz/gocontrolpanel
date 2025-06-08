@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
 export const createColumns = (
-  serverId: number,
+  serverUuid: string,
   refetch: () => void,
 ): ColumnDef<PlayerInfo>[] => [
   {
@@ -49,7 +49,7 @@ export const createColumns = (
 
       const handleRemoveGuest = async () => {
         try {
-          const { error } = await removeGuest(serverId, player.login);
+          const { error } = await removeGuest(serverUuid, player.login);
           if (error) {
             throw new Error(error);
           }

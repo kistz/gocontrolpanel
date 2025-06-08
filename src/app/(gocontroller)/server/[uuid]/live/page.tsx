@@ -3,9 +3,9 @@ import LiveDashboard from "@/components/live/live-dashboard";
 export default async function LivePage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
 
-  return <LiveDashboard serverId={id} />;
+  return <LiveDashboard serverUuid={uuid} />;
 }

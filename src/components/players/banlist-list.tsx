@@ -1,7 +1,7 @@
 "use client";
 
 import { cleanBanList, getBanList } from "@/actions/gbx/player";
-import { createColumns } from "@/app/(gocontroller)/server/[id]/players/banlist-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[uuid]/players/banlist-columns";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
 import { useEffect, useState } from "react";
@@ -11,21 +11,21 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface BanlistListProps {
-  serverId: number;
+  serverUuid: string;
 }
 
-export default function BanlistList({ serverId }: BanlistListProps) {
+export default function BanlistList({ serverUuid }: BanlistListProps) {
   const [banlist, setBanlist] = useState<PlayerInfo[]>([]);
 
   const [confirmClearBanlist, setConfirmClearBanlist] = useState(false);
 
   useEffect(() => {
     refetch();
-  }, [serverId]);
+  }, [serverUuid]);
 
   const refetch = async () => {
     try {
-      const { data, error } = await getBanList(serverId);
+      const { data, error } = await getBanList(serverUuid);
       if (error) {
         throw new Error(error);
       }
@@ -40,7 +40,7 @@ export default function BanlistList({ serverId }: BanlistListProps) {
 
   const handleClearBanlist = async () => {
     try {
-      const { error } = await cleanBanList(serverId);
+      const { error } = await cleanBanList(serverUuid);
       if (error) {
         throw new Error(error);
       }
@@ -54,7 +54,7 @@ export default function BanlistList({ serverId }: BanlistListProps) {
     }
   };
 
-  const columns = createColumns(serverId, refetch);
+  const columns = createColumns(serverUuid, refetch);
 
   return (
     <>

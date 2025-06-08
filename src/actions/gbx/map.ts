@@ -9,23 +9,23 @@ import { GbxClient } from "@evotm/gbxclient";
 import { getMapByUid } from "../database/maps";
 
 export async function getJukebox(
-  server: number,
+  serverUuid: string,
 ): Promise<ServerResponse<JukeboxMap[]>> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKeyJukebox(server);
+    const key = getKeyJukebox(serverUuid);
     const items = await redis.lrange(key, 0, -1);
     return items.map((item) => JSON.parse(item));
   });
 }
 
 export async function setJukebox(
-  server: number,
+  serverUuid: string,
   jukebox: JukeboxMap[],
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKeyJukebox(server);
+    const key = getKeyJukebox(serverUuid);
     await redis.del(key);
     if (jukebox.length > 0) {
       await redis.rpush(key, ...jukebox.map((map) => JSON.stringify(map)));
@@ -33,16 +33,18 @@ export async function setJukebox(
   });
 }
 
-export async function clearJukebox(server: number): Promise<ServerResponse> {
+export async function clearJukebox(
+  serverUuid: string,
+): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKeyJukebox(server);
+    const key = getKeyJukebox(serverUuid);
     await redis.del(key);
   });
 }
 
 export async function addMapToJukebox(
-  server: number,
+  serverUuid: string,
   map: Maps,
 ): Promise<ServerResponse<JukeboxMap>> {
   return doServerActionWithAuth(["admin"], async (session) => {
@@ -54,7 +56,7 @@ export async function addMapToJukebox(
       QueuedByDisplayName: session.user.displayName,
     };
 
-    const key = getKeyJukebox(server);
+    const key = getKeyJukebox(serverUuid);
     await redis.rpush(key, JSON.stringify(newMap));
 
     return newMap;
@@ -62,12 +64,12 @@ export async function addMapToJukebox(
 }
 
 export async function removeMapFromJukebox(
-  server: number,
+  serverUuid: string,
   id: string,
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
-    const key = getKeyJukebox(server);
+    const key = getKeyJukebox(serverUuid);
     const items = await redis.lrange(key, 0, -1);
 
     const filtered = items.filter((item) => {
@@ -82,9 +84,9 @@ export async function removeMapFromJukebox(
   });
 }
 
-export async function onPodiumStart(server: number) {
+export async function onPodiumStart(serverUuid: string) {
   const redis = await getRedisClient();
-  const key = getKeyJukebox(server);
+  const key = getKeyJukebox(serverUuid);
   const items = await redis.lrange(key, 0, -1);
 
   if (items.length === 0) return;
@@ -92,17 +94,17 @@ export async function onPodiumStart(server: number) {
   const nextRaw = items[0];
   const nextMap: JukeboxMap = JSON.parse(nextRaw);
 
-  const client = await getGbxClient(server);
+  const client = await getGbxClient(serverUuid);
   await client.call("ChooseNextMap", nextMap.fileName);
 
   await redis.lpop(key);
 }
 
 export async function getCurrentMapInfo(
-  server: number,
+  serverUuid: string,
 ): Promise<ServerResponse<MapInfo>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     const mapInfo = await client.call("GetCurrentMapInfo");
 
     if (!mapInfo) {
@@ -114,10 +116,10 @@ export async function getCurrentMapInfo(
 }
 
 export async function getCurrentMapIndex(
-  server: number,
+  serverUuid: string,
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     const mapIndex = await client.call("GetCurrentMapIndex");
 
     if (typeof mapIndex !== "number") {
@@ -129,42 +131,42 @@ export async function getCurrentMapIndex(
 }
 
 export async function jumpToMap(
-  server: number,
+  serverUuid: string,
   index: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     await client.call("JumpToMapIndex", index);
   });
 }
 
 export async function setNextMap(
-  server: number,
+  serverUuid: string,
   index: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
 
     await client.call("SetNextMapIndex", index);
   });
 }
 
 export async function addMap(
-  server: number,
+  serverUuid: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     await client.call("AddMap", filename);
   });
 }
 
 export async function addMapList(
-  server: number,
+  serverUuid: string,
   filenames: string[],
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     const res = await client.call("AddMapList", filenames);
 
     if (typeof res !== "number") {
@@ -176,21 +178,21 @@ export async function addMapList(
 }
 
 export async function removeMap(
-  server: number,
+  serverUuid: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     await client.call("RemoveMap", filename);
   });
 }
 
 export async function removeMapList(
-  server: number,
+  serverUuid: string,
   filenames: string[],
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     const res = await client.call("RemoveMapList", filenames);
 
     if (typeof res !== "number") {
@@ -202,21 +204,21 @@ export async function removeMapList(
 }
 
 export async function insertMap(
-  server: number,
+  serverUuid: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     await client.call("InsertMap", filename);
   });
 }
 
 export async function insertMapList(
-  server: number,
+  serverUuid: string,
   filenames: string[],
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     const res = await client.call("InsertMapList", filenames);
 
     if (typeof res !== "number") {
@@ -229,7 +231,7 @@ export async function insertMapList(
 
 export async function syncMap(
   client: GbxClient,
-  server: number,
+  serverUuid: string,
 ): Promise<void> {
   const mapInfo = await client.call("GetCurrentMapInfo");
 
@@ -243,7 +245,7 @@ export async function syncMap(
   }
 
   const redis = await getRedisClient();
-  const key = getKeyActiveMap(server);
+  const key = getKeyActiveMap(serverUuid);
 
   await redis.set(key, JSON.stringify(map));
 }

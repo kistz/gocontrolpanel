@@ -13,11 +13,11 @@ import { ScriptNameSchema, ScriptNameSchemaType } from "./game-schema";
 export default function ScriptNameForm({
   scriptName,
   scripts,
-  serverId,
+  serverUuid,
 }: {
   scriptName: string;
   scripts: string[];
-  serverId: number;
+  serverUuid: string;
 }) {
   const scriptNameForm = useForm<ScriptNameSchemaType>({
     resolver: zodResolver(ScriptNameSchema),
@@ -28,7 +28,7 @@ export default function ScriptNameForm({
 
   async function onSubmitScriptName(values: ScriptNameSchemaType) {
     try {
-      const { error } = await setScriptName(serverId, values.scriptName);
+      const { error } = await setScriptName(serverUuid, values.scriptName);
       if (error) {
         throw new Error(error);
       }

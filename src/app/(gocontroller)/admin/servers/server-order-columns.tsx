@@ -32,7 +32,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        const { error } = await removeServer(server.id);
+        const { error } = await removeServer(server.uuid);
         if (error) {
           throw new Error(error);
         }
@@ -87,7 +87,7 @@ const ServerActionsCell = memo(function ServerActionsCell({
 
 export const createColumns = (refetch: () => void): DndListColumn<Server>[] => [
   {
-    id: "id",
+    id: "uuid",
     cell: () => <></>,
     visibility: false,
   },

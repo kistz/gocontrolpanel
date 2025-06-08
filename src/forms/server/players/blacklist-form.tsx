@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { blacklistSchema, BlacklistSchemaType } from "./blacklist-schema";
 
-export default function BlacklistForm({ serverId }: { serverId: number }) {
+export default function BlacklistForm({ serverUuid }: { serverUuid: string }) {
   const form = useForm<BlacklistSchemaType>({
     resolver: zodResolver(blacklistSchema),
     defaultValues: {
@@ -22,7 +22,7 @@ export default function BlacklistForm({ serverId }: { serverId: number }) {
     try {
       form.trigger("filename");
       const filename = form.getValues("filename");
-      const { error } = await loadBlacklist(serverId, filename);
+      const { error } = await loadBlacklist(serverUuid, filename);
       if (error) {
         throw new Error(error);
       }
@@ -39,7 +39,7 @@ export default function BlacklistForm({ serverId }: { serverId: number }) {
     try {
       form.trigger("filename");
       const filename = form.getValues("filename");
-      const { error } = await saveBlacklist(serverId, filename);
+      const { error } = await saveBlacklist(serverUuid, filename);
       if (error) {
         throw new Error(error);
       }

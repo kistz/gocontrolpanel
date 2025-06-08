@@ -23,7 +23,7 @@ interface CarouselMapCardProps {
   isCurrent?: boolean;
   isSwitching?: boolean;
   total: number;
-  serverId: number;
+  serverUuid: string;
   className?: string;
 }
 
@@ -33,13 +33,13 @@ export default function CarouselMapCard({
   isCurrent = false,
   isSwitching = false,
   total,
-  serverId,
+  serverUuid,
   className,
 }: CarouselMapCardProps) {
   const onPreviousMap = async () => {
     try {
       const previousIndex = index - 1 < 0 ? total - 1 : index - 1;
-      const { error } = await jumpToMap(serverId, previousIndex);
+      const { error } = await jumpToMap(serverUuid, previousIndex);
       if (error) {
         throw new Error(error);
       }
@@ -53,7 +53,7 @@ export default function CarouselMapCard({
 
   const onRestartMap = async () => {
     try {
-      const { error } = await restartMap(serverId);
+      const { error } = await restartMap(serverUuid);
       if (error) {
         throw new Error(error);
       }
@@ -69,7 +69,7 @@ export default function CarouselMapCard({
 
   const onNextMap = async () => {
     try {
-      const { error } = await nextMap(serverId);
+      const { error } = await nextMap(serverUuid);
       if (error) {
         throw new Error(error);
       }
@@ -83,7 +83,7 @@ export default function CarouselMapCard({
 
   const onJumpToMap = async () => {
     try {
-      await jumpToMap(serverId, index);
+      await jumpToMap(serverUuid, index);
       toast.success("Jumped to map", {
         description: `Jumped to ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });

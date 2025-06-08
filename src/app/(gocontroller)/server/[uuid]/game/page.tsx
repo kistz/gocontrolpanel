@@ -20,19 +20,19 @@ import { parseTmTags } from "tmtags";
 export default async function ServerGamePage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
 
-  const { data: mapList } = await getMapList(id);
-  const { data: currentIndex } = await getCurrentMapIndex(id);
+  const { data: mapList } = await getMapList(uuid);
+  const { data: currentIndex } = await getCurrentMapIndex(uuid);
 
-  const { data: scripts } = await getScripts(id);
+  const { data: scripts } = await getScripts(uuid);
 
-  const { data: showOpponents } = await getShowOpponents(id);
-  const { data: scriptName } = await getScriptName(id);
-  const { data: modeScriptInfo } = await getModeScriptInfo(id);
-  const { data: modeScriptSettings } = await getModeScriptSettings(id);
+  const { data: showOpponents } = await getShowOpponents(uuid);
+  const { data: scriptName } = await getScriptName(uuid);
+  const { data: modeScriptInfo } = await getModeScriptInfo(uuid);
+  const { data: modeScriptSettings } = await getModeScriptSettings(uuid);
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,7 +52,7 @@ export default async function ServerGamePage({
 
         <TabsContent value="map" className="flex flex-col gap-6">
           <MapCarousel
-            serverId={id}
+            serverUuid={uuid}
             maps={mapList}
             startIndex={currentIndex}
             loop={true}
@@ -63,18 +63,18 @@ export default async function ServerGamePage({
             <div className="flex gap-6 flex-col min-[960px]:flex-row">
               <div className="flex flex-col gap-4 flex-1">
                 <ShowOpponentsForm
-                  serverId={id}
+                  serverUuid={uuid}
                   showOpponents={showOpponents.NextValue}
                 />
                 <ScriptNameForm
-                  serverId={id}
+                  serverUuid={uuid}
                   scriptName={scriptName.NextValue}
                   scripts={scripts}
                 />
               </div>
               <div className="flex flex-col gap-4 flex-1">
-                <MatchSettingsForm serverId={id} />
-                <PlaylistForm serverId={id} />
+                <MatchSettingsForm serverUuid={uuid} />
+                <PlaylistForm serverUuid={uuid} />
               </div>
             </div>
           </Card>
@@ -98,7 +98,7 @@ export default async function ServerGamePage({
               </div>
 
               <ModeScriptSettingsForm
-                serverId={id}
+                serverUuid={uuid}
                 modeScriptSettings={modeScriptSettings}
                 modeScriptInfo={modeScriptInfo}
               />

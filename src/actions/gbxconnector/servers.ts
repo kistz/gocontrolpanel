@@ -68,11 +68,11 @@ export async function addServer(
 }
 
 export async function editServer(
-  serverId: number,
+  serverUuid: string,
   server: EditServerSchemaType,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const res = await axiosAuth.put(`/servers/${serverId}`, server);
+    const res = await axiosAuth.put(`/servers/${serverUuid}`, server);
 
     if (res.status !== 200) {
       throw new ServerError("Failed to edit server");
@@ -82,9 +82,11 @@ export async function editServer(
   });
 }
 
-export async function removeServer(id: number): Promise<ServerResponse> {
+export async function removeServer(
+  serverUuid: string,
+): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const res = await axiosAuth.delete(`/servers/${id}`);
+    const res = await axiosAuth.delete(`/servers/${serverUuid}`);
 
     if (res.status !== 200) {
       throw new ServerError("Failed to remove server");
@@ -111,7 +113,7 @@ export async function orderServers(
 
     for (const server of orderedServers) {
       try {
-        await connectToGbxClient(server.id);
+        await connectToGbxClient(server.uuid);
       } catch (error) {
         console.error("Failed to connect to server", error);
       }

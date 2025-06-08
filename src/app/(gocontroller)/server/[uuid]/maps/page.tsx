@@ -9,14 +9,14 @@ import { getFileManager } from "@/lib/filemanager";
 export default async function ServerMapsPage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
 
-  const { data: maps } = await getMapList(id);
-  const { data: jukebox } = await getJukebox(id);
+  const { data: maps } = await getMapList(uuid);
+  const { data: jukebox } = await getJukebox(uuid);
 
-  const filemanager = await getFileManager(id);
+  const filemanager = await getFileManager(uuid);
 
   return (
     <div className="flex flex-col gap-6">
@@ -32,9 +32,9 @@ export default async function ServerMapsPage({
           <TabsTrigger value="jukebox">Jukebox</TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
-          <MapOrder mapList={maps} serverId={id} />
+          <MapOrder mapList={maps} serverUuid={uuid} />
 
-          {filemanager?.health && <LocalMapsTable serverId={id} />}
+          {filemanager?.health && <LocalMapsTable serverUuid={uuid} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">
@@ -42,7 +42,7 @@ export default async function ServerMapsPage({
             server, the jukeboxes might conflict.
           </p>
 
-          <Jukebox serverId={id} jukebox={jukebox} maps={maps} />
+          <Jukebox serverUuid={uuid} jukebox={jukebox} maps={maps} />
         </TabsContent>
       </Tabs>
     </div>

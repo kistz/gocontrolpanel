@@ -9,7 +9,7 @@ const template = path.resolve(
 );
 
 export async function renderLocalRecordsWidget(
-  serverId: number,
+  serverUuid: string,
   records: { player: string; time: number }[] = [],
   pos = { x: 0, y: 0 },
   size = { width: 140, height: 210 },
@@ -30,6 +30,6 @@ export async function renderLocalRecordsWidget(
     });
   });
 
-  const client = await getGbxClient(serverId);
+  const client = await getGbxClient(serverUuid);
   await client.call("SendDisplayManialinkPage", manialink, 0, false);
 }

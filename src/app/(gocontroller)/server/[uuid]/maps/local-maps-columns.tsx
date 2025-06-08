@@ -9,7 +9,9 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (serverId: number): ColumnDef<LocalMapInfo>[] => [
+export const createColumns = (
+  serverUuid: string,
+): ColumnDef<LocalMapInfo>[] => [
   {
     accessorKey: "Path",
     header: ({ column }) => (
@@ -59,7 +61,7 @@ export const createColumns = (serverId: number): ColumnDef<LocalMapInfo>[] => [
       const handleAddMap = () => {
         startTransition(async () => {
           try {
-            const { error } = await addMap(serverId, localMap.FileName);
+            const { error } = await addMap(serverUuid, localMap.FileName);
             if (error) {
               throw new Error(error);
             }

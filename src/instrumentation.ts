@@ -6,7 +6,7 @@ import { connectToGbxClient } from "./lib/gbxclient";
 export async function register() {
   const servers = await syncServers();
   servers.forEach((server) => {
-    connectToGbxClient(server.id);
+    connectToGbxClient(server.uuid);
   });
   const tokens = await getTokens();
   if (!tokens) {

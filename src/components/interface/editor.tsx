@@ -30,7 +30,13 @@ export type InterfaceComponentHandles = {
 export const EDITOR_DEFAULT_WIDTH = 1169;
 export const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
-export default function InterfaceEditor({ serverId, interfaceString }: { serverId: number, interfaceString?: string }) {
+export default function InterfaceEditor({
+  serverUuid,
+  interfaceString,
+}: {
+  serverUuid: string;
+  interfaceString?: string;
+}) {
   const editorRef = useRef<HTMLDivElement>(null);
   const widgetRefs = useRef<React.RefObject<any>[]>([]);
 
@@ -73,7 +79,7 @@ export default function InterfaceEditor({ serverId, interfaceString }: { serverI
 
   const onSave = async () => {
     const data = widgetRefs.current.map(
-      (ref) => ref.current && ref.current.render(serverId),
+      (ref) => ref.current && ref.current.render(serverUuid),
     );
 
     console.log(JSON.stringify(data));

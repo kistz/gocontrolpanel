@@ -28,7 +28,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
+export const createColumns = (serverUuid: string): ColumnDef<PlayerInfo>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (
@@ -88,7 +88,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
       const handleBan = async () => {
         try {
           const { error } = await banPlayer(
-            serverId,
+            serverUuid,
             player.login,
             "Banned by admin",
           );
@@ -108,7 +108,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
 
       const handleBlacklist = async () => {
         try {
-          const { error } = await blacklistPlayer(serverId, player.login);
+          const { error } = await blacklistPlayer(serverUuid, player.login);
           if (error) {
             throw new Error(error);
           }
@@ -125,7 +125,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
 
       const handleAddGuest = async () => {
         try {
-          const { error } = await addGuest(serverId, player.login);
+          const { error } = await addGuest(serverUuid, player.login);
           if (error) {
             throw new Error(error);
           }
@@ -142,7 +142,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
 
       const handleRemoveGuest = async () => {
         try {
-          const { error } = await removeGuest(serverId, player.login);
+          const { error } = await removeGuest(serverUuid, player.login);
           if (error) {
             throw new Error(error);
           }
@@ -160,7 +160,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
       const handleKick = async () => {
         try {
           const { error } = await kickPlayer(
-            serverId,
+            serverUuid,
             player.login,
             "Kicked by admin",
           );
@@ -180,7 +180,7 @@ export const createColumns = (serverId: number): ColumnDef<PlayerInfo>[] => [
 
       const handleForceSpectator = async () => {
         try {
-          const { error } = await forceSpectator(serverId, player.login, 3);
+          const { error } = await forceSpectator(serverUuid, player.login, 3);
           if (error) {
             throw new Error(error);
           }

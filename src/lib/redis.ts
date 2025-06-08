@@ -35,6 +35,6 @@ export async function getRedisClient() {
   return client;
 }
 
-export const getKeyActiveMap = (server: number) => `active-map:${server}`;
-export const getKeyJukebox = (server: number) => `jukebox:${server}`;
-export const getKeyPlayers = (server: number) => `players:${server}`;
+export const getKeyActiveMap = (serverUuid: string) => `active-map:${serverUuid}`;
+export const getKeyJukebox = (serverUuid: string) => `jukebox:${serverUuid}`;
+export const getKeyPlayers = (serverUuid: string) => `players:${serverUuid}`;

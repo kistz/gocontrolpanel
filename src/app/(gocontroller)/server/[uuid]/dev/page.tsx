@@ -3,9 +3,9 @@ import DevDashboard from "@/components/dev/dashboard";
 export default async function LivePage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
 
-  return <DevDashboard serverId={id} />;
+  return <DevDashboard serverUuid={uuid} />;
 }

@@ -14,13 +14,13 @@ import {
   ServerSettingsSchemaType,
 } from "./settings-schema";
 
-export default function SettingsForm({ serverId }: { serverId: number }) {
+export default function SettingsForm({ serverUuid }: { serverUuid: string }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<ServerSettingsSchemaType>({
     resolver: zodResolver(ServerSettingsSchema),
     defaultValues: async () => {
-      const { data: settings } = await getServerSettings(serverId);
+      const { data: settings } = await getServerSettings(serverUuid);
       setIsLoading(false);
       return settings;
     },
@@ -28,7 +28,7 @@ export default function SettingsForm({ serverId }: { serverId: number }) {
 
   async function onSubmit(values: ServerSettingsSchemaType) {
     try {
-      const { error } = await saveServerSettings(serverId, values);
+      const { error } = await saveServerSettings(serverUuid, values);
       if (error) {
         throw new Error(error);
       }

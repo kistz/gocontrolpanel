@@ -6,8 +6,8 @@ import {
   getJukebox,
   setJukebox,
 } from "@/actions/gbx/map";
-import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/server/[id]/maps/jukebox-columns";
-import { createColumns as createMapColumns } from "@/app/(gocontroller)/server/[id]/maps/server-maps-columns";
+import { createColumns as createJukeboxColumns } from "@/app/(gocontroller)/server/[uuid]/maps/jukebox-columns";
+import { createColumns as createMapColumns } from "@/app/(gocontroller)/server/[uuid]/maps/server-maps-columns";
 import { Maps } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { JukeboxMap } from "@/types/map";
@@ -19,12 +19,12 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface JukeboxProps {
-  serverId: number;
+  serverUuid: string;
   jukebox: JukeboxMap[];
   maps: Maps[];
 }
 
-export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
+export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
   const [defaultJukebox, setDefaultJukebox] = useState<JukeboxMap[]>(
     jukebox || [],
   );
@@ -33,7 +33,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   useEffect(() => {
     const intervalIndex = setInterval(async () => {
-      const { data: jukebox } = await getJukebox(serverId);
+      const { data: jukebox } = await getJukebox(serverUuid);
 
       if (jukebox[0]?.id !== jukeboxOrder[0]?.id) {
         setJukeboxOrder(jukebox);
@@ -42,11 +42,11 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
     }, 10000);
 
     return () => clearInterval(intervalIndex);
-  }, [jukeboxOrder, serverId]);
+  }, [jukeboxOrder, serverUuid]);
 
   async function saveJukebox() {
     try {
-      const { error } = await setJukebox(serverId, jukeboxOrder);
+      const { error } = await setJukebox(serverUuid, jukeboxOrder);
       if (error) {
         throw new Error(error);
       }
@@ -67,7 +67,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   async function onAddMap(map: Maps) {
     try {
-      const { data: newMap, error } = await addMapToJukebox(serverId, map);
+      const { data: newMap, error } = await addMapToJukebox(serverUuid, map);
       if (error) {
         throw new Error(error);
       }
@@ -83,7 +83,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
 
   async function onClearJukebox() {
     try {
-      const { error } = await clearJukebox(serverId);
+      const { error } = await clearJukebox(serverUuid);
       if (error) {
         throw new Error(error);
       }
@@ -111,7 +111,7 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
             columns={jukeboxColumns}
             data={jukeboxOrder}
             setData={setJukeboxOrder}
-            serverId={serverId}
+            serverUuid={serverUuid}
           />
           <div className="flex flex-row-reverse gap-2">
             <Button onClick={saveJukebox}>Save Jukebox</Button>

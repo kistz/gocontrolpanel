@@ -5,21 +5,21 @@ import { Maps } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
 
 export async function onPlayerFinish(
-  server: number,
+  serverUuid: string,
   login: string,
   time: number,
 ) {
   const redis = await getRedisClient();
-  const key = getKeyActiveMap(server);
+  const key = getKeyActiveMap(serverUuid);
 
   const activeMap = await redis.get(key);
   if (!activeMap) {
-    throw new Error(`No active map found for server ${server}`);
+    throw new Error(`No active map found for server ${serverUuid}`);
   }
 
   const mapData: Maps = JSON.parse(activeMap);
   if (!mapData) {
-    throw new Error(`Map data is invalid for server ${server}`);
+    throw new Error(`Map data is invalid for server ${serverUuid}`);
   }
 
   await saveRecord({

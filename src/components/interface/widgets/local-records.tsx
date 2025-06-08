@@ -1,12 +1,6 @@
 "use client";
 
-import { renderLocalRecordsWidget } from "@/actions/gbx/manialink/local-records";
-import {
-  getDefaultPosition,
-  getDefaultSize,
-  getManialinkPosition,
-  getManialinkSize,
-} from "@/lib/utils";
+import { getDefaultPosition, getDefaultSize } from "@/lib/utils";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Rnd } from "react-rnd";
 import {
@@ -67,7 +61,7 @@ const LocalRecordsWidgetComponent = forwardRef<
     height: 210,
   });
 
-  const [header, setHeader] = useState(defaultHeader);
+  const [header, _] = useState(defaultHeader);
   const [position, setPosition] = useState(defaultPosition);
   const [size, setSize] = useState(defaultSize);
 
@@ -134,5 +128,7 @@ const LocalRecordsWidgetComponent = forwardRef<
     </Rnd>
   );
 });
+
+LocalRecordsWidgetComponent.displayName = "LocalRecordsWidgetComponent";
 
 export default LocalRecordsWidgetComponent;

@@ -8,13 +8,13 @@ export default async function EditorPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
   searchParams: Promise<{ path: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
   const { path } = await searchParams;
 
-  const { data, error } = await getFile(id, path || "/UserData");
+  const { data, error } = await getFile(uuid, path || "/UserData");
 
   if (error) {
     return (
@@ -29,7 +29,7 @@ export default async function EditorPage({
       <div className="flex flex-col w-full h-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
-          serverId={id}
+          serverUuid={uuid}
           className="h-9 flex items-center"
         />
 
@@ -60,7 +60,7 @@ export default async function EditorPage({
       <TextEditor
         defaultText={data.value as string}
         path={path}
-        serverId={id}
+        serverUuid={uuid}
       />
     </div>
   );

@@ -5,13 +5,13 @@ export default async function ServerFilesPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
   searchParams: Promise<{ path: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
   const { path } = await searchParams;
 
-  const { data, error } = await getRoute(id, path || "/UserData");
+  const { data, error } = await getRoute(uuid, path || "/UserData");
 
   if (error) {
     return (
@@ -21,5 +21,5 @@ export default async function ServerFilesPage({
     );
   }
 
-  return <Browser data={data} serverId={id} path={path || "/UserData"} />;
+  return <Browser data={data} serverUuid={uuid} path={path || "/UserData"} />;
 }

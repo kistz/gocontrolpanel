@@ -6,12 +6,12 @@ import { ServerError, ServerResponse } from "@/types/responses";
 import { isAxiosError } from "axios";
 
 export async function getChatConfig(
-  serverId: number,
+  serverUuid: string,
 ): Promise<ServerResponse<ChatConfigSchemaType>> {
   return doServerActionWithAuth(["admin", "moderator"], async () => {
     try {
       const res = await axiosAuth.get<ChatConfigSchemaType>(
-        `chat/${serverId}/config`,
+        `chat/${serverUuid}/config`,
       );
 
       return res.data;
@@ -26,13 +26,13 @@ export async function getChatConfig(
 }
 
 export async function updateChatConfig(
-  serverId: number,
+  serverUuid: string,
   config: ChatConfigSchemaType,
 ): Promise<ServerResponse<ChatConfigSchemaType>> {
   return doServerActionWithAuth(["admin"], async () => {
     try {
       const res = await axiosAuth.put<ChatConfigSchemaType>(
-        `chat/${serverId}/config`,
+        `chat/${serverUuid}/config`,
         config,
       );
 

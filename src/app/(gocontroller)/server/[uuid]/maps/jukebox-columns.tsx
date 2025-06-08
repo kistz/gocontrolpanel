@@ -1,6 +1,6 @@
 "use client";
 
-import { removeMap } from "@/actions/gbx/map";
+import { removeMapFromJukebox } from "@/actions/gbx/map";
 import { DndListColumn } from "@/components/dnd/dnd-list";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Maps } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
+import { JukeboxMap } from "@/types/map";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -19,22 +19,22 @@ import { parseTmTags } from "tmtags";
 
 const MapActionsCell = memo(function MapActionsCell({
   data,
-  serverId,
+  serverUuid,
   onRemoveMap,
 }: {
-  data: Maps;
-  serverId?: number;
-  onRemoveMap: (map: Maps) => void;
+  data: JukeboxMap;
+  serverUuid?: string;
+  onRemoveMap: (map: JukeboxMap) => void;
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!serverId) return null;
+  if (!serverUuid) return null;
 
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        const { error } = await removeMap(serverId, data.fileName);
+        const { error } = await removeMapFromJukebox(serverUuid, data.id);
         if (error) {
           throw new Error(error);
         }
@@ -81,8 +81,8 @@ const MapActionsCell = memo(function MapActionsCell({
 });
 
 export const createColumns = (
-  onRemoveMap: (map: Maps) => void,
-): DndListColumn<Maps>[] => [
+  onRemoveMap: (map: JukeboxMap) => void,
+): DndListColumn<JukeboxMap>[] => [
   {
     id: "id",
     cell: () => <></>,
@@ -107,14 +107,22 @@ export const createColumns = (
     ),
   },
   {
-    id: "uid",
+    id: "QueuedByDisplayName",
+    cell: ({ data }) => (
+      <span
+        className="truncate"
+        dangerouslySetInnerHTML={{
+          __html: parseTmTags(data.QueuedByDisplayName),
+        }}
+      />
+    ),
   },
   {
     id: "actions",
-    cell: ({ data, serverId }) => (
+    cell: ({ data, serverUuid }) => (
       <MapActionsCell
         data={data}
-        serverId={serverId}
+        serverUuid={serverUuid}
         onRemoveMap={onRemoveMap}
       />
     ),

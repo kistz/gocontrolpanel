@@ -7,11 +7,11 @@ import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
 export default async function ServerInterfacePage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ uuid: string }>;
 }) {
-  const { id } = await params;
+  const { uuid } = await params;
 
-  const { data } = await getChatConfig(id);
+  const { data } = await getChatConfig(uuid);
 
   const interfaceString = "";
 
@@ -31,11 +31,14 @@ export default async function ServerInterfacePage({
         </TabsList>
 
         <TabsContent value="widgets" className="flex flex-col gap-6 h-full">
-          <InterfaceEditor serverId={id} interfaceString={interfaceString} />
+          <InterfaceEditor
+            serverUuid={uuid}
+            interfaceString={interfaceString}
+          />
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
-            <ChatConfigForm serverId={id} chatConfig={data} />
+            <ChatConfigForm serverUuid={uuid} chatConfig={data} />
           </Card>
         </TabsContent>
       </Tabs>

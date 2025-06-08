@@ -154,12 +154,12 @@ export async function deleteMapById(id: string): Promise<ServerResponse> {
 }
 
 export async function getMapList(
-  server: number,
+  serverUuid: string,
   count?: number,
   start: number = 0,
 ): Promise<ServerResponse<Maps[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(server);
+    const client = await getGbxClient(serverUuid);
     const pageSize = 100;
     let allMapList: MapInfoMinimal[] = [];
 

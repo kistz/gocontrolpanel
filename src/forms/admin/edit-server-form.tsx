@@ -32,7 +32,7 @@ export default function EditServerForm({
 
   async function onSubmit(values: EditServerSchemaType) {
     try {
-      const { error } = await editServer(server.id, values);
+      const { error } = await editServer(server.uuid, values);
       if (error) {
         throw new Error(error);
       }

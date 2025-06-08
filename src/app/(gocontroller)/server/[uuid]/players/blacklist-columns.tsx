@@ -1,6 +1,6 @@
 "use client";
 
-import { unbanPlayer } from "@/actions/gbx/player";
+import { unblacklistPlayer } from "@/actions/gbx/player";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
 export const createColumns = (
-  serverId: number,
+  serverUuid: string,
   refetch: () => void,
 ): ColumnDef<PlayerInfo>[] => [
   {
@@ -45,19 +45,19 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const player = row.original;
-      const [confirmUnban, setConfirmUnban] = useState(false);
+      const [confirmUnblacklist, setConfirmUnblacklist] = useState(false);
 
-      const handleUnban = async () => {
+      const handleUnblacklist = async () => {
         try {
-          const { error } = await unbanPlayer(serverId, player.login);
+          const { error } = await unblacklistPlayer(serverUuid, player.login);
           if (error) {
             throw new Error(error);
           }
 
           refetch();
-          toast.success("Player successfully unbanned");
+          toast.success("Player successfully removed from blacklist");
         } catch (error) {
-          toast.error("Error unbanning player", {
+          toast.error("Error removing player from blacklist", {
             description: getErrorMessage(error),
           });
         }
@@ -75,20 +75,20 @@ export const createColumns = (
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 variant="destructive"
-                onClick={() => setConfirmUnban(true)}
+                onClick={() => setConfirmUnblacklist(true)}
               >
-                Unban player
+                Remove from blacklist
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <ConfirmModal
-            isOpen={confirmUnban}
-            onClose={() => setConfirmUnban(false)}
-            title="Unban player"
-            description={`Are you sure you want to unban ${player.nickName}?`}
-            onConfirm={handleUnban}
-            confirmText="Unban"
+            isOpen={confirmUnblacklist}
+            onClose={() => setConfirmUnblacklist(false)}
+            title="Remove from blacklist"
+            description={`Are you sure you want to remove ${player.nickName} from the blacklist?`}
+            onConfirm={handleUnblacklist}
+            confirmText="Remove"
             cancelText="Cancel"
           />
         </div>

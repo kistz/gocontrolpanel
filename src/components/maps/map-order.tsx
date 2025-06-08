@@ -1,6 +1,6 @@
 "use client";
 import { addMapList, removeMapList } from "@/actions/gbx/map";
-import { createColumns } from "@/app/(gocontroller)/server/[id]/maps/map-order-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[uuid]/maps/map-order-columns";
 import { Maps } from "@/lib/prisma/generated";
 import { getDivergingList, getErrorMessage } from "@/lib/utils";
 import { useState } from "react";
@@ -11,10 +11,10 @@ import { Button } from "../ui/button";
 
 export default function MapOrder({
   mapList,
-  serverId,
+  serverUuid,
 }: {
   mapList: Maps[];
-  serverId: number;
+  serverUuid: string;
 }) {
   const [defaultMapList, setDefaultMapList] = useState<Maps[]>(mapList);
   const [mapOrder, setMapOrder] = useState<Maps[]>(defaultMapList);
@@ -27,12 +27,12 @@ export default function MapOrder({
 
       if (!files.length || files.length == 0) return;
 
-      const { error: removeError } = await removeMapList(serverId, files);
+      const { error: removeError } = await removeMapList(serverUuid, files);
       if (removeError) {
         throw new Error(removeError);
       }
 
-      const { error: addError } = await addMapList(serverId, files);
+      const { error: addError } = await addMapList(serverUuid, files);
       if (addError) {
         throw new Error(addError);
       }
@@ -67,7 +67,7 @@ export default function MapOrder({
           columns={columns}
           data={mapOrder}
           setData={setMapOrder}
-          serverId={serverId}
+          serverUuid={serverUuid}
         />
       </div>
       <div className="flex flex-row-reverse gap-2">

@@ -15,7 +15,7 @@ interface ActionsProps {
   setSelectedItem: Dispatch<SetStateAction<FileEntry | null>>;
   setFolders: Dispatch<SetStateAction<FileEntry[]>>;
   setFiles: Dispatch<SetStateAction<FileEntry[]>>;
-  serverId: number;
+  serverUuid: string;
   path: string;
   uploadFilesCallback: (files: FileList | null) => void;
 }
@@ -25,7 +25,7 @@ export default function Actions({
   setSelectedItem,
   setFolders,
   setFiles,
-  serverId,
+  serverUuid,
   path,
   uploadFilesCallback,
 }: ActionsProps) {
@@ -46,7 +46,7 @@ export default function Actions({
   const handleDelete = async () => {
     if (selectedItem) {
       try {
-        const { error } = await deleteEntry(serverId, selectedItem.path);
+        const { error } = await deleteEntry(serverUuid, selectedItem.path);
         if (error) {
           throw new Error(error);
         }
@@ -95,7 +95,7 @@ export default function Actions({
       <Modal>
         <CreateFileEntryModal
           path={removePrefix(path, "/UserData")}
-          serverId={serverId}
+          serverUuid={serverUuid}
           isDir={true}
           onSubmit={(fileEntry?: FileEntry) => {
             if (!fileEntry) return;
@@ -112,7 +112,7 @@ export default function Actions({
       <Modal>
         <CreateFileEntryModal
           path={removePrefix(path, "/UserData")}
-          serverId={serverId}
+          serverUuid={serverUuid}
           isDir={false}
           onSubmit={(fileEntry?: FileEntry) => {
             if (!fileEntry) return;

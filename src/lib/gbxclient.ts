@@ -7,21 +7,23 @@ import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
 
 const globalForGbx = globalThis as unknown as {
-  cachedClients?: { [key: number]: GbxClient };
+  cachedClients?: { [key: string]: GbxClient };
 };
 
 const cachedClients = (globalForGbx.cachedClients ??= {});
 
-export async function connectToGbxClient(id: number): Promise<GbxClient> {
+export async function connectToGbxClient(
+  serverUuid: string,
+): Promise<GbxClient> {
   const servers = await getServers();
-  const server = servers.find((server) => server.id == id);
+  const server = servers.find((server) => server.uuid == serverUuid);
 
   if (!server) {
-    throw new Error(`Server ${id} not found in cached servers`);
+    throw new Error(`Server ${serverUuid} not found in cached servers`);
   }
 
   if (!server.isConnected) {
-    throw new Error(`Server ${id} is not connected`);
+    throw new Error(`Server ${serverUuid} is not connected`);
   }
 
   const client = new GbxClient({
@@ -51,31 +53,31 @@ export async function connectToGbxClient(id: number): Promise<GbxClient> {
   await client.call("SetApiVersion", "2023-04-24");
   await client.call("EnableCallbacks", true);
   await client.callScript("XmlRpc.EnableCallbacks", "true");
-  await setupListeners(client, server.id);
-  await syncPlayerList(client, server.id);
-  await syncMap(client, server.id);
+  await setupListeners(client, server.uuid);
+  await syncPlayerList(client, server.uuid);
+  await syncMap(client, server.uuid);
 
-  cachedClients[server.id] = client;
+  cachedClients[server.uuid] = client;
   return client;
 }
 
-export async function getGbxClient(id: number): Promise<GbxClient> {
-  if (cachedClients[id]) {
-    return cachedClients[id];
+export async function getGbxClient(serverUuid: string): Promise<GbxClient> {
+  if (cachedClients[serverUuid]) {
+    return cachedClients[serverUuid];
   }
 
-  return await connectToGbxClient(id);
+  return await connectToGbxClient(serverUuid);
 }
 
-export async function disconnectGbxClient(id: number): Promise<void> {
-  if (cachedClients[id]) {
-    delete cachedClients[id];
+export async function disconnectGbxClient(serverUuid: string): Promise<void> {
+  if (cachedClients[serverUuid]) {
+    delete cachedClients[serverUuid];
   }
 }
 
 export async function setupListeners(
   client: GbxClient,
-  id: number,
+  serverUuid: string,
 ): Promise<void> {
   client.on("callback", (method: string, data: any) => {
     if (method === "ManiaPlanet.ModeScriptCallbackArray") {
@@ -86,11 +88,11 @@ export async function setupListeners(
 
       switch (methodName) {
         case "Maniaplanet.Podium_Start":
-          onPodiumStart(id);
+          onPodiumStart(serverUuid);
           break;
         case "Trackmania.Event.WayPoint":
           if (params.isendrace) {
-            onPlayerFinish(id, params.login, params.racetime);
+            onPlayerFinish(serverUuid, params.login, params.racetime);
           }
           break;
       }

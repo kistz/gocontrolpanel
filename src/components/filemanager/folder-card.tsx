@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation";
 
 export default function FolderCard({
   fileEntry,
-  serverId,
+  serverUuid,
   onClick,
   active,
 }: {
   fileEntry: FileEntry;
-  serverId: number;
+  serverUuid: string;
   onClick?: () => void;
   active?: boolean;
 }) {
@@ -20,7 +20,7 @@ export default function FolderCard({
 
   const handleDoubleClick = () => {
     router.push(
-      `${generatePath(routes.servers.files, { id: serverId })}?path=${fileEntry.path}`,
+      `${generatePath(routes.servers.files, { uuid: serverUuid })}?path=${fileEntry.path}`,
     );
   };
 
