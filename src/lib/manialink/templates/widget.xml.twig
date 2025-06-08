@@ -1,0 +1,7 @@
+{% extends "src/lib/manialink/templates/manialink.xml.twig" %}
+
+{% block body %}
+	<frame pos="{{ pos.x }} {{ pos.y }}" z-index="{{ pos.z|default(1) }}">
+	  {% block content %}{% endblock %}
+  </frame>
+{% endblock %}
