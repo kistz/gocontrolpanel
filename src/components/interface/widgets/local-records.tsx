@@ -1,50 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { Rnd, RndDragCallback, RndResizeCallback } from "react-rnd";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { Rnd } from "react-rnd";
 import { InterfaceComponent } from "../editor";
 
-export default function LocalRecordsWidget({
-  onClick,
-  boundaryRef,
-}: InterfaceComponent) {
+const records = [
+  { player: "Marijntje04Marijntje04", time: "1:23.456" },
+  { player: "Marijntje04", time: "1:24.789" },
+  { player: "Marijntje04", time: "1:25.012" },
+  { player: "Marijntje04", time: "1:26.345" },
+  { player: "Marijntje04", time: "1:27.678" },
+  { player: "Marijntje04", time: "1:28.901" },
+  { player: "Marijntje04", time: "1:29.234" },
+  { player: "Marijntje04", time: "1:30.567" },
+  { player: "Marijntje04", time: "1:31.890" },
+  { player: "Marijntje04", time: "1:32.123" },
+];
+
+export type LocalRecordsWidgetHandles = {
+  getData: () => {
+    header: string;
+    position: { x: number; y: number };
+    size: { width: number; height: number };
+  };
+};
+
+const LocalRecordsWidget = forwardRef<
+  LocalRecordsWidgetHandles,
+  InterfaceComponent
+>(({ scale, onClick }, ref) => {
   const [header, setHeader] = useState("Records");
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [size, setSize] = useState({ width: 140, height: 210 });
 
-  const records = [
-    { player: "Marijntje04Marijntje04", time: "1:23.456" },
-    { player: "Marijntje04", time: "1:24.789" },
-    { player: "Marijntje04", time: "1:25.012" },
-    { player: "Marijntje04", time: "1:26.345" },
-    { player: "Marijntje04", time: "1:27.678" },
-    { player: "Marijntje04", time: "1:28.901" },
-    { player: "Marijntje04", time: "1:29.234" },
-    { player: "Marijntje04", time: "1:30.567" },
-    { player: "Marijntje04", time: "1:31.890" },
-    { player: "Marijntje04", time: "1:32.123" },
-  ];
-
-  const onResizeStop: RndResizeCallback = (
-    e,
-    dir,
-    elementRef,
-    delta,
-    position,
-  ) => {
-    console.log("Resize stopped:", {
-      event: e,
-      direction: dir,
-      element: elementRef,
-      delta,
+  useImperativeHandle(ref, () => ({
+    getData: () => ({
+      header,
       position,
-    });
-  };
-
-  const onDragStop: RndDragCallback = (e, data) => {
-    console.log("Drag stopped:", {
-      event: e,
-      data,
-    });
-  };
+      size,
+    }),
+  }));
 
   return (
     <Rnd
@@ -56,10 +51,14 @@ export default function LocalRecordsWidget({
       }}
       minWidth={140}
       minHeight={210}
-      bounds={boundaryRef?.current ?? undefined}
+      scale={scale ?? 1}
+      bounds="parent"
       className="bg-black"
-      onResizeStop={onResizeStop}
-      onDragStop={onDragStop}
+      onDragStop={(_, d) => setPosition({ x: d.x, y: d.y })}
+      onResizeStop={(_, __, ref, ___, position) => {
+        setSize({ width: ref.offsetWidth, height: ref.offsetHeight });
+        setPosition(position);
+      }}
       onClick={onClick}
     >
       {header && (
@@ -83,4 +82,6 @@ export default function LocalRecordsWidget({
       </div>
     </Rnd>
   );
-}
+});
+
+export default LocalRecordsWidget;

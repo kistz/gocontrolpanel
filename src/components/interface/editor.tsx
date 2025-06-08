@@ -1,7 +1,14 @@
 "use client";
 import { IconPlus } from "@tabler/icons-react";
 import Image from "next/image";
-import { cloneElement, JSX, useEffect, useRef, useState } from "react";
+import {
+  cloneElement,
+  createRef,
+  JSX,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
@@ -9,28 +16,47 @@ import LocalRecordsWidget from "./widgets/local-records";
 
 export type InterfaceComponent = {
   onClick?: () => void;
-  boundaryRef: React.RefObject<HTMLDivElement | null>;
+  scale?: number;
+  ref?: React.Ref<{
+    getData: () => any;
+  }>;
 };
+
+const EDITOR_DEFAULT_WIDTH = 1169;
+const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
 export default function InterfaceEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
+  const widgetRefs = useRef<React.RefObject<any>[]>([]);
+
   const [components, setComponents] = useState<JSX.Element[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const [editorSize, setEditorSize] = useState({ width: 0, height: 0 });
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const observer = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      console.log("Editor size changed:", width, height);
-      setEditorSize({ width, height });
+    const observer = new ResizeObserver(({ 0: { contentRect } }) => {
+      const widthRatio = contentRect.width / EDITOR_DEFAULT_WIDTH;
+      const heightRatio = contentRect.height / EDITOR_DEFAULT_HEIGHT;
+      setScale(Math.min(widthRatio, heightRatio));
     });
 
     observer.observe(editorRef.current);
+
     return () => observer.disconnect();
   }, []);
+
+  const addWidget = (Widget: React.ComponentType<InterfaceComponent>) => {
+    const newRef = createRef<any>();
+    widgetRefs.current.push(newRef);
+
+    setComponents((prev) => [
+      ...prev,
+      <Widget key={prev.length} ref={newRef} />,
+    ]);
+  };
 
   const handleDelete = () => {
     if (selectedIndex === null) return;
@@ -38,55 +64,55 @@ export default function InterfaceEditor() {
     setSelectedIndex(null);
   };
 
-  const renderWidget = (Widget: React.ComponentType<InterfaceComponent>) => {
-    return <Widget key={components.length} boundaryRef={editorRef} />;
+  const onSave = () => {
+    const allData = widgetRefs.current.map((ref) =>
+      ref.current ? ref.current.getData() : null,
+    );
+    console.log("All widgets data:", allData);
   };
 
   return (
     <div className="flex w-full gap-4">
-      <div className="relative flex-3 aspect-video" ref={editorRef}>
-        <Image
-          src="/tm-background.png"
-          alt="Interface Background"
-          fill
-          className="rounded-lg"
-        />
+      <div
+        ref={editorRef}
+        className="relative flex-3 h-full aspect-video overflow-hidden"
+        style={{
+          width: EDITOR_DEFAULT_WIDTH * scale,
+          position: "relative",
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            aspectRatio: "16 / 9",
+            width: EDITOR_DEFAULT_WIDTH,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+            position: "relative",
+          }}
+        >
+          <Image
+            src="/tm-background.png"
+            alt="Interface Background"
+            fill
+            className="rounded-lg"
+          />
 
-        {components.map((Component, index) => {
-          const scale = editorSize.width / 1169;
-
-          const cloned = cloneElement(Component, {
-            onClick: () => {
-              setSelectedIndex(index);
-            },
-          });
-
-          return (
-            <div
-              key={index}
-              className="absolute cursor-pointer"
-              style={{
-                transform: `scale(${scale})`,
-              }}
-            >
-              {cloned}
-            </div>
-          )
-        })}
+          {components.map((Comp, i) =>
+            cloneElement(Comp, {
+              key: i,
+              scale,
+              onClick: () => setSelectedIndex(i),
+            }),
+          )}
+        </div>
       </div>
 
       <Card className="flex-1">
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-4 p-4 h-full">
           <h2 className="text-lg font-semibold">Widgets</h2>
           <div className="flex flex-col gap-2">
-            <Button
-              onClick={() => {
-                setComponents([
-                  ...components,
-                  renderWidget(LocalRecordsWidget),
-                ]);
-              }}
-            >
+            <Button onClick={() => addWidget(LocalRecordsWidget)}>
               <IconPlus />
               Add Local Records Widget
             </Button>
@@ -106,6 +132,12 @@ export default function InterfaceEditor() {
               </Button>
             </div>
           )}
+
+          <Separator className="mt-auto" />
+
+          <Button onClick={onSave} className="w-full">
+            Save Changes
+          </Button>
         </div>
       </Card>
     </div>
