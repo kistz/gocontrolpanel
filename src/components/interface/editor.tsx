@@ -72,7 +72,7 @@ export default function InterfaceEditor() {
   };
 
   return (
-    <div className="flex w-full gap-4">
+    <div className="flex w-full gap-4 flex-col md:flex-row">
       <div
         ref={editorRef}
         className="relative flex-3 h-full aspect-video overflow-hidden"
