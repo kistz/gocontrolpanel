@@ -25,7 +25,7 @@ export type InterfaceComponentHandles = {
     serverId: number,
     EDITOR_DEFAULT_WIDTH: number,
     EDITOR_DEFAULT_HEIGHT: number,
-  ) => Promise<any>;
+  ) => Promise<void>;
 };
 
 const EDITOR_DEFAULT_WIDTH = 1169;

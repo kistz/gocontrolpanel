@@ -19,7 +19,8 @@ const records = [
   { player: "Marijntje04", time: "1:32.123" },
 ];
 
-export interface LocalRecordsWidgetComponentProps extends InterfaceComponent {
+export interface LocalRecordsWidgetComponentProps
+  extends InterfaceComponent<LocalRecordsWidgetComponentHandles> {
   defaultValues?: {
     header?: string;
     position?: { x: number; y: number };
@@ -27,12 +28,16 @@ export interface LocalRecordsWidgetComponentProps extends InterfaceComponent {
   };
 }
 
-export type LocalRecordsWidgetComponentHandles = InterfaceComponentHandles & {
+export type LocalRecordsWidgetComponentHandles = Omit<
+  InterfaceComponentHandles,
+  "render"
+> & {
   render: (
     serverId: number,
     EDITOR_DEFAULT_WIDTH: number,
     EDITOR_DEFAULT_HEIGHT: number,
   ) => Promise<{
+    id: string;
     header: string;
     positionPercentage: { x: number; y: number };
     sizePercentage: { width: number; height: number };
@@ -43,6 +48,8 @@ const LocalRecordsWidgetComponent = forwardRef<
   LocalRecordsWidgetComponentHandles,
   LocalRecordsWidgetComponentProps
 >(({ scale, onClick, defaultValues }, ref) => {
+  const id = "local-records-widget";
+
   const defaultHeader = defaultValues?.header ?? "Records";
   const defaultPosition = {
     x: defaultValues?.position?.x ?? 0,
@@ -91,10 +98,11 @@ const LocalRecordsWidgetComponent = forwardRef<
       );
 
       return {
+        id,
         header,
         positionPercentage,
         sizePercentage,
-      }
+      };
     },
   }));
 
