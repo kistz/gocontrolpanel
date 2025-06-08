@@ -14,15 +14,19 @@ import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
 import LocalRecordsWidgetComponent from "./widgets/local-records";
 
-export type InterfaceComponent = {
+export type InterfaceComponent<T = InterfaceComponentHandles> = {
   onClick?: () => void;
   scale?: number;
-  ref?: React.Ref<InterfaceComponentHandles>;
+  ref?: React.Ref<T>;
 };
 
 export type InterfaceComponentHandles = {
-  render: (serverId: number, EDITOR_DEFAULT_WIDTH: number, EDITOR_DEFAULT_HEIGHT: number) => Promise<void>;
-}
+  render: (
+    serverId: number,
+    EDITOR_DEFAULT_WIDTH: number,
+    EDITOR_DEFAULT_HEIGHT: number,
+  ) => Promise<any>;
+};
 
 const EDITOR_DEFAULT_WIDTH = 1169;
 const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
@@ -50,8 +54,10 @@ export default function InterfaceEditor({ serverId }: { serverId: number }) {
     return () => observer.disconnect();
   }, []);
 
-  const addWidget = (Widget: React.ComponentType<InterfaceComponent>) => {
-    const newRef = createRef<any>();
+  const addWidget = <T,>(
+    Widget: React.ComponentType<InterfaceComponent<T>>,
+  ) => {
+    const newRef = createRef<T>();
     widgetRefs.current.push(newRef);
 
     setComponents((prev) => [

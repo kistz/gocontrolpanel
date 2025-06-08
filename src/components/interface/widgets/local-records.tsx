@@ -27,8 +27,20 @@ export interface LocalRecordsWidgetComponentProps extends InterfaceComponent {
   };
 }
 
+export type LocalRecordsWidgetComponentHandles = InterfaceComponentHandles & {
+  render: (
+    serverId: number,
+    EDITOR_DEFAULT_WIDTH: number,
+    EDITOR_DEFAULT_HEIGHT: number,
+  ) => Promise<{
+    header: string;
+    positionPercentage: { x: number; y: number };
+    sizePercentage: { width: number; height: number };
+  }>;
+};
+
 const LocalRecordsWidgetComponent = forwardRef<
-  InterfaceComponentHandles,
+  LocalRecordsWidgetComponentHandles,
   LocalRecordsWidgetComponentProps
 >(({ scale, onClick, defaultValues }, ref) => {
   const defaultHeader = defaultValues?.header ?? "Records";
@@ -77,6 +89,12 @@ const LocalRecordsWidgetComponent = forwardRef<
         getManialinkPosition(positionPercentage),
         getManialinkSize(sizePercentage),
       );
+
+      return {
+        header,
+        positionPercentage,
+        sizePercentage,
+      }
     },
   }));
 
