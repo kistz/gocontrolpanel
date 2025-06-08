@@ -65,10 +65,29 @@ export default function InterfaceEditor() {
   };
 
   const onSave = () => {
+    console.log(widgetRefs.current)
+
     const allData = widgetRefs.current.map((ref) =>
       ref.current ? ref.current.getData() : null,
-    );
-    console.log("All widgets data:", allData);
+    ).filter(w => w !== null);
+
+    const position = allData.map((data) => data.position)[0];
+    const size = allData.map((data) => data.size)[0];
+
+    const positionPercentage = {
+      x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
+      y: (position.y / EDITOR_DEFAULT_HEIGHT) * 100,
+    }
+
+    const sizePercentage = {
+      width: (size.width / EDITOR_DEFAULT_WIDTH) * 100,
+      height: (size.height / EDITOR_DEFAULT_HEIGHT) * 100,
+    };
+
+    console.log("Saving interface data:", {
+      position: positionPercentage,
+      size: sizePercentage,
+    });
   };
 
   return (
