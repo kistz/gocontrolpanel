@@ -100,7 +100,7 @@ export async function orderServers(
   return doServerActionWithAuth(["admin"], async () => {
     const res = await axiosAuth.put(
       "/servers/order",
-      servers.map((server) => server.id),
+      servers.map((server) => server.uuid),
     );
 
     if (res.status !== 200) {
