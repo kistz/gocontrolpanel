@@ -17,10 +17,12 @@ import LocalRecordsWidgetComponent from "./widgets/local-records";
 export type InterfaceComponent = {
   onClick?: () => void;
   scale?: number;
-  ref?: React.Ref<{
-    render: () => any;
-  }>;
+  ref?: React.Ref<InterfaceComponentHandles>;
 };
+
+export type InterfaceComponentHandles = {
+  render: (serverId: number, EDITOR_DEFAULT_WIDTH: number, EDITOR_DEFAULT_HEIGHT: number) => Promise<void>;
+}
 
 const EDITOR_DEFAULT_WIDTH = 1169;
 const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
@@ -80,7 +82,7 @@ export default function InterfaceEditor({ serverId }: { serverId: number }) {
     <div className="flex w-full gap-4 flex-col md:flex-row">
       <div
         ref={editorRef}
-        className="relative flex-3 h-full aspect-video overflow-hidden"
+        className="relative flex-4 h-full aspect-video overflow-hidden"
         style={{
           width: EDITOR_DEFAULT_WIDTH * scale,
           position: "relative",

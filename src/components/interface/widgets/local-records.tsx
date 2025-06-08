@@ -4,7 +4,7 @@ import { renderLocalRecordsWidget } from "@/actions/gbx/manialink/local-records"
 import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Rnd } from "react-rnd";
-import { InterfaceComponent } from "../editor";
+import { InterfaceComponent, InterfaceComponentHandles } from "../editor";
 
 const records = [
   { player: "Marijntje04Marijntje04", time: "1:23.456" },
@@ -19,17 +19,31 @@ const records = [
   { player: "Marijntje04", time: "1:32.123" },
 ];
 
-export type LocalRecordsWidgetHandles = {
-  render: (serverId: number, EDITOR_DEFAULT_WIDTH: number, EDITOR_DEFAULT_HEIGHT: number) => Promise<void>;
-};
+export interface LocalRecordsWidgetComponentProps extends InterfaceComponent {
+  defaultValues?: {
+    header?: string;
+    position?: { x: number; y: number };
+    size?: { width: number; height: number };
+  };
+}
 
 const LocalRecordsWidgetComponent = forwardRef<
-  LocalRecordsWidgetHandles,
-  InterfaceComponent
->(({ scale, onClick }, ref) => {
-  const [header, setHeader] = useState("Records");
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState({ width: 140, height: 210 });
+  InterfaceComponentHandles,
+  LocalRecordsWidgetComponentProps
+>(({ scale, onClick, defaultValues }, ref) => {
+  const defaultHeader = defaultValues?.header ?? "Records";
+  const defaultPosition = {
+    x: defaultValues?.position?.x ?? 0,
+    y: defaultValues?.position?.y ?? 0,
+  };
+  const defaultSize = {
+    width: defaultValues?.size?.width ?? 140,
+    height: defaultValues?.size?.height ?? 210,
+  };
+
+  const [header, setHeader] = useState(defaultHeader);
+  const [position, setPosition] = useState(defaultPosition);
+  const [size, setSize] = useState(defaultSize);
 
   useImperativeHandle(ref, () => ({
     render: async (
@@ -69,10 +83,10 @@ const LocalRecordsWidgetComponent = forwardRef<
   return (
     <Rnd
       default={{
-        x: 0,
-        y: 0,
-        width: 140,
-        height: 210,
+        x: defaultPosition.x,
+        y: defaultPosition.y,
+        width: defaultSize.width,
+        height: defaultSize.height,
       }}
       minWidth={140}
       minHeight={210}
