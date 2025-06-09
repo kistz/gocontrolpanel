@@ -2,6 +2,7 @@
 import { getGbxClient } from "@/lib/gbxclient";
 import path from "path";
 import twig from "twig";
+import { v4 as uuidv4 } from "uuid";
 
 const template = path.resolve(
   process.cwd(),
@@ -18,7 +19,7 @@ export async function renderLocalRecordsWidget(
     records,
     pos,
     size,
-    id: "1",
+    id: uuidv4(),
   };
 
   twig.cache(false);

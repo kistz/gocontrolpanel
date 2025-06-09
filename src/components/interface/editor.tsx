@@ -1,7 +1,8 @@
 "use client";
 import { saveInterface } from "@/actions/database/interfaces";
+import { renderInterface } from "@/actions/gbx/manialink/render-interface";
 import { Interfaces } from "@/lib/prisma/generated";
-import { IconDeviceFloppy, IconPlus } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconEye, IconPlus } from "@tabler/icons-react";
 import Image from "next/image";
 import {
   cloneElement,
@@ -180,6 +181,22 @@ export default function InterfaceEditor({
     }
   };
 
+  const render = async () => {
+    if (!selectedInterface) {
+      toast.error("No interface selected");
+      return;
+    }
+
+    const { error } = await renderInterface(selectedInterface);
+    if (error) {
+      console.error("Failed to render interface:", error);
+      toast.error("Failed to render interface");
+      return;
+    }
+
+    toast.success("Interface rendered successfully");
+  };
+
   useEffect(() => {
     if (!selectedInterface) {
       setLoading(false);
@@ -258,46 +275,60 @@ export default function InterfaceEditor({
               )}
               <Separator className="mt-auto" />
 
-              <div className="flex gap-2">
-                <Select
-                  onValueChange={onInterfaceChange}
-                  defaultValue={selectedInterface?.id || ""}
-                  disabled={loading}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select interface" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {interfaces?.map((i) => (
-                      <SelectItem
-                        key={i.id}
-                        value={i.id}
-                        className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
-                      >
-                        {i.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="flex gap-2 flex-col">
+                <div className="w-full flex gap-2">
+                  <Select
+                    onValueChange={onInterfaceChange}
+                    defaultValue={selectedInterface?.id || ""}
+                    disabled={loading}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select interface" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {interfaces?.map((i) => (
+                        <SelectItem
+                          key={i.id}
+                          value={i.id}
+                          className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
+                        >
+                          {i.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                <Modal>
-                  <CreateInterfaceModal
-                    serverUuid={serverUuid}
-                    onSubmit={(newInterface?: Interfaces) => {
-                      if (!newInterface) return;
-                      setInterfaces((prev) => [...prev, newInterface]);
-                    }}
-                  />
-                  <Button size="icon">
-                    <IconPlus />
-                    <span className="sr-only">Create New Interface</span>
+                  <Modal>
+                    <CreateInterfaceModal
+                      serverUuid={serverUuid}
+                      onSubmit={(newInterface?: Interfaces) => {
+                        if (!newInterface) return;
+                        setInterfaces((prev) => [...prev, newInterface]);
+                      }}
+                    />
+                    <Button size="icon">
+                      <IconPlus />
+                      <span className="sr-only">Create New Interface</span>
+                    </Button>
+                  </Modal>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    disabled={!selectedInterface}
+                    onClick={render}
+                    className="flex-1"
+                  >
+                    <IconEye />
+                    Render
                   </Button>
-                </Modal>
 
-                <Button onClick={onSave}>
-                  <IconDeviceFloppy />
-                  Save
-                </Button>
+                  <Button onClick={onSave} className="flex-1">
+                    <IconDeviceFloppy />
+                    Save
+                  </Button>
+                </div>
               </div>
             </>
           )}
