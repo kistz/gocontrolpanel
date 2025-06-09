@@ -1,6 +1,7 @@
 "use server";
 
 import { doServerActionWithAuth } from "@/lib/actions";
+import { getGbxClient } from "@/lib/gbxclient";
 import { Interfaces } from "@/lib/prisma/generated";
 import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { ServerResponse } from "@/types/responses";
@@ -24,6 +25,9 @@ export async function renderInterface(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const data = JSON.parse(interfaceData.interfaceString);
+
+    const client = await getGbxClient(interfaceData.serverUuid);
+    await client.call("SendHideManialinkPage");
 
     for (const widgetData of data) {
       switch (widgetData.id) {
