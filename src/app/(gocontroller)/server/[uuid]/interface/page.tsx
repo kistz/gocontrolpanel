@@ -1,3 +1,4 @@
+import { getInterfaces } from "@/actions/database/interfaces";
 import { getChatConfig } from "@/actions/gbxconnector/chat";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
@@ -13,7 +14,7 @@ export default async function ServerInterfacePage({
 
   const { data } = await getChatConfig(uuid);
 
-  const interfaceString = "";
+  const { data: interfaces } = await getInterfaces(uuid);
 
   return (
     <div className="flex flex-col gap-6 h-full">
@@ -33,7 +34,8 @@ export default async function ServerInterfacePage({
         <TabsContent value="widgets" className="flex flex-col gap-6 h-full">
           <InterfaceEditor
             serverUuid={uuid}
-            interfaceString={interfaceString}
+            defaultInterface={interfaces[0]}
+            defaultInterfaces={interfaces}
           />
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">

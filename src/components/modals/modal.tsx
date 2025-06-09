@@ -8,6 +8,7 @@ import {
   ReactElement,
   useState,
 } from "react";
+import { DefaultModalProps } from "./default-props";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -30,11 +31,9 @@ export default function Modal({
 
   const childrenArray = Children.toArray(children);
 
-  let modalElement: ReactElement<{ closeModal?: () => void }> | null = null;
+  let modalElement: ReactElement<DefaultModalProps> | null = null;
   if (childrenArray.length > 0 && isValidElement(childrenArray[0])) {
-    modalElement = childrenArray[0] as ReactElement<{
-      closeModal?: () => void;
-    }>;
+    modalElement = childrenArray[0] as ReactElement<DefaultModalProps>;
   }
 
   let triggerElement: ReactElement<{ onClick?: () => void }> | null = null;
@@ -65,7 +64,9 @@ export default function Modal({
           className="fixed top-0 left-0 z-[9998] p-4 flex h-screen w-screen items-center justify-center bg-black/50"
           onClick={handleBackdropClick}
         >
-          {cloneElement(modalElement, { closeModal: closeModal })}
+          {cloneElement(modalElement, {
+            closeModal: closeModal,
+          })}
         </div>
       )}
     </>

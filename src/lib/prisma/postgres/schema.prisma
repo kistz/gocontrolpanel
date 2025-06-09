@@ -70,8 +70,9 @@ model Records {
 
 model Interfaces {
   id       String   @id @default(uuid())
+  name    String
   serverUuid String
-  interfaceString String
+  interfaceString String @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
