@@ -240,7 +240,7 @@ export default function InterfaceEditor({
                   onClick={() => addWidget(LocalRecordsWidgetComponent)}
                 >
                   <IconPlus />
-                  Add Local Records Widget
+                  Local Records
                 </Button>
               </div>
               <Separator />
