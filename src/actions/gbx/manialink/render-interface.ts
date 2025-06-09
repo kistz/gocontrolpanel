@@ -26,6 +26,7 @@ export async function renderInterface(
   return doServerActionWithAuth(["admin"], async () => {
     const data = JSON.parse(interfaceData.interfaceString);
 
+    // Hide any existing Manialink pages before rendering the new interface
     const client = await getGbxClient(interfaceData.serverUuid);
     await client.call("SendHideManialinkPage");
 
