@@ -19,7 +19,7 @@ export async function renderLocalRecordsWidget(
     records,
     pos,
     size,
-    title: {
+    header: {
       text: "Records",
       font: "RobotoCondensedBold",
     },
@@ -58,8 +58,8 @@ export async function renderLocalRecordsWidget(
         padding: {
           left: 2 / 4,
           right: 0 / 4,
-          top: 1 / 4,
-          bottom: 1 / 4,
+          top: 0 / 4,
+          bottom: 0 / 4,
         },
       },
     },

@@ -160,7 +160,13 @@ const LocalRecordsWidgetComponent = forwardRef<
             >
               {record.player}
             </span>
-            <span className="text-green-400 font-bold ml-auto">
+            <span
+              className="font-bold ml-auto"
+              style={{
+                color: `#${attributes.record?.time?.color ?? "0C6"}`,
+                padding: `${attributes.record?.time?.padding?.top ?? 0}px ${attributes.record?.time?.padding?.right ?? 0}px ${attributes.record?.time?.padding?.bottom ?? 0}px ${attributes.record?.time?.padding?.left ?? 0}px`,
+              }}
+            >
               {record.time}
             </span>
           </div>

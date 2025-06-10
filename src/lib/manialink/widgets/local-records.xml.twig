@@ -5,13 +5,13 @@
     <quad pos="0 0" size="{{ size.width }} {{ size.height }}" bgcolor="000" />
     <quad pos="0 0" size="{{ size.width }} 4" bgcolor="0C6" />
     <label
-      text="{{ title.text }}"
+      text="{{ header.text }}"
       size="{{ size.width }} 4"
       halign="center"
       valign="center"
       textsize="2"
       pos="{{ size.width / 2 }} -1.5"
-      textfont="{{ title.font }}"
+      textfont="{{ header.font }}"
     />
     {% for rec in records %}
       <frame pos="0 -{{ loop.index * (4 + record.padding.top + record.padding.bottom) }}">
