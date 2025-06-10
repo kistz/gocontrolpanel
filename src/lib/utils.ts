@@ -206,6 +206,10 @@ export function getManialinkSize(sizePercentage: {
 
   const width = (sizePercentage.width / 100) * maniaLinkWidth;
   const height = (sizePercentage.height / 100) * maniaLinkHeight;
+
+  console.log(
+    `Manialink size: ${width} ${height} (percentage: ${sizePercentage.width} ${sizePercentage.height})`,
+  );
   return { width, height };
 }
 
@@ -249,4 +253,15 @@ export function getDefaultSize(
   }
 
   return { width: 140, height: 210 };
+}
+
+export function parseComponentId(id: string): string {
+  // Replace - with space
+  const formattedId = id.replace(/-/g, " ");
+
+  // Capitalize the first letter of each word
+  return formattedId
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }

@@ -4,11 +4,54 @@
   <frame pos="0 0">
     <quad pos="0 0" size="{{ size.width }} {{ size.height }}" bgcolor="000" />
     <quad pos="0 0" size="{{ size.width }} 4" bgcolor="0C6" />
-    <label text="Records" size="{{ size.width }} 4" halign="center" pos="{{ size.width / 2 }} 0" />
+    <label
+      text="{{ title.text }}"
+      size="{{ size.width }} 4"
+      halign="center"
+      valign="center"
+      textsize="2"
+      pos="{{ size.width / 2 }} -1.5"
+      textfont="{{ title.font }}"
+    />
     {% for record in records %}
-      <frame pos="0 -{{ loop.index * 4 }}">
-        <label text="Marijntje04" size="{{ size.width - 10 }} 4" pos="0 0" />
-        <label text="12.123" size="10 4" pos="{{ size.width - 10 }} 0" />
+      <frame pos="0 -{{ loop.index * (4 + player.padding.top + player.padding.bottom) }}">
+        <label
+          text="{{ record.position }}"
+          size="{{ position.width }} {{ 4 - player.padding.top - player.padding.bottom }}"
+          pos="2.5 -{{ player.padding.top + 1.75 }}"
+          textfont="{{ position.font }}"
+          valign="center"
+          halign="center"
+          textsize="1.5"
+          textcolor="{{ position.color }}"
+        />
+
+        <label
+          text="{{ record.player }}"
+          size="{{ size.width - 10 - player.padding.left - player.padding.right - position.width }} {{ 4 + player.padding.top + player.padding.bottom }}"
+          pos="{{ position.width + player.padding.left }} -{{ player.padding.top + 1.75 }}"
+          textfont="{{ player.font }}"
+          valign="center"
+          textsize="1.5"
+          textcolor="{{ player.color }}"
+        />
+        <label
+          text="12.123"
+          size="{{ 10 - time.padding.left - time.padding.right }} {{ 4 - time.padding.top - time.padding.bottom }}"
+          pos="{{ size.width - 10 - time.padding.left }} -{{ time.padding.top + 1.75 }}"
+          valign="center"
+          textfont="{{ time.font }}"
+          textcolor="{{ time.color }}"
+          textsize="1.5"
+        />
+
+        {% if border.bottom %}
+          <quad
+            pos="0 -{{ 4 + player.padding.top + player.padding.bottom }}"
+            size="{{ size.width }} {{ border.bottom }}"
+            bgcolor="{{ border.color }}"
+          />
+        {% endif %}
       </frame>
     {% endfor %}
   </frame>

@@ -11,14 +11,50 @@ const template = path.resolve(
 
 export async function renderLocalRecordsWidget(
   serverUuid: string,
-  records: { player: string; time: number }[] = [],
-  pos = { x: 0, y: 0 },
-  size = { width: 140, height: 210 },
+  records: { player: string; time: number }[],
+  pos: { x: number; y: number },
+  size: { width: number; height: number },
 ) {
   const data = {
     records,
     pos,
     size,
+    title: {
+      text: "Records",
+      font: "RobotoCondensedBold",
+    },
+    position: {
+      width: 4,
+      font: "RobotoCondensedBold",
+      color: "FFF",
+    },
+    player: {
+      font: "RobotoCondensed",
+      color: "FFF",
+      padding: {
+        left: 4 / 4,
+        right: 0 / 4,
+        top: 1 / 4,
+        bottom: 1 / 4,
+      }
+    },
+    time: {
+      font: "RobotoCondensedBold",
+      color: "0C6",
+      padding: {
+        left: 2 / 4,
+        right: 0 / 4,
+        top: 1 / 4,
+        bottom: 1 / 4,
+      }
+    },
+    border: {
+      color: "8888",
+      bottom: 1 / 8,
+      top: 0 / 8,
+      left: 0 / 8,
+      right: 0 / 8,
+    },
     id: uuidv4(),
   };
 

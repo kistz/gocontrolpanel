@@ -11,16 +11,16 @@ import {
 } from "../editor";
 
 const records = [
-  { player: "Marijntje04Marijntje04", time: "1:23.456" },
-  { player: "Marijntje04", time: "1:24.789" },
-  { player: "Marijntje04", time: "1:25.012" },
-  { player: "Marijntje04", time: "1:26.345" },
-  { player: "Marijntje04", time: "1:27.678" },
-  { player: "Marijntje04", time: "1:28.901" },
-  { player: "Marijntje04", time: "1:29.234" },
-  { player: "Marijntje04", time: "1:30.567" },
-  { player: "Marijntje04", time: "1:31.890" },
-  { player: "Marijntje04", time: "1:32.123" },
+  { player: "Marijntje04", time: 121345 },
+  { player: "Cheeselover2298", time: 121345 },
+  { player: "Marijntje04", time: 121345 },
+  { player: "Marijntje04", time: 12345 },
+  { player: "Marijntje04", time: 12345 },
+  { player: "Marijntje04", time: 12345 },
+  { player: "Marijntje04", time: 12345 },
+  { player: "Marijntje04", time: 12345 },
+  { player: "Marijntje04", time: 12345 },
+  { player: "Marijntje04", time: 12345 },
 ];
 
 export interface LocalRecordsWidgetComponentProps
@@ -47,7 +47,7 @@ export type LocalRecordsWidgetComponentHandles = Omit<
 const LocalRecordsWidgetComponent = forwardRef<
   LocalRecordsWidgetComponentHandles,
   LocalRecordsWidgetComponentProps
->(({ scale, onClick, defaultValues }, ref) => {
+>(({ scale, onClick, defaultValues, uuid }, ref) => {
   const id = "local-records-widget";
 
   const defaultHeader = defaultValues?.header ?? "Records";
@@ -58,7 +58,7 @@ const LocalRecordsWidgetComponent = forwardRef<
 
   const defaultSize = getDefaultSize(defaultValues?.sizePercentage, {
     width: 140,
-    height: 210,
+    height: 182,
   });
 
   const [header, _] = useState(defaultHeader);
@@ -66,6 +66,7 @@ const LocalRecordsWidgetComponent = forwardRef<
   const [size, setSize] = useState(defaultSize);
 
   useImperativeHandle(ref, () => ({
+    uuid,
     render: () => {
       const positionPercentage = {
         x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
@@ -94,8 +95,6 @@ const LocalRecordsWidgetComponent = forwardRef<
         width: defaultSize.width,
         height: defaultSize.height,
       }}
-      minWidth={140}
-      minHeight={210}
       scale={scale ?? 1}
       bounds="parent"
       className="bg-black"
@@ -107,7 +106,7 @@ const LocalRecordsWidgetComponent = forwardRef<
       onClick={onClick}
     >
       {header && (
-        <div className="bg-primary text-center font-bold text-sm">
+        <div className="bg-primary text-center font-bold text-[10.5px]">
           <span>{header}</span>
         </div>
       )}
@@ -116,12 +115,17 @@ const LocalRecordsWidgetComponent = forwardRef<
         {records.map((record, index) => (
           <div
             key={index}
-            className="flex text-[12px] justify-between px-1 items-center border-b border-gray-700 last:border-b-0"
+            className="flex text-[10.5px] px-1 items-center border-b border-gray-700"
           >
-            <span className="text-white overflow-hidden text-ellipsis">
+            <span className="text-white font-bold w-[16px] text-center pr-1">
+              {index + 1}
+            </span>
+            <span className="text-white overflow-hidden mr-1">
               {record.player}
             </span>
-            <span className="text-green-400">{record.time}</span>
+            <span className="text-green-400 font-bold ml-auto">
+              {record.time}
+            </span>
           </div>
         ))}
       </div>

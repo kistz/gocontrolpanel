@@ -8,16 +8,16 @@ import { ServerResponse } from "@/types/responses";
 import { renderLocalRecordsWidget } from "./local-records";
 
 const records = [
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
-  { player: "Marijntje04", time: 12345 },
+  { position: 1, player: "Marijntje04", time: 12345 },
+  { position: 2, player: "Cheeselover2298", time: 12345 },
+  { position: 3, player: "Marijntje04", time: 12345 },
+  { position: 4, player: "Marijntje04", time: 12345 },
+  { position: 5, player: "Marijntje04", time: 12345 },
+  { position: 6, player: "Marijntje04", time: 12345 },
+  { position: 7, player: "Marijntje04", time: 12345 },
+  { position: 8, player: "Marijntje04", time: 12345 },
+  { position: 9, player: "Marijntje04", time: 12345 },
+  { position: 10, player: "Marijntje04", time: 12345 },
 ];
 
 export async function renderInterface(

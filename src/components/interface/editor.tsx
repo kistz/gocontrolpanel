@@ -2,7 +2,13 @@
 import { saveInterface } from "@/actions/database/interfaces";
 import { renderInterface } from "@/actions/gbx/manialink/render-interface";
 import { Interfaces } from "@/lib/prisma/generated";
-import { IconDeviceFloppy, IconEye, IconPlus } from "@tabler/icons-react";
+import { parseComponentId } from "@/lib/utils";
+import {
+  IconDeviceFloppy,
+  IconEye,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import {
   cloneElement,
@@ -30,12 +36,14 @@ import LocalRecordsWidgetComponent, {
 } from "./widgets/local-records";
 
 export type InterfaceComponent<T = InterfaceComponentHandles> = {
+  uuid: string;
   onClick?: () => void;
   scale?: number;
   ref?: React.Ref<T>;
 };
 
 export type InterfaceComponentHandles = {
+  uuid: string;
   render: () => void;
 };
 
@@ -61,7 +69,8 @@ export default function InterfaceEditor({
   const widgetRefs = useRef<React.RefObject<any>[]>([]);
 
   const [components, setComponents] = useState<JSX.Element[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [selectedComponent, setSelectedComponent] =
+    useState<React.RefObject<any> | null>(null);
 
   const [scale, setScale] = useState(1);
 
@@ -72,7 +81,7 @@ export default function InterfaceEditor({
       return;
     }
 
-    setSelectedIndex(null);
+    setSelectedComponent(null);
     setComponents([]);
     setLoading(true);
     setSelectedInterface(newInterface);
@@ -96,18 +105,21 @@ export default function InterfaceEditor({
     Widget: React.ComponentType<InterfaceComponent<T>>,
   ) => {
     const newRef = createRef<T>();
-    widgetRefs.current.push(newRef);
 
-    setComponents((prev) => [
-      ...prev,
-      <Widget key={prev.length} ref={newRef} />,
-    ]);
+    setComponents((prev) => {
+      const id = crypto.randomUUID();
+      widgetRefs.current.push(newRef);
+
+      return [...prev, <Widget key={id} uuid={id} ref={newRef} />];
+    });
   };
 
   const handleDelete = () => {
-    if (selectedIndex === null) return;
-    setComponents(components.filter((_, i) => i !== selectedIndex));
-    setSelectedIndex(null);
+    if (selectedComponent === null) return;
+    setComponents(
+      components.filter((c) => c.key !== selectedComponent.current?.uuid),
+    );
+    setSelectedComponent(null);
   };
 
   const onSave = async () => {
@@ -117,7 +129,7 @@ export default function InterfaceEditor({
     }
 
     const data = widgetRefs.current
-      .map((ref) => ref.current && ref.current.render(serverUuid))
+      .map((ref) => ref.current && ref.current.render())
       .filter((d) => d !== null && d !== undefined);
 
     const { data: savedInterface, error } = await saveInterface(
@@ -154,10 +166,12 @@ export default function InterfaceEditor({
           case "local-records-widget":
             const newRef = createRef<LocalRecordsWidgetComponentHandles>();
             widgetRefs.current.push(newRef);
+            const id = crypto.randomUUID();
 
             newComponents.push(
               <LocalRecordsWidgetComponent
-                key={i}
+                key={id}
+                uuid={id}
                 ref={newRef}
                 defaultValues={{
                   header: widgetData.header,
@@ -197,6 +211,18 @@ export default function InterfaceEditor({
     toast.success("Interface rendered successfully");
   };
 
+  const handleSelect = (Comp: JSX.Element) => {
+    const ref = widgetRefs.current.find(
+      (r) => r.current?.uuid === Comp.props.uuid,
+    );
+    if (!ref) {
+      console.warn("Component ref not found:", Comp.props.uuid);
+      return;
+    }
+
+    setSelectedComponent(ref);
+  };
+
   useEffect(() => {
     if (!selectedInterface) {
       setLoading(false);
@@ -234,9 +260,10 @@ export default function InterfaceEditor({
 
           {components.map((Comp, i) =>
             cloneElement(Comp, {
-              key: i,
               scale,
-              onClick: () => setSelectedIndex(i),
+              onClick: () => {
+                handleSelect(Comp);
+              },
             }),
           )}
         </div>
@@ -261,17 +288,25 @@ export default function InterfaceEditor({
                 </Button>
               </div>
               <Separator />
-              <h2 className="text-lg font-semibold">Selected Component</h2>
-              {selectedIndex !== null && (
-                <div className="flex flex-col gap-2">
-                  <p>
-                    Component {selectedIndex + 1}:{" "}
-                    {components[selectedIndex].type.name}
-                  </p>
-                  <Button variant="destructive" onClick={handleDelete}>
-                    Delete Component
-                  </Button>
-                </div>
+              {selectedComponent !== null && (
+                <>
+                  <div className="flex gap-2 justify-between w-full">
+                    <h2 className="text-lg font-semibold">
+                      {parseComponentId(
+                        selectedComponent.current?.render(serverUuid).id,
+                      ) || "Selected Component"}
+                    </h2>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      onClick={handleDelete}
+                    >
+                      <IconTrash />
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-col gap-2"></div>
+                </>
               )}
               <Separator className="mt-auto" />
 
@@ -324,7 +359,11 @@ export default function InterfaceEditor({
                     Render
                   </Button>
 
-                  <Button onClick={onSave} className="flex-1">
+                  <Button
+                    onClick={onSave}
+                    disabled={!selectedInterface}
+                    className="flex-1"
+                  >
                     <IconDeviceFloppy />
                     Save
                   </Button>
