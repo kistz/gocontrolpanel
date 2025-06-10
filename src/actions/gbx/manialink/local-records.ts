@@ -27,8 +27,8 @@ export async function renderLocalRecordsWidget(
       padding: {
         left: 2 / 4,
         right: 2 / 4,
-        top: 1 / 4,
-        bottom: 1 / 4,
+        top: 0 / 4 + 0.25,
+        bottom: 0 / 4 + 0.25,
       },
       border: {
         color: "8888",
@@ -50,7 +50,7 @@ export async function renderLocalRecordsWidget(
           right: 0 / 4,
           top: 0 / 4,
           bottom: 0 / 4,
-        }
+        },
       },
       time: {
         font: "RobotoCondensedBold",
@@ -60,7 +60,7 @@ export async function renderLocalRecordsWidget(
           right: 0 / 4,
           top: 1 / 4,
           bottom: 1 / 4,
-        }
+        },
       },
     },
     id: uuidv4(),
