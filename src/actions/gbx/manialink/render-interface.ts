@@ -6,6 +6,7 @@ import { Interfaces } from "@/lib/prisma/generated";
 import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { ServerResponse } from "@/types/responses";
 import { renderLocalRecordsWidget } from "./local-records";
+import { LocalRecordsSchemaType } from "@/components/interface/widgets/local-records/local-records-schema";
 
 const records = [
   { position: 1, player: "Marijntje04", time: 12345 },
@@ -38,6 +39,7 @@ export async function renderInterface(
             records,
             getManialinkPosition(widgetData.positionPercentage),
             getManialinkSize(widgetData.sizePercentage),
+            widgetData.attributes as LocalRecordsSchemaType,
           );
           break;
         default:
