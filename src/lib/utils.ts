@@ -207,9 +207,6 @@ export function getManialinkSize(sizePercentage: {
   const width = (sizePercentage.width / 100) * maniaLinkWidth;
   const height = (sizePercentage.height / 100) * maniaLinkHeight;
 
-  console.log(
-    `Manialink size: ${width} ${height} (percentage: ${sizePercentage.width} ${sizePercentage.height})`,
-  );
   return { width, height };
 }
 

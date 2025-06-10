@@ -30,7 +30,7 @@ export default function LocalRecordsForm({
 
   return (
     <Form {...form}>
-      <form className="flex flex-col gap-2">
+      <form className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <span className="font-bold">Header</span>
 
@@ -59,6 +59,104 @@ export default function LocalRecordsForm({
             name={"record.padding"}
             label="Padding"
             errors={form.formState.errors.record?.padding}
+            min={0}
+          />
+
+          <span className="font-bold">Border</span>
+
+          <FormElement
+            control={form.control}
+            name={"record.border.color"}
+            label="Color"
+            placeholder="8888"
+            error={form.formState.errors.record?.border?.color}
+          />
+
+          <FourSideInput
+            control={form.control}
+            name={"record.border"}
+            label="Border"
+            errors={form.formState.errors.record?.border}
+            min={0}
+          />
+
+          <span className="font-bold">Position</span>
+
+          <FormElement
+            control={form.control}
+            name={"record.position.width"}
+            label="Width"
+            type="number"
+            placeholder="4"
+            error={form.formState.errors.record?.position?.width}
+          />
+
+          <FormElement
+            control={form.control}
+            name={"record.position.font"}
+            label="Font"
+            placeholder="RobotoCondensedBold"
+            error={form.formState.errors.record?.position?.font}
+          />
+
+          <FormElement
+            control={form.control}
+            name={"record.position.color"}
+            label="Color"
+            placeholder="FFF"
+            error={form.formState.errors.record?.position?.color}
+          />
+
+          <span className="font-bold">Player</span>
+
+          <FormElement
+            control={form.control}
+            name={"record.player.font"}
+            label="Font"
+            placeholder="RobotoCondensed"
+            error={form.formState.errors.record?.player?.font}
+          />
+
+          <FormElement
+            control={form.control}
+            name={"record.player.color"}
+            label="Color"
+            placeholder="FFF"
+            error={form.formState.errors.record?.player?.color}
+          />
+
+          <FourSideInput
+            control={form.control}
+            name={"record.player.padding"}
+            label="Padding"
+            errors={form.formState.errors.record?.player?.padding}
+            min={0}
+          />
+
+          <span className="font-bold">Time</span>
+
+          <FormElement
+            control={form.control}
+            name={"record.time.font"}
+            label="Font"
+            placeholder="RobotoCondensedBold"
+            error={form.formState.errors.record?.time?.font}
+          />
+
+          <FormElement
+            control={form.control}
+            name={"record.time.color"}
+            label="Color"
+            placeholder="0C6"
+            error={form.formState.errors.record?.time?.color}
+          />
+
+          <FourSideInput
+            control={form.control}
+            name={"record.time.padding"}
+            label="Padding"
+            errors={form.formState.errors.record?.time?.padding}
+            min={0}
           />
         </div>
       </form>

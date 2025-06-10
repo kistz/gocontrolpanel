@@ -13,43 +13,43 @@
       pos="{{ size.width / 2 }} -1.5"
       textfont="{{ title.font }}"
     />
-    {% for record in records %}
-      <frame pos="0 -{{ loop.index * (4 + player.padding.top + player.padding.bottom) }}">
+    {% for rec in records %}
+      <frame pos="0 -{{ loop.index * (4 + record.padding.top + record.padding.bottom) }}">
         <label
-          text="{{ record.position }}"
-          size="{{ position.width }} {{ 4 - player.padding.top - player.padding.bottom }}"
-          pos="2.5 -{{ player.padding.top + 1.75 }}"
-          textfont="{{ position.font }}"
+          text="{{ rec.position }}"
+          size="{{ record.position.width }} {{ 4 - record.padding.top - record.padding.bottom }}"
+          pos="2.5 -{{ record.padding.top + 1.75 }}"
+          textfont="{{ record.position.font }}"
           valign="center"
           halign="center"
           textsize="1.5"
-          textcolor="{{ position.color }}"
+          textcolor="{{ record.position.color }}"
         />
 
         <label
-          text="{{ record.player }}"
-          size="{{ size.width - 10 - player.padding.left - player.padding.right - position.width }} {{ 4 + player.padding.top + player.padding.bottom }}"
-          pos="{{ position.width + player.padding.left }} -{{ player.padding.top + 1.75 }}"
-          textfont="{{ player.font }}"
+          text="{{ rec.player }}"
+          size="{{ size.width - 10 - record.player.padding.left - record.player.padding.right - record.position.width }} {{ 4 + record.player.padding.top + record.player.padding.bottom }}"
+          pos="{{ record.position.width + record.player.padding.left }} -{{ record.player.padding.top + 1.75 }}"
+          textfont="{{ record.player.font }}"
           valign="center"
           textsize="1.5"
-          textcolor="{{ player.color }}"
+          textcolor="{{ record.player.color }}"
         />
         <label
           text="12.123"
-          size="{{ 10 - time.padding.left - time.padding.right }} {{ 4 - time.padding.top - time.padding.bottom }}"
-          pos="{{ size.width - 10 - time.padding.left }} -{{ time.padding.top + 1.75 }}"
+          size="{{ 10 - record.time.padding.left - record.time.padding.right }} {{ 4 - record.time.padding.top - record.time.padding.bottom }}"
+          pos="{{ size.width - 10 - record.time.padding.left }} -{{ record.time.padding.top + 1.75 }}"
           valign="center"
-          textfont="{{ time.font }}"
-          textcolor="{{ time.color }}"
+          textfont="{{ record.time.font }}"
+          textcolor="{{ record.time.color }}"
           textsize="1.5"
         />
 
-        {% if border.bottom %}
+        {% if record.border.bottom %}
           <quad
-            pos="0 -{{ 4 + player.padding.top + player.padding.bottom }}"
-            size="{{ size.width }} {{ border.bottom }}"
-            bgcolor="{{ border.color }}"
+            pos="0 -{{ 4 + record.padding.top + record.padding.bottom }}"
+            size="{{ size.width }} {{ record.border.bottom }}"
+            bgcolor="{{ record.border.color }}"
           />
         {% endif %}
       </frame>

@@ -34,6 +34,7 @@ interface RenderInputProps<TControl extends FieldValues> {
   isLoading?: boolean;
   autoFocus?: boolean;
   step?: string;
+  min?: number;
   error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
 }
@@ -50,6 +51,7 @@ export default function RenderInput<TControl extends FieldValues>({
   isLoading = false,
   autoFocus = false,
   step,
+  min,
   error,
   className,
 }: RenderInputProps<TControl & FieldValues>) {
@@ -67,6 +69,7 @@ export default function RenderInput<TControl extends FieldValues>({
           className={className}
           error={!!error}
           step={step}
+          min={min}
           autoFocus={autoFocus}
         />
       );

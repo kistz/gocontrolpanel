@@ -43,6 +43,7 @@ export type InterfaceComponent<T = InterfaceComponentHandles> = {
 };
 
 export type InterfaceComponentHandles = {
+  id: string;
   uuid: string;
   render: () => void;
   getEditFields: () => React.ReactNode;
@@ -230,7 +231,7 @@ export default function InterfaceEditor({
       return;
     }
     loadWidgets(selectedInterface.interfaceString);
-  }, [selectedInterface]);
+  }, []);
 
   return (
     <div className="flex w-full gap-4 flex-col md:flex-row">
@@ -292,28 +293,28 @@ export default function InterfaceEditor({
                 </Button>
               </div>
               <Separator />
-              {selectedComponent !== null && (
-                <div className="overflow-y-scroll">
-                  <div className="flex gap-2 justify-between w-full">
-                    <h2 className="text-lg font-semibold">
-                      {parseComponentId(
-                        selectedComponent.current?.render(serverUuid).id,
-                      ) || "Selected Component"}
-                    </h2>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={handleDelete}
-                    >
-                      <IconTrash />
-                    </Button>
-                  </div>
+              {selectedComponent !== null &&
+                selectedComponent.current !== null && (
+                  <div className="overflow-y-scroll">
+                    <div className="flex gap-2 justify-between w-full">
+                      <h2 className="text-lg font-semibold">
+                        {parseComponentId(selectedComponent.current?.id) ||
+                          "Selected Component"}
+                      </h2>
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={handleDelete}
+                      >
+                        <IconTrash />
+                      </Button>
+                    </div>
 
-                  <div className="w-full">
-                    {selectedComponent.current?.getEditFields()}
+                    <div className="w-full">
+                      {selectedComponent.current?.getEditFields()}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
               <Separator className="mt-auto" />
 
               <div className="flex gap-2 flex-col">

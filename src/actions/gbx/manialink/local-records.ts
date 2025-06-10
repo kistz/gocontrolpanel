@@ -23,37 +23,45 @@ export async function renderLocalRecordsWidget(
       text: "Records",
       font: "RobotoCondensedBold",
     },
-    position: {
-      width: 4,
-      font: "RobotoCondensedBold",
-      color: "FFF",
-    },
-    player: {
-      font: "RobotoCondensed",
-      color: "FFF",
-      padding: {
-        left: 4 / 4,
-        right: 0 / 4,
-        top: 1 / 4,
-        bottom: 1 / 4,
-      }
-    },
-    time: {
-      font: "RobotoCondensedBold",
-      color: "0C6",
+    record: {
       padding: {
         left: 2 / 4,
-        right: 0 / 4,
+        right: 2 / 4,
         top: 1 / 4,
         bottom: 1 / 4,
-      }
-    },
-    border: {
-      color: "8888",
-      bottom: 1 / 8,
-      top: 0 / 8,
-      left: 0 / 8,
-      right: 0 / 8,
+      },
+      border: {
+        color: "8888",
+        bottom: 1 / 4,
+        top: 0 / 4,
+        left: 0 / 4,
+        right: 0 / 4,
+      },
+      position: {
+        width: 4,
+        font: "RobotoCondensedBold",
+        color: "FFF",
+      },
+      player: {
+        font: "RobotoCondensed",
+        color: "FFF",
+        padding: {
+          left: 4 / 4,
+          right: 0 / 4,
+          top: 1 / 4,
+          bottom: 1 / 4,
+        }
+      },
+      time: {
+        font: "RobotoCondensedBold",
+        color: "0C6",
+        padding: {
+          left: 2 / 4,
+          right: 0 / 4,
+          top: 1 / 4,
+          bottom: 1 / 4,
+        }
+      },
     },
     id: uuidv4(),
   };

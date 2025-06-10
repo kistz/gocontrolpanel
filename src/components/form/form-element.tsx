@@ -24,6 +24,7 @@ interface FormElementProps<TControl extends FieldValues> {
   isLoading?: boolean;
   autoFocus?: boolean;
   step?: string;
+  min?: number;
   error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
   children?: React.ReactNode;
@@ -44,6 +45,7 @@ export default function FormElement<TControl extends FieldValues>({
   isLoading = false,
   autoFocus = false,
   step,
+  min,
   error,
   className,
   children,
@@ -107,6 +109,7 @@ export default function FormElement<TControl extends FieldValues>({
                 isDisabled={isDisabled || isLoading}
                 isLoading={isLoading}
                 step={step}
+                min={min}
                 error={error}
                 autoFocus={autoFocus}
                 className={className}

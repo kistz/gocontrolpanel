@@ -74,6 +74,7 @@ const LocalRecordsWidgetComponent = forwardRef<
   const [size, setSize] = useState(defaultSize);
 
   useImperativeHandle(ref, () => ({
+    id,
     uuid,
     render: () => {
       const positionPercentage = {
