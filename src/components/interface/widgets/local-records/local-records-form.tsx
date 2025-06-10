@@ -9,6 +9,7 @@ import {
   LocalRecordsSchema,
   LocalRecordsSchemaType,
 } from "./local-records-schema";
+import { FONTS } from "@/lib/manialink/attributes";
 
 export default function LocalRecordsForm({
   defaultValues,
@@ -45,6 +46,11 @@ export default function LocalRecordsForm({
           <FormElement
             control={form.control}
             name={"header.font"}
+            type="select"
+            options={FONTS.map((font) => ({
+              value: font,
+              label: font,
+            }))}
             label="Font"
             placeholder="RobotoCondensedBold"
             error={form.formState.errors.header?.font}
@@ -95,6 +101,11 @@ export default function LocalRecordsForm({
             control={form.control}
             name={"record.position.font"}
             label="Font"
+            type="select"
+            options={FONTS.map((font) => ({
+              value: font,
+              label: font,
+            }))}
             placeholder="RobotoCondensedBold"
             error={form.formState.errors.record?.position?.font}
           />
@@ -113,6 +124,11 @@ export default function LocalRecordsForm({
             control={form.control}
             name={"record.player.font"}
             label="Font"
+            type="select"
+            options={FONTS.map((font) => ({
+              value: font,
+              label: font,
+            }))}
             placeholder="RobotoCondensed"
             error={form.formState.errors.record?.player?.font}
           />
@@ -139,6 +155,11 @@ export default function LocalRecordsForm({
             control={form.control}
             name={"record.time.font"}
             label="Font"
+            type="select"
+            options={FONTS.map((font) => ({
+              value: font,
+              label: font,
+            }))}
             placeholder="RobotoCondensedBold"
             error={form.formState.errors.record?.time?.font}
           />
