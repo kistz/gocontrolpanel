@@ -134,12 +134,30 @@ const LocalRecordsWidgetComponent = forwardRef<
         {records.map((record, index) => (
           <div
             key={index}
-            className="flex text-[10.5px] px-1 items-center border-b border-gray-700"
+            className="flex text-[10.5px] items-center"
+            style={{
+              padding: `${attributes.record?.padding?.top ?? 0}px ${attributes.record?.padding?.right ?? 0}px ${attributes.record?.padding?.bottom ?? 0}px ${attributes.record?.padding?.left ?? 0}px`,
+              borderBottom: `${
+                attributes.record?.border?.bottom ?? 0
+              }px solid #${attributes.record?.border?.color ?? "8888"}`,
+            }}
           >
-            <span className="text-white font-bold w-[16px] text-center pr-1">
+            <span
+              className="font-bold text-center pr-1"
+              style={{
+                width: `${attributes.record?.position?.width ?? 4}px`,
+                color: `#${attributes.record?.position?.color ?? "FFF"}`,
+              }}
+            >
               {index + 1}
             </span>
-            <span className="text-white overflow-hidden mr-1">
+            <span
+              className="overflow-hidden"
+              style={{
+                color: `#${attributes.record?.player?.color ?? "FFF"}`,
+                padding: `${attributes.record?.player?.padding?.top ?? 0}px ${attributes.record?.player?.padding?.right ?? 0}px ${attributes.record?.player?.padding?.bottom ?? 0}px ${attributes.record?.player?.padding?.left ?? 0}px`,
+              }}
+            >
               {record.player}
             </span>
             <span className="text-green-400 font-bold ml-auto">

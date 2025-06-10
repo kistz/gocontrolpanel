@@ -38,7 +38,7 @@ export async function renderLocalRecordsWidget(
         right: 0 / 4,
       },
       position: {
-        width: 4,
+        width: 16 / 3,
         font: "RobotoCondensedBold",
         color: "FFF",
       },
@@ -46,10 +46,10 @@ export async function renderLocalRecordsWidget(
         font: "RobotoCondensed",
         color: "FFF",
         padding: {
-          left: 4 / 4,
+          left: 0 / 4,
           right: 0 / 4,
-          top: 1 / 4,
-          bottom: 1 / 4,
+          top: 0 / 4,
+          bottom: 0 / 4,
         }
       },
       time: {

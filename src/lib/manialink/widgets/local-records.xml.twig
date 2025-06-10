@@ -18,7 +18,7 @@
         <label
           text="{{ rec.position }}"
           size="{{ record.position.width }} {{ 4 - record.padding.top - record.padding.bottom }}"
-          pos="2.5 -{{ record.padding.top + 1.75 }}"
+          pos="2.5 -{{ (4 - record.padding.top - record.padding.bottom) / 2 + 0.25 }}"
           textfont="{{ record.position.font }}"
           valign="center"
           halign="center"
@@ -29,7 +29,7 @@
         <label
           text="{{ rec.player }}"
           size="{{ size.width - 10 - record.player.padding.left - record.player.padding.right - record.position.width }} {{ 4 + record.player.padding.top + record.player.padding.bottom }}"
-          pos="{{ record.position.width + record.player.padding.left }} -{{ record.player.padding.top + 1.75 }}"
+          pos="{{ record.position.width + record.player.padding.left }} -{{ (4 + record.player.padding.top + record.player.padding.bottom) / 2 }}"
           textfont="{{ record.player.font }}"
           valign="center"
           textsize="1.5"
@@ -38,7 +38,7 @@
         <label
           text="12.123"
           size="{{ 10 - record.time.padding.left - record.time.padding.right }} {{ 4 - record.time.padding.top - record.time.padding.bottom }}"
-          pos="{{ size.width - 10 - record.time.padding.left }} -{{ record.time.padding.top + 1.75 }}"
+          pos="{{ size.width - 10 - record.time.padding.left }} -{{ (4 - record.time.padding.top - record.time.padding.bottom) / 2 }}"
           valign="center"
           textfont="{{ record.time.font }}"
           textcolor="{{ record.time.color }}"
