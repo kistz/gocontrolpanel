@@ -4,6 +4,10 @@ import { authenticate, getTokens } from "./lib/api/nadeo";
 import { connectToGbxClient } from "./lib/gbxclient";
 
 export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./lib/twig")
+  }
+
   const servers = await syncServers();
   servers.forEach((server) => {
     connectToGbxClient(server.uuid);

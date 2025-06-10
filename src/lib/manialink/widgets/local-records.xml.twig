@@ -14,11 +14,11 @@
       textfont="{{ header.font }}"
     />
     {% for rec in records %}
-      <frame pos="0 -{{ loop.index * (4 + record.padding.top + record.padding.bottom) }}">
+      <frame pos="0 -{{ loop.index * (4 + record.padding.top|padding + record.padding.bottom|padding + 0.5) }}">
         <label
           text="{{ rec.position }}"
-          size="{{ record.position.width }} {{ 4 - record.padding.top - record.padding.bottom }}"
-          pos="2.5 -{{ (4 - record.padding.top - record.padding.bottom) / 2 + 0.25 }}"
+          size="{{ record.position.width|position }} {{ 4 - record.padding.top|padding - record.padding.bottom|padding  + 0.5 }}"
+          pos="2.5 -{{ (4 - record.padding.top|padding + 0.25 - record.padding.bottom|padding) / 2 + 0.25 }}"
           textfont="{{ record.position.font }}"
           valign="center"
           halign="center"
@@ -28,8 +28,8 @@
 
         <label
           text="{{ rec.player }}"
-          size="{{ size.width - 10 - record.player.padding.left - record.player.padding.right - record.position.width }} {{ 4 + record.player.padding.top + record.player.padding.bottom }}"
-          pos="{{ record.position.width + record.player.padding.left }} -{{ (4 + record.player.padding.top + record.player.padding.bottom) / 2 }}"
+          size="{{ size.width - 10 - record.player.padding.left|padding - record.player.padding.right|padding - record.position.width|position }} {{ 4 + record.player.padding.top|padding + record.player.padding.bottom|padding }}"
+          pos="{{ record.position.width|position + record.player.padding.left|padding }} -{{ (4 + record.player.padding.top|padding + record.player.padding.bottom|padding) / 2 }}"
           textfont="{{ record.player.font }}"
           valign="center"
           textsize="1.5"
@@ -37,8 +37,8 @@
         />
         <label
           text="12.123"
-          size="{{ 10 - record.time.padding.left - record.time.padding.right }} {{ 4 - record.time.padding.top - record.time.padding.bottom }}"
-          pos="{{ size.width - 10 - record.time.padding.left }} -{{ (4 - record.time.padding.top - record.time.padding.bottom) / 2  + 0.25 }}"
+          size="{{ 10 - record.time.padding.left|padding - record.time.padding.right|padding }} {{ 4 - record.time.padding.top|padding - record.time.padding.bottom|padding }}"
+          pos="{{ size.width - 10 - record.time.padding.left|padding }} -{{ (4 - record.time.padding.top|padding - record.time.padding.bottom|padding) / 2  + 0.25 }}"
           valign="center"
           textfont="{{ record.time.font }}"
           textcolor="{{ record.time.color }}"
@@ -47,8 +47,8 @@
 
         {% if record.border.bottom %}
           <quad
-            pos="0 -{{ 4 + record.padding.top + record.padding.bottom }}"
-            size="{{ size.width }} {{ record.border.bottom }}"
+            pos="0 -{{ 4 + record.padding.top|padding + record.padding.bottom|border + 0.5 }}"
+            size="{{ size.width }} {{ record.border.bottom|border }}"
             bgcolor="{{ record.border.color }}"
           />
         {% endif %}

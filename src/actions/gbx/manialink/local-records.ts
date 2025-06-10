@@ -1,13 +1,8 @@
 "use server";
 import { getGbxClient } from "@/lib/gbxclient";
+import { environment } from "@/lib/twig";
 import path from "path";
-import twig from "twig";
 import { v4 as uuidv4 } from "uuid";
-
-const template = path.resolve(
-  process.cwd(),
-  "src/lib/manialink/widgets/local-records.xml.twig",
-);
 
 export async function renderLocalRecordsWidget(
   serverUuid: string,
@@ -25,20 +20,20 @@ export async function renderLocalRecordsWidget(
     },
     record: {
       padding: {
-        left: 2 / 4,
-        right: 2 / 4,
-        top: 0 / 4 + 0.25,
-        bottom: 0 / 4 + 0.25,
+        left: 2,
+        right: 2,
+        top: 0,
+        bottom: 0,
       },
       border: {
         color: "8888",
-        bottom: 1 / 4,
-        top: 0 / 4,
-        left: 0 / 4,
-        right: 0 / 4,
+        bottom: 1,
+        top: 0,
+        left: 0,
+        right: 0,
       },
       position: {
-        width: 16 / 3,
+        width: 16,
         font: "RobotoCondensedBold",
         color: "FFF",
       },
@@ -46,34 +41,34 @@ export async function renderLocalRecordsWidget(
         font: "RobotoCondensed",
         color: "FFF",
         padding: {
-          left: 0 / 4,
-          right: 0 / 4,
-          top: 0 / 4,
-          bottom: 0 / 4,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
         },
       },
       time: {
         font: "RobotoCondensedBold",
         color: "0C6",
         padding: {
-          left: 2 / 4,
-          right: 0 / 4,
-          top: 0 / 4,
-          bottom: 0 / 4,
+          left: 2,
+          right: 0,
+          top: 0,
+          bottom: 0,
         },
       },
     },
     id: uuidv4(),
   };
 
-  twig.cache(false);
-
-  const manialink = await new Promise((resolve, reject) => {
-    twig.renderFile(template, data, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const template = environment.loadTemplate(
+    `${path.resolve(
+      process.cwd(),
+      "src/lib/manialink/widgets/local-records.xml.twig",
+    )}`,
+    "utf-8",
+  );
+  const manialink = template.render(environment, new Map(Object.entries(data)));
 
   const client = await getGbxClient(serverUuid);
   await client.call("SendDisplayManialinkPage", manialink, 0, false);

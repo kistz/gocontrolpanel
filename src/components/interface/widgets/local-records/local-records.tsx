@@ -57,6 +57,46 @@ const LocalRecordsWidgetComponent = forwardRef<
       text: "Records",
       font: "RobotoCondensedBold",
     },
+    record: {
+      padding: {
+        left: 2,
+        right: 2,
+        top: 0,
+        bottom: 0,
+      },
+      border: {
+        color: "8888",
+        bottom: 1,
+        top: 0,
+        left: 0,
+        right: 0,
+      },
+      position: {
+        width: 16,
+        font: "RobotoCondensedBold",
+        color: "FFF",
+      },
+      player: {
+        font: "RobotoCondensed",
+        color: "FFF",
+        padding: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+      },
+      time: {
+        font: "RobotoCondensedBold",
+        color: "0C6",
+        padding: {
+          left: 2,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+      },
+    },
   };
   const defaultPosition = getDefaultPosition(
     defaultValues?.positionPercentage,
