@@ -105,13 +105,13 @@ export default function InterfaceEditor({
     Widget: React.ComponentType<InterfaceComponent<T>>,
   ) => {
     const newRef = createRef<T>();
+    widgetRefs.current.push(newRef);
+    const id = crypto.randomUUID();
 
-    setComponents((prev) => {
-      const id = crypto.randomUUID();
-      widgetRefs.current.push(newRef);
-
-      return [...prev, <Widget key={id} uuid={id} ref={newRef} />];
-    });
+    setComponents((prev) => [
+      ...prev,
+      <Widget key={id} uuid={id} ref={newRef} />,
+    ]);
   };
 
   const handleDelete = () => {
