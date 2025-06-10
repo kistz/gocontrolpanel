@@ -309,7 +309,7 @@ export default function InterfaceEditor({
                     </Button>
                   </div>
 
-                  <div className="w-full h-full">
+                  <div className="w-full">
                     {selectedComponent.current?.getEditFields()}
                   </div>
                 </div>

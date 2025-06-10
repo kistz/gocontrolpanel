@@ -1,6 +1,7 @@
 "use client";
 
 import FormElement from "@/components/form/form-element";
+import FourSideInput from "@/components/form/four-side-input";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -53,40 +54,11 @@ export default function LocalRecordsForm({
         <div className="flex flex-col gap-2">
           <span className="font-bold">Record</span>
 
-          <FormElement
+          <FourSideInput
             control={form.control}
-            name={"record.padding.left"}
-            label="Padding Left"
-            type="number"
-            placeholder="0"
-            error={form.formState.errors.record?.padding?.left}
-          />
-
-          <FormElement
-            control={form.control}
-            name={"record.padding.right"}
-            label="Padding Right"
-            type="number"
-            placeholder="0"
-            error={form.formState.errors.record?.padding?.right}
-          />
-
-          <FormElement
-            control={form.control}
-            name={"record.padding.top"}
-            label="Padding Top"
-            type="number"
-            placeholder="0"
-            error={form.formState.errors.record?.padding?.top}
-          />
-
-          <FormElement
-            control={form.control}
-            name={"record.padding.bottom"}
-            label="Padding Bottom"
-            type="number"
-            placeholder="0"
-            error={form.formState.errors.record?.padding?.bottom}
+            name={"record.padding"}
+            label="Padding"
+            errors={form.formState.errors.record?.padding}
           />
         </div>
       </form>
