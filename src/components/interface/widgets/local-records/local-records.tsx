@@ -8,7 +8,9 @@ import {
   EDITOR_DEFAULT_WIDTH,
   InterfaceComponent,
   InterfaceComponentHandles,
-} from "../editor";
+} from "../../editor";
+import LocalRecordsForm from "./local-records-form";
+import { LocalRecordsSchemaType } from "./local-records-schema";
 
 const records = [
   { player: "Marijntje04", time: 121345 },
@@ -26,7 +28,7 @@ const records = [
 export interface LocalRecordsWidgetComponentProps
   extends InterfaceComponent<LocalRecordsWidgetComponentHandles> {
   defaultValues?: {
-    header?: string;
+    attributes?: LocalRecordsSchemaType;
     positionPercentage?: { x: number; y: number };
     sizePercentage?: { width: number; height: number };
   };
@@ -38,7 +40,7 @@ export type LocalRecordsWidgetComponentHandles = Omit<
 > & {
   render: () => {
     id: string;
-    header: string;
+    attributes: LocalRecordsSchemaType;
     positionPercentage: { x: number; y: number };
     sizePercentage: { width: number; height: number };
   };
@@ -50,7 +52,12 @@ const LocalRecordsWidgetComponent = forwardRef<
 >(({ scale, onClick, defaultValues, uuid }, ref) => {
   const id = "local-records-widget";
 
-  const defaultHeader = defaultValues?.header ?? "Records";
+  const defaultAttributes = defaultValues?.attributes ?? {
+    header: {
+      text: "Records",
+      font: "RobotoCondensedBold",
+    },
+  };
   const defaultPosition = getDefaultPosition(
     defaultValues?.positionPercentage,
     { x: EDITOR_DEFAULT_WIDTH - 140, y: 100 },
@@ -61,7 +68,8 @@ const LocalRecordsWidgetComponent = forwardRef<
     height: 182,
   });
 
-  const [header, _] = useState(defaultHeader);
+  const [attributes, setAttributes] =
+    useState<LocalRecordsSchemaType>(defaultAttributes);
   const [position, setPosition] = useState(defaultPosition);
   const [size, setSize] = useState(defaultSize);
 
@@ -80,10 +88,20 @@ const LocalRecordsWidgetComponent = forwardRef<
 
       return {
         id,
-        header,
+        attributes,
         positionPercentage,
         sizePercentage,
       };
+    },
+    getEditFields() {
+      return (
+        <LocalRecordsForm
+          defaultValues={attributes}
+          onChange={(data) => {
+            setAttributes(data);
+          }}
+        />
+      );
     },
   }));
 
@@ -95,6 +113,8 @@ const LocalRecordsWidgetComponent = forwardRef<
         width: defaultSize.width,
         height: defaultSize.height,
       }}
+      position={position}
+      size={size}
       scale={scale ?? 1}
       bounds="parent"
       className="bg-black"
@@ -105,11 +125,9 @@ const LocalRecordsWidgetComponent = forwardRef<
       }}
       onClick={onClick}
     >
-      {header && (
-        <div className="bg-primary text-center font-bold text-[10.5px]">
-          <span>{header}</span>
-        </div>
-      )}
+      <div className="bg-primary text-center font-bold text-[10.5px]">
+        <span>{attributes.header?.text || "\u00A0"}</span>
+      </div>
 
       <div className="h-full">
         {records.map((record, index) => (

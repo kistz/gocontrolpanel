@@ -33,7 +33,7 @@ import {
 import { Separator } from "../ui/separator";
 import LocalRecordsWidgetComponent, {
   LocalRecordsWidgetComponentHandles,
-} from "./widgets/local-records";
+} from "./widgets/local-records/local-records";
 
 export type InterfaceComponent<T = InterfaceComponentHandles> = {
   uuid: string;
@@ -45,6 +45,7 @@ export type InterfaceComponent<T = InterfaceComponentHandles> = {
 export type InterfaceComponentHandles = {
   uuid: string;
   render: () => void;
+  getEditFields: () => React.ReactNode;
 };
 
 export const EDITOR_DEFAULT_WIDTH = 1169;
@@ -174,7 +175,7 @@ export default function InterfaceEditor({
                 uuid={id}
                 ref={newRef}
                 defaultValues={{
-                  header: widgetData.header,
+                  attributes: widgetData.attributes,
                   positionPercentage: widgetData.positionPercentage,
                   sizePercentage: widgetData.sizePercentage,
                 }}
@@ -258,7 +259,7 @@ export default function InterfaceEditor({
             className="rounded-lg"
           />
 
-          {components.map((Comp, i) =>
+          {components.map((Comp) =>
             cloneElement(Comp, {
               scale,
               onClick: () => {
@@ -269,7 +270,10 @@ export default function InterfaceEditor({
         </div>
       </div>
 
-      <Card className="flex-1">
+      <Card
+        className="flex-1"
+        style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
+      >
         <div className="flex flex-col gap-4 p-4 h-full">
           {loading ? (
             <div className="flex items-center justify-center h-full">
@@ -289,7 +293,7 @@ export default function InterfaceEditor({
               </div>
               <Separator />
               {selectedComponent !== null && (
-                <>
+                <div className="overflow-y-scroll">
                   <div className="flex gap-2 justify-between w-full">
                     <h2 className="text-lg font-semibold">
                       {parseComponentId(
@@ -305,8 +309,10 @@ export default function InterfaceEditor({
                     </Button>
                   </div>
 
-                  <div className="flex flex-col gap-2"></div>
-                </>
+                  <div className="w-full h-full">
+                    {selectedComponent.current?.getEditFields()}
+                  </div>
+                </div>
               )}
               <Separator className="mt-auto" />
 
