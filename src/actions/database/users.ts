@@ -118,7 +118,6 @@ export async function getUserByLogin(
 ): Promise<ServerResponse<Users>> {
   return doServerAction(async () => {
     const db = getClient();
-    console.log(login);
     const user = await db.users.findFirstOrThrow({
       where: {
         login,
