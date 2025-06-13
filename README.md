@@ -1,4 +1,18 @@
-# GoControlPanel Docker Compose Setup
+# GoControlPanel
+
+A Dockerized management panel for dedicated Trackmania servers. Works both standalone and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup) and others.
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [New Stack Setup](#new-stack-setup)
+  - [PyPlanet/EvoSC Stack Setup](#pyplanetevosc-stack-setup)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
+# Docker Setup
 
 This repository provides a **Docker Compose** configuration to set up and run **GoControlPanel** and its dependencies using Docker containers.
 
@@ -31,12 +45,14 @@ cd gocontrolpanel
 Make sure to update the environment variables for the services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
+
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
 
 - **GBXConnector Environment Variables**:
+
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
   - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
@@ -51,7 +67,7 @@ Make sure to update the environment variables for the services in your `docker-c
 Run the following command to start all services defined in the `docker-compose.yml` file:
 
 ```bash
-docker compose up -d --build
+sudo docker compose up -d --build
 ```
 
 ### 4. Access the GoControlPanel
@@ -82,7 +98,7 @@ The container name is likely something like `<current-folder>-db-1`.
 1. Log into the database container.
 
 ```bash
-docker exec -it <container-name> mariadb -u root -p
+sudo docker exec -it <container-name> mariadb -u root -p
 ```
 
 > **Note:** The password `secret` is the default, but it may differ depending on your `docker-compose.yml` setup.
@@ -184,6 +200,7 @@ volumes:
 Make sure to update the environment variables for the added services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
+
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
   - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
@@ -220,7 +237,7 @@ The `servers.json` file is used by the **GBXConnector** to configure the servers
 Run the following command to start the services.
 
 ```bash
-docker compose up -d --build
+sudo docker compose up -d --build
 ```
 
 ### 7. Access the GoControlPanel
@@ -234,13 +251,13 @@ That's it! You can now access your **GoControlPanel** at `http://localhost:3000`
 If you encounter any issues, check the logs of a specific service by running:
 
 ```bash
-docker compose logs <service-name>
+sudo docker compose logs <service-name>
 ```
 
 For example, to view the logs of the **GoControlPanel** service:
 
 ```bash
-docker compose logs gocontrolpanel
+sudo docker compose logs gocontrolpanel
 ```
 
 ---
