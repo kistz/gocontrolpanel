@@ -47,15 +47,15 @@ Make sure to update the environment variables for the services in your `docker-c
 - **GoControlPanel Environment Variables**:
 
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
-  - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
-  - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
+  - `CONNECTOR_API_KEY`: API key for the GbxConnector (can be any string).
+  - `DEFAULT_ADMINS`: Comma-separated list of default admin logins. Probably your own login, e.g., `v8vgGbx_TuKkBabAyn7nsQ`.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
 
-- **GBXConnector Environment Variables**:
+- **GbxConnector Environment Variables**:
 
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
-  - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
+  - `INTERNAL_API_KEY`: Internal API key for GbxConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
 
 - **Dedicated Server Environment Variables**:
@@ -69,6 +69,8 @@ Run the following command to start all services defined in the `docker-compose.y
 ```bash
 sudo docker compose up -d --build
 ```
+
+> **Note:** The `--build` flag is only needed on the first run.
 
 ### 4. Access the GoControlPanel
 
@@ -202,19 +204,19 @@ Make sure to update the environment variables for the added services in your `do
 - **GoControlPanel Environment Variables**:
 
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
-  - `CONNECTOR_API_KEY`: API key for the GBXConnector (can be any string).
+  - `CONNECTOR_API_KEY`: API key for the GbxConnector (can be any string).
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
 
-- **GBXConnector Environment Variables**:
+- **GbxConnector Environment Variables**:
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
-  - `INTERNAL_API_KEY`: Internal API key for GBXConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
+  - `INTERNAL_API_KEY`: Internal API key for GbxConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
 
 ### 5. Modify the `servers.json` File
 
-The `servers.json` file is used by the **GBXConnector** to configure the servers it connects to. You will need to modify this file with the correct server details. Paste this configuration into your existing `servers.json` file:
+The `servers.json` file is used by the **GbxConnector** to configure the servers it connects to. You will need to modify this file with the correct server details. Paste this configuration into your existing `servers.json` file:
 
 ```json
 [
