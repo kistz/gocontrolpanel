@@ -47,15 +47,18 @@ export type InterfaceComponentHandles = {
   id: string;
   uuid: string;
   render: (editorRef: HTMLDivElement) => void;
-  getEditFields: () => React.ReactNode;
+  attributesForm: () => React.ReactNode;
 };
 
 export interface ComponentProps {
+  uuid: string;
   scale?: number;
   onClick?: () => void;
 }
 
 export interface ComponentHandles {
+  uuid: string;
+  id: string;
   attributesForm: () => React.ReactNode;
 }
 
@@ -251,7 +254,7 @@ export default function InterfaceEditor({
   return (
     <div className="flex w-full gap-4 flex-col md:flex-row">
       <Card
-        className="flex-1"
+        className="overflow-x-hidden flex-1"
         style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
       >
         <div className="flex flex-col gap-4 p-4 h-full">
@@ -280,6 +283,29 @@ export default function InterfaceEditor({
                 </Button>
               </div>
               <Separator />
+
+              <div className="flex flex-col gap-2">
+                {components.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    No components added yet.
+                  </p>
+                ) : (
+                  components.map((Comp) => {
+                    console.log(Comp);
+                    return (
+                      <Button
+                        key={Comp.key}
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => handleSelect(Comp)}
+                      >
+                        {parseComponentId(Comp.props.ref.current?.id || "") ||
+                          "Unnamed Component"}
+                      </Button>
+                    );
+                  })
+                )}
+              </div>
             </>
           )}
         </div>
@@ -291,7 +317,6 @@ export default function InterfaceEditor({
         style={{
           width: EDITOR_DEFAULT_WIDTH * scale,
           position: "relative",
-          flexShrink: 0,
         }}
       >
         <div
@@ -350,7 +375,7 @@ export default function InterfaceEditor({
                     </div>
 
                     <div className="w-full">
-                      {selectedComponent.current?.getEditFields()}
+                      {selectedComponent.current?.attributesForm()}
                     </div>
                   </div>
                 )}

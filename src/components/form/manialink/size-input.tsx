@@ -13,25 +13,22 @@ export default function SizeInput<TControl extends FieldValues>({
   min = 0,
 }: SizeInputProps<TControl>) {
   return (
-    <div className="flex flex-col gap-1">
-      <span>Size</span>
+    <div className="grid grid-cols-2 gap-2">
+      <FormElement
+        name={`${name}.width` as Path<TControl & FieldValues>}
+        label="Width"
+        type="number"
+        placeholder="0"
+        min={min}
+      />
 
-      <div className="grid grid-cols-2 gap-2">
-        <FormElement
-          name={`${name}.width` as Path<TControl & FieldValues>}
-          label="Width"
-          type="number"
-          placeholder="0"
-          min={min}
-        />
-        <FormElement
-          name={`${name}.height` as Path<TControl & FieldValues>}
-          label="Height"
-          type="number"
-          placeholder="0"
-          min={min}
-        />
-      </div>
+      <FormElement
+        name={`${name}.height` as Path<TControl & FieldValues>}
+        label="Height"
+        type="number"
+        placeholder="0"
+        min={min}
+      />
     </div>
   );
 }

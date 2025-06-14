@@ -2,18 +2,10 @@
 
 import FormElement from "@/components/form/form-element";
 import PositionInput from "@/components/form/manialink/position-input";
-import { UseFormReturn } from "react-hook-form";
-import { DefaultAttributesSchemaType } from "./default-attributes-schema";
 
-interface DefaultAttributesFormProps {
-  form: UseFormReturn<DefaultAttributesSchemaType>;
-}
-
-export default function DefaultAttributesForm({
-  form,
-}: DefaultAttributesFormProps) {
+export default function DefaultAttributesForm() {
   return (
-    <div className="flex flex-col gap-2">
+    <>
       <PositionInput name="pos" min={-1000} />
 
       <FormElement
@@ -27,11 +19,10 @@ export default function DefaultAttributesForm({
 
       <FormElement name="rot" label="Rotation" type="number" placeholder="0" />
 
-      <FormElement name="hidden" label="Hidden" type="checkbox" />
-
       <FormElement name="id" label="Id" placeholder="my-element" />
 
       <FormElement name="class" label="Class" placeholder="my-class" />
-    </div>
+      <FormElement name="hidden" label="Hidden" type="checkbox" />
+    </>
   );
 }

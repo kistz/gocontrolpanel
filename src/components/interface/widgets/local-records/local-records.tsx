@@ -154,7 +154,7 @@ const LocalRecordsWidgetComponent = forwardRef<
         sizePercentage,
       };
     },
-    getEditFields() {
+    attributesForm() {
       return (
         <LocalRecordsForm
           defaultValues={attributes}

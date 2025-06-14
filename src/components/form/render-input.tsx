@@ -122,7 +122,7 @@ export default function RenderInput<TControl extends FieldValues>({
       );
     case "checkbox":
       return (
-        <div className={cn("flex items-center space-x-2", className)}>
+        <div className={cn("flex items-center gap-2", className)}>
           <Checkbox
             id={name}
             disabled={isDisabled || isLoading}

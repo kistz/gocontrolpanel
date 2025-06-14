@@ -12,6 +12,7 @@ import {
 import { capitalizeWords } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import DefaultAttributesForm from "../default-attributes-form";
 import { QuadSchema, QuadSchemaType } from "./quad-schema";
 
 interface QuadFormProps {
@@ -35,6 +36,8 @@ export default function QuadForm({ attributes, onChange }: QuadFormProps) {
     <Form {...form}>
       <form className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
+          <DefaultAttributesForm />
+
           <SizeInput name="size" />
 
           <FormElement
@@ -172,8 +175,7 @@ export default function QuadForm({ attributes, onChange }: QuadFormProps) {
           <FormElement
             name="pinCorners"
             label="Pin Corners"
-            placeholder="0,0,0,0"
-            description="Format: <-0.75,1.>:<1.,1.>:<0.75,-1.>:<-1.,-1.>"
+            placeholder="<-0.75,1.>:<1.,1.>:<0.75,-1.>:<-1.,-1.>"
           />
         </div>
       </form>

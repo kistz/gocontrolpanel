@@ -9,15 +9,18 @@ interface QuadComponentProps extends ComponentProps {
 }
 
 const QuadComponent = forwardRef<ComponentHandles, QuadComponentProps>(
-  ({ scale, onClick, defaultAttributes }, ref) => {
+  ({ scale, onClick, uuid, defaultAttributes }, ref) => {
     const id = "quad-component";
 
     const componentRef = useRef<Rnd | null>(null);
 
-    const [attributes, setAttributes] =
-      useState<QuadSchemaType | undefined>(defaultAttributes);
+    const [attributes, setAttributes] = useState<QuadSchemaType | undefined>(
+      defaultAttributes,
+    );
 
     useImperativeHandle(ref, () => ({
+      uuid,
+      id,
       attributesForm() {
         return <QuadForm attributes={attributes} />;
       },
