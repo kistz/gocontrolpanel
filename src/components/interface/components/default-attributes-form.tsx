@@ -1,12 +1,7 @@
 "use client";
 
-import ClassInput from "@/components/form/manialink/class-input";
-import HiddenInput from "@/components/form/manialink/hidden-input";
-import IdInput from "@/components/form/manialink/id-input";
+import FormElement from "@/components/form/form-element";
 import PositionInput from "@/components/form/manialink/position-input";
-import RotationInput from "@/components/form/manialink/rotation-input";
-import ScaleInput from "@/components/form/manialink/scale-input";
-import ZIndexInput from "@/components/form/manialink/z-index-input";
 import { UseFormReturn } from "react-hook-form";
 import { DefaultAttributesSchemaType } from "./default-attributes-schema";
 
@@ -19,45 +14,24 @@ export default function DefaultAttributesForm({
 }: DefaultAttributesFormProps) {
   return (
     <div className="flex flex-col gap-2">
-      <PositionInput
-        control={form.control}
-        name="pos"
-        label="Position"
-        errors={form.formState.errors.pos}
-        min={-1000}
-      />
+      <PositionInput name="pos" label="Position" min={-1000} />
 
-      <ZIndexInput
-        control={form.control}
+      <FormElement
         name="zIndex"
-        error={form.formState.errors.zIndex}
+        label="Z Index"
+        type="number"
+        placeholder="0"
       />
 
-      <ScaleInput
-        control={form.control}
-        name="scale"
-        error={form.formState.errors.scale}
-      />
+      <FormElement name="scale" label="Scale" type="number" placeholder="1" />
 
-      <RotationInput
-        control={form.control}
-        name="rot"
-        error={form.formState.errors.rot}
-      />
+      <FormElement name="rot" label="Rotation" type="number" placeholder="0" />
 
-      <HiddenInput
-        control={form.control}
-        name="hidden"
-        error={form.formState.errors.hidden}
-      />
+      <FormElement name="hidden" label="Hidden" type="checkbox" />
 
-      <IdInput
-        control={form.control}
-        name="id"
-        error={form.formState.errors.id}
-      />
+      <FormElement name="id" label="Id" placeholder="my-element" />
 
-      <ClassInput name="class" />
+      <FormElement name="class" label="Class" placeholder="my-class" />
     </div>
   );
 }

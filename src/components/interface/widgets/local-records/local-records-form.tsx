@@ -59,13 +59,7 @@ export default function LocalRecordsForm({
         <div className="flex flex-col gap-2">
           <span className="font-bold">Record</span>
 
-          <FourSideInput
-            control={form.control}
-            name={"record.padding"}
-            label="Padding"
-            errors={form.formState.errors.record?.padding}
-            min={0}
-          />
+          <FourSideInput name={"record.padding"} label="Padding" min={0} />
 
           <span className="font-bold">Border</span>
 
@@ -75,13 +69,7 @@ export default function LocalRecordsForm({
             placeholder="8888"
           />
 
-          <FourSideInput
-            control={form.control}
-            name={"record.border"}
-            label="Border"
-            errors={form.formState.errors.record?.border}
-            min={0}
-          />
+          <FourSideInput name={"record.border"} label="Border" min={0} />
 
           <span className="font-bold">Position</span>
 
@@ -133,10 +121,8 @@ export default function LocalRecordsForm({
           />
 
           <FourSideInput
-            control={form.control}
             name={"record.player.padding"}
             label="Padding"
-            errors={form.formState.errors.record?.player?.padding}
             min={0}
           />
         </div>
@@ -161,13 +147,7 @@ export default function LocalRecordsForm({
             placeholder="0C6"
           />
 
-          <FourSideInput
-            control={form.control}
-            name={"record.time.padding"}
-            label="Padding"
-            errors={form.formState.errors.record?.time?.padding}
-            min={0}
-          />
+          <FourSideInput name={"record.time.padding"} label="Padding" min={0} />
         </div>
       </form>
     </Form>
