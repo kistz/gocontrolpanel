@@ -64,12 +64,10 @@ export default function MatchSettingsForm({
     <Form {...matchSettingsForm}>
       <form className="flex flex-col gap-2">
         <FormElement
-          control={matchSettingsForm.control}
           name={"filename"}
           label="Match Settings"
           description="The name of the file to save/load match settings."
           placeholder="matchlist.txt"
-          error={matchSettingsForm.formState.errors.filename}
           className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
           isRequired
         >

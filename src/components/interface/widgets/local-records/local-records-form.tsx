@@ -1,7 +1,7 @@
 "use client";
 
 import FormElement from "@/components/form/form-element";
-import FourSideInput from "@/components/form/four-side-input";
+import FourSideInput from "@/components/form/manialink/four-side-input";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { FONTS } from "@/lib/manialink/attributes";
@@ -37,15 +37,12 @@ export default function LocalRecordsForm({
           <span className="font-bold">Header</span>
 
           <FormElement
-            control={form.control}
             name={"header.text"}
             label="Text"
             placeholder="Records"
-            error={form.formState.errors.header?.text}
           />
 
           <FormElement
-            control={form.control}
             name={"header.font"}
             type="select"
             options={FONTS.map((font) => ({
@@ -54,7 +51,6 @@ export default function LocalRecordsForm({
             }))}
             label="Font"
             placeholder="RobotoCondensedBold"
-            error={form.formState.errors.header?.font}
           />
         </div>
 
@@ -74,11 +70,9 @@ export default function LocalRecordsForm({
           <span className="font-bold">Border</span>
 
           <FormElement
-            control={form.control}
             name={"record.border.color"}
             label="Color"
             placeholder="8888"
-            error={form.formState.errors.record?.border?.color}
           />
 
           <FourSideInput
@@ -92,16 +86,13 @@ export default function LocalRecordsForm({
           <span className="font-bold">Position</span>
 
           <FormElement
-            control={form.control}
             name={"record.position.width"}
             label="Width"
             type="number"
             placeholder="4"
-            error={form.formState.errors.record?.position?.width}
           />
 
           <FormElement
-            control={form.control}
             name={"record.position.font"}
             label="Font"
             type="select"
@@ -110,15 +101,12 @@ export default function LocalRecordsForm({
               label: font,
             }))}
             placeholder="RobotoCondensedBold"
-            error={form.formState.errors.record?.position?.font}
           />
 
           <FormElement
-            control={form.control}
             name={"record.position.color"}
             label="Color"
             placeholder="FFF"
-            error={form.formState.errors.record?.position?.color}
           />
         </div>
 
@@ -128,7 +116,6 @@ export default function LocalRecordsForm({
           <span className="font-bold">Player</span>
 
           <FormElement
-            control={form.control}
             name={"record.player.font"}
             label="Font"
             type="select"
@@ -137,15 +124,12 @@ export default function LocalRecordsForm({
               label: font,
             }))}
             placeholder="RobotoCondensed"
-            error={form.formState.errors.record?.player?.font}
           />
 
           <FormElement
-            control={form.control}
             name={"record.player.color"}
             label="Color"
             placeholder="FFF"
-            error={form.formState.errors.record?.player?.color}
           />
 
           <FourSideInput
@@ -161,7 +145,6 @@ export default function LocalRecordsForm({
           <span className="font-bold">Time</span>
 
           <FormElement
-            control={form.control}
             name={"record.time.font"}
             label="Font"
             type="select"
@@ -170,15 +153,12 @@ export default function LocalRecordsForm({
               label: font,
             }))}
             placeholder="RobotoCondensedBold"
-            error={form.formState.errors.record?.time?.font}
           />
 
           <FormElement
-            control={form.control}
             name={"record.time.color"}
             label="Color"
             placeholder="0C6"
-            error={form.formState.errors.record?.time?.color}
           />
 
           <FourSideInput

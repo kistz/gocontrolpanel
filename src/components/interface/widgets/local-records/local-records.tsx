@@ -1,7 +1,11 @@
 "use client";
 
-import { getDefaultPosition, getDefaultSize } from "@/lib/utils";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import {
+  getAllChildrenProps,
+  getDefaultPosition,
+  getDefaultSize,
+} from "@/lib/interface/utils";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import {
   EDITOR_DEFAULT_HEIGHT,
@@ -38,7 +42,7 @@ export type LocalRecordsWidgetComponentHandles = Omit<
   InterfaceComponentHandles,
   "render"
 > & {
-  render: () => {
+  render: (editorRef: HTMLDivElement) => {
     id: string;
     attributes: LocalRecordsSchemaType;
     positionPercentage: { x: number; y: number };
@@ -51,6 +55,7 @@ const LocalRecordsWidgetComponent = forwardRef<
   LocalRecordsWidgetComponentProps
 >(({ scale, onClick, defaultValues, uuid }, ref) => {
   const id = "local-records-widget";
+  const widgetRef = useRef<Rnd | null>(null);
 
   const defaultAttributes = defaultValues?.attributes ?? {
     header: {
@@ -116,7 +121,22 @@ const LocalRecordsWidgetComponent = forwardRef<
   useImperativeHandle(ref, () => ({
     id,
     uuid,
-    render: () => {
+    render: (editorRef) => {
+      if (!widgetRef.current) {
+        throw new Error("Widget reference is not set");
+      }
+
+      if (!widgetRef.current.resizableElement.current) {
+        throw new Error("Resizable element reference not found");
+      }
+
+      const props = getAllChildrenProps(
+        widgetRef.current.resizableElement.current.children,
+        editorRef,
+      );
+
+      console.log("Props:", props);
+
       const positionPercentage = {
         x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,
         y: (position.y / EDITOR_DEFAULT_HEIGHT) * 100,
@@ -158,15 +178,22 @@ const LocalRecordsWidgetComponent = forwardRef<
       size={size}
       scale={scale ?? 1}
       bounds="parent"
-      className="bg-black"
       onDragStop={(_, d) => setPosition({ x: d.x, y: d.y })}
       onResizeStop={(_, __, ref, ___, position) => {
         setSize({ width: ref.offsetWidth, height: ref.offsetHeight });
         setPosition(position);
       }}
+      ref={widgetRef}
       onClick={onClick}
     >
-      <div className="bg-primary text-center font-bold text-[10.5px]">
+      <div
+        style={{
+          background: "#0C6",
+          textAlign: "center",
+          fontFamily: "RobotoCondensedBold",
+          fontSize: "10.5px",
+        }}
+      >
         <span>{attributes.header?.text || "\u00A0"}</span>
       </div>
 
@@ -174,7 +201,7 @@ const LocalRecordsWidgetComponent = forwardRef<
         {records.map((record, index) => (
           <div
             key={index}
-            className="flex text-[10.5px] items-center"
+            className="flex text-[10.5px] items-center bg-black"
             style={{
               padding: `${attributes.record?.padding?.top ?? 0}px ${attributes.record?.padding?.right ?? 0}px ${attributes.record?.padding?.bottom ?? 0}px ${attributes.record?.padding?.left ?? 0}px`,
               borderBottom: `${

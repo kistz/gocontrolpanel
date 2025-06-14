@@ -52,14 +52,12 @@ export default function EditUserForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormElement
-          control={form.control}
           name={"roles"}
           options={rolesOptions}
           defaultValues={getRoles(user.roles)}
           label="Roles"
           description="The roles of the user."
           placeholder="Select roles"
-          error={form.formState.errors.roles}
           className="w-full min-w-64"
           type="multi-select"
         />

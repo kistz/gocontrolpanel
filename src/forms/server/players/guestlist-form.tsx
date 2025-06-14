@@ -56,10 +56,8 @@ export default function GuestlistForm({ serverUuid }: { serverUuid: string }) {
     <Form {...form}>
       <form className="flex flex-col gap-2">
         <FormElement
-          control={form.control}
           name="filename"
           placeholder="guestlist.txt"
-          error={form.formState.errors.filename}
           className="min-w-64"
           isRequired
         >

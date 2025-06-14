@@ -48,12 +48,10 @@ export default function ShowOpponentsForm({
         className="flex flex-col gap-2"
       >
         <FormElement
-          control={showOpponentsForm.control}
           name={"showOpponents"}
           label="Show Opponents"
           description="The number of opponents to show. 0 is no override, 1 is show all, rest is the number of opponents."
           placeholder="Show Opponents..."
-          error={showOpponentsForm.formState.errors.showOpponents}
           className="w-20"
           isRequired
           type="number"

@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   ControllerRenderProps,
   FieldError,
+  FieldErrorsImpl,
   FieldValues,
   Merge,
 } from "react-hook-form";
@@ -35,7 +36,7 @@ interface RenderInputProps<TControl extends FieldValues> {
   autoFocus?: boolean;
   step?: string;
   min?: number;
-  error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
+  error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
   className?: string;
 }
 

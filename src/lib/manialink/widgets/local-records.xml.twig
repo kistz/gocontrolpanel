@@ -2,7 +2,6 @@
 
 {% block content %}
   <frame pos="0 0">
-    <quad pos="0 0" size="{{ size.width }} {{ size.height }}" bgcolor="000" />
     <quad pos="0 0" size="{{ size.width }} 4" bgcolor="0C6" />
     <label
       text="{{ header.text }}"
@@ -13,12 +12,16 @@
       pos="{{ size.width / 2 }} -1.5"
       textfont="{{ header.font }}"
     />
+
+    {% set rowHeight = 4 + record.padding.top|padding + record.padding.bottom|padding %}
+
     {% for rec in records %}
-      <frame pos="0 -{{ loop.index * (4 + record.padding.top|padding + record.padding.bottom|padding + 0.5) }}">
+      <frame pos="0 -{{ loop.index * rowHeight + (loop.index != 1 ? record.border.bottom is defined ? record.border.bottom|border : 0 : 0) }}">
+        <quad pos="0 0" size="{{ size.width }} {{ rowHeight }}" bgcolor="000" />
         <label
           text="{{ rec.position }}"
           size="{{ record.position.width|position }} {{ 4 - record.padding.top|padding - record.padding.bottom|padding  + 0.5 }}"
-          pos="2.5 -{{ (4 - record.padding.top|padding + 0.25 - record.padding.bottom|padding) / 2 + 0.25 }}"
+          pos="{{ (record.position.width|position / 2 - 1.5)|min(1.5) }} -{{ (4 - record.padding.top|padding + 0.25 - record.padding.bottom|padding) / 2 }}"
           textfont="{{ record.position.font }}"
           valign="center"
           halign="center"
@@ -36,9 +39,9 @@
           textcolor="{{ record.player.color }}"
         />
         <label
-          text="12.123"
+          text="{{ rec.time }}"
           size="{{ 10 - record.time.padding.left|padding - record.time.padding.right|padding }} {{ 4 - record.time.padding.top|padding - record.time.padding.bottom|padding }}"
-          pos="{{ size.width - 10 - record.time.padding.left|padding }} -{{ (4 - record.time.padding.top|padding - record.time.padding.bottom|padding) / 2  + 0.25 }}"
+          pos="{{ size.width - 10 - record.time.padding.left|padding }} -{{ (4 - record.time.padding.top|padding - record.time.padding.bottom|padding) / 2 }}"
           valign="center"
           textfont="{{ record.time.font }}"
           textcolor="{{ record.time.color }}"
@@ -47,7 +50,7 @@
 
         {% if record.border.bottom %}
           <quad
-            pos="0 -{{ 4 + record.padding.top|padding + record.padding.bottom|border + 0.5 }}"
+            pos="0 -{{ 4 + record.padding.top|padding + record.padding.bottom|border }}"
             size="{{ size.width }} {{ record.border.bottom|border }}"
             bgcolor="{{ record.border.color }}"
           />

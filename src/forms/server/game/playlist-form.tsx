@@ -54,12 +54,10 @@ export default function PlaylistForm({ serverUuid }: { serverUuid: string }) {
     <Form {...playlistForm}>
       <form className="flex flex-col gap-2">
         <FormElement
-          control={playlistForm.control}
           name={"filename"}
           label="Playlist"
           description="The name of the file to append/insert playlist."
           placeholder="playlist.txt"
-          error={playlistForm.formState.errors.filename}
           className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
           isRequired
         >

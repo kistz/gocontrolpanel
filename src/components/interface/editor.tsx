@@ -1,8 +1,8 @@
 "use client";
 import { saveInterface } from "@/actions/database/interfaces";
 import { renderInterface } from "@/actions/gbx/manialink/render-interface";
+import { parseComponentId } from "@/lib/interface/utils";
 import { Interfaces } from "@/lib/prisma/generated";
-import { parseComponentId } from "@/lib/utils";
 import {
   IconDeviceFloppy,
   IconEye,
@@ -10,7 +10,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import Image from "next/image";
-import {
+import React, {
   cloneElement,
   createRef,
   JSX,
@@ -45,9 +45,18 @@ export type InterfaceComponent<T = InterfaceComponentHandles> = {
 export type InterfaceComponentHandles = {
   id: string;
   uuid: string;
-  render: () => void;
+  render: (editorRef: HTMLDivElement) => void;
   getEditFields: () => React.ReactNode;
 };
+
+export interface ComponentProps {
+  scale: number;
+  onClick?: () => void;
+}
+
+export interface ComponentHandles {
+  attributesForm: () => React.ReactNode;
+}
 
 export const EDITOR_DEFAULT_WIDTH = 1169;
 export const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
@@ -130,8 +139,13 @@ export default function InterfaceEditor({
       return;
     }
 
+    if (!editorRef.current) {
+      toast.error("Editor not initialized");
+      return;
+    }
+
     const data = widgetRefs.current
-      .map((ref) => ref.current && ref.current.render())
+      .map((ref) => ref.current && ref.current.render(editorRef.current))
       .filter((d) => d !== null && d !== undefined);
 
     const { data: savedInterface, error } = await saveInterface(
@@ -163,7 +177,7 @@ export default function InterfaceEditor({
       const data = JSON.parse(dataString);
       const newComponents: JSX.Element[] = [];
 
-      data.forEach((widgetData: any, i: number) => {
+      data.forEach((widgetData: any) => {
         switch (widgetData.id) {
           case "local-records-widget":
             const newRef = createRef<LocalRecordsWidgetComponentHandles>();

@@ -1,4 +1,4 @@
-import { Control, FieldError, FieldValues, Merge, Path } from "react-hook-form";
+import { Path, useFormContext } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -9,8 +9,7 @@ import {
 } from "../ui/form";
 import RenderInput from "./render-input";
 
-interface FormElementProps<TControl extends FieldValues> {
-  control: Control<TControl>;
+interface FormElementProps<TControl> {
   name: Path<TControl>;
   label?: string;
   description?: string;
@@ -25,13 +24,11 @@ interface FormElementProps<TControl extends FieldValues> {
   autoFocus?: boolean;
   step?: string;
   min?: number;
-  error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
   className?: string;
   children?: React.ReactNode;
 }
 
-export default function FormElement<TControl extends FieldValues>({
-  control,
+export default function FormElement<TControl>({
   name,
   label,
   description,
@@ -46,18 +43,19 @@ export default function FormElement<TControl extends FieldValues>({
   autoFocus = false,
   step,
   min,
-  error,
   className,
   children,
-}: FormElementProps<TControl & FieldValues>) {
+}: FormElementProps<TControl>) {
   if (isHidden) return null;
 
-  const getErrorMessage = (
-    error:
-      | FieldError
-      | Merge<FieldError, (FieldError | undefined)[]>
-      | undefined,
-  ): string | undefined => {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+
+  const error = errors[name];
+
+  const getErrorMessage = (error: any): string | undefined => {
     if (!error) return undefined;
 
     if ("message" in error && typeof error.message === "string") {
@@ -83,7 +81,7 @@ export default function FormElement<TControl extends FieldValues>({
               {label && (
                 <FormLabel
                   className="text-sm flex items-end"
-                  data-error={false}
+                  data-error={!!error}
                 >
                   {label}{" "}
                   {isRequired && (
@@ -114,7 +112,6 @@ export default function FormElement<TControl extends FieldValues>({
                 autoFocus={autoFocus}
                 className={className}
               />
-
               {children}
             </div>
           </FormControl>

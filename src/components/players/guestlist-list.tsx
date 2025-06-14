@@ -2,7 +2,7 @@
 
 import { cleanGuestlist, getGuestlist } from "@/actions/gbx/player";
 import { createColumns } from "@/app/(gocontroller)/server/[uuid]/players/guestlist-columns";
-import GuestlistForm from "@/forms/server/players/guetlist-form";
+import GuestlistForm from "@/forms/server/players/guestlist-form";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
 import { useEffect, useState } from "react";

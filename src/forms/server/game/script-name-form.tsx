@@ -47,7 +47,6 @@ export default function ScriptNameForm({
         className="flex flex-col gap-2"
       >
         <FormElement
-          control={scriptNameForm.control}
           name={"scriptName"}
           label="Script Name"
           description="The name of the script to load."
@@ -55,7 +54,6 @@ export default function ScriptNameForm({
             label: script,
             value: script,
           }))}
-          error={scriptNameForm.formState.errors.scriptName}
           className="w-[200px] min-[500px]:w-1/2"
           type="select"
           isRequired

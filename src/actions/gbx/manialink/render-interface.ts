@@ -1,12 +1,12 @@
 "use server";
 
+import { LocalRecordsSchemaType } from "@/components/interface/widgets/local-records/local-records-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
+import { getManialinkPosition, getManialinkSize } from "@/lib/interface/utils";
 import { Interfaces } from "@/lib/prisma/generated";
-import { getManialinkPosition, getManialinkSize } from "@/lib/utils";
 import { ServerResponse } from "@/types/responses";
 import { renderLocalRecordsWidget } from "./local-records";
-import { LocalRecordsSchemaType } from "@/components/interface/widgets/local-records/local-records-schema";
 
 const records = [
   { position: 1, player: "Marijntje04", time: 12345 },

@@ -12,14 +12,16 @@ export const environment = createSynchronousEnvironment(loader, {
   parserOptions: { level: 3 },
 });
 
+environment.addFilter(createSynchronousFilter("padding", paddingFilter, []));
+environment.addFilter(createSynchronousFilter("position", positionFilter, []));
+environment.addFilter(createSynchronousFilter("border", borderFilter, []));
 environment.addFilter(
-  createSynchronousFilter("padding", paddingFilter, []),
-);
-environment.addFilter(
-  createSynchronousFilter("position", positionFilter, []),
-);
-environment.addFilter(
-  createSynchronousFilter("border", borderFilter, []),
+  createSynchronousFilter("min", minFilter, [
+    {
+      name: "min",
+      defaultValue: 0,
+    },
+  ]),
 );
 
 function paddingFilter(_: TwingSynchronousExecutionContext, value: any) {
@@ -32,4 +34,12 @@ function positionFilter(_: TwingSynchronousExecutionContext, value: any) {
 
 function borderFilter(_: TwingSynchronousExecutionContext, value: any) {
   return value / 4;
+}
+
+function minFilter(
+  _: TwingSynchronousExecutionContext,
+  value: any,
+  min: number,
+) {
+  return Math.max(value, min);
 }
