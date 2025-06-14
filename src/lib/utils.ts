@@ -179,3 +179,10 @@ export function initGbxWebsocketClient(path: string, token: string): WebSocket {
   const baseUri = envUrl && envUrl != "" ? envUrl : "/gbx";
   return new WebSocket(`${baseUri}${path}?token=${token}`);
 }
+
+export function capitalizeWords(str: string): string {
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}

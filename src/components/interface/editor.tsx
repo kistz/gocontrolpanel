@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Separator } from "../ui/separator";
+import QuadComponent from "./components/quad/quad";
 import LocalRecordsWidgetComponent, {
   LocalRecordsWidgetComponentHandles,
 } from "./widgets/local-records/local-records";
@@ -50,7 +51,7 @@ export type InterfaceComponentHandles = {
 };
 
 export interface ComponentProps {
-  scale: number;
+  scale?: number;
   onClick?: () => void;
 }
 
@@ -249,6 +250,41 @@ export default function InterfaceEditor({
 
   return (
     <div className="flex w-full gap-4 flex-col md:flex-row">
+      <Card
+        className="flex-1"
+        style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
+      >
+        <div className="flex flex-col gap-4 p-4 h-full">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-lg font-semibold">Widgets</h2>
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => addWidget(LocalRecordsWidgetComponent)}
+                >
+                  <IconPlus />
+                  Local Records
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => addWidget(QuadComponent)}
+                >
+                  <IconPlus />
+                  Add Quad
+                </Button>
+              </div>
+              <Separator />
+            </>
+          )}
+        </div>
+      </Card>
+
       <div
         ref={editorRef}
         className="relative flex-4 h-full aspect-video overflow-hidden"
@@ -286,7 +322,7 @@ export default function InterfaceEditor({
       </div>
 
       <Card
-        className="flex-1"
+        className="flex-1 overflow-x-hidden"
         style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
       >
         <div className="flex flex-col gap-4 p-4 h-full">
@@ -296,17 +332,6 @@ export default function InterfaceEditor({
             </div>
           ) : (
             <>
-              <h2 className="text-lg font-semibold">Widgets</h2>
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => addWidget(LocalRecordsWidgetComponent)}
-                >
-                  <IconPlus />
-                  Local Records
-                </Button>
-              </div>
-              <Separator />
               {selectedComponent !== null &&
                 selectedComponent.current !== null && (
                   <div className="overflow-y-scroll">

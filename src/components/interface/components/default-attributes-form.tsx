@@ -14,7 +14,7 @@ export default function DefaultAttributesForm({
 }: DefaultAttributesFormProps) {
   return (
     <div className="flex flex-col gap-2">
-      <PositionInput name="pos" label="Position" min={-1000} />
+      <PositionInput name="pos" min={-1000} />
 
       <FormElement
         name="zIndex"
