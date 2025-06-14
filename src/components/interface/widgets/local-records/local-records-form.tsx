@@ -3,13 +3,14 @@
 import FormElement from "@/components/form/form-element";
 import FourSideInput from "@/components/form/four-side-input";
 import { Form } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
+import { FONTS } from "@/lib/manialink/attributes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   LocalRecordsSchema,
   LocalRecordsSchemaType,
 } from "./local-records-schema";
-import { FONTS } from "@/lib/manialink/attributes";
 
 export default function LocalRecordsForm({
   defaultValues,
@@ -56,6 +57,8 @@ export default function LocalRecordsForm({
             error={form.formState.errors.header?.font}
           />
         </div>
+
+        <Separator />
 
         <div className="flex flex-col gap-2">
           <span className="font-bold">Record</span>
@@ -117,7 +120,11 @@ export default function LocalRecordsForm({
             placeholder="FFF"
             error={form.formState.errors.record?.position?.color}
           />
+        </div>
 
+        <Separator />
+
+        <div className="flex flex-col gap-2">
           <span className="font-bold">Player</span>
 
           <FormElement
@@ -148,7 +155,9 @@ export default function LocalRecordsForm({
             errors={form.formState.errors.record?.player?.padding}
             min={0}
           />
-
+        </div>
+        <Separator />
+        <div className="flex flex-col gap-2">
           <span className="font-bold">Time</span>
 
           <FormElement

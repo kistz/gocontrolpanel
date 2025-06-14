@@ -67,7 +67,7 @@ Make sure to update the environment variables for the services in your `docker-c
 Run the following command to start all services defined in the `docker-compose.yml` file:
 
 ```bash
-sudo docker compose up -d --build
+docker compose up -d --build
 ```
 
 > **Note:** The `--build` flag is only needed on the first run.
@@ -100,7 +100,7 @@ The container name is likely something like `<current-folder>-db-1`.
 1. Log into the database container.
 
 ```bash
-sudo docker exec -it <container-name> mariadb -u root -p
+docker exec -it <container-name> mariadb -u root -p
 ```
 
 > **Note:** The password `secret` is the default, but it may differ depending on your `docker-compose.yml` setup.
@@ -239,7 +239,7 @@ The `servers.json` file is used by the **GbxConnector** to configure the servers
 Run the following command to start the services.
 
 ```bash
-sudo docker compose up -d --build
+docker compose up -d --build
 ```
 
 ### 7. Access the GoControlPanel
@@ -253,13 +253,13 @@ That's it! You can now access your **GoControlPanel** at `http://localhost:3000`
 If you encounter any issues, check the logs of a specific service by running:
 
 ```bash
-sudo docker compose logs <service-name>
+docker compose logs <service-name>
 ```
 
 For example, to view the logs of the **GoControlPanel** service:
 
 ```bash
-sudo docker compose logs gocontrolpanel
+docker compose logs gocontrolpanel
 ```
 
 ---
