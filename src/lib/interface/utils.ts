@@ -100,3 +100,17 @@ export function manialinkPositionToEditorPosition(position: {
     y: y * EDITOR_DEFAULT_HEIGHT,
   };
 }
+
+export function manialinkSizeToEditorSize(size: {
+  width: number;
+  height: number;
+}): { width: number; height: number } {
+  const manialinkWidth = 320;
+  const manialinkHeight = 180;
+
+  // Convert to percentage
+  const width = (size.width / manialinkWidth) * EDITOR_DEFAULT_WIDTH;
+  const height = (size.height / manialinkHeight) * EDITOR_DEFAULT_HEIGHT;
+
+  return { width, height };
+}

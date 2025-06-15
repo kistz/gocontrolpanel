@@ -1,4 +1,7 @@
-import { manialinkPositionToEditorPosition } from "@/lib/interface/utils";
+import {
+  manialinkPositionToEditorPosition,
+  manialinkSizeToEditorSize,
+} from "@/lib/interface/utils";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { ComponentHandles, ComponentProps } from "../../editor";
@@ -45,22 +48,26 @@ const QuadComponent = forwardRef<
           y: attributes?.pos?.y ?? 0,
         }) || { x: 0, y: 0 }
       }
-      size={{
-        width: attributes?.size?.width || 100,
-        height: attributes?.size?.height || 40,
-      }}
+      size={manialinkSizeToEditorSize({
+        width: attributes?.size?.width ?? 0,
+        height: attributes?.size?.height ?? 0,
+      })}
       disableDragging={true}
       enableResizing={false}
-      style={{
-        zIndex: attributes?.zIndex,
-        transform: `scale(${scale}) rotate(${attributes?.rot || 0}deg)`,
-        display: attributes?.hidden ? "none" : "block",
-        opacity: attributes?.opacity ? 1 : 0,
-        backgroundImage: `url(${attributes?.image || ""})`,
-        backgroundColor: "#" + attributes?.bgColor,
-        filter: `blur(${attributes?.blurAmount || 0}px)`,
-      }}
-    />
+    >
+      <div
+        className="w-full h-full"
+        style={{
+          zIndex: attributes?.zIndex,
+          transform: `scale(${attributes.scale}) rotate(${attributes?.rot || 0}deg)`,
+          display: attributes?.hidden ? "none" : "flex",
+          opacity: attributes?.opacity ? 1 : 0,
+          backgroundImage: `url(${attributes?.image || ""})`,
+          backgroundColor: "#" + attributes?.bgColor,
+          filter: `blur(${attributes?.blurAmount || 0}px)`,
+        }}
+      />
+    </Rnd>
   );
 });
 
