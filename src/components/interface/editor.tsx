@@ -32,9 +32,7 @@ import {
 } from "../ui/select";
 import { Separator } from "../ui/separator";
 import QuadComponent from "./components/quad/quad";
-import LocalRecordsWidgetComponent, {
-  LocalRecordsWidgetComponentHandles,
-} from "./widgets/local-records/local-records";
+import { QuadSchemaType } from "./components/quad/quad-schema";
 
 export type InterfaceComponent<T = InterfaceComponentHandles> = {
   uuid: string;
@@ -50,17 +48,18 @@ export type InterfaceComponentHandles = {
   attributesForm: () => React.ReactNode;
 };
 
-export interface ComponentProps<T = ComponentHandles, TData = any> {
+export interface ComponentProps<T> {
   uuid: string;
   scale?: number;
   onClick?: () => void;
-  ref?: React.Ref<T>;
-  defaultAttributes?: TData;
+  ref?: React.Ref<ComponentHandles<T>>;
+  defaultAttributes?: T;
 }
 
-export interface ComponentHandles {
+export interface ComponentHandles<T = any> {
   uuid: string;
   id: string;
+  getAttributes: () => T;
   attributesForm: () => React.ReactNode;
 }
 
@@ -125,12 +124,12 @@ export default function InterfaceEditor({
     return () => observer.disconnect();
   }, []);
 
-  const addWidget = <T extends ComponentHandles, TData>(
-    Widget: React.ComponentType<ComponentProps<T, TData>>,
+  const addWidget = <T,>(
+    Widget: React.ComponentType<ComponentProps<T>>,
     label: string,
-    defaultAttributes?: TData,
+    defaultAttributes?: T,
   ) => {
-    const newRef = createRef<T>();
+    const newRef = createRef<ComponentHandles<T>>();
     const id = crypto.randomUUID();
 
     widgetRefs.current.push(newRef);
@@ -211,22 +210,18 @@ export default function InterfaceEditor({
 
       data.forEach((widgetData: any) => {
         switch (widgetData.id) {
-          case "local-records-widget":
-            const newRef = createRef<LocalRecordsWidgetComponentHandles>();
+          case "quad-component":
+            const newRef = createRef<ComponentHandles<QuadSchemaType>>();
             widgetRefs.current.push(newRef);
             const id = crypto.randomUUID();
 
             newComponents.push({
               element: (
-                <LocalRecordsWidgetComponent
+                <QuadComponent
                   key={id}
                   uuid={id}
                   ref={newRef}
-                  defaultValues={{
-                    attributes: widgetData.attributes,
-                    positionPercentage: widgetData.positionPercentage,
-                    sizePercentage: widgetData.sizePercentage,
-                  }}
+                  defaultAttributes={widgetData.defaultAttributes}
                 />
               ),
               uuid: id,

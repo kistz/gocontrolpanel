@@ -6,20 +6,21 @@ import QuadForm from "./quad-form";
 import { QuadSchemaType } from "./quad-schema";
 
 const QuadComponent = forwardRef<
-  ComponentHandles,
+  ComponentHandles<QuadSchemaType>,
   ComponentProps<QuadSchemaType>
 >(({ scale, onClick, uuid, defaultAttributes }, ref) => {
   const id = "quad-component";
 
   const componentRef = useRef<Rnd | null>(null);
 
-  const [attributes, setAttributes] = useState<QuadSchemaType | undefined>(
-    defaultAttributes,
+  const [attributes, setAttributes] = useState<QuadSchemaType>(
+    defaultAttributes ?? {},
   );
 
   useImperativeHandle(ref, () => ({
     uuid,
     id,
+    getAttributes: () => attributes,
     attributesForm() {
       return (
         <QuadForm
