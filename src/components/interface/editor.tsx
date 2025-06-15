@@ -62,6 +62,13 @@ export interface ComponentHandles {
   attributesForm: () => React.ReactNode;
 }
 
+type ComponentEntry = {
+  element: JSX.Element;
+  uuid: string;
+  label: string;
+  ref: React.RefObject<ComponentHandles>;
+};
+
 export const EDITOR_DEFAULT_WIDTH = 1169;
 export const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
@@ -83,9 +90,9 @@ export default function InterfaceEditor({
   const editorRef = useRef<HTMLDivElement>(null);
   const widgetRefs = useRef<React.RefObject<any>[]>([]);
 
-  const [components, setComponents] = useState<JSX.Element[]>([]);
+  const [components, setComponents] = useState<ComponentEntry[]>([]);
   const [selectedComponent, setSelectedComponent] =
-    useState<React.RefObject<ComponentHandles> | null>(null);
+    useState<ComponentEntry | null>(null);
 
   const [scale, setScale] = useState(1);
 
@@ -116,23 +123,34 @@ export default function InterfaceEditor({
     return () => observer.disconnect();
   }, []);
 
-  const addWidget = <T,>(
+  const addWidget = <T extends ComponentHandles>(
     Widget: React.ComponentType<InterfaceComponent<T>>,
+    label: string,
   ) => {
     const newRef = createRef<T>();
-    widgetRefs.current.push(newRef);
     const id = crypto.randomUUID();
+
+    widgetRefs.current.push(newRef);
+
+    const element = <Widget key={id} uuid={id} ref={newRef} />;
 
     setComponents((prev) => [
       ...prev,
-      <Widget key={id} uuid={id} ref={newRef} />,
+      {
+        element,
+        uuid: id,
+        label,
+        ref: newRef as React.RefObject<ComponentHandles>,
+      },
     ]);
   };
 
   const handleDelete = () => {
     if (selectedComponent === null) return;
     setComponents(
-      components.filter((c) => c.key !== selectedComponent.current?.uuid),
+      components.filter(
+        (c) => c.element.key !== selectedComponent.ref.current?.uuid,
+      ),
     );
     setSelectedComponent(null);
   };
@@ -179,7 +197,7 @@ export default function InterfaceEditor({
 
     try {
       const data = JSON.parse(dataString);
-      const newComponents: JSX.Element[] = [];
+      const newComponents: ComponentEntry[] = [];
 
       data.forEach((widgetData: any) => {
         switch (widgetData.id) {
@@ -188,18 +206,23 @@ export default function InterfaceEditor({
             widgetRefs.current.push(newRef);
             const id = crypto.randomUUID();
 
-            newComponents.push(
-              <LocalRecordsWidgetComponent
-                key={id}
-                uuid={id}
-                ref={newRef}
-                defaultValues={{
-                  attributes: widgetData.attributes,
-                  positionPercentage: widgetData.positionPercentage,
-                  sizePercentage: widgetData.sizePercentage,
-                }}
-              />,
-            );
+            newComponents.push({
+              element: (
+                <LocalRecordsWidgetComponent
+                  key={id}
+                  uuid={id}
+                  ref={newRef}
+                  defaultValues={{
+                    attributes: widgetData.attributes,
+                    positionPercentage: widgetData.positionPercentage,
+                    sizePercentage: widgetData.sizePercentage,
+                  }}
+                />
+              ),
+              uuid: id,
+              label: "Local Records Widget",
+              ref: newRef as React.RefObject<ComponentHandles>,
+            });
             break;
           default:
             console.warn(`Unknown widget id: ${widgetData.id}`);
@@ -231,16 +254,14 @@ export default function InterfaceEditor({
     toast.success("Interface rendered successfully");
   };
 
-  const handleSelect = (Comp: JSX.Element) => {
-    const ref = widgetRefs.current.find(
-      (r) => r.current?.uuid === Comp.props.uuid,
-    );
+  const handleSelect = (entry: ComponentEntry) => {
+    const ref = widgetRefs.current.find((r) => r.current?.uuid === entry.uuid);
     if (!ref) {
-      console.warn("Component ref not found:", Comp.props.uuid);
+      console.warn("Component ref not found:", entry.uuid);
       return;
     }
 
-    setSelectedComponent(ref);
+    setSelectedComponent(entry);
   };
 
   useEffect(() => {
@@ -268,7 +289,13 @@ export default function InterfaceEditor({
               <div className="flex flex-col gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => addWidget(LocalRecordsWidgetComponent)}
+                  className="justify-start w-full"
+                  onClick={() =>
+                    addWidget(
+                      LocalRecordsWidgetComponent,
+                      "Local Records Widget",
+                    )
+                  }
                 >
                   <IconPlus />
                   Local Records
@@ -276,7 +303,8 @@ export default function InterfaceEditor({
 
                 <Button
                   variant="outline"
-                  onClick={() => addWidget(QuadComponent)}
+                  className="justify-start w-full"
+                  onClick={() => addWidget(QuadComponent, "Quad Component")}
                 >
                   <IconPlus />
                   Add Quad
@@ -290,20 +318,16 @@ export default function InterfaceEditor({
                     No components added yet.
                   </p>
                 ) : (
-                  components.map((Comp) => {
-                    console.log(Comp);
-                    return (
-                      <Button
-                        key={Comp.key}
-                        variant="outline"
-                        className="w-full justify-start"
-                        onClick={() => handleSelect(Comp)}
-                      >
-                        {parseComponentId(Comp.props.ref.current?.id || "") ||
-                          "Unnamed Component"}
-                      </Button>
-                    );
-                  })
+                  components.map((Comp) => (
+                    <Button
+                      key={Comp.element.key}
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => handleSelect(Comp)}
+                    >
+                      {Comp.label}
+                    </Button>
+                  ))
                 )}
               </div>
             </>
@@ -336,7 +360,7 @@ export default function InterfaceEditor({
           />
 
           {components.map((Comp) =>
-            cloneElement(Comp, {
+            cloneElement(Comp.element, {
               scale,
               onClick: () => {
                 handleSelect(Comp);
@@ -358,12 +382,11 @@ export default function InterfaceEditor({
           ) : (
             <>
               {selectedComponent !== null &&
-                selectedComponent.current !== null && (
+                selectedComponent.ref.current !== null && (
                   <div className="overflow-y-scroll">
                     <div className="flex gap-2 justify-between w-full">
                       <h2 className="text-lg font-semibold">
-                        {parseComponentId(selectedComponent.current?.id) ||
-                          "Selected Component"}
+                        {selectedComponent.label}
                       </h2>
                       <Button
                         size="icon"
@@ -375,7 +398,7 @@ export default function InterfaceEditor({
                     </div>
 
                     <div className="w-full">
-                      {selectedComponent.current?.attributesForm()}
+                      {selectedComponent.ref.current?.attributesForm()}
                     </div>
                   </div>
                 )}
