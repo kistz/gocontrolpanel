@@ -4,33 +4,61 @@ import { ComponentHandles, ComponentProps } from "../../editor";
 import QuadForm from "./quad-form";
 import { QuadSchemaType } from "./quad-schema";
 
-interface QuadComponentProps extends ComponentProps {
-  defaultAttributes?: QuadSchemaType;
-}
+const QuadComponent = forwardRef<
+  ComponentHandles,
+  ComponentProps<QuadSchemaType>
+>(({ scale, onClick, uuid, defaultAttributes }, ref) => {
+  const id = "quad-component";
 
-const QuadComponent = forwardRef<ComponentHandles, QuadComponentProps>(
-  ({ scale, onClick, uuid, defaultAttributes }, ref) => {
-    const id = "quad-component";
+  const componentRef = useRef<Rnd | null>(null);
 
-    const componentRef = useRef<Rnd | null>(null);
+  const [attributes, setAttributes] = useState<QuadSchemaType | undefined>(
+    defaultAttributes,
+  );
 
-    const [attributes, setAttributes] = useState<QuadSchemaType | undefined>(
-      defaultAttributes,
-    );
+  useImperativeHandle(ref, () => ({
+    uuid,
+    id,
+    attributesForm() {
+      return (
+        <QuadForm
+          attributes={attributes}
+          onChange={(data) => {
+            setAttributes(data);
+          }}
+        />
+      );
+    },
+  }));
 
-    useImperativeHandle(ref, () => ({
-      uuid,
-      id,
-      attributesForm() {
-        return <QuadForm attributes={attributes} />;
-      },
-    }));
-
-    return (
-      <Rnd scale={scale} bounds="parent" onClick={onClick} ref={componentRef} />
-    );
-  },
-);
+  return (
+    <Rnd
+      scale={scale}
+      bounds="parent"
+      onClick={onClick}
+      ref={componentRef}
+      position={{
+        x: attributes?.pos?.x || 0,
+        y: attributes?.pos?.y || 0,
+      }}
+      size={{
+        width: attributes?.size?.width || 100,
+        height: attributes?.size?.height || 40,
+      }}
+      disableDragging={true}
+      enableResizing={false}
+      style={{
+        zIndex: attributes?.zIndex,
+        transform: `scale(${scale}) rotate(${attributes?.rot || 0}deg)`,
+        display: attributes?.hidden ? "none" : "block",
+        opacity: attributes?.opacity ? 1 : 0,
+        backgroundImage: `url(${attributes?.image || ""})`,
+        backgroundColor: "#" + attributes?.bgColor,
+        filter: `blur(${attributes?.blurAmount || 0}px)`,
+      }}
+    />
+  );
+});
 
 QuadComponent.displayName = "QuadComponent";
 

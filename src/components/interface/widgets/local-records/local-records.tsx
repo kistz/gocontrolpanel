@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  getAllChildrenProps,
-  getDefaultPosition,
-  getDefaultSize,
-} from "@/lib/interface/utils";
+import { getDefaultPosition, getDefaultSize } from "@/lib/interface/utils";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import {
@@ -121,7 +117,7 @@ const LocalRecordsWidgetComponent = forwardRef<
   useImperativeHandle(ref, () => ({
     id,
     uuid,
-    render: (editorRef) => {
+    render: () => {
       if (!widgetRef.current) {
         throw new Error("Widget reference is not set");
       }
@@ -129,13 +125,6 @@ const LocalRecordsWidgetComponent = forwardRef<
       if (!widgetRef.current.resizableElement.current) {
         throw new Error("Resizable element reference not found");
       }
-
-      const props = getAllChildrenProps(
-        widgetRef.current.resizableElement.current.children,
-        editorRef,
-      );
-
-      console.log("Props:", props);
 
       const positionPercentage = {
         x: (position.x / EDITOR_DEFAULT_WIDTH) * 100,

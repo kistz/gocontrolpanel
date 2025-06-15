@@ -1,8 +1,8 @@
 "use client";
 import { saveInterface } from "@/actions/database/interfaces";
 import { renderInterface } from "@/actions/gbx/manialink/render-interface";
-import { parseComponentId } from "@/lib/interface/utils";
 import { Interfaces } from "@/lib/prisma/generated";
+import { cn } from "@/lib/utils";
 import {
   IconDeviceFloppy,
   IconEye,
@@ -50,10 +50,12 @@ export type InterfaceComponentHandles = {
   attributesForm: () => React.ReactNode;
 };
 
-export interface ComponentProps {
+export interface ComponentProps<T = ComponentHandles, TData = any> {
   uuid: string;
   scale?: number;
   onClick?: () => void;
+  ref?: React.Ref<T>;
+  defaultAttributes?: TData;
 }
 
 export interface ComponentHandles {
@@ -123,16 +125,24 @@ export default function InterfaceEditor({
     return () => observer.disconnect();
   }, []);
 
-  const addWidget = <T extends ComponentHandles>(
-    Widget: React.ComponentType<InterfaceComponent<T>>,
+  const addWidget = <T extends ComponentHandles, TData>(
+    Widget: React.ComponentType<ComponentProps<T, TData>>,
     label: string,
+    defaultAttributes?: TData,
   ) => {
     const newRef = createRef<T>();
     const id = crypto.randomUUID();
 
     widgetRefs.current.push(newRef);
 
-    const element = <Widget key={id} uuid={id} ref={newRef} />;
+    const element = (
+      <Widget
+        key={id}
+        uuid={id}
+        ref={newRef}
+        defaultAttributes={defaultAttributes}
+      />
+    );
 
     setComponents((prev) => [
       ...prev,
@@ -291,20 +301,13 @@ export default function InterfaceEditor({
                   variant="outline"
                   className="justify-start w-full"
                   onClick={() =>
-                    addWidget(
-                      LocalRecordsWidgetComponent,
-                      "Local Records Widget",
-                    )
+                    addWidget(QuadComponent, "Quad Component", {
+                      pos: { x: 0, y: 0 },
+                      size: { width: 100, height: 40 },
+                      bgColor: "000",
+                      opacity: true,
+                    })
                   }
-                >
-                  <IconPlus />
-                  Local Records
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="justify-start w-full"
-                  onClick={() => addWidget(QuadComponent, "Quad Component")}
                 >
                   <IconPlus />
                   Add Quad
@@ -322,7 +325,11 @@ export default function InterfaceEditor({
                     <Button
                       key={Comp.element.key}
                       variant="outline"
-                      className="w-full justify-start"
+                      className={cn(
+                        "justify-start w-full",
+                        selectedComponent?.uuid === Comp.uuid &&
+                          "border-primary!",
+                      )}
                       onClick={() => handleSelect(Comp)}
                     >
                       {Comp.label}
