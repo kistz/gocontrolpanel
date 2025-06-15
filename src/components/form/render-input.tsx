@@ -66,7 +66,10 @@ export default function RenderInput<TControl extends FieldValues>({
           type={type}
           placeholder={placeholder}
           disabled={isDisabled || isLoading}
-          {...field}
+          value={
+            isNaN(field.value) || field.value === undefined ? "" : field.value
+          }
+          onChange={(e) => field.onChange(e.target.valueAsNumber)}
           className={className}
           error={!!error}
           step={step}

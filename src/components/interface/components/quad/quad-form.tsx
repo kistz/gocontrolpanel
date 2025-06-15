@@ -27,6 +27,7 @@ export default function QuadForm({ attributes, onChange }: QuadFormProps) {
   });
 
   form.watch((data) => {
+    console.log(data)
     if (onChange) {
       onChange(data);
     }

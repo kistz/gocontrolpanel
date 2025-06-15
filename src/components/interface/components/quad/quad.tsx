@@ -1,3 +1,4 @@
+import { manialinkPositionToEditorPosition } from "@/lib/interface/utils";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { ComponentHandles, ComponentProps } from "../../editor";
@@ -37,10 +38,12 @@ const QuadComponent = forwardRef<
       bounds="parent"
       onClick={onClick}
       ref={componentRef}
-      position={{
-        x: attributes?.pos?.x || 0,
-        y: attributes?.pos?.y || 0,
-      }}
+      position={
+        manialinkPositionToEditorPosition({
+          x: attributes?.pos?.x ?? 0,
+          y: attributes?.pos?.y ?? 0,
+        }) || { x: 0, y: 0 }
+      }
       size={{
         width: attributes?.size?.width || 100,
         height: attributes?.size?.height || 40,

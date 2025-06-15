@@ -7,12 +7,13 @@ export function getManialinkPosition(positionPercentage: {
   x: number;
   y: number;
 }): { x: number; y: number } {
-  const width = 320;
-  const height = 180;
+  const manialinkWidth = 320;
+  const manialinkHeight = 180;
 
   // 0, 0 is in the middle of the screen
-  const x = (positionPercentage.x / 100) * width - width / 2;
-  const y = ((positionPercentage.y / 100) * height - height / 2) * -1;
+  const x = (positionPercentage.x / 100) * manialinkWidth - manialinkWidth / 2;
+  const y =
+    ((positionPercentage.y / 100) * manialinkHeight - manialinkHeight / 2) * -1;
   return { x, y };
 }
 
@@ -20,11 +21,11 @@ export function getManialinkSize(sizePercentage: {
   width: number;
   height: number;
 }): { width: number; height: number } {
-  const maniaLinkWidth = 320;
-  const maniaLinkHeight = 180;
+  const manialinkWidth = 320;
+  const manialinkHeight = 180;
 
-  const width = (sizePercentage.width / 100) * maniaLinkWidth;
-  const height = (sizePercentage.height / 100) * maniaLinkHeight;
+  const width = (sizePercentage.width / 100) * manialinkWidth;
+  const height = (sizePercentage.height / 100) * manialinkHeight;
 
   return { width, height };
 }
@@ -80,4 +81,24 @@ export function parseComponentId(id: string): string {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+export function manialinkPositionToEditorPosition(position: {
+  x: number;
+  y: number;
+}): { x: number; y: number } {
+  const manialinkWidth = 320;
+  const manialinkHeight = 180;
+
+  console.log(position)
+
+  // Convert to percentage
+  const x = (position.x + manialinkWidth / 2) / manialinkWidth;
+  const y = (position.y * -1 + manialinkHeight / 2) / manialinkHeight;
+
+  // Get the editor position
+  return {
+    x: x * EDITOR_DEFAULT_WIDTH,
+    y: y * EDITOR_DEFAULT_HEIGHT,
+  };
 }
