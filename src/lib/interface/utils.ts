@@ -90,8 +90,6 @@ export function manialinkPositionToEditorPosition(position: {
   const manialinkWidth = 320;
   const manialinkHeight = 180;
 
-  console.log(position)
-
   // Convert to percentage
   const x = (position.x + manialinkWidth / 2) / manialinkWidth;
   const y = (position.y * -1 + manialinkHeight / 2) / manialinkHeight;
