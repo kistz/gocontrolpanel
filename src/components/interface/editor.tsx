@@ -85,7 +85,7 @@ export default function InterfaceEditor({
 
   const [components, setComponents] = useState<JSX.Element[]>([]);
   const [selectedComponent, setSelectedComponent] =
-    useState<React.RefObject<any> | null>(null);
+    useState<React.RefObject<ComponentHandles> | null>(null);
 
   const [scale, setScale] = useState(1);
 

@@ -54,6 +54,17 @@ input[type="number"] {
   appearance: textfield;
 }
 
+input[type="checkbox"][aria-hidden="true"] {
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
