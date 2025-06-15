@@ -66,6 +66,7 @@ const QuadComponent = forwardRef<
         style={{
           zIndex: attributes?.zIndex,
           transform: `scale(${attributes.scale}) rotate(${attributes?.rot || 0}deg)`,
+          transformOrigin: "top left",
           display: attributes?.hidden ? "none" : "flex",
           opacity: attributes?.opacity ? 1 : 0,
           backgroundImage: `url(${attributes?.image || ""})`,

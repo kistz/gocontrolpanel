@@ -1,12 +1,12 @@
 "use server";
 
-import { LocalRecordsSchemaType } from "@/components/interface/widgets/local-records/local-records-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
-import { getManialinkPosition, getManialinkSize } from "@/lib/interface/utils";
 import { Interfaces } from "@/lib/prisma/generated";
+import { environment } from "@/lib/twig";
 import { ServerResponse } from "@/types/responses";
-import { renderLocalRecordsWidget } from "./local-records";
+import path from "path";
+import { renderQuadComponent } from "./components/quad";
 
 const records = [
   { position: 1, player: "Marijntje04", time: 12345 },
@@ -31,20 +31,32 @@ export async function renderInterface(
     const client = await getGbxClient(interfaceData.serverUuid);
     await client.call("SendHideManialinkPage");
 
+    const manialinks: string[] = [];
+
     for (const widgetData of data) {
-      switch (widgetData.id) {
-        case "local-records-widget":
-          await renderLocalRecordsWidget(
-            interfaceData.serverUuid,
-            records,
-            getManialinkPosition(widgetData.positionPercentage),
-            getManialinkSize(widgetData.sizePercentage),
-            widgetData.attributes as LocalRecordsSchemaType,
-          );
+      switch (widgetData.componentId) {
+        case "quad-component":
+          manialinks.push(await renderQuadComponent(widgetData.attributes));
           break;
         default:
-          console.warn(`Unknown widget id: ${widgetData.id}`);
+          console.warn(`Unknown widget id: ${widgetData.componentId}`);
       }
     }
+
+    const template = environment.loadTemplate(
+      `${path.resolve(process.cwd(), "src/lib/manialink/manialink.xml.twig")}`,
+      "utf-8",
+    );
+
+    const manialink = template.render(
+      environment,
+      new Map(
+        Object.entries({
+          manialinks,
+        }),
+      ),
+    );
+
+    await client.call("SendDisplayManialinkPage", manialink, 0, false);
   });
 }
