@@ -59,7 +59,11 @@ export interface ComponentProps<T> {
 export interface ComponentHandles<T = any> {
   uuid: string;
   id: string;
-  getAttributes: () => T;
+  getAttributes: () => {
+    componentId: string;
+    uuid: string;
+    attributes: T;
+  };
   attributesForm: () => React.ReactNode;
 }
 
@@ -176,7 +180,7 @@ export default function InterfaceEditor({
     }
 
     const data = widgetRefs.current
-      .map((ref) => ref.current && ref.current.render(editorRef.current))
+      .map((ref) => ref.current && ref.current.getAttributes())
       .filter((d) => d !== null && d !== undefined);
 
     const { data: savedInterface, error } = await saveInterface(
@@ -209,23 +213,22 @@ export default function InterfaceEditor({
       const newComponents: ComponentEntry[] = [];
 
       data.forEach((widgetData: any) => {
-        switch (widgetData.id) {
+        switch (widgetData.componentId) {
           case "quad-component":
             const newRef = createRef<ComponentHandles<QuadSchemaType>>();
             widgetRefs.current.push(newRef);
-            const id = crypto.randomUUID();
 
             newComponents.push({
               element: (
                 <QuadComponent
-                  key={id}
-                  uuid={id}
+                  key={widgetData.uuid}
+                  uuid={widgetData.uuid}
                   ref={newRef}
-                  defaultAttributes={widgetData.defaultAttributes}
+                  defaultAttributes={widgetData.attributes}
                 />
               ),
-              uuid: id,
-              label: "Local Records Widget",
+              uuid: widgetData.uuid,
+              label: "Quad Component",
               ref: newRef as React.RefObject<ComponentHandles>,
             });
             break;
@@ -275,7 +278,7 @@ export default function InterfaceEditor({
       return;
     }
     loadWidgets(selectedInterface.interfaceString);
-  }, []);
+  }, [selectedInterface]);
 
   return (
     <div className="flex w-full gap-4 flex-col md:flex-row">
@@ -305,7 +308,7 @@ export default function InterfaceEditor({
                   }
                 >
                   <IconPlus />
-                  Add Quad
+                  Quad
                 </Button>
               </div>
               <Separator />

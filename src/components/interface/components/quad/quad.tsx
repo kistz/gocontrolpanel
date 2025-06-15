@@ -23,7 +23,13 @@ const QuadComponent = forwardRef<
   useImperativeHandle(ref, () => ({
     uuid,
     id,
-    getAttributes: () => attributes,
+    getAttributes: () => {
+      return {
+        componentId: id,
+        uuid,
+        attributes,
+      }
+    },
     attributesForm() {
       return (
         <QuadForm
