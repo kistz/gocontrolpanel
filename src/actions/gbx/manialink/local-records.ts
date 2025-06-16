@@ -3,7 +3,6 @@ import { LocalRecordsSchemaType } from "@/components/interface/widgets/local-rec
 import { getGbxClient } from "@/lib/gbxclient";
 import { environment } from "@/lib/twig";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
 
 export async function renderLocalRecordsWidget(
   serverUuid: string,
@@ -17,7 +16,7 @@ export async function renderLocalRecordsWidget(
     pos,
     size,
     ...attributes,
-    id: uuidv4(),
+    id: crypto.randomUUID(),
   };
 
   const template = environment.loadTemplate(

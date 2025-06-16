@@ -52,10 +52,13 @@ export async function renderInterface(
       environment,
       new Map(
         Object.entries({
+          id: interfaceData.id,
           manialinks,
         }),
       ),
     );
+
+    console.log("Rendering Manialink:", manialink);
 
     await client.call("SendDisplayManialinkPage", manialink, 0, false);
   });
