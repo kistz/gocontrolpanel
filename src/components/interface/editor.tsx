@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import {
   IconDeviceFloppy,
   IconEye,
+  IconLayoutSidebar,
+  IconLayoutSidebarRight,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
@@ -100,6 +102,9 @@ export default function InterfaceEditor({
     useState<ComponentEntry | null>(null);
 
   const [scale, setScale] = useState(1);
+
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   const onInterfaceChange = (value: string) => {
     const newInterface = interfaces.find((i) => i.id === value);
@@ -278,195 +283,223 @@ export default function InterfaceEditor({
   }, [selectedInterface]);
 
   return (
-    <div className="flex w-full gap-4 flex-col md:flex-row">
-      <Card
-        className="overflow-x-hidden flex-1"
-        style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
-      >
-        <div className="flex flex-col gap-4 p-4 h-full">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">Loading...</p>
-            </div>
-          ) : (
-            <>
-              <h2 className="text-lg font-semibold">Widgets</h2>
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  className="justify-start w-full"
-                  onClick={() =>
-                    addWidget(QuadComponent, "Quad Component", {
-                      pos: { x: 0, y: 0 },
-                      size: { width: 100, height: 40 },
-                      bgColor: "000",
-                      opacity: true,
-                    })
-                  }
+    <div className="flex flex-col gap-2">
+      <Card className="flex flex-row justify-between px-4 py-2 items-center">
+        <div className="flex gap-2">
+          <span
+            className="sr-only"
+            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+          >
+            Toggle Left Sidebar
+          </span>
+          <IconLayoutSidebar
+            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+          />
+          <span
+            className="sr-only"
+            onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+          >
+            Toggle Right Sidebar
+          </span>
+          <IconLayoutSidebarRight
+            onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+          />
+        </div>
+
+        <div className="flex gap-2">
+          <Select
+            onValueChange={onInterfaceChange}
+            defaultValue={selectedInterface?.id || ""}
+            disabled={loading}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select interface" />
+            </SelectTrigger>
+            <SelectContent>
+              {interfaces?.map((i) => (
+                <SelectItem
+                  key={i.id}
+                  value={i.id}
+                  className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
                 >
-                  <IconPlus />
-                  Quad
-                </Button>
-              </div>
-              <Separator />
+                  {i.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              <div className="flex flex-col gap-2">
-                {components.length === 0 ? (
-                  <p className="text-muted-foreground">
-                    No components added yet.
-                  </p>
-                ) : (
-                  components.map((Comp) => (
-                    <Button
-                      key={Comp.element.key}
-                      variant="outline"
-                      className={cn(
-                        " justify-between w-full",
-                        selectedComponent?.uuid === Comp.uuid &&
-                          "border-primary!",
-                      )}
-                      onClick={() => handleSelect(Comp)}
-                    >
-                      {Comp.label}
+          <Modal>
+            <CreateInterfaceModal
+              serverUuid={serverUuid}
+              onSubmit={(newInterface?: Interfaces) => {
+                if (!newInterface) return;
+                setInterfaces((prev) => [...prev, newInterface]);
+              }}
+            />
+            <Button size="icon" variant={"outline"}>
+              <IconPlus />
+              <span className="sr-only">Create New Interface</span>
+            </Button>
+          </Modal>
+        </div>
 
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          handleDelete(Comp.uuid);
-                        }}
-                      >
-                        <IconTrash />
-                      </span>
-                    </Button>
-                  ))
-                )}
-              </div>
-            </>
-          )}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            disabled={!selectedInterface}
+            onClick={render}
+            className="flex-1"
+          >
+            <IconEye />
+            Render
+          </Button>
+
+          <Button
+            onClick={onSave}
+            disabled={!selectedInterface}
+            className="flex-1"
+          >
+            <IconDeviceFloppy />
+            Save
+          </Button>
         </div>
       </Card>
 
-      <div
-        ref={editorRef}
-        className="relative flex-4 h-full aspect-video overflow-hidden"
-        style={{
-          width: EDITOR_DEFAULT_WIDTH * scale,
-          position: "relative",
-        }}
-      >
+      <div className="flex w-full gap-2 flex-col md:flex-row">
+        <Card
+          className={cn(
+            "overflow-x-hidden",
+            leftSidebarOpen ? "flex-1" : "hidden w-0",
+          )}
+          style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
+        >
+          <div className="flex flex-col gap-4 p-4 h-full">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-muted-foreground">Loading...</p>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-lg font-semibold">Widgets</h2>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="justify-start w-full"
+                    onClick={() =>
+                      addWidget(QuadComponent, "Quad Component", {
+                        pos: { x: 0, y: 0 },
+                        size: { width: 100, height: 40 },
+                        bgColor: "000",
+                        opacity: true,
+                      })
+                    }
+                  >
+                    <IconPlus />
+                    Quad
+                  </Button>
+                </div>
+                <Separator />
+
+                <div className="flex flex-col gap-2">
+                  {components.length === 0 ? (
+                    <p className="text-muted-foreground">
+                      No components added yet.
+                    </p>
+                  ) : (
+                    components.map((Comp) => (
+                      <Button
+                        key={Comp.element.key}
+                        variant="outline"
+                        className={cn(
+                          " justify-between w-full",
+                          selectedComponent?.uuid === Comp.uuid &&
+                            "border-primary!",
+                        )}
+                        onClick={() => handleSelect(Comp)}
+                      >
+                        {Comp.label}
+
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            handleDelete(Comp.uuid);
+                          }}
+                        >
+                          <IconTrash />
+                        </span>
+                      </Button>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </Card>
+
         <div
+          ref={editorRef}
+          className="relative flex-4 h-full aspect-video overflow-hidden"
           style={{
-            aspectRatio: "16 / 9",
-            width: EDITOR_DEFAULT_WIDTH,
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
+            width: EDITOR_DEFAULT_WIDTH * scale,
             position: "relative",
           }}
         >
-          <Image
-            src="/tm-background.png"
-            alt="Interface Background"
-            fill
-            className="rounded-lg"
-          />
+          <div
+            style={{
+              aspectRatio: "16 / 9",
+              width: EDITOR_DEFAULT_WIDTH,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              position: "relative",
+            }}
+          >
+            <Image
+              src="/tm-background.png"
+              alt="Interface Background"
+              fill
+              className="rounded-lg"
+            />
 
-          {components.map((Comp) =>
-            cloneElement(Comp.element, {
-              scale,
-              onClick: () => {
-                handleSelect(Comp);
-              },
-            }),
-          )}
+            {components.map((Comp) =>
+              cloneElement(Comp.element, {
+                scale,
+                onClick: () => {
+                  handleSelect(Comp);
+                },
+              }),
+            )}
+          </div>
         </div>
-      </div>
 
-      <Card
-        className="flex-1 overflow-x-hidden"
-        style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
-      >
-        <div className="flex flex-col gap-4 p-4 h-full">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">Loading...</p>
-            </div>
-          ) : (
-            <>
-              {selectedComponent !== null &&
-                selectedComponent.ref.current !== null && (
-                  <div
-                    key={selectedComponent.uuid}
-                    className="overflow-y-scroll w-full"
-                  >
-                    {selectedComponent.ref.current?.attributesForm()}
-                  </div>
-                )}
-              <Separator className="mt-auto" />
-
-              <div className="flex gap-2 flex-col">
-                <div className="w-full flex gap-2">
-                  <Select
-                    onValueChange={onInterfaceChange}
-                    defaultValue={selectedInterface?.id || ""}
-                    disabled={loading}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select interface" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {interfaces?.map((i) => (
-                        <SelectItem
-                          key={i.id}
-                          value={i.id}
-                          className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
-                        >
-                          {i.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Modal>
-                    <CreateInterfaceModal
-                      serverUuid={serverUuid}
-                      onSubmit={(newInterface?: Interfaces) => {
-                        if (!newInterface) return;
-                        setInterfaces((prev) => [...prev, newInterface]);
-                      }}
-                    />
-                    <Button size="icon">
-                      <IconPlus />
-                      <span className="sr-only">Create New Interface</span>
-                    </Button>
-                  </Modal>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    disabled={!selectedInterface}
-                    onClick={render}
-                    className="flex-1"
-                  >
-                    <IconEye />
-                    Render
-                  </Button>
-
-                  <Button
-                    onClick={onSave}
-                    disabled={!selectedInterface}
-                    className="flex-1"
-                  >
-                    <IconDeviceFloppy />
-                    Save
-                  </Button>
-                </div>
+        <Card
+          className={cn(
+            "overflow-x-hidden",
+            rightSidebarOpen ? "flex-1" : "hidden w-0",
+          )}
+          style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
+        >
+          <div className="flex flex-col gap-4 p-4 h-full">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-muted-foreground">Loading...</p>
               </div>
-            </>
-          )}
-        </div>
-      </Card>
+            ) : (
+              <>
+                {selectedComponent !== null &&
+                  selectedComponent.ref.current !== null && (
+                    <div
+                      key={selectedComponent.uuid}
+                      className="overflow-y-scroll w-full"
+                    >
+                      {selectedComponent.ref.current?.attributesForm()}
+                    </div>
+                  )}
+              </>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
