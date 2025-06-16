@@ -480,19 +480,23 @@ export default function InterfaceEditor({
           style={{ maxHeight: `${EDITOR_DEFAULT_HEIGHT * scale}px` }}
         >
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">Loading...</p>
+            <div className="flex items-center justify-center h-full p-4">
+              <p className="text-muted-foreground text-center">Loading...</p>
+            </div>
+          ) : selectedComponent !== null &&
+            selectedComponent.ref.current !== null ? (
+            <div
+              key={selectedComponent.uuid}
+              className="overflow-y-scroll w-full flex flex-col gap-4 p-4 h-full"
+            >
+              {selectedComponent.ref.current?.attributesForm()}
             </div>
           ) : (
-            selectedComponent !== null &&
-            selectedComponent.ref.current !== null && (
-              <div
-                key={selectedComponent.uuid}
-                className="overflow-y-scroll w-full flex flex-col gap-4 p-4 h-full"
-              >
-                {selectedComponent.ref.current?.attributesForm()}
-              </div>
-            )
+            <div className="flex items-center justify-center h-full p-4">
+              <p className="text-muted-foreground text-center">
+                Select a component to edit its attributes.
+              </p>
+            </div>
           )}
         </Card>
       </div>
