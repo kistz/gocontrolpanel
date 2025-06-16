@@ -69,7 +69,7 @@ export default function RenderInput<TControl extends FieldValues>({
           {...field}
           onChange={(e) =>
             type === "number"
-              ? field.onChange(e.target.valueAsNumber)
+              ? field.onChange(e.target.valueAsNumber ?? "")
               : field.onChange(e.target.value)
           }
           className={className}

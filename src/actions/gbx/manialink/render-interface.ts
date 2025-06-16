@@ -58,8 +58,6 @@ export async function renderInterface(
       ),
     );
 
-    console.log("Rendering Manialink:", manialink);
-
     await client.call("SendDisplayManialinkPage", manialink, 0, false);
   });
 }
