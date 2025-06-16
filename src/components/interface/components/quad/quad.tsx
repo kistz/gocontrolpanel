@@ -63,13 +63,15 @@ const QuadComponent = forwardRef<
       })}
       disableDragging={true}
       enableResizing={false}
+      style={{
+        zIndex: attributes?.zIndex || 0,
+      }}
     >
       <div
         className="w-full h-full"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         style={{
-          zIndex: attributes?.zIndex,
           transform: `scale(${attributes.scale || 1}) rotate(${attributes?.rot || 0}deg) translateX(${getTranslateX(attributes.hAlign)}%) translateY(${getTranslateY(attributes.vAlign)}%)`,
           transformOrigin: "top left",
           display: attributes?.hidden ? "none" : "flex",

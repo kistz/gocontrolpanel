@@ -158,14 +158,11 @@ export default function InterfaceEditor({
     ]);
   };
 
-  const handleDelete = () => {
-    if (selectedComponent === null) return;
-    setComponents(
-      components.filter(
-        (c) => c.element.key !== selectedComponent.ref.current?.uuid,
-      ),
-    );
-    setSelectedComponent(null);
+  const handleDelete = (uuid: string) => {
+    setComponents(components.filter((c) => c.element.key !== uuid));
+    if (selectedComponent?.uuid === uuid) {
+      setSelectedComponent(null);
+    }
   };
 
   const onSave = async () => {
@@ -324,13 +321,23 @@ export default function InterfaceEditor({
                       key={Comp.element.key}
                       variant="outline"
                       className={cn(
-                        "justify-start w-full",
+                        " justify-between w-full",
                         selectedComponent?.uuid === Comp.uuid &&
                           "border-primary!",
                       )}
                       onClick={() => handleSelect(Comp)}
                     >
                       {Comp.label}
+
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          handleDelete(Comp.uuid);
+                        }}
+                      >
+                        <IconTrash />
+                      </span>
                     </Button>
                   ))
                 )}
@@ -388,23 +395,11 @@ export default function InterfaceEditor({
             <>
               {selectedComponent !== null &&
                 selectedComponent.ref.current !== null && (
-                  <div className="overflow-y-scroll">
-                    <div className="flex gap-2 justify-between w-full">
-                      <h2 className="text-lg font-semibold">
-                        {selectedComponent.label}
-                      </h2>
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        onClick={handleDelete}
-                      >
-                        <IconTrash />
-                      </Button>
-                    </div>
-
-                    <div className="w-full">
-                      {selectedComponent.ref.current?.attributesForm()}
-                    </div>
+                  <div
+                    key={selectedComponent.uuid}
+                    className="overflow-y-scroll w-full"
+                  >
+                    {selectedComponent.ref.current?.attributesForm()}
                   </div>
                 )}
               <Separator className="mt-auto" />
