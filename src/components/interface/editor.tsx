@@ -2,7 +2,7 @@
 import { saveInterface } from "@/actions/database/interfaces";
 import { renderInterface } from "@/actions/gbx/manialink/render-interface";
 import { Interfaces } from "@/lib/prisma/generated";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import {
   IconDeviceFloppy,
   IconEye,
@@ -254,14 +254,19 @@ export default function InterfaceEditor({
       return;
     }
 
-    const { error } = await renderInterface(selectedInterface);
-    if (error) {
-      console.error("Failed to render interface:", error);
-      toast.error("Failed to render interface");
-      return;
-    }
+    try {
+      const { error } = await renderInterface(selectedInterface);
+      if (error) {
+        throw new Error(error);
+      }
 
-    toast.success("Interface rendered successfully");
+      toast.success("Interface rendered successfully");
+    } catch (error) {
+      console.error("Failed to render interface:", error);
+      toast.error("Failed to render interface", {
+        description: getErrorMessage(error),
+      });
+    }
   };
 
   const handleSelect = (entry: ComponentEntry) => {

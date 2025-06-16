@@ -4,7 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Interfaces } from "@/lib/prisma/generated";
 import { environment } from "@/lib/twig";
-import { ServerResponse } from "@/types/responses";
+import { ServerError, ServerResponse } from "@/types/responses";
 import path from "path";
 import { renderQuadComponent } from "./components/quad";
 
@@ -25,6 +25,10 @@ export async function renderInterface(
   interfaceData: Interfaces,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
+    if (!interfaceData.interfaceString) {
+      throw new ServerError("No components found in the interface.");
+    }
+
     const data = JSON.parse(interfaceData.interfaceString);
 
     // Hide any existing Manialink pages before rendering the new interface
