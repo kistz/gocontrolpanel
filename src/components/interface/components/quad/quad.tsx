@@ -1,4 +1,6 @@
 import {
+  getTranslateX,
+  getTranslateY,
   manialinkPositionToEditorPosition,
   manialinkSizeToEditorSize,
 } from "@/lib/interface/utils";
@@ -28,7 +30,7 @@ const QuadComponent = forwardRef<
         componentId: id,
         uuid,
         attributes,
-      }
+      };
     },
     attributesForm() {
       return (
@@ -41,9 +43,6 @@ const QuadComponent = forwardRef<
       );
     },
   }));
-
-  const translateX = attributes?.hAlign === "center" ? -50 : 0;
-  const translateY = attributes?.vAlign === "center" ? -50 : 0;
 
   return (
     <Rnd
@@ -68,7 +67,7 @@ const QuadComponent = forwardRef<
         className="w-full h-full"
         style={{
           zIndex: attributes?.zIndex,
-          transform: `scale(${attributes.scale || 1}) rotate(${attributes?.rot || 0}deg) translateX(${translateX}%) translateY(${translateY}%)`,
+          transform: `scale(${attributes.scale || 1}) rotate(${attributes?.rot || 0}deg) translateX(${getTranslateX(attributes.hAlign)}%) translateY(${getTranslateY(attributes.vAlign)}%)`,
           transformOrigin: "top left",
           display: attributes?.hidden ? "none" : "flex",
           opacity: attributes?.opacity ? 1 : 0,

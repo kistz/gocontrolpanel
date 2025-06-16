@@ -114,3 +114,26 @@ export function manialinkSizeToEditorSize(size: {
 
   return { width, height };
 }
+
+export function getTranslateX(hAlign?: string): number {
+  switch (hAlign) {
+    case "center":
+      return -50;
+    case "right":
+      return -100;
+    default:
+      return 0;
+  }
+}
+
+export function getTranslateY(vAlign?: string): number {
+  switch (vAlign) {
+    case "center":
+    case "center2":
+      return -50;
+    case "bottom":
+      return -100;
+    default:
+      return 0;
+  }
+}
