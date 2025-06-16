@@ -25,15 +25,15 @@ export async function renderInterface(
   interfaceData: Interfaces,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    if (!interfaceData.interfaceString) {
-      throw new ServerError("No components found in the interface.");
-    }
-
-    const data = JSON.parse(interfaceData.interfaceString);
-
     // Hide any existing Manialink pages before rendering the new interface
     const client = await getGbxClient(interfaceData.serverUuid);
     await client.call("SendHideManialinkPage");
+
+    if (!interfaceData.interfaceString) {
+      return;
+    }
+
+    const data = JSON.parse(interfaceData.interfaceString);
 
     const manialinks: string[] = [];
 
