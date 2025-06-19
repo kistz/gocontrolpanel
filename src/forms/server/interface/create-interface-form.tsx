@@ -52,12 +52,10 @@ export default function CreateInterfaceForm({
         className="flex flex-col gap-4"
       >
         <FormElement
-          control={form.control}
           name={"name"}
           label="Name"
           description="The name of the interface."
           placeholder="Enter interface name"
-          error={form.formState.errors.name}
           isRequired
         />
 
