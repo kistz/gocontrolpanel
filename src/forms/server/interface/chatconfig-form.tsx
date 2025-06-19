@@ -72,22 +72,18 @@ export default function ChatConfigForm({
         className="flex flex-col gap-6"
       >
         <FormElement
-          control={form.control}
           name={"manualRouting"}
           label="Manual Routing"
           description="Enable manual routing for chat messages."
-          error={form.formState.errors.manualRouting}
           type="checkbox"
           isRequired
         />
 
         <div>
           <FormElement
-            control={form.control}
             name={"messageFormat"}
             label="Message Format"
             description="Define the format for chat messages. Available variables: {login}, {nickName}, {message}."
-            error={form.formState.errors.messageFormat}
             type="text"
             placeholder="{nickName}: {message}"
             className="max-w-128"
@@ -102,11 +98,9 @@ export default function ChatConfigForm({
 
         <div>
           <FormElement
-            control={form.control}
             name={"connectMessage"}
             label="Connect Message"
             description="Message sent when a player connects. Available variables: {login}, {nickName}."
-            error={form.formState.errors.connectMessage}
             type="text"
             placeholder="Welcome to the server {nickName}!"
             className="max-w-128"
@@ -121,11 +115,9 @@ export default function ChatConfigForm({
 
         <div>
           <FormElement
-            control={form.control}
             name={"disconnectMessage"}
             label="Disconnect Message"
             description="Message sent when a player disconnects. Available variables: {login}, {nickName}."
-            error={form.formState.errors.disconnectMessage}
             type="text"
             placeholder="Goodbye {nickName}!"
             className="max-w-128"
