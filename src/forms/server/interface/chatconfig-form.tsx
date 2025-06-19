@@ -83,7 +83,7 @@ export default function ChatConfigForm({
           <FormElement
             name={"messageFormat"}
             label="Message Format"
-            description="Define the format for chat messages. Available variables: {login}, {nickName}, {message}."
+            description="Requires manual routing to be enabled. Define the format for chat messages. Available variables: {login}, {nickName}, {message}."
             type="text"
             placeholder="{nickName}: {message}"
             className="max-w-128"
