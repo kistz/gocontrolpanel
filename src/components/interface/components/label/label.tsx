@@ -81,7 +81,7 @@ const LabelComponent = forwardRef<
           justifyContent: getAlignHorizontal(attributes?.hAlign),
           opacity: attributes?.opacity ? 1 : 0,
           fontFamily: attributes?.textFont,
-          fontSize: attributes?.textSize,
+          fontSize: attributes?.textSize ? 4 + attributes.textSize * 5 : 16,
           lineHeight: 1,
           color: "#" + attributes?.textColor,
           backgroundColor: isHovered
