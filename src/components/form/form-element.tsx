@@ -22,8 +22,9 @@ interface FormElementProps<TControl> {
   isHidden?: boolean;
   isLoading?: boolean;
   autoFocus?: boolean;
-  step?: string;
+  step?: number;
   min?: number;
+  max?: number;
   className?: string;
   children?: React.ReactNode;
 }
@@ -43,6 +44,7 @@ export default function FormElement<TControl>({
   autoFocus = false,
   step,
   min,
+  max,
   className,
   children,
 }: FormElementProps<TControl>) {
@@ -108,6 +110,7 @@ export default function FormElement<TControl>({
                 isLoading={isLoading}
                 step={step}
                 min={min}
+                max={max}
                 error={error}
                 autoFocus={autoFocus}
                 className={className}

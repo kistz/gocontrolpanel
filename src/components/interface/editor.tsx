@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Separator } from "../ui/separator";
+import LabelComponent from "./components/label/label";
 import QuadComponent from "./components/quad/quad";
 import { QuadSchemaType } from "./components/quad/quad-schema";
 
@@ -234,6 +235,24 @@ export default function InterfaceEditor({
               ref: newRef as React.RefObject<ComponentHandles>,
             });
             break;
+          case "label-component":
+            const labelRef = createRef<ComponentHandles>();
+            widgetRefs.current.push(labelRef);
+
+            newComponents.push({
+              element: (
+                <LabelComponent
+                  key={widgetData.uuid}
+                  uuid={widgetData.uuid}
+                  ref={labelRef}
+                  defaultAttributes={widgetData.attributes}
+                />
+              ),
+              uuid: widgetData.uuid,
+              label: "Label Component",
+              ref: labelRef as React.RefObject<ComponentHandles>,
+            });
+            break;
           default:
             console.warn(`Unknown widget id: ${widgetData.id}`);
         }
@@ -401,6 +420,21 @@ export default function InterfaceEditor({
                   >
                     <IconPlus />
                     Quad
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="justify-start w-full"
+                    onClick={() =>
+                      addWidget(LabelComponent, "Label Component", {
+                        pos: { x: 0, y: 0 },
+                        size: { width: 100, height: 40 },
+                        opacity: true,
+                        text: "Label",
+                      })
+                    }
+                  >
+                    <IconPlus />
+                    Label
                   </Button>
                 </div>
                 <Separator />

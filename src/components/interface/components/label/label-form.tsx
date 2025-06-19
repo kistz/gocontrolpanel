@@ -3,21 +3,21 @@
 import FormElement from "@/components/form/form-element";
 import SizeInput from "@/components/form/manialink/size-input";
 import { Form } from "@/components/ui/form";
-import { BLENDS, H_ALIGN, KEEP_RATIO } from "@/lib/manialink/attributes";
+import { FONTS, H_ALIGN, V_ALIGN } from "@/lib/manialink/attributes";
 import { capitalizeWords } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import DefaultAttributesForm from "../default-attributes-form";
-import { QuadSchema, QuadSchemaType } from "./quad-schema";
+import { LabelSchema, LabelSchemaType } from "./label-schema";
 
-interface QuadFormProps {
-  attributes?: QuadSchemaType;
-  onChange?: (attributes: QuadSchemaType) => void;
+interface LabelFormProps {
+  attributes?: LabelSchemaType;
+  onChange?: (attributes: LabelSchemaType) => void;
 }
 
-export default function QuadForm({ attributes, onChange }: QuadFormProps) {
-  const form = useForm<QuadSchemaType>({
-    resolver: zodResolver(QuadSchema),
+export default function LabelForm({ attributes, onChange }: LabelFormProps) {
+  const form = useForm<LabelSchemaType>({
+    resolver: zodResolver(LabelSchema),
     defaultValues: attributes,
   });
 
@@ -49,19 +49,18 @@ export default function QuadForm({ attributes, onChange }: QuadFormProps) {
             name={"vAlign"}
             label="Vertical Align"
             type="select"
-            options={H_ALIGN.map((o) => ({
+            options={V_ALIGN.map((o) => ({
               label: capitalizeWords(o),
               value: o,
             }))}
           />
-
-          <FormElement name="opacity" label="Opacity" type="checkbox" />
 
           <FormElement
             name="scriptEvents"
             label="Script Events"
             type="checkbox"
           />
+          <FormElement name="opacity" label="Opacity" type="checkbox" />
 
           <FormElement name="action" label="Action" placeholder="myAction" />
 
@@ -83,96 +82,94 @@ export default function QuadForm({ attributes, onChange }: QuadFormProps) {
             placeholder="EventType'EventData1'EventData2'EventData3'…"
           />
 
-          <FormElement
-            name="image"
-            label="Image"
-            placeholder="https://example.com/image.png"
-          />
-
-          <FormElement
-            name="imageFocus"
-            label="Image Focus"
-            placeholder="https://example.com/image-focus.png"
-          />
-
-          <FormElement
-            name="alphaMask"
-            label="Alpha Mask"
-            placeholder="https://example.com/alpha-mask.png"
-          />
-
-          <FormElement
-            name="bgColor"
-            label="Background Color"
-            placeholder="FFFFFF"
-          />
-
-          <FormElement
-            name="bgColorFocus"
-            label="Background Color Focus"
-            placeholder="FFFFFF"
-          />
-
-          <FormElement
-            name="blurAmount"
-            label="Blur Amount"
-            type="number"
-            placeholder="0"
-            min={0}
-          />
-
-          <FormElement
-            name="blend"
-            label="Blend Mode"
-            type="select"
-            options={BLENDS.map((o) => {
-              return { label: capitalizeWords(o), value: o };
-            })}
-          />
-
           <FormElement name="style" label="Style" placeholder="myStyle" />
 
           <FormElement
-            name="subStyle"
-            label="Sub Style"
-            placeholder="mySubStyle"
+            name="textFont"
+            label="Text Font"
+            type="select"
+            options={FONTS.map((font) => ({
+              label: capitalizeWords(font),
+              value: font,
+            }))}
           />
 
           <FormElement
-            name="styleSelected"
-            label="Style Selected"
-            type="checkbox"
+            name="textSize"
+            label="Text Size"
+            type="number"
+            min={0}
+            placeholder="12"
           />
 
-          <FormElement name="colorize" label="Colorize" placeholder="FFFFFF" />
-
           <FormElement
-            name="modulateColor"
-            label="Modulate Color"
+            name="textColor"
+            label="Text Color"
             placeholder="FFFFFF"
           />
 
-          <FormElement name="autoScale" label="Auto Scale" type="checkbox" />
-
           <FormElement
-            name="keepRatio"
-            label="Keep Ratio"
-            type="select"
-            options={KEEP_RATIO.map((o) => {
-              return { label: capitalizeWords(o), value: o };
-            })}
+            name="focusAreaColor1"
+            label="Focus Area Color 1"
+            placeholder="FFFFFF"
           />
 
           <FormElement
-            name="autoScaleFixedWidth"
-            label="Auto Scale Fixed Width"
+            name="focusAreaColor2"
+            label="Focus Area Color 2"
+            placeholder="FFFFFF"
+          />
+
+          <FormElement name="text" label="Text" placeholder="Hello, World!" />
+
+          <FormElement
+            name="textPrefix"
+            label="Text Prefix"
+            placeholder="Prefix: "
+          />
+
+          <FormElement name="textEmboss" label="Text Emboss" type="checkbox" />
+
+          <FormElement
+            name="autoNewLine"
+            label="Auto New Line"
             type="checkbox"
           />
 
           <FormElement
-            name="pinCorners"
-            label="Pin Corners"
-            placeholder="<-0.75,1.>:<1.,1.>:<0.75,-1.>:<-1.,-1.>"
+            name="lineSpacing"
+            label="Line Spacing"
+            type="number"
+            min={0}
+            placeholder="0"
+          />
+
+          <FormElement
+            name="maxLine"
+            label="Max Line"
+            type="number"
+            min={1}
+            placeholder="1"
+          />
+
+          <FormElement name="translate" label="Translate" type="checkbox" />
+
+          <FormElement name="textId" label="Text Id" placeholder="myTextId" />
+
+          <FormElement
+            name="appendEllipsis"
+            label="Append Ellipsis"
+            type="checkbox"
+          />
+
+          <FormElement
+            name="italicSlope"
+            label="Italic Slope"
+            type="number"
+            min={-1}
+            max={1}
+            step={0.01}
+            placeholder="0"
           />
         </div>
       </form>

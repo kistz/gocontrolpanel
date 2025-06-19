@@ -137,3 +137,28 @@ export function getTranslateY(vAlign?: string): number {
       return 0;
   }
 }
+
+export function getAlignHorizontal(
+  hAlign?: string,
+): "start" | "center" | "end" {
+  switch (hAlign) {
+    case "center":
+      return "center";
+    case "right":
+      return "end";
+    default:
+      return "start";
+  }
+}
+
+export function getAlignVertical(vAlign?: string): "start" | "center" | "end" {
+  switch (vAlign) {
+    case "center":
+    case "center2":
+      return "center";
+    case "bottom":
+      return "end";
+    default:
+      return "start";
+  }
+}
