@@ -10,7 +10,6 @@ import {
   ServerError,
   ServerResponse,
 } from "@/types/responses";
-import { ObjectId } from "mongodb";
 
 export async function getAllMaps(): Promise<ServerResponse<Maps[]>> {
   return doServerAction(async () => {
@@ -223,7 +222,7 @@ export async function getMapList(
             );
 
             newMaps.push({
-              id: new ObjectId().toString(),
+              id: crypto.randomUUID(),
               name: mapInfo.Name || "Unknown",
               uid: mapInfo.UId,
               fileName: mapInfo.FileName || "",

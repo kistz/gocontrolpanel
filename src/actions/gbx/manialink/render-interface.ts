@@ -3,11 +3,12 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Interfaces } from "@/lib/prisma/generated";
-import { environment } from "@/lib/twig";
 import { ServerResponse } from "@/types/responses";
+import fs from "fs/promises";
 import path from "path";
 import { renderLabelComponent } from "./components/label";
 import { renderQuadComponent } from "./components/quad";
+import { Handlebars } from "@/lib/handlebars";
 
 export async function renderInterface(
   interfaceData: Interfaces,
@@ -38,20 +39,16 @@ export async function renderInterface(
       }
     }
 
-    const template = environment.loadTemplate(
-      `${path.resolve(process.cwd(), "src/lib/manialink/manialink.xml.twig")}`,
-      "utf-8",
+    const templatePath = path.resolve(
+      process.cwd(),
+      "src/lib/manialink/manialink.hbs",
     );
-
-    const manialink = template.render(
-      environment,
-      new Map(
-        Object.entries({
-          id: interfaceData.id,
-          manialinks,
-        }),
-      ),
-    );
+    const templateSource = await fs.readFile(templatePath, "utf-8");
+    const template = Handlebars.compile(templateSource);
+    const manialink = template({
+      id: interfaceData.id,
+      manialinks,
+    });
 
     await client.call("SendDisplayManialinkPage", manialink, 0, false);
   });

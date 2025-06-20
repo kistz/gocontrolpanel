@@ -8,7 +8,6 @@ import {
   ServerError,
   ServerResponse,
 } from "@/types/responses";
-import { ObjectId } from "mongodb";
 
 export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
   return doServerAction(async () => {
@@ -151,7 +150,6 @@ export async function createUserAuth(
 
     const newUser = {
       ...user,
-      id: new ObjectId().toString(),
       roles: getRoles(user.roles),
       createdAt: new Date(),
       updatedAt: new Date(),
