@@ -25,18 +25,24 @@ export default async function ServerInterfacePage({
         </h4>
       </div>
 
-      <Tabs defaultValue="widgets" className="w-full h-full">
+      <Tabs defaultValue="interface" className="w-full h-full">
         <TabsList className="w-full">
-          <TabsTrigger value="widgets">Widgets</TabsTrigger>
+          <TabsTrigger value="interface">Interface</TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="widgets" className="flex flex-col gap-6 h-full">
-          <InterfaceEditor
-            serverUuid={uuid}
-            defaultInterface={interfaces[0]}
-            defaultInterfaces={interfaces}
-          />
+        <TabsContent value="interface" className="flex flex-col gap-6 h-full">
+          {process.env.NODE_ENV === "development" ? (
+            <InterfaceEditor
+              serverUuid={uuid}
+              defaultInterface={interfaces[0]}
+              defaultInterfaces={interfaces}
+            />
+          ) : (
+            <span className="text-muted-foreground">
+              Interface editor is still in development.
+            </span>
+          )}
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">

@@ -96,7 +96,7 @@ export default function InterfaceEditor({
   const [interfaces, setInterfaces] = useState<Interfaces[]>(defaultInterfaces);
 
   const editorRef = useRef<HTMLDivElement>(null);
-  const widgetRefs = useRef<React.RefObject<any>[]>([]);
+  const componentRefs = useRef<React.RefObject<any>[]>([]);
 
   const [components, setComponents] = useState<ComponentEntry[]>([]);
   const [selectedComponent, setSelectedComponent] =
@@ -134,18 +134,18 @@ export default function InterfaceEditor({
     return () => observer.disconnect();
   }, []);
 
-  const addWidget = <T,>(
-    Widget: React.ComponentType<ComponentProps<T>>,
+  const addComponent = <T,>(
+    Component: React.ComponentType<ComponentProps<T>>,
     label: string,
     defaultAttributes?: T,
   ) => {
     const newRef = createRef<ComponentHandles<T>>();
     const id = crypto.randomUUID();
 
-    widgetRefs.current.push(newRef);
+    componentRefs.current.push(newRef);
 
     const element = (
-      <Widget
+      <Component
         key={id}
         uuid={id}
         ref={newRef}
@@ -182,7 +182,7 @@ export default function InterfaceEditor({
       return;
     }
 
-    const data = widgetRefs.current
+    const data = componentRefs.current
       .map((ref) => ref.current && ref.current.getAttributes())
       .filter((d) => d !== null && d !== undefined);
 
@@ -205,7 +205,7 @@ export default function InterfaceEditor({
     );
   };
 
-  const loadWidgets = (dataString: string) => {
+  const loadComponents = (dataString: string) => {
     if (!dataString) {
       setLoading(false);
       return;
@@ -215,54 +215,54 @@ export default function InterfaceEditor({
       const data = JSON.parse(dataString);
       const newComponents: ComponentEntry[] = [];
 
-      data.forEach((widgetData: any) => {
-        switch (widgetData.componentId) {
+      data.forEach((componentData: any) => {
+        switch (componentData.componentId) {
           case "quad-component":
             const newRef = createRef<ComponentHandles<QuadSchemaType>>();
-            widgetRefs.current.push(newRef);
+            componentRefs.current.push(newRef);
 
             newComponents.push({
               element: (
                 <QuadComponent
-                  key={widgetData.uuid}
-                  uuid={widgetData.uuid}
+                  key={componentData.uuid}
+                  uuid={componentData.uuid}
                   ref={newRef}
-                  defaultAttributes={widgetData.attributes}
+                  defaultAttributes={componentData.attributes}
                 />
               ),
-              uuid: widgetData.uuid,
+              uuid: componentData.uuid,
               label: "Quad Component",
               ref: newRef as React.RefObject<ComponentHandles>,
             });
             break;
           case "label-component":
             const labelRef = createRef<ComponentHandles>();
-            widgetRefs.current.push(labelRef);
+            componentRefs.current.push(labelRef);
 
             newComponents.push({
               element: (
                 <LabelComponent
-                  key={widgetData.uuid}
-                  uuid={widgetData.uuid}
+                  key={componentData.uuid}
+                  uuid={componentData.uuid}
                   ref={labelRef}
-                  defaultAttributes={widgetData.attributes}
+                  defaultAttributes={componentData.attributes}
                 />
               ),
-              uuid: widgetData.uuid,
+              uuid: componentData.uuid,
               label: "Label Component",
               ref: labelRef as React.RefObject<ComponentHandles>,
             });
             break;
           default:
-            console.warn(`Unknown widget id: ${widgetData.id}`);
+            console.warn(`Unknown component id: ${componentData.id}`);
         }
       });
 
       setComponents(newComponents);
       setLoading(false);
     } catch (error) {
-      console.error("Failed to parse widget data:", error);
-      toast.error("Failed to load widgets");
+      console.error("Failed to parse component data:", error);
+      toast.error("Failed to load components");
       setLoading(false);
     }
   };
@@ -289,7 +289,7 @@ export default function InterfaceEditor({
   };
 
   const handleSelect = (entry: ComponentEntry) => {
-    const ref = widgetRefs.current.find((r) => r.current?.uuid === entry.uuid);
+    const ref = componentRefs.current.find((r) => r.current?.uuid === entry.uuid);
     if (!ref) {
       console.warn("Component ref not found:", entry.uuid);
       return;
@@ -303,7 +303,7 @@ export default function InterfaceEditor({
       setLoading(false);
       return;
     }
-    loadWidgets(selectedInterface.interfaceString);
+    loadComponents(selectedInterface.interfaceString);
   }, [selectedInterface]);
 
   return (
@@ -404,13 +404,13 @@ export default function InterfaceEditor({
               </div>
             ) : (
               <>
-                <h2 className="text-lg font-semibold">Widgets</h2>
+                <h2 className="text-lg font-semibold">Components</h2>
                 <div className="flex flex-col gap-2">
                   <Button
                     variant="outline"
                     className="justify-start w-full"
                     onClick={() =>
-                      addWidget(QuadComponent, "Quad Component", {
+                      addComponent(QuadComponent, "Quad Component", {
                         pos: { x: 0, y: 0 },
                         size: { width: 100, height: 40 },
                         bgColor: "000",
@@ -425,7 +425,7 @@ export default function InterfaceEditor({
                     variant="outline"
                     className="justify-start w-full"
                     onClick={() =>
-                      addWidget(LabelComponent, "Label Component", {
+                      addComponent(LabelComponent, "Label Component", {
                         pos: { x: 0, y: 0 },
                         size: { width: 100, height: 40 },
                         opacity: true,
@@ -497,7 +497,7 @@ export default function InterfaceEditor({
               src="/tm-background.png"
               alt="Interface Background"
               fill
-              className="rounded-lg"
+              className="rounded-xl"
             />
 
             {components.map((Comp) =>
