@@ -24,7 +24,10 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
     data.filter((fileEntry: FileEntry) => !fileEntry.isDir),
   );
 
-  const [selectedItem, setSelectedItem] = useState<FileEntry | null>(null);
+  const [selectedItems, setSelectedItems] = useState<FileEntry[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null,
+  );
 
   const [dragActive, setDragActive] = useState(false);
 
@@ -79,11 +82,20 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
     [serverUuid, path],
   );
 
-  const handleSelect = (fileEntry: FileEntry) => {
-    if (selectedItem?.path === fileEntry.path) {
-      setSelectedItem(null);
+  const handleSelect = (
+    e: React.MouseEvent,
+    fileEntry: FileEntry,
+    index: number,
+  ) => {
+    if (e.shiftKey && lastSelectedIndex !== null) {
+      const allItems = [...folders, ...files];
+      const start = Math.min(lastSelectedIndex, index);
+      const end = Math.max(lastSelectedIndex, index);
+      const newSelected = allItems.slice(start, end + 1);
+      setSelectedItems(newSelected);
     } else {
-      setSelectedItem(fileEntry);
+      setSelectedItems([fileEntry]);
+      setLastSelectedIndex(index);
     }
   };
 
@@ -109,6 +121,11 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
     e.preventDefault();
     setDragActive(false);
   };
+
+  useEffect(() => {
+    setSelectedItems([]);
+    setLastSelectedIndex(null);
+  }, [path]);
 
   return (
     <div
@@ -137,8 +154,8 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
         />
 
         <Actions
-          selectedItem={selectedItem}
-          setSelectedItem={setSelectedItem}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
           setFolders={setFolders}
           setFiles={setFiles}
           serverUuid={serverUuid}
@@ -160,15 +177,15 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
               <h1 className="font-bold">Folders</h1>
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
-              {folders.map((fileEntry: FileEntry) => (
+              {folders.map((fileEntry: FileEntry, index) => (
                 <FolderCard
                   key={fileEntry.path}
                   fileEntry={fileEntry}
                   serverUuid={serverUuid}
-                  active={selectedItem?.path === fileEntry.path}
-                  onClick={() => {
-                    handleSelect(fileEntry);
-                  }}
+                  active={selectedItems.some(
+                    (item) => item.path === fileEntry.path,
+                  )}
+                  onClick={(e) => handleSelect(e, fileEntry, index)}
                 />
               ))}
             </div>
@@ -181,17 +198,20 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
               <h1 className="font-bold">Files</h1>
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
-              {files.map((fileEntry: FileEntry) => (
-                <FileCard
-                  key={fileEntry.path}
-                  fileEntry={fileEntry}
-                  serverUuid={serverUuid}
-                  active={selectedItem?.path === fileEntry.path}
-                  onClick={() => {
-                    handleSelect(fileEntry);
-                  }}
-                />
-              ))}
+              {files.map((fileEntry: FileEntry, index) => {
+                const fileIndex = folders.length + index;
+                return (
+                  <FileCard
+                    key={fileEntry.path}
+                    fileEntry={fileEntry}
+                    serverUuid={serverUuid}
+                    active={selectedItems.some(
+                      (item) => item.path === fileEntry.path,
+                    )}
+                    onClick={(e) => handleSelect(e, fileEntry, fileIndex)}
+                  />
+                );
+              })}
             </div>
           </>
         )}

@@ -147,7 +147,7 @@ export async function saveFileText(
 
 export async function deleteEntry(
   serverUuid: string,
-  path: string,
+  paths: string[],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const fileManager = await getFileManager(serverUuid);
@@ -160,7 +160,7 @@ export async function deleteEntry(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify([path]),
+      body: JSON.stringify(paths),
     });
 
     if (res.status !== 200) {

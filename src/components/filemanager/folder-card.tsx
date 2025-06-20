@@ -4,6 +4,7 @@ import { routes } from "@/routes";
 import { FileEntry } from "@/types/filemanager";
 import { IconFolder } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function FolderCard({
   fileEntry,
@@ -13,7 +14,7 @@ export default function FolderCard({
 }: {
   fileEntry: FileEntry;
   serverUuid: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   active?: boolean;
 }) {
   const router = useRouter();
