@@ -183,6 +183,10 @@ export async function removeMap(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverUuid);
+    const mapList = await client.call("GetMapList", 2, 0);
+    if (mapList.length < 2) {
+      throw new ServerError("Cannot remove the last map from the server");
+    }
     await client.call("RemoveMap", filename);
   });
 }
