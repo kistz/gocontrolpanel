@@ -1,7 +1,7 @@
 "use client";
 
 import FormElement from "@/components/form/form-element";
-import { Control, FieldError, FieldValues, Merge, Path } from "react-hook-form";
+import { FieldValues, Path } from "react-hook-form";
 
 export default function FourSideInput<TControl extends FieldValues>({
   name,
