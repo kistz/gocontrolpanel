@@ -71,7 +71,7 @@ Manage your server files, including uploading, deleting and editing files.
 
 **Interface Editor**
 
-Edit the interface of your server, create your own interface and manage chat message formatting.
+Edit the interface of your server, create your own interface (still in development) and manage chat message formatting.
 
 ![Interface Editor Page](https://i.imgur.com/sqmN4VB.png "Interface Editor Page")
 ![Chat Message Editor Page](https://i.imgur.com/NPPVIez.png "Chat Message Editor Page")
