@@ -35,7 +35,7 @@ ENV DATABASE_URL=$DATABASE_URL
 ARG DB_TYPE
 ENV DB=$DB_TYPE
 
-# RUN bun run generate
+RUN bun run generate
 
 RUN bun run build;
 
