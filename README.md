@@ -4,13 +4,89 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-  - [New Stack Setup](#new-stack-setup)
-  - [PyPlanet/EvoSC Stack Setup](#pyplanetevosc-stack-setup)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
+- [Overview](#overview)
+  - [Features](#features)
+    - [Server Settings](#server-settings)
+    - [Game Management](#game-management)
+    - [Maps Management](#maps-management)
+    - [Player Management](#player-management)
+    - [Live Match](#live-match)
+    - [Files Management](#files-management)
+    - [Interface Editor](#interface-editor)
+    - [User Management](#user-management)
+    - [Server Management](#server-management)
+- [Docker Setup](#docker-setup)
+  - [Prerequisites](#prerequisites)
+  - [Getting Started](#getting-started)
+    - [New Stack Setup](#new-stack-setup)
+    - [PyPlanet/EvoSC Stack Setup](#pyplanetevosc-stack-setup)
+  - [Troubleshooting](#troubleshooting)
+  - [Contributing](#contributing)
+  - [License](#license)
+
+# Overview
+
+**GoControlPanel** is a management panel designed for dedicated Trackmania servers. It provides an easy-to-use interface for managing server settings, players andd maps. The panel can be run as a standalone service or integrated with other server controllers like **PyPlanet** or **EvoSC**.
+
+## Features
+
+**Server Settings**
+
+Manage your general server settings like the server name, password, and other configurations.
+
+![Settings Page](https://i.imgur.com/iguu7Az.png "Settings Page")
+
+**Game Management**
+
+Manage your game settings, this includes map management and mode settings.
+
+![Game Page](https://i.imgur.com/23ZazeQ.png "Game Page")
+![Mode Settings Page](https://i.imgur.com/VeDGg0x.png "Mode Settings Page")
+
+**Maps Management**
+
+Manage your maps, including adding local maps, changing map order and a jukebox.
+
+![Maps Page](https://i.imgur.com/ptCwgvj.png "Maps Page")
+![Map Jukebox Page](https://i.imgur.com/lVazn2e.png "Map Jukebox Page")
+
+**Player Management**
+
+Manage your players, including banning players and managing blacklists and guestlists.
+
+![Players Page](https://i.imgur.com/hreZiWz.png "Players Page")
+
+**Live Match**
+
+Monitor live matches, including player scores and match status.
+
+![Live Match Page](https://i.imgur.com/YN2o70M.png "Live Match Page")
+
+**Files Management**
+
+Manage your server files, including uploading, deleting and editing files.
+
+![Files Page](https://i.imgur.com/gN4Tt0W.png "Files Page")
+![File Editor Page](https://i.imgur.com/TEaogHH.png "File Editor Page")
+
+**Interface Editor**
+
+Edit the interface of your server, create your own interface and manage chat message formatting.
+
+![Interface Editor Page](https://i.imgur.com/sqmN4VB.png "Interface Editor Page")
+![Chat Message Editor Page](https://i.imgur.com/NPPVIez.png "Chat Message Editor Page")
+
+**User Management**
+
+Manage users, including adding new users, managing roles and permissions.
+
+![User Management Page](https://i.imgur.com/aOoWkWl.png "User Management Page")
+
+**Server Management**
+
+Manage your servers, add new servers and configure the server settings.
+
+![Server Management Page](https://i.imgur.com/3XMGL6m.png "Server Management Page")
 
 # Docker Setup
 
