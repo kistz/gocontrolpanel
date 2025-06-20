@@ -25,16 +25,16 @@ export async function renderInterface(
 
     const manialinks: string[] = [];
 
-    for (const widgetData of data) {
-      switch (widgetData.componentId) {
+    for (const componentData of data) {
+      switch (componentData.componentId) {
         case "quad-component":
-          manialinks.push(await renderQuadComponent(widgetData.attributes));
+          manialinks.push(await renderQuadComponent(componentData.attributes));
           break;
         case "label-component":
-          manialinks.push(await renderLabelComponent(widgetData.attributes));
+          manialinks.push(await renderLabelComponent(componentData.attributes));
           break;
         default:
-          console.warn(`Unknown widget id: ${widgetData.componentId}`);
+          console.warn(`Unknown component id: ${componentData.componentId}`);
       }
     }
 
