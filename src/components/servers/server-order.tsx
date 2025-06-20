@@ -44,9 +44,9 @@ export default function ServerOrder({ servers }: { servers: Server[] }) {
   async function refetchServers() {
     const updatedServers = await getServers();
     const updatedServerOrder = serverOrder
-      .filter((server) => updatedServers.some((s) => s.id == server.id))
+      .filter((server) => updatedServers.some((s) => s.uuid == server.uuid))
       .map((server) => {
-        const updatedServer = updatedServers.find((s) => s.id === server.id);
+        const updatedServer = updatedServers.find((s) => s.uuid === server.uuid);
         return updatedServer ? { ...server, ...updatedServer } : server;
       });
     setServerOrder(updatedServerOrder);

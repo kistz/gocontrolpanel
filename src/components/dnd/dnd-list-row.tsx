@@ -9,14 +9,14 @@ interface DndListRowProps<TData> {
   id: string | number;
   row: TData;
   columns: DndListColumn<TData>[];
-  serverId?: number;
+  serverUuid?: string;
 }
 
 export default function DndListRow<TData>({
   id,
   row,
   columns,
-  serverId,
+  serverUuid,
 }: DndListRowProps<TData>) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -49,7 +49,7 @@ export default function DndListRow<TData>({
           aria-describedby=""
         >
           {column.cell ? (
-            createElement(column.cell, { data: row, serverId })
+            createElement(column.cell, { data: row, serverUuid })
           ) : (
             <span className="truncate text-sm">
               {row[column.id as keyof TData] as string}

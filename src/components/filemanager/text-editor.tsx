@@ -16,11 +16,11 @@ import FilesBreadcrumbs from "./breadcrumbs";
 export default function TextEditor({
   path,
   defaultText = "",
-  serverId,
+  serverUuid,
 }: {
   path: string;
   defaultText: string;
-  serverId: number;
+  serverUuid: string;
 }) {
   const { resolvedTheme } = useTheme();
   const router = useRouter();
@@ -40,13 +40,13 @@ export default function TextEditor({
   const handleCancel = () => {
     const parentPath = path.split("/").slice(0, -1).join("/");
     router.push(
-      `${generatePath(routes.servers.files, { id: serverId })}?path=${parentPath}`,
+      `${generatePath(routes.servers.files, { uuid: serverUuid })}?path=${parentPath}`,
     );
   };
 
   const handleSave = async () => {
     try {
-      const { error } = await saveFileText(serverId, path, text);
+      const { error } = await saveFileText(serverUuid, path, text);
 
       if (error) {
         throw new Error("Failed to save file");
@@ -113,7 +113,7 @@ export default function TextEditor({
       <div className="flex flex-row items-center justify-between w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
-          serverId={serverId}
+          serverUuid={serverUuid}
         />
         <div className="flex gap-2">
           <Button variant={"outline"} onClick={handleCancel}>

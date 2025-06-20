@@ -74,12 +74,12 @@ function pathToRegex(path: string) {
 }
 
 // Use in a React client component
-export function useCurrentServerId(pathname: string): number | null {
+export function useCurrentServerUuid(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);
     if (match) {
-      return parseInt(match[1], 10); // Return the captured `:id`
+      return match[1]; // Assuming the server UUID is the first captured group
     }
   }
 
@@ -178,4 +178,11 @@ export function initGbxWebsocketClient(path: string, token: string): WebSocket {
   const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
   const baseUri = envUrl && envUrl != "" ? envUrl : "/gbx";
   return new WebSocket(`${baseUri}${path}?token=${token}`);
+}
+
+export function capitalizeWords(str: string): string {
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 }

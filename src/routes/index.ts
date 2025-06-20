@@ -3,14 +3,15 @@ import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 export const routes = {
   dashboard: "/",
   servers: {
-    settings: "/server/:id/settings",
-    game: "/server/:id/game",
-    maps: "/server/:id/maps",
-    players: "/server/:id/players",
-    live: "/server/:id/live",
-    files: "/server/:id/files",
-    editor: "/server/:id/files/editor",
-    dev: "/server/:id/dev",
+    settings: "/server/:uuid/settings",
+    game: "/server/:uuid/game",
+    maps: "/server/:uuid/maps",
+    players: "/server/:uuid/players",
+    live: "/server/:uuid/live",
+    files: "/server/:uuid/files",
+    editor: "/server/:uuid/files/editor",
+    dev: "/server/:uuid/dev",
+    interface: "/server/:uuid/interface",
   },
   admin: {
     users: "/admin/users",
@@ -119,6 +120,17 @@ export const breadCrumbs: {
       },
       {
         label: "Dev",
+      },
+    ],
+  },
+  {
+    path: routes.servers.interface,
+    breadCrumbs: [
+      {
+        label: "Server",
+      },
+      {
+        label: "Interface",
       },
     ],
   },

@@ -4,23 +4,24 @@ import { routes } from "@/routes";
 import { FileEntry } from "@/types/filemanager";
 import { IconFile } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function FileCard({
   fileEntry,
-  serverId,
+  serverUuid,
   onClick,
   active,
 }: {
   fileEntry: FileEntry;
-  serverId: number;
-  onClick?: () => void;
+  serverUuid: string;
+  onClick?: (e: React.MouseEvent) => void;
   active?: boolean;
 }) {
   const router = useRouter();
 
   const handleDoubleClick = () => {
     router.push(
-      `${generatePath(routes.servers.editor, { id: serverId })}?path=${fileEntry.path}`,
+      `${generatePath(routes.servers.editor, { uuid: serverUuid })}?path=${fileEntry.path}`,
     );
   };
 

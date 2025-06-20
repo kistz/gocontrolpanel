@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PlaylistSchema, PlaylistSchemaType } from "./game-schema";
 
-export default function PlaylistForm({ serverId }: { serverId: number }) {
+export default function PlaylistForm({ serverUuid }: { serverUuid: string }) {
   const playlistForm = useForm<PlaylistSchemaType>({
     resolver: zodResolver(PlaylistSchema),
     defaultValues: {
@@ -22,7 +22,7 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      const { error } = await appendPlaylist(serverId, filename);
+      const { error } = await appendPlaylist(serverUuid, filename);
       if (error) {
         throw new Error(error);
       }
@@ -38,7 +38,7 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      const { error } = await insertPlaylist(serverId, filename);
+      const { error } = await insertPlaylist(serverUuid, filename);
       if (error) {
         throw new Error(error);
       }
@@ -54,12 +54,10 @@ export default function PlaylistForm({ serverId }: { serverId: number }) {
     <Form {...playlistForm}>
       <form className="flex flex-col gap-2">
         <FormElement
-          control={playlistForm.control}
           name={"filename"}
           label="Playlist"
           description="The name of the file to append/insert playlist."
           placeholder="playlist.txt"
-          error={playlistForm.formState.errors.filename}
           className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
           isRequired
         >

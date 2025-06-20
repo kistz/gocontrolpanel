@@ -1,6 +1,6 @@
 "use client";
 
-import { getMapByUid } from "@/actions/database/map";
+import { getMapByUid } from "@/actions/database/maps";
 import { Maps } from "@/lib/prisma/generated";
 import { formatTime, getErrorMessage } from "@/lib/utils";
 import {
@@ -19,7 +19,7 @@ import { Separator } from "../ui/separator";
 import LiveActions from "./live-actions";
 
 interface MapInfoProps {
-  serverId: number;
+  serverUuid: string;
   map?: string;
   mode?: string;
   pauseAvailable: boolean;
@@ -28,7 +28,7 @@ interface MapInfoProps {
 }
 
 export default function MapInfo({
-  serverId,
+  serverUuid,
   map,
   mode,
   pauseAvailable,
@@ -120,7 +120,7 @@ export default function MapInfo({
           <>
             <Separator />
             <LiveActions
-              serverId={serverId}
+              serverUuid={serverUuid}
               pauseAvailable={pauseAvailable}
               isPaused={isPaused}
               isWarmUp={isWarmUp}

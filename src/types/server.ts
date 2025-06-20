@@ -23,6 +23,7 @@ export interface ScriptCommandDescs {
 
 export interface Server {
   id: number;
+  uuid: string;
   name: string;
   description?: string;
   host: string;

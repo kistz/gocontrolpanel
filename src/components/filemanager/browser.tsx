@@ -12,11 +12,11 @@ import FolderCard from "./folder-card";
 
 interface BrowserProps {
   data: FileEntry[];
-  serverId: number;
+  serverUuid: string;
   path: string;
 }
 
-export default function Browser({ data, serverId, path }: BrowserProps) {
+export default function Browser({ data, serverUuid, path }: BrowserProps) {
   const [folders, setFolders] = useState<FileEntry[]>(
     data.filter((fileEntry: FileEntry) => fileEntry.isDir),
   );
@@ -24,7 +24,10 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     data.filter((fileEntry: FileEntry) => !fileEntry.isDir),
   );
 
-  const [selectedItem, setSelectedItem] = useState<FileEntry | null>(null);
+  const [selectedItems, setSelectedItems] = useState<FileEntry[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null,
+  );
 
   const [dragActive, setDragActive] = useState(false);
 
@@ -44,7 +47,7 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
       }
 
       try {
-        const { data, error } = await uploadFiles(serverId, formData);
+        const { data, error } = await uploadFiles(serverUuid, formData);
         if (error) {
           throw new Error(error);
         }
@@ -76,14 +79,23 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
         });
       }
     },
-    [serverId, path],
+    [serverUuid, path],
   );
 
-  const handleSelect = (fileEntry: FileEntry) => {
-    if (selectedItem?.path === fileEntry.path) {
-      setSelectedItem(null);
+  const handleSelect = (
+    e: React.MouseEvent,
+    fileEntry: FileEntry,
+    index: number,
+  ) => {
+    if (e.shiftKey && lastSelectedIndex !== null) {
+      const allItems = [...folders, ...files];
+      const start = Math.min(lastSelectedIndex, index);
+      const end = Math.max(lastSelectedIndex, index);
+      const newSelected = allItems.slice(start, end + 1);
+      setSelectedItems(newSelected);
     } else {
-      setSelectedItem(fileEntry);
+      setSelectedItems([fileEntry]);
+      setLastSelectedIndex(index);
     }
   };
 
@@ -110,6 +122,11 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
     setDragActive(false);
   };
 
+  useEffect(() => {
+    setSelectedItems([]);
+    setLastSelectedIndex(null);
+  }, [path]);
+
   return (
     <div
       className="flex flex-col gap-4 h-full"
@@ -133,15 +150,15 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
       <div className="flex justify-between items-center w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
-          serverId={serverId}
+          serverUuid={serverUuid}
         />
 
         <Actions
-          selectedItem={selectedItem}
-          setSelectedItem={setSelectedItem}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
           setFolders={setFolders}
           setFiles={setFiles}
-          serverId={serverId}
+          serverUuid={serverUuid}
           path={path}
           uploadFilesCallback={uploadFilesCallback}
         />
@@ -160,15 +177,15 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
               <h1 className="font-bold">Folders</h1>
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
-              {folders.map((fileEntry: FileEntry) => (
+              {folders.map((fileEntry: FileEntry, index) => (
                 <FolderCard
                   key={fileEntry.path}
                   fileEntry={fileEntry}
-                  serverId={serverId}
-                  active={selectedItem?.path === fileEntry.path}
-                  onClick={() => {
-                    handleSelect(fileEntry);
-                  }}
+                  serverUuid={serverUuid}
+                  active={selectedItems.some(
+                    (item) => item.path === fileEntry.path,
+                  )}
+                  onClick={(e) => handleSelect(e, fileEntry, index)}
                 />
               ))}
             </div>
@@ -181,17 +198,20 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
               <h1 className="font-bold">Files</h1>
             </div>
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] gap-2">
-              {files.map((fileEntry: FileEntry) => (
-                <FileCard
-                  key={fileEntry.path}
-                  fileEntry={fileEntry}
-                  serverId={serverId}
-                  active={selectedItem?.path === fileEntry.path}
-                  onClick={() => {
-                    handleSelect(fileEntry);
-                  }}
-                />
-              ))}
+              {files.map((fileEntry: FileEntry, index) => {
+                const fileIndex = folders.length + index;
+                return (
+                  <FileCard
+                    key={fileEntry.path}
+                    fileEntry={fileEntry}
+                    serverUuid={serverUuid}
+                    active={selectedItems.some(
+                      (item) => item.path === fileEntry.path,
+                    )}
+                    onClick={(e) => handleSelect(e, fileEntry, fileIndex)}
+                  />
+                );
+              })}
             </div>
           </>
         )}

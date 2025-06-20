@@ -16,12 +16,17 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { disconnectGbxClient } from "@/lib/gbxclient";
-import { generatePath, useCurrentServerId, initGbxWebsocketClient } from "@/lib/utils";
+import {
+  generatePath,
+  initGbxWebsocketClient,
+  useCurrentServerUuid,
+} from "@/lib/utils";
 import { routes } from "@/routes";
 import { Server } from "@/types/server";
 import {
   IconActivity,
   IconAdjustmentsAlt,
+  IconDeviceDesktop,
   IconDeviceGamepad,
   IconFileDescription,
   IconMap,
@@ -38,7 +43,7 @@ import { toast } from "sonner";
 interface ServerNavGroup {
   name: string;
   servers: {
-    id: number;
+    uuid: string;
     name: string;
     isConnected: boolean;
     isActive: boolean;
@@ -58,22 +63,22 @@ export default function NavServers() {
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
   const [healthStatus, setHealthStatus] = useState(false);
-  const [serverId, setServerId] = useState<number | null>(null);
+  const [serverUuid, setServerUuid] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = useCurrentServerId(pathname);
-    setServerId(id);
+    const uuid = useCurrentServerUuid(pathname);
+    setServerUuid(uuid);
   }, [pathname]);
 
   useEffect(() => {
     for (const server of servers) {
-      if (!servers.find((s) => s.id === server.id)?.isConnected) {
-        (async () => await disconnectGbxClient(server.id))();
+      if (!servers.find((s) => s.uuid === server.uuid)?.isConnected) {
+        (async () => await disconnectGbxClient(server.uuid))();
       }
     }
 
     for (const server of servers) {
-      if (server.id === serverId && !server.isConnected) {
+      if (server.uuid === serverUuid && !server.isConnected) {
         toast.error(`Server ${server.name} is offline`);
         router.push("/");
       }
@@ -93,7 +98,10 @@ export default function NavServers() {
       }
 
       try {
-        const socket = initGbxWebsocketClient("/ws/servers", session.jwt as string);
+        const socket = initGbxWebsocketClient(
+          "/ws/servers",
+          session.jwt as string,
+        );
 
         socket.onmessage = async (event) => {
           const data: Server[] = JSON.parse(event.data);
@@ -118,44 +126,44 @@ export default function NavServers() {
   const group: ServerNavGroup = {
     name: "Servers",
     servers: servers.map((server) => ({
-      id: server.id,
+      uuid: server.uuid,
       name: server.name,
       isConnected: server.isConnected,
       icon: IconServer,
-      isActive: serverId === server.id,
+      isActive: serverUuid === server.uuid,
       items: [
         {
           name: "Settings",
           url: generatePath(routes.servers.settings, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconAdjustmentsAlt,
         },
         {
           name: "Game",
           url: generatePath(routes.servers.game, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconDeviceGamepad,
         },
         {
           name: "Maps",
           url: generatePath(routes.servers.maps, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconMap,
         },
         {
           name: "Players",
           url: generatePath(routes.servers.players, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconUsers,
         },
         {
           name: "Live",
           url: generatePath(routes.servers.live, {
-            id: server.id,
+            uuid: server.uuid,
           }),
           icon: IconActivity,
         },
@@ -164,16 +172,23 @@ export default function NavServers() {
               {
                 name: "Files",
                 url: generatePath(routes.servers.files, {
-                  id: server.id,
+                  uuid: server.uuid,
                 }),
                 icon: IconFileDescription,
               },
             ]
           : []),
+        {
+          name: "Interface",
+          url: generatePath(routes.servers.interface, {
+            uuid: server.uuid,
+          }),
+          icon: IconDeviceDesktop,
+        },
         // {
         //   name: "Dev",
         //   url: generatePath(routes.servers.dev, {
-        //     id: server.id,
+        //     uuid: server.uuid,
         //   }),
         //   icon: IconCode,
         // }
@@ -222,7 +237,7 @@ export default function NavServers() {
           {group.servers.map((server) =>
             server.items && server.items.length > 0 ? (
               <Collapsible
-                key={server.id || server.name}
+                key={server.uuid}
                 asChild
                 defaultOpen={server.isActive}
                 className="group/collapsible"

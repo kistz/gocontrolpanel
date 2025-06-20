@@ -1,5 +1,5 @@
 "use client";
-import { updateUser } from "@/actions/database/user";
+import { updateUser } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -52,14 +52,12 @@ export default function EditUserForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormElement
-          control={form.control}
           name={"roles"}
           options={rolesOptions}
           defaultValues={getRoles(user.roles)}
           label="Roles"
           description="The roles of the user."
           placeholder="Select roles"
-          error={form.formState.errors.roles}
           className="w-full min-w-64"
           type="multi-select"
         />

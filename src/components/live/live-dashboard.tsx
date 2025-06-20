@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
+import KnockoutScores from "./knockout-scores";
 import LiveRound from "./live-round";
 import MapInfo from "./mapinfo";
 import MatchSettings from "./match-settings";
@@ -14,9 +15,8 @@ import Rankings from "./rankings";
 import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
-import KnockoutScores from "./knockout-scores";
 
-export default function LiveDashboard({ serverId }: { serverId: number }) {
+export default function LiveDashboard({ serverUuid }: { serverUuid: string }) {
   const { data: session } = useSession();
 
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
@@ -33,7 +33,10 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
       return;
     }
 
-    const socket = initGbxWebsocketClient(`/ws/live/${serverId}`, session.jwt as string);
+    const socket = initGbxWebsocketClient(
+      `/ws/live/${serverUuid}`,
+      session.jwt as string,
+    );
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
@@ -152,7 +155,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
     return () => {
       socket.close();
     };
-  }, [serverId, session]);
+  }, [serverUuid, session]);
 
   useEffect(() => {
     if (!liveInfo?.players) {
@@ -161,7 +164,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
 
     const fetchData = async () => {
       try {
-        const { data, error } = await getPlayerList(serverId);
+        const { data, error } = await getPlayerList(serverUuid);
         if (error) {
           throw new Error(error);
         }
@@ -220,7 +223,7 @@ export default function LiveDashboard({ serverId }: { serverId: number }) {
 
       <div className="flex flex-col min-[1200px]:flex-row min-[1528px]:flex-col gap-4">
         <MapInfo
-          serverId={serverId}
+          serverUuid={serverUuid}
           map={mapInfo?.map}
           mode={mapInfo?.mode}
           pauseAvailable={liveInfo.pauseAvailable}

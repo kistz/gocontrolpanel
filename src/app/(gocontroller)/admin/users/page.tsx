@@ -1,4 +1,4 @@
-import { getUsersPaginated } from "@/actions/database/user";
+import { getUsersPaginated } from "@/actions/database/users";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { createColumns } from "./columns";
 

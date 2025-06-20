@@ -11,10 +11,10 @@ import { toast } from "sonner";
 import { ShowOpponentsSchema, ShowOpponentsSchemaType } from "./game-schema";
 
 export default function ShowOpponentsForm({
-  serverId,
+  serverUuid,
   showOpponents,
 }: {
-  serverId: number;
+  serverUuid: string;
   showOpponents: number;
 }) {
   const showOpponentsForm = useForm<ShowOpponentsSchemaType>({
@@ -26,7 +26,10 @@ export default function ShowOpponentsForm({
 
   async function onSubmitShowOpponents(values: ShowOpponentsSchemaType) {
     try {
-      const { error } = await setShowOpponents(serverId, values.showOpponents);
+      const { error } = await setShowOpponents(
+        serverUuid,
+        values.showOpponents,
+      );
       if (error) {
         throw new Error(error);
       }
@@ -45,12 +48,10 @@ export default function ShowOpponentsForm({
         className="flex flex-col gap-2"
       >
         <FormElement
-          control={showOpponentsForm.control}
           name={"showOpponents"}
           label="Show Opponents"
           description="The number of opponents to show. 0 is no override, 1 is show all, rest is the number of opponents."
           placeholder="Show Opponents..."
-          error={showOpponentsForm.formState.errors.showOpponents}
           className="w-20"
           isRequired
           type="number"

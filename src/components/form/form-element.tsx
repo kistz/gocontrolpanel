@@ -1,4 +1,4 @@
-import { Control, FieldError, FieldValues, Merge, Path } from "react-hook-form";
+import { Path, useFormContext } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -9,8 +9,7 @@ import {
 } from "../ui/form";
 import RenderInput from "./render-input";
 
-interface FormElementProps<TControl extends FieldValues> {
-  control: Control<TControl>;
+interface FormElementProps<TControl> {
   name: Path<TControl>;
   label?: string;
   description?: string;
@@ -23,14 +22,14 @@ interface FormElementProps<TControl extends FieldValues> {
   isHidden?: boolean;
   isLoading?: boolean;
   autoFocus?: boolean;
-  step?: string;
-  error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
+  step?: number;
+  min?: number;
+  max?: number;
   className?: string;
   children?: React.ReactNode;
 }
 
-export default function FormElement<TControl extends FieldValues>({
-  control,
+export default function FormElement<TControl>({
   name,
   label,
   description,
@@ -44,18 +43,21 @@ export default function FormElement<TControl extends FieldValues>({
   isLoading = false,
   autoFocus = false,
   step,
-  error,
+  min,
+  max,
   className,
   children,
-}: FormElementProps<TControl & FieldValues>) {
+}: FormElementProps<TControl>) {
   if (isHidden) return null;
 
-  const getErrorMessage = (
-    error:
-      | FieldError
-      | Merge<FieldError, (FieldError | undefined)[]>
-      | undefined,
-  ): string | undefined => {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+
+  const error = errors[name];
+
+  const getErrorMessage = (error: any): string | undefined => {
     if (!error) return undefined;
 
     if ("message" in error && typeof error.message === "string") {
@@ -76,27 +78,24 @@ export default function FormElement<TControl extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          {label ||
-            (description && (
-              <div>
-                {label && (
-                  <FormLabel
-                    className="text-sm flex items-end"
-                    data-error={false}
-                  >
-                    {label}{" "}
-                    {isRequired && (
-                      <span className="text-xs text-muted-foreground">
-                        (Required)
-                      </span>
-                    )}
-                  </FormLabel>
-                )}
-                {description && (
-                  <FormDescription>{description}</FormDescription>
-                )}
-              </div>
-            ))}
+          {(label || description) && (
+            <div>
+              {label && (
+                <FormLabel
+                  className="text-sm flex items-end"
+                  data-error={!!error}
+                >
+                  {label}{" "}
+                  {isRequired && (
+                    <span className="text-xs text-muted-foreground">
+                      (Required)
+                    </span>
+                  )}
+                </FormLabel>
+              )}
+              {description && <FormDescription>{description}</FormDescription>}
+            </div>
+          )}
           <FormControl>
             <div className="flex gap-2">
               <RenderInput
@@ -110,11 +109,12 @@ export default function FormElement<TControl extends FieldValues>({
                 isDisabled={isDisabled || isLoading}
                 isLoading={isLoading}
                 step={step}
+                min={min}
+                max={max}
                 error={error}
                 autoFocus={autoFocus}
                 className={className}
               />
-
               {children}
             </div>
           </FormControl>

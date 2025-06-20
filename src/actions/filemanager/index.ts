@@ -7,10 +7,10 @@ import { ContentType, File, FileEntry } from "@/types/filemanager";
 import { ServerError, ServerResponse } from "@/types/responses";
 
 export async function getUserData(
-  server: number,
+  serverUuid: string,
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -41,11 +41,11 @@ export async function getUserData(
 }
 
 export async function getRoute(
-  server: number,
+  serverUuid: string,
   path: string,
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -83,11 +83,11 @@ export async function getRoute(
 }
 
 export async function getFile(
-  server: number,
+  serverUuid: string,
   path: string,
 ): Promise<ServerResponse<File>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -121,12 +121,12 @@ export async function getFile(
 }
 
 export async function saveFileText(
-  server: number,
+  serverUuid: string,
   path: string,
   text: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -146,11 +146,11 @@ export async function saveFileText(
 }
 
 export async function deleteEntry(
-  server: number,
-  path: string,
+  serverUuid: string,
+  paths: string[],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -160,7 +160,7 @@ export async function deleteEntry(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify([path]),
+      body: JSON.stringify(paths),
     });
 
     if (res.status !== 200) {
@@ -170,11 +170,11 @@ export async function deleteEntry(
 }
 
 export async function uploadFiles(
-  server: number,
+  serverUuid: string,
   formData: FormData,
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -203,7 +203,7 @@ export async function uploadFiles(
 }
 
 export async function getScripts(
-  server: number,
+  serverUuid: string,
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const defaultScripts = [
@@ -222,7 +222,7 @@ export async function getScripts(
     ];
 
     try {
-      const fileManager = await getFileManager(server);
+      const fileManager = await getFileManager(serverUuid);
       if (!fileManager?.health) {
         throw new ServerError("Could not connect to file manager");
       }
@@ -253,11 +253,11 @@ export async function getScripts(
 }
 
 export async function createFileEntry(
-  server: number,
+  serverUuid: string,
   request: CreateFileEntrySchemaType,
 ): Promise<ServerResponse<FileEntry>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(server);
+    const fileManager = await getFileManager(serverUuid);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }
@@ -281,9 +281,9 @@ export async function createFileEntry(
       throw new ServerError("Failed to create file entry");
     }
 
-    return  {
+    return {
       ...data,
       lastModified: new Date(data.lastModified),
-    }
+    };
   });
 }

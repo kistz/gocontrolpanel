@@ -11,21 +11,21 @@ import Modal from "../modals/modal";
 import { Button } from "../ui/button";
 
 interface ActionsProps {
-  selectedItem: FileEntry | null;
-  setSelectedItem: Dispatch<SetStateAction<FileEntry | null>>;
+  selectedItems: FileEntry[];
+  setSelectedItems: Dispatch<SetStateAction<FileEntry[]>>;
   setFolders: Dispatch<SetStateAction<FileEntry[]>>;
   setFiles: Dispatch<SetStateAction<FileEntry[]>>;
-  serverId: number;
+  serverUuid: string;
   path: string;
   uploadFilesCallback: (files: FileList | null) => void;
 }
 
 export default function Actions({
-  selectedItem,
-  setSelectedItem,
+  selectedItems,
+  setSelectedItems,
   setFolders,
   setFiles,
-  serverId,
+  serverUuid,
   path,
   uploadFilesCallback,
 }: ActionsProps) {
@@ -44,36 +44,39 @@ export default function Actions({
   };
 
   const handleDelete = async () => {
-    if (selectedItem) {
-      try {
-        const { error } = await deleteEntry(serverId, selectedItem.path);
-        if (error) {
-          throw new Error(error);
-        }
+    if (selectedItems.length === 0) return;
 
-        setFolders((prev) =>
-          prev.filter((folder) => folder.path !== selectedItem.path),
-        );
+    try {
+      const pathsToDelete = selectedItems.map((item) => item.path);
+      const { error } = await deleteEntry(serverUuid, pathsToDelete);
 
-        setFiles((prev) =>
-          prev.filter((file) => file.path !== selectedItem.path),
-        );
-
-        setSelectedItem(null);
-        toast.success("Item successfully deleted", {
-          description: `Deleted ${selectedItem.name}`,
-        });
-      } catch (error) {
-        toast.error("Failed to delete item", {
-          description: getErrorMessage(error),
-        });
+      if (error) {
+        throw new Error(error);
       }
+
+      setFolders((prev) =>
+        prev.filter((folder) => !pathsToDelete.includes(folder.path)),
+      );
+
+      setFiles((prev) =>
+        prev.filter((file) => !pathsToDelete.includes(file.path)),
+      );
+
+      toast.success("Items deleted", {
+        description: `${selectedItems.length} item(s) successfully deleted.`,
+      });
+
+      setSelectedItems([]);
+    } catch (error) {
+      toast.error("Failed to delete items", {
+        description: getErrorMessage(error),
+      });
     }
   };
 
   return (
     <div className="flex items-center gap-2">
-      {selectedItem && (
+      {selectedItems.length > 0 && (
         <>
           <Button variant="destructive" onClick={() => setIsDeleting(true)}>
             <IconTrash size={20} />
@@ -84,8 +87,8 @@ export default function Actions({
             isOpen={isDeleting}
             onConfirm={handleDelete}
             onClose={() => setIsDeleting(false)}
-            title="Delete item"
-            description={`Are you sure you want to delete ${selectedItem?.name}?`}
+            title="Delete items"
+            description={`Are you sure you want to delete ${selectedItems.length} item(s)?`}
             confirmText="Delete"
             cancelText="Cancel"
           />
@@ -95,12 +98,11 @@ export default function Actions({
       <Modal>
         <CreateFileEntryModal
           path={removePrefix(path, "/UserData")}
-          serverId={serverId}
+          serverUuid={serverUuid}
           isDir={true}
           onSubmit={(fileEntry?: FileEntry) => {
             if (!fileEntry) return;
             setFolders((prev) => [...prev, fileEntry]);
-            setSelectedItem(fileEntry);
           }}
         />
         <Button variant={"outline"}>
@@ -112,12 +114,11 @@ export default function Actions({
       <Modal>
         <CreateFileEntryModal
           path={removePrefix(path, "/UserData")}
-          serverId={serverId}
+          serverUuid={serverUuid}
           isDir={false}
           onSubmit={(fileEntry?: FileEntry) => {
             if (!fileEntry) return;
             setFiles((prev) => [...prev, fileEntry]);
-            setSelectedItem(fileEntry);
           }}
         />
         <Button variant={"outline"}>

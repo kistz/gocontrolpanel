@@ -10,7 +10,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MatchSettingsSchema, MatchSettingsSchemaType } from "./game-schema";
 
-export default function MatchSettingsForm({ serverId }: { serverId: number }) {
+export default function MatchSettingsForm({
+  serverUuid,
+}: {
+  serverUuid: string;
+}) {
   const matchSettingsForm = useForm<MatchSettingsSchemaType>({
     resolver: zodResolver(MatchSettingsSchema),
     defaultValues: {
@@ -23,7 +27,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
       const { error } = await loadMatchSettings(
-        serverId,
+        serverUuid,
         "MatchSettings/" + filename,
       );
       if (error) {
@@ -42,7 +46,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
       matchSettingsForm.trigger("filename");
       const filename = matchSettingsForm.getValues("filename");
       const { error } = await saveMatchSettings(
-        serverId,
+        serverUuid,
         "MatchSettings/" + filename,
       );
       if (error) {
@@ -60,12 +64,10 @@ export default function MatchSettingsForm({ serverId }: { serverId: number }) {
     <Form {...matchSettingsForm}>
       <form className="flex flex-col gap-2">
         <FormElement
-          control={matchSettingsForm.control}
           name={"filename"}
           label="Match Settings"
           description="The name of the file to save/load match settings."
           placeholder="matchlist.txt"
-          error={matchSettingsForm.formState.errors.filename}
           className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
           isRequired
         >

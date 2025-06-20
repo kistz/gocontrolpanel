@@ -15,12 +15,12 @@ import {
 } from "./create-file-entry-schema";
 
 export default function CreateFileEntryForm({
-  serverId,
+  serverUuid,
   path,
   isDir = false,
   callback,
 }: {
-  serverId: number;
+  serverUuid: string;
   path: string;
   isDir?: boolean;
   callback?: (fileEntry: FileEntry) => void;
@@ -37,7 +37,7 @@ export default function CreateFileEntryForm({
   async function onSubmit(values: CreateFileEntrySchemaType) {
     try {
       values.path = path + "/" + values.path;
-      const { data, error } = await createFileEntry(serverId, values);
+      const { data, error } = await createFileEntry(serverUuid, values);
       if (error) {
         throw new Error(error);
       }
@@ -60,26 +60,22 @@ export default function CreateFileEntryForm({
         className="flex flex-col gap-4"
       >
         <FormElement
-          control={form.control}
           name={"path"}
           label="Name"
           description={
             isDir ? "The name of the directory." : "The name of the file."
           }
           placeholder={isDir ? "Enter directory name" : "Enter file name"}
-          error={form.formState.errors.path}
           isRequired
           autoFocus
         />
 
         {!isDir && (
           <FormElement
-            control={form.control}
             name={"content"}
             label="Content"
             description="The content of the file."
             placeholder="Enter file content"
-            error={form.formState.errors.content}
             isRequired
             type="textarea"
           />

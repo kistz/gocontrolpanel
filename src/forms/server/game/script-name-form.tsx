@@ -13,11 +13,11 @@ import { ScriptNameSchema, ScriptNameSchemaType } from "./game-schema";
 export default function ScriptNameForm({
   scriptName,
   scripts,
-  serverId,
+  serverUuid,
 }: {
   scriptName: string;
   scripts: string[];
-  serverId: number;
+  serverUuid: string;
 }) {
   const scriptNameForm = useForm<ScriptNameSchemaType>({
     resolver: zodResolver(ScriptNameSchema),
@@ -28,7 +28,7 @@ export default function ScriptNameForm({
 
   async function onSubmitScriptName(values: ScriptNameSchemaType) {
     try {
-      const { error } = await setScriptName(serverId, values.scriptName);
+      const { error } = await setScriptName(serverUuid, values.scriptName);
       if (error) {
         throw new Error(error);
       }
@@ -47,7 +47,6 @@ export default function ScriptNameForm({
         className="flex flex-col gap-2"
       >
         <FormElement
-          control={scriptNameForm.control}
           name={"scriptName"}
           label="Script Name"
           description="The name of the script to load."
@@ -55,7 +54,6 @@ export default function ScriptNameForm({
             label: script,
             value: script,
           }))}
-          error={scriptNameForm.formState.errors.scriptName}
           className="w-[200px] min-[500px]:w-1/2"
           type="select"
           isRequired

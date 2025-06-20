@@ -1,4 +1,4 @@
-import { deleteMapById } from "@/actions/database/map";
+import { deleteMapById } from "@/actions/database/maps";
 import { Button } from "@/components/ui/button";
 import { Maps } from "@/lib/prisma/generated";
 import { IconDownload, IconHeartbeat } from "@tabler/icons-react";

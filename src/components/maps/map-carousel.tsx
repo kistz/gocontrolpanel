@@ -21,7 +21,7 @@ import {
 import CarouselMapCard from "./carousel-map-card";
 
 interface MapCarouselProps {
-  serverId: number;
+  serverUuid: string;
   maps: Maps[];
   loop?: boolean;
   startIndex?: number;
@@ -29,7 +29,7 @@ interface MapCarouselProps {
 }
 
 export default function MapCarousel({
-  serverId,
+  serverUuid,
   maps,
   loop = false,
   startIndex = 0,
@@ -59,7 +59,10 @@ export default function MapCarousel({
       return;
     }
 
-    const socket = initGbxWebsocketClient(`/ws/map/${serverId}`, session.jwt as string);
+    const socket = initGbxWebsocketClient(
+      `/ws/map/${serverUuid}`,
+      session.jwt as string,
+    );
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
@@ -101,7 +104,7 @@ export default function MapCarousel({
     return () => {
       socket.close();
     };
-  }, [serverId, maps, session]);
+  }, [serverUuid, maps, session]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -121,7 +124,7 @@ export default function MapCarousel({
               className="min-[1060px]:basis-1/2 min-[1380px]:basis-1/3 m-auto"
             >
               <CarouselMapCard
-                serverId={serverId}
+                serverUuid={serverUuid}
                 map={map}
                 index={index}
                 isCurrent={index === currentIndex}

@@ -2,7 +2,7 @@ import {
   createUserAuth,
   getUserById,
   getUserByLogin,
-} from "@/actions/database/user";
+} from "@/actions/database/users";
 import {
   GetServerSidePropsContext,
   NextApiRequest,

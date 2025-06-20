@@ -6,13 +6,13 @@ import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function CreateFileEntryModal({
-  serverId,
+  serverUuid,
   path,
   isDir = false,
   closeModal,
   onSubmit,
 }: {
-  serverId: number;
+  serverUuid: string;
   path: string;
   isDir?: boolean;
 } & DefaultModalProps<void, FileEntry>) {
@@ -43,7 +43,7 @@ export default function CreateFileEntryModal({
       </div>
 
       <CreateFileEntryForm
-        serverId={serverId}
+        serverUuid={serverUuid}
         path={path}
         isDir={isDir}
         callback={handleSubmit}

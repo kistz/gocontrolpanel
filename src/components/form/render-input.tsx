@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   ControllerRenderProps,
   FieldError,
+  FieldErrorsImpl,
   FieldValues,
   Merge,
 } from "react-hook-form";
@@ -33,8 +34,10 @@ interface RenderInputProps<TControl extends FieldValues> {
   isDisabled?: boolean;
   isLoading?: boolean;
   autoFocus?: boolean;
-  step?: string;
-  error?: FieldError | Merge<FieldError, (FieldError | undefined)[]>;
+  step?: number;
+  min?: number;
+  max?: number;
+  error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
   className?: string;
 }
 
@@ -50,6 +53,8 @@ export default function RenderInput<TControl extends FieldValues>({
   isLoading = false,
   autoFocus = false,
   step,
+  min,
+  max,
   error,
   className,
 }: RenderInputProps<TControl & FieldValues>) {
@@ -64,9 +69,16 @@ export default function RenderInput<TControl extends FieldValues>({
           placeholder={placeholder}
           disabled={isDisabled || isLoading}
           {...field}
+          onChange={(e) =>
+            type === "number"
+              ? field.onChange(e.target.value ? e.target.valueAsNumber : "")
+              : field.onChange(e.target.value)
+          }
           className={className}
           error={!!error}
           step={step}
+          min={min}
+          max={max}
           autoFocus={autoFocus}
         />
       );
@@ -118,7 +130,7 @@ export default function RenderInput<TControl extends FieldValues>({
       );
     case "checkbox":
       return (
-        <div className={cn("flex items-center space-x-2", className)}>
+        <div className={cn("flex items-center gap-2", className)}>
           <Checkbox
             id={name}
             disabled={isDisabled || isLoading}

@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteUserById } from "@/actions/database/user";
+import { deleteUserById } from "@/actions/database/users";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditUserModal from "@/components/modals/edit-user";
 import Modal from "@/components/modals/modal";

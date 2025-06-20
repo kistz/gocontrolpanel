@@ -1,9 +1,8 @@
 "use server";
 import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
 import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
-import { doServerAction } from "@/lib/actions";
+import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosAuth } from "@/lib/axios/connector";
-import config from "@/lib/config";
 import { connectToGbxClient } from "@/lib/gbxclient";
 import { getRedisClient } from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
@@ -14,7 +13,7 @@ let healthStatus: boolean | null = null;
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
-  const res = await axiosAuth.get("/servers");
+  const res = await axiosAuth.get<Server[]>("/servers");
 
   if (res.status !== 200) {
     if (isAxiosError(res) && res.code === "ECONNREFUSED") {
@@ -25,7 +24,7 @@ export async function syncServers(): Promise<Server[]> {
 
   const redis = await getRedisClient();
 
-  const servers: Server[] = res.data;
+  const servers = res.data;
 
   await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
   return servers;
@@ -57,8 +56,8 @@ export async function getHealthStatus(): Promise<boolean> {
 export async function addServer(
   server: AddServerSchemaType,
 ): Promise<ServerResponse> {
-  return doServerAction(async () => {
-    const res = await axiosAuth.post(`${config.CONNECTOR_URL}/servers`, server);
+  return doServerActionWithAuth(["admin"], async () => {
+    const res = await axiosAuth.post("/servers", server);
 
     if (res.status !== 200) {
       throw new ServerError("Failed to add server");
@@ -69,11 +68,11 @@ export async function addServer(
 }
 
 export async function editServer(
-  serverId: number,
+  serverUuid: string,
   server: EditServerSchemaType,
 ): Promise<ServerResponse> {
-  return doServerAction(async () => {
-    const res = await axiosAuth.put(`/servers/${serverId}`, server);
+  return doServerActionWithAuth(["admin"], async () => {
+    const res = await axiosAuth.put(`/servers/${serverUuid}`, server);
 
     if (res.status !== 200) {
       throw new ServerError("Failed to edit server");
@@ -83,9 +82,11 @@ export async function editServer(
   });
 }
 
-export async function removeServer(id: number): Promise<ServerResponse> {
-  return doServerAction(async () => {
-    const res = await axiosAuth.delete(`/servers/${id}`);
+export async function removeServer(
+  serverUuid: string,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const res = await axiosAuth.delete(`/servers/${serverUuid}`);
 
     if (res.status !== 200) {
       throw new ServerError("Failed to remove server");
@@ -98,10 +99,10 @@ export async function removeServer(id: number): Promise<ServerResponse> {
 export async function orderServers(
   servers: Server[],
 ): Promise<ServerResponse<Server[]>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth(["admin"], async () => {
     const res = await axiosAuth.put(
       "/servers/order",
-      servers.map((server) => server.id),
+      servers.map((server) => server.uuid),
     );
 
     if (res.status !== 200) {
@@ -112,7 +113,7 @@ export async function orderServers(
 
     for (const server of orderedServers) {
       try {
-        await connectToGbxClient(server.id);
+        await connectToGbxClient(server.uuid);
       } catch (error) {
         console.error("Failed to connect to server", error);
       }

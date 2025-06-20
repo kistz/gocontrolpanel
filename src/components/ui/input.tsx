@@ -19,6 +19,7 @@ function Input({ className, type, error, ...props }: InputProps) {
         error && "border-destructive focus-visible:ring-destructive/40",
       )}
       {...props}
+      value={props.value ?? (type === "number" ? 0 : "")}
     />
   );
 }

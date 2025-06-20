@@ -11,7 +11,7 @@ datasource db {
 model Maps {
   id             String   @id @default(uuid())
   name           String
-  uid            String
+  uid            String @unique
   fileName       String
   author         String
   authorNickname String
@@ -21,9 +21,11 @@ model Maps {
   bronzeTime     Int
 
   submitter      String?
-  timestamp      DateTime?
-  fileUrl        String?
-  thumbnailUrl   String?
+  timestamp      DateTime? 
+  fileUrl        String? @unique
+  thumbnailUrl   String? @unique
+
+  records        Records[]
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -47,4 +49,35 @@ model Users {
 
   @@index([deletedAt])
   @@map("users")
+}
+
+model Records {
+  id        String   @id @default(uuid())
+  mapId    String
+  map Maps @relation(fields: [mapId], references: [id])
+  login    String
+  mapUid  String
+  time   Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@index([mapId])
+  @@map("records")
+}
+
+model Interfaces {
+  id       String   @id @default(uuid())
+  name    String
+  serverUuid String
+  interfaceString String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("interfaces")
 }
