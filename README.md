@@ -71,7 +71,7 @@ Manage your server files, including uploading, deleting and editing files.
 
 **Interface Editor**
 
-Edit the interface of your server, create your own interface and manage chat message formatting.
+Edit the interface of your server, create your own interface (still in development) and manage chat message formatting.
 
 ![Interface Editor Page](https://i.imgur.com/sqmN4VB.png "Interface Editor Page")
 ![Chat Message Editor Page](https://i.imgur.com/NPPVIez.png "Chat Message Editor Page")
@@ -103,7 +103,7 @@ You will also need some credentials for the **Nadeo API** to configure the **GoC
 
 ## Getting Started
 
-This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup). There are also some boilerplate `docker-compose.yml` files available in the [docker](./docker/) folder for a variety of server controllers. Plug in your own configuration and you are good to go!
+This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup). There are also some boilerplate `docker-compose.yml` files available in the [docker](./docker/) folder for a variety of server controllers. Just move into the folder of your choice, plugin your own configurations and run the `docker compose up -d --build` command to start the services.
 
 ## New Stack Setup
 
