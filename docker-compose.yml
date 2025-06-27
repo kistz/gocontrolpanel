@@ -5,14 +5,13 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
+        - CONNECTOR_URL=http://nginx/gbx
         - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
         - DB_TYPE=mysql
     restart: unless-stopped
     environment:
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: 
-      CONNECTOR_API_KEY: 
       DEFAULT_ADMINS: 
       NADEO_CLIENT_ID: 
       NADEO_CLIENT_SECRET: 
@@ -32,7 +31,6 @@ services:
       PORT: 6980
       SERVER_RECONNECT_INTERVAL: 15
       JWT_SECRET: 
-      INTERNAL_API_KEY: 
       LOG_LEVEL: DEBUG
     volumes:
       - ./servers.json:/app/servers.json

@@ -1,12 +1,14 @@
-import { getServers } from "@/actions/gbxconnector/servers";
+import { syncServers } from "@/actions/gbxconnector/servers";
 import { FileManager } from "@/types/filemanager";
 
 const cachedFileManagers: {
   [key: string]: FileManager;
 } = {};
 
-export async function syncFileManager(serverUuid: string): Promise<FileManager> {
-  const servers = await getServers();
+export async function syncFileManager(
+  serverUuid: string,
+): Promise<FileManager> {
+  const servers = await syncServers();
 
   const server = servers.find((server) => server.uuid == serverUuid);
   if (!server) {
@@ -36,7 +38,9 @@ export async function syncFileManager(serverUuid: string): Promise<FileManager> 
   return fileManager;
 }
 
-export async function getFileManager(serverUuid: string): Promise<FileManager | null> {
+export async function getFileManager(
+  serverUuid: string,
+): Promise<FileManager | null> {
   if (cachedFileManagers[serverUuid]) {
     return cachedFileManagers[serverUuid];
   }

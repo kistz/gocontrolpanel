@@ -30,8 +30,10 @@ export async function syncServers(): Promise<Server[]> {
   return servers;
 }
 
-export async function getServers(): Promise<Server[]> {
-  return await syncServers();
+export async function getServers(): Promise<ServerResponse<Server[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    return await syncServers();
+  });
 }
 
 export async function getHealthStatus(): Promise<boolean> {

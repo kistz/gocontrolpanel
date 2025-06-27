@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 
 export default async function AdminServersPage() {
-  const servers = await getServers();
+  const { data: servers } = await getServers();
 
   return (
     <div className="flex flex-col gap-6">

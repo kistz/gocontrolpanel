@@ -7,7 +7,6 @@ const config: Config = {
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
     : [],
-  CONNECTOR_API_KEY: process.env.CONNECTOR_API_KEY || "",
   NADEO: {
     CLIENT_ID: process.env.NADEO_CLIENT_ID || "",
     CLIENT_SECRET: process.env.NADEO_CLIENT_SECRET || "",

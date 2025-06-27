@@ -2,7 +2,7 @@
 import { onPlayerFinish } from "@/actions/gbx/listeners/records";
 import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { syncPlayerList } from "@/actions/gbx/player";
-import { getServers } from "@/actions/gbxconnector/servers";
+import { syncServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
 
@@ -15,7 +15,7 @@ const cachedClients = (globalForGbx.cachedClients ??= {});
 export async function connectToGbxClient(
   serverUuid: string,
 ): Promise<GbxClient> {
-  const servers = await getServers();
+  const servers = await syncServers();
   const server = servers.find((server) => server.uuid == serverUuid);
 
   if (!server) {
