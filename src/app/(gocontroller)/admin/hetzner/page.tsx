@@ -32,8 +32,8 @@ export default async function AdminHetznerPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {projects.map((project) => (
-          <ProjectCard project={project} users={users} />
+        {projects.map((project, index) => (
+          <ProjectCard project={project} users={users} key={index} />
         ))}
       </div>
     </div>

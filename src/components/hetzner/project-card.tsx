@@ -7,7 +7,7 @@ import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import EditProjectModal from "../modals/edit-project";
 import Modal from "../modals/modal";
@@ -24,7 +24,10 @@ export default function ProjectCard({
   const router = useRouter();
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  const handleDeleteProject = async () => {
+  const handleDeleteProject: React.MouseEventHandler<
+    HTMLButtonElement
+  > = async (e) => {
+    e.stopPropagation();
     try {
       const { error } = await deleteHetznerProject(project.id);
       if (error) {
@@ -41,7 +44,10 @@ export default function ProjectCard({
 
   return (
     <>
-      <Card className="p-4 gap-2">
+      <Card
+        className="p-4 gap-2 hover:border-primary cursor-pointer"
+        onClick={() => router.push(`/admin/hetzner/${project.id}`)}
+      >
         <div className="flex justify-between gap-2 items-center">
           <h3 className="text-lg font-semibold truncate min-w-o">
             {project.name}
@@ -51,7 +57,10 @@ export default function ProjectCard({
             <Button
               variant="outline"
               size="icon"
-              onClick={() => setIsEditOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditOpen(true);
+              }}
             >
               <IconEdit />
               <span className="sr-only">Edit Project</span>
