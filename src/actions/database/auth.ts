@@ -1,16 +1,45 @@
 import { doServerAction } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { Users } from "@/lib/prisma/generated";
+import { Prisma, Users } from "@/lib/prisma/generated";
 import { ServerError, ServerResponse } from "@/types/responses";
 import "server-only";
 
-export async function getUserById(id: string): Promise<ServerResponse<Users>> {
+const groupsUsers = Prisma.validator<Prisma.UsersInclude>()({
+  groups: {
+    include: {
+      group: true,
+    },
+  },
+});
+
+export type UsersWithGroups = Prisma.UsersGetPayload<{
+  include: typeof groupsUsers;
+}>;
+
+export async function getUserById(
+  id: string,
+): Promise<ServerResponse<UsersWithGroups>> {
   return doServerAction(async () => {
     const db = getClient();
     const user = await db.users.findUniqueOrThrow({
       where: {
         id,
         deletedAt: null,
+      },
+      include: {
+        groups: {
+          where: {
+            group: {
+              deletedAt: null,
+            },
+          },
+          select: {
+            groupId: true,
+            role: true,
+            userId: true,
+            group: true,
+          },
+        },
       },
     });
 
@@ -20,13 +49,28 @@ export async function getUserById(id: string): Promise<ServerResponse<Users>> {
 
 export async function getUserByLogin(
   login: string,
-): Promise<ServerResponse<Users>> {
+): Promise<ServerResponse<UsersWithGroups>> {
   return doServerAction(async () => {
     const db = getClient();
     const user = await db.users.findFirstOrThrow({
       where: {
         login,
         deletedAt: null,
+      },
+      include: {
+        groups: {
+          where: {
+            group: {
+              deletedAt: null,
+            },
+          },
+          select: {
+            groupId: true,
+            role: true,
+            userId: true,
+            group: true,
+          },
+        },
       },
     });
 
@@ -36,7 +80,7 @@ export async function getUserByLogin(
 
 export async function createUserAuth(
   user: Omit<Users, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<ServerResponse<Users>> {
+): Promise<ServerResponse<UsersWithGroups>> {
   return doServerAction(async () => {
     const db = getClient();
 
@@ -64,6 +108,21 @@ export async function createUserAuth(
 
     const result = await db.users.create({
       data: newUser,
+      include: {
+        groups: {
+          where: {
+            group: {
+              deletedAt: null,
+            },
+          },
+          select: {
+            groupId: true,
+            role: true,
+            userId: true,
+            group: true,
+          },
+        },
+      },
     });
 
     if (!result) {

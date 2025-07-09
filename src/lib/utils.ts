@@ -174,10 +174,31 @@ export function removePrefix(str: string, prefix: string): string {
   return str;
 }
 
-export function initGbxWebsocketClient(path: string, token: string): WebSocket {
+export function initGbxWebsocketClient(
+  path: string,
+  token: string,
+  params?: Record<string, string | string[]>,
+): WebSocket {
   const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-  const baseUri = envUrl && envUrl != "" ? envUrl : "/gbx";
-  return new WebSocket(`${baseUri}${path}?token=${token}`);
+  const baseUri = envUrl && envUrl !== "" ? envUrl : "/gbx";
+
+  const searchParams = new URLSearchParams();
+
+  if (params) {
+    for (const key in params) {
+      const value = params[key];
+      if (Array.isArray(value)) {
+        value.forEach((v) => searchParams.append(key, v));
+      } else {
+        searchParams.append(key, value);
+      }
+    }
+  }
+
+  // Append the token param first, so token is always included
+  searchParams.append("token", token);
+
+  return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
 }
 
 export function capitalizeWords(str: string): string {

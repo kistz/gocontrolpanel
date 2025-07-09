@@ -46,6 +46,11 @@ export async function getAllGroups(): Promise<
       },
       include: {
         users: {
+          where: {
+            user: {
+              deletedAt: null,
+            },
+          },
           select: {
             userId: true,
             groupId: true,
@@ -102,6 +107,11 @@ export async function getGroupsPaginated(
       },
       include: {
         users: {
+          where: {
+            user: {
+              deletedAt: null,
+            },
+          },
           include: {
             user: true,
           },
@@ -130,6 +140,11 @@ export async function getGroup(
       where: { id: groupId },
       include: {
         users: {
+          where: {
+            user: {
+              deletedAt: null,
+            },
+          },
           include: {
             user: true,
           },
@@ -166,6 +181,11 @@ export async function createGroup(
       },
       include: {
         users: {
+          where: {
+            user: {
+              deletedAt: null,
+            },
+          },
           include: {
             user: true,
           },
@@ -207,6 +227,11 @@ export async function updateGroup(
         },
         include: {
           users: {
+            where: {
+              user: {
+                deletedAt: null,
+              },
+            },
             include: { user: true },
           },
           _count: {
@@ -255,6 +280,11 @@ export async function updateGroup(
       data: updateData,
       include: {
         users: {
+          where: {
+            user: {
+              deletedAt: null,
+            },
+          },
           include: {
             user: true,
           },

@@ -42,12 +42,12 @@ model Users {
   path      String
   admin     Boolean @default(false)
   ubiUid    String @unique
+  groups GroupMember[]
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime?
 
-  groupMembers GroupMember[]
 
   @@index([deletedAt])
   @@map("users")

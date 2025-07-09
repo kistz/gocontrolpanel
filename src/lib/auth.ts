@@ -2,6 +2,7 @@ import {
   createUserAuth,
   getUserById,
   getUserByLogin,
+  UsersWithGroups,
 } from "@/actions/database/auth";
 import {
   GetServerSidePropsContext,
@@ -15,6 +16,7 @@ import { getWebIdentities } from "./api/nadeo";
 import { axiosAuth } from "./axios/connector";
 import config from "./config";
 import { Users } from "./prisma/generated";
+import { getList } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -83,6 +85,7 @@ export const authOptions: NextAuthOptions = {
         displayName: token.displayName,
         admin: token.admin,
         ubiId: token.ubiId,
+        groups: token.groups,
       };
 
       session.jwt = token.jwt;
@@ -90,7 +93,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      let dbUser: Users | null;
+      let dbUser: UsersWithGroups | null;
       if (user) {
         const login = slugid.encode(user.accountId);
         ({ data: dbUser } = await getUserByLogin(login));
@@ -140,6 +143,12 @@ export const authOptions: NextAuthOptions = {
       token.id = dbUser.id;
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid;
+      token.groups = dbUser.groups.map((group) => ({
+        id: group.group.id,
+        name: group.group.name,
+        serverUuids: getList(group.group.serverUuids),
+        role: group.role,
+      }));
 
       return token;
     },
