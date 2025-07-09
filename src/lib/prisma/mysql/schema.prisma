@@ -43,6 +43,7 @@ model Users {
   admin     Boolean @default(false)
   ubiUid    String @unique
   groups GroupMember[]
+  hetznerProjects HetznerProjectUser[]
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -115,4 +116,34 @@ enum GroupRole {
   Admin
   Moderator
   Member
+}
+
+model HetznerProjects {
+  id          String   @id @default(uuid())
+  apiTokens Json
+  users HetznerProjectUser[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([deletedAt])
+  @@map("hetzner_projects")
+}
+
+model HetznerProjectUser {
+  userId     String
+  projectId  String
+  role       HetznerProjectRole
+
+  user       Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project    HetznerProjects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([userId, projectId])
+  @@map("hetzner_project_users")
+}
+
+enum HetznerProjectRole {
+  Admin
+  Moderator
 }
