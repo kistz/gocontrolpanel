@@ -28,9 +28,14 @@ export function decryptHetznerToken(encryptedBase64: string): string {
   const decipher = crypto.createDecipheriv(algorithm, key, iv);
   decipher.setAuthTag(tag);
 
-  const decrypted = Buffer.concat([
-    decipher.update(encrypted),
-    decipher.final(),
-  ]);
-  return decrypted.toString("utf8");
+  try {
+    const decrypted = Buffer.concat([
+      decipher.update(encrypted),
+      decipher.final(),
+    ]);
+    return decrypted.toString("utf8");
+  } catch (error) {
+    console.error("Decryption failed:", error);
+    return encryptedBase64; // Return the original string if decryption fails
+  }
 }
