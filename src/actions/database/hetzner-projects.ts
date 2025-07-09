@@ -172,9 +172,10 @@ export async function updateHetznerProject(
     Omit<EditHetznerProjects, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
 ): Promise<ServerResponse<HetznerProjectsWithUsers>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth([], async (session) => {
     const db = getClient();
 
+    const userId = session?.user?.id;
     const { users, apiTokens, ...projectData } = hetznerProject;
 
     const currentUsers = await db.hetznerProjectUser.findMany({
@@ -184,7 +185,7 @@ export async function updateHetznerProject(
 
     if (!users) {
       const updatedHetznerProject = await db.hetznerProjects.update({
-        where: { id: projectId },
+        where: { id: projectId, users: { some: { userId } } },
         data: {
           ...projectData,
           apiTokens: getList(apiTokens).map((token) =>
@@ -253,7 +254,7 @@ export async function updateHetznerProject(
     };
 
     const updatedHetznerProject = await db.hetznerProjects.update({
-      where: { id: projectId },
+      where: { id: projectId, users: { some: { userId } } },
       data: updateData,
       include: {
         users: {
@@ -280,5 +281,19 @@ export async function updateHetznerProject(
         decryptHetznerToken(token),
       ),
     };
+  });
+}
+
+export async function deleteHetznerProject(
+  projectId: string,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth([], async (session) => {
+    const db = getClient();
+
+    const userId = session?.user?.id;
+    await db.hetznerProjects.update({
+      where: { id: projectId, users: { some: { userId } } },
+      data: { deletedAt: new Date() },
+    });
   });
 }
