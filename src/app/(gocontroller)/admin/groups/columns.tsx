@@ -16,6 +16,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { Server } from "@/types/server";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -48,6 +49,7 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const group = row.original;
+      const { update } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
@@ -60,6 +62,7 @@ export const createColumns = (
               throw new Error(error);
             }
             refetch();
+            update();
             toast.success("Group successfully deleted");
           } catch (error) {
             toast.error("Error deleting group", {
