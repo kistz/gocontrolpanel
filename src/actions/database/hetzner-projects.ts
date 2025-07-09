@@ -2,9 +2,10 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
+import { decryptHetznerToken, encryptHetznerToken } from "@/lib/hetzner";
 import { Prisma } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
-import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { ServerResponse } from "@/types/responses";
 
 const editHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
   users: {
@@ -36,28 +37,15 @@ export type HetznerProjectsWithUsers = Prisma.HetznerProjectsGetPayload<{
   include: typeof usersHetznerProjects;
 }>;
 
-export async function getHetznerProjectsPaginated(
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string },
-  filter?: string,
-): Promise<ServerResponse<PaginationResponse<HetznerProjectsWithUsers>>> {
+export async function getAllHetznerProjects(): Promise<
+  ServerResponse<HetznerProjectsWithUsers[]>
+> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
-
-    const totalCount = await db.hetznerProjects.count({
-      where: {
-        deletedAt: null,
-      },
-    });
 
     const hetznerProjects = await db.hetznerProjects.findMany({
       where: {
         deletedAt: null,
-      },
-      skip: pagination.skip,
-      take: pagination.limit,
-      orderBy: {
-        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc",
       },
       include: {
         users: {
@@ -78,20 +66,23 @@ export async function getHetznerProjectsPaginated(
       },
     });
 
-    return {
-      data: hetznerProjects,
-      totalCount,
-    };
+    return hetznerProjects.map((project) => ({
+      ...project,
+      apiTokens: getList(project.apiTokens).map((token) =>
+        decryptHetznerToken(token),
+      ),
+    }));
   });
 }
 
 export async function getHetznerProject(
   hetznerProjectId: string,
 ): Promise<ServerResponse<HetznerProjectsWithUsers | null>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth([], async (session) => {
     const db = getClient();
+    const userId = session?.user?.id;
     const hetznerProject = await db.hetznerProjects.findUnique({
-      where: { id: hetznerProjectId },
+      where: { id: hetznerProjectId, users: { some: { userId } } },
       include: {
         users: {
           where: {
@@ -111,7 +102,16 @@ export async function getHetznerProject(
       },
     });
 
-    return hetznerProject;
+    if (!hetznerProject) {
+      return null;
+    }
+
+    return {
+      ...hetznerProject,
+      apiTokens: getList(hetznerProject.apiTokens).map((token) =>
+        decryptHetznerToken(token),
+      ),
+    };
   });
 }
 
@@ -128,7 +128,9 @@ export async function createHetznerProject(
     const newProject = await db.hetznerProjects.create({
       data: {
         ...projectData,
-        apiTokens: getList(apiTokens),
+        apiTokens: getList(apiTokens).map((token) =>
+          encryptHetznerToken(token),
+        ),
         users: {
           create: users.map((user) => ({
             role: user.role,
@@ -155,7 +157,12 @@ export async function createHetznerProject(
       },
     });
 
-    return newProject;
+    return {
+      ...newProject,
+      apiTokens: getList(newProject.apiTokens).map((token) =>
+        decryptHetznerToken(token),
+      ),
+    };
   });
 }
 
@@ -180,7 +187,9 @@ export async function updateHetznerProject(
         where: { id: projectId },
         data: {
           ...projectData,
-          apiTokens: getList(apiTokens),
+          apiTokens: getList(apiTokens).map((token) =>
+            encryptHetznerToken(token),
+          ),
         },
         include: {
           users: {
@@ -201,7 +210,12 @@ export async function updateHetznerProject(
         },
       });
 
-      return updatedHetznerProject;
+      return {
+        ...updatedHetznerProject,
+        apiTokens: getList(updatedHetznerProject.apiTokens).map((token) =>
+          decryptHetznerToken(token),
+        ),
+      };
     }
 
     const usersMap = new Map(users.map((u) => [u.userId, u.role]));
@@ -218,7 +232,7 @@ export async function updateHetznerProject(
 
     const updateData: any = {
       ...projectData,
-      apiTokens: getList(apiTokens),
+      apiTokens: getList(apiTokens).map((token) => encryptHetznerToken(token)),
       users: {
         deleteMany: toRemove.map((u) => ({
           userId: u.userId,
@@ -260,6 +274,11 @@ export async function updateHetznerProject(
       },
     });
 
-    return updatedHetznerProject;
+    return {
+      ...updatedHetznerProject,
+      apiTokens: getList(updatedHetznerProject.apiTokens).map((token) =>
+        decryptHetznerToken(token),
+      ),
+    };
   });
 }

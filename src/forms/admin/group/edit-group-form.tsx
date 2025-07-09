@@ -108,6 +108,7 @@ export default function EditGroupForm({
               </div>
               <FormElement
                 name={`users.${index}.role`}
+                className="w-30"
                 placeholder="Select role"
                 options={Object.values(GroupRole).map((role) => ({
                   label: role,

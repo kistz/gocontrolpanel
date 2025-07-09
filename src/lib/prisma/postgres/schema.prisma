@@ -120,6 +120,7 @@ enum GroupRole {
 
 model HetznerProjects {
   id          String   @id @default(uuid())
+  name       String
   apiTokens String[]
   users HetznerProjectUser[]
 

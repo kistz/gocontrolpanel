@@ -1,57 +1,50 @@
 "use client";
-import { createGroup } from "@/actions/database/groups";
+import { createHetznerProject } from "@/actions/database/hetzner-projects";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Users } from "@/lib/prisma/generated";
-import { getErrorMessage, getList } from "@/lib/utils";
-import { Server } from "@/types/server";
+import { HetznerProjectRole, Users } from "@/lib/prisma/generated";
+import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AddGroupSchema, AddGroupSchemaType } from "./add-group-schema";
+import { AddProjectSchema, AddProjectSchemaType } from "./add-project-schema";
 
-export default function AddGroupForm({
-  servers,
+export default function AddProjectForm({
   users,
   callback,
 }: {
-  servers: Server[];
   users: Users[];
   callback?: () => void;
 }) {
-  const form = useForm<AddGroupSchemaType>({
-    resolver: zodResolver(AddGroupSchema),
+  const form = useForm<AddProjectSchemaType>({
+    resolver: zodResolver(AddProjectSchema),
   });
 
-  async function onSubmit(values: AddGroupSchemaType) {
+  async function onSubmit(values: AddProjectSchemaType) {
     try {
-      const { error } = await createGroup({
+      const { error } = await createHetznerProject({
         ...values,
-        description: values.description || "",
-        serverUuids: getList(values.serverUuids),
         users:
           values.users?.map((user) => ({
             userId: user.userId,
-            role: user.role as GroupRole,
+            role: user.role as HetznerProjectRole,
           })) || [],
       });
       if (error) {
         throw new Error(error);
       }
-      toast.success("Group successfully created");
+      toast.success("Project successfully created");
       if (callback) {
         callback();
       }
     } catch (error) {
-      toast.error("Failed to create group", {
+      toast.error("Failed to create project", {
         description: getErrorMessage(error),
       });
     }
   }
-
-  console.log(users);
 
   return (
     <Form {...form}>
@@ -61,31 +54,57 @@ export default function AddGroupForm({
       >
         <FormElement
           name="name"
-          label="Group Name"
-          placeholder="Enter group name"
+          label="Project Name"
+          placeholder="Enter project name"
           isRequired
         />
 
-        <FormElement
-          name="description"
-          label="Description"
-          placeholder="Enter group description"
-        />
-
-        <FormElement
-          name="serverUuids"
-          label="Servers"
-          placeholder="Select servers"
-          options={servers.map((server) => ({
-            label: server.name,
-            value: server.uuid,
-          }))}
-          type="multi-select"
-        />
+        {/* API Tokens */}
+        <div className="flex flex-col gap-2">
+          <FormLabel className="text-sm">API Tokens</FormLabel>
+          {form.watch("apiTokens")?.map((_, index) => (
+            <div key={index} className="flex items-end gap-2">
+              <div className="flex-1">
+                <FormElement
+                  name={`apiTokens.${index}`}
+                  className="w-full"
+                  placeholder="Enter API token"
+                  isRequired
+                />
+              </div>
+              <Button
+                type="button"
+                variant="destructive"
+                size={"icon"}
+                onClick={() => {
+                  const currentTokens = form.getValues("apiTokens");
+                  form.setValue(
+                    "apiTokens",
+                    currentTokens?.filter((_, i) => i !== index),
+                  );
+                }}
+              >
+                <IconTrash />
+                <span className="sr-only">Remove Token</span>
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              const currentTokens = form.getValues("apiTokens") || [];
+              form.setValue("apiTokens", [...currentTokens, ""]);
+            }}
+          >
+            <IconPlus />
+            Add Token
+          </Button>
+        </div>
 
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
-          <FormLabel className="text-sm">Members</FormLabel>
+          <FormLabel className="text-sm">Users</FormLabel>
           {form.watch("users")?.map((_, index) => (
             <div key={index} className="flex items-end gap-2">
               <div className="flex-1">
@@ -102,9 +121,9 @@ export default function AddGroupForm({
               </div>
               <FormElement
                 name={`users.${index}.role`}
-                className="w-26"
+                className="w-30"
                 placeholder="Select role"
-                options={Object.values(GroupRole).map((role) => ({
+                options={Object.values(HetznerProjectRole).map((role) => ({
                   label: role,
                   value: role,
                 }))}
@@ -123,7 +142,7 @@ export default function AddGroupForm({
                 }}
               >
                 <IconTrash />
-                <span className="sr-only">Remove Member</span>
+                <span className="sr-only">Remove User</span>
               </Button>
             </div>
           ))}
@@ -135,12 +154,12 @@ export default function AddGroupForm({
               const currentUsers = form.getValues("users") || [];
               form.setValue("users", [
                 ...currentUsers,
-                { userId: "", role: GroupRole.Member },
+                { userId: "", role: HetznerProjectRole.Moderator },
               ]);
             }}
           >
             <IconPlus />
-            Add Member
+            Add User
           </Button>
         </div>
         <Button

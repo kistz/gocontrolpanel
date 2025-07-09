@@ -17,6 +17,7 @@ export const routes = {
     users: "/admin/users",
     servers: "/admin/servers",
     groups: "/admin/groups",
+    hetzner: "/admin/hetzner",
   },
   login: "/login",
 };
@@ -165,6 +166,17 @@ export const breadCrumbs: {
       },
       {
         label: "Servers",
+      },
+    ],
+  },
+  {
+    path: routes.admin.hetzner,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "Hetzner",
       },
     ],
   },

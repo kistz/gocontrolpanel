@@ -1,6 +1,6 @@
 "use client";
 import { GroupsWithUsers } from "@/actions/database/groups";
-import EditGroupForm from "@/forms/admin/edit-group-form";
+import EditGroupForm from "@/forms/admin/group/edit-group-form";
 import { Users } from "@/lib/prisma/generated";
 import { Server } from "@/types/server";
 import { IconX } from "@tabler/icons-react";

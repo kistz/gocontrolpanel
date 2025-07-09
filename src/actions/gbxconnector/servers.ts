@@ -1,6 +1,6 @@
 "use server";
-import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
-import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
+import { AddServerSchemaType } from "@/forms/admin/server/add-server-schema";
+import { EditServerSchemaType } from "@/forms/admin/server/edit-server-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosAuth } from "@/lib/axios/connector";
 import { connectToGbxClient } from "@/lib/gbxclient";

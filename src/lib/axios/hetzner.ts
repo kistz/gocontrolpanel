@@ -9,14 +9,6 @@ export const axiosHetzner = axios.create({
   },
 });
 
-axiosHetzner.interceptors.request.use((request) => {
-  const token = getHetznerToken();
-  if (token) {
-    request.headers.Authorization = `Bearer ${token}`;
-  }
-  return request;
-});
-
 axiosHetzner.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
@@ -37,5 +29,5 @@ axiosHetzner.interceptors.response.use(
       code: "unavailable",
       message: error.message || "Network error",
     } satisfies HetznerApiError);
-  }
+  },
 );

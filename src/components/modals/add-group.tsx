@@ -1,5 +1,5 @@
 "use client";
-import AddGroupForm from "@/forms/admin/add-group-form";
+import AddGroupForm from "@/forms/admin/group/add-group-form";
 import { Users } from "@/lib/prisma/generated";
 import { Server } from "@/types/server";
 import { IconX } from "@tabler/icons-react";
