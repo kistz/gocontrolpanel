@@ -2,7 +2,6 @@
 import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Users } from "@/lib/prisma/generated";
-import { getRoles } from "@/lib/utils";
 import {
   PaginationResponse,
   ServerError,
@@ -150,7 +149,7 @@ export async function createUserAuth(
 
     const newUser = {
       ...user,
-      roles: getRoles(user.roles),
+      admin: user.admin,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
@@ -191,9 +190,7 @@ export async function updateUser(
       },
     });
 
-    const isRemovingAdmin =
-      getRoles(existingUser.roles).includes("admin") &&
-      !getRoles(data.roles).includes("admin");
+    const isRemovingAdmin = existingUser.admin && !data.admin;
 
     if (isRemovingAdmin) {
       throw new ServerError("Cannot remove admin role");
@@ -203,7 +200,7 @@ export async function updateUser(
       where: { id },
       data: {
         ...data,
-        roles: getRoles(data.roles),
+        admin: data.admin,
         updatedAt: new Date(),
         deletedAt: null,
       },

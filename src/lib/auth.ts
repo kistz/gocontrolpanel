@@ -15,7 +15,6 @@ import { getWebIdentities } from "./api/nadeo";
 import { axiosAuth } from "./axios/connector";
 import config from "./config";
 import { Users } from "./prisma/generated";
-import { getRoles } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -82,7 +81,7 @@ export const authOptions: NextAuthOptions = {
         accountId: token.accountId,
         login: token.login,
         displayName: token.displayName,
-        roles: token.roles || [],
+        admin: token.admin,
         ubiId: token.ubiId,
       };
 
@@ -122,7 +121,7 @@ export const authOptions: NextAuthOptions = {
         ({ data: dbUser } = await createUserAuth({
           login: token.login,
           nickName: token.displayName,
-          roles: config.DEFAULT_ADMINS.includes(token.login) ? ["admin"] : [],
+          admin: config.DEFAULT_ADMINS.includes(token.login),
           path: "",
           ubiUid,
         }));
@@ -139,7 +138,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       token.id = dbUser.id;
-      token.roles = getRoles(dbUser.roles);
+      token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid;
 
       return token;
@@ -166,7 +165,7 @@ export async function withAuth(roles?: string[]): Promise<Session> {
     throw new Error("Not authenticated");
   }
 
-  if (roles && !session.user.roles.some((role) => roles.includes(role))) {
+  if (roles && !session.user.admin) {
     throw new Error("Not authorized");
   }
   return session;

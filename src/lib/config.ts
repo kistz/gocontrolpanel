@@ -4,6 +4,7 @@ import "dotenv/config";
 const config: Config = {
   NODE_ENV: process.env.NODE_ENV || "development",
   CONNECTOR_URL: process.env.CONNECTOR_URL || "http://localhost:6980",
+  HETZNER_URL: "https://api.hetzner.cloud/v1",
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
     : [],

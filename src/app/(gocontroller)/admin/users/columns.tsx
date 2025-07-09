@@ -42,17 +42,12 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     ),
   },
   {
-    accessorKey: "roles",
+    accessorKey: "admin",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Roles"} />
+      <DataTableColumnHeader column={column} title={"Admin"} />
     ),
     cell: ({ row }) => {
-      const roles = row.getValue("roles") as string[];
-      // Capitalize the first letter of each role
-      const formattedRoles = roles
-        .map((role) => role.charAt(0).toUpperCase() + role.slice(1))
-        .join(", ");
-      return <span>{formattedRoles}</span>;
+      return <span>{row.getValue("admin") as string}</span>;
     },
   },
   {

@@ -116,7 +116,7 @@ export default function MapInfo({
           <span className="text-sm">{formatTime(mapInfo.authorTime)}</span>
         </div>
 
-        {session.data?.user?.roles?.includes("admin") && (
+        {session.data?.user?.admin && (
           <>
             <Separator />
             <LiveActions

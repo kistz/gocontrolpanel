@@ -40,12 +40,14 @@ model Users {
   login     String @unique
   nickName  String
   path      String
-  roles     Json
+  admin     Boolean @default(false)
   ubiUid    String @unique
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime?
+
+  groupMembers GroupMember[]
 
   @@index([deletedAt])
   @@map("users")
@@ -80,4 +82,37 @@ model Interfaces {
 
   @@index([deletedAt])
   @@map("interfaces")
+}
+
+model Groups {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  serverUuids  Json
+  users        GroupMember[]
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  @@index([deletedAt])
+  @@map("groups")
+}
+
+model GroupMember {
+  userId   String
+  groupId  String
+  role     GroupRole
+
+  user     Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    Groups  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+  @@map("group_members")
+}
+
+enum GroupRole {
+  Admin
+  Moderator
+  User
 }

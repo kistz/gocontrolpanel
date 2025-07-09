@@ -10,7 +10,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      roles: string[];
+      admin: boolean;
       displayName: string;
       accountId: string;
       ubiId: string;
@@ -32,7 +32,7 @@ declare module "next-auth/jwt" {
     accountId: string;
     login: string;
     displayName: string;
-    roles: string[];
+    admin: boolean;
     ubiId: string;
     jwt?: string;
   }

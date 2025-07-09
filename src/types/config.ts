@@ -1,6 +1,7 @@
 export interface Config {
   NODE_ENV: string;
   CONNECTOR_URL: string;
+  HETZNER_URL: string;
   DEFAULT_ADMINS: string[];
   NADEO: {
     CLIENT_ID: string;
