@@ -11,7 +11,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Users } from "@/lib/prisma/generated";
@@ -107,8 +106,6 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>View user</DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
                 Edit user
               </DropdownMenuItem>
