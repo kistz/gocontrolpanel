@@ -3,7 +3,7 @@ import { HetznerApiError } from "@/types/api/hetzner/error";
 import axios, { AxiosError } from "axios";
 
 export const axiosHetzner = axios.create({
-  baseURL: config.HETZNER_URL,
+  baseURL: config.HETZNER.URL,
   headers: {
     "Content-Type": "application/json",
   },
