@@ -1,9 +1,7 @@
 "use client";
-
-import { deleteUserById } from "@/actions/database/users";
-import BooleanDisplay from "@/components/boolean-display";
+import { deleteGroup, GroupsWithUsers } from "@/actions/database/groups";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditUserModal from "@/components/modals/edit-user";
+import EditGroupModal from "@/components/modals/edit-group";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -15,66 +13,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { Server } from "@/types/server";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { parseTmTags } from "tmtags";
 
-export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
+export const createColumns = (
+  refetch: () => void,
+  data: {
+    servers: Server[];
+    users: Users[];
+  },
+): ColumnDef<GroupsWithUsers>[] => [
   {
-    accessorKey: "nickName",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Nickname"} />
-    ),
-    cell: ({ row }) => (
-      <span
-        dangerouslySetInnerHTML={{
-          __html: parseTmTags(row.getValue("nickName")),
-        }}
-      />
+      <DataTableColumnHeader column={column} title={"Group Name"} />
     ),
   },
   {
-    accessorKey: "login",
+    accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Login"} />
+      <DataTableColumnHeader column={column} title={"Description"} />
     ),
   },
   {
-    accessorKey: "admin",
+    accessorKey: "_count.users",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Admin"} />
+      <DataTableColumnHeader column={column} title={"Members"} />
     ),
-    cell: ({ row }) => (
-      <BooleanDisplay
-        value={row.getValue("admin") as boolean}
-        falseIcon={IconX}
-        trueIcon={IconCheck}
-      />
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Joined"} />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original;
+      const group = row.original;
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
@@ -82,14 +55,14 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
       const handleDelete = () => {
         startTransition(async () => {
           try {
-            const { error } = await deleteUserById(user.id);
+            const { error } = await deleteGroup(group.id);
             if (error) {
               throw new Error(error);
             }
             refetch();
-            toast.success("User successfully deleted");
+            toast.success("Group successfully deleted");
           } catch (error) {
-            toast.error("Error deleting user", {
+            toast.error("Error deleting group", {
               description: getErrorMessage(error),
             });
           }
@@ -107,13 +80,13 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit user
+                Edit group
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsOpen(true)}
               >
-                Delete user
+                Delete group
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -122,8 +95,8 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onConfirm={handleDelete}
-            title="Delete user"
-            description={`Are you sure you want to delete ${user.nickName}?`}
+            title="Delete group"
+            description={`Are you sure you want to delete ${group.name}?`}
             confirmText="Delete"
             cancelText="Cancel"
           />
@@ -133,7 +106,13 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             setIsOpen={setIsEditOpen}
             onClose={() => refetch()}
           >
-            <EditUserModal data={user} />
+            <EditGroupModal
+              data={{
+                group,
+                servers: data.servers,
+                users: data.users,
+              }}
+            />
           </Modal>
         </div>
       );

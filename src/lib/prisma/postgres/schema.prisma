@@ -114,5 +114,5 @@ model GroupMember {
 enum GroupRole {
   Admin
   Moderator
-  User
+  Member
 }

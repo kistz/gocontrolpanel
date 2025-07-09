@@ -156,13 +156,13 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
   return Buffer.from(buffer).toString("base64");
 }
 
-export function getRoles(roles: any): string[] {
-  if (Array.isArray(roles)) {
-    return roles.map(String);
-  } else if (typeof roles === "string") {
-    return [roles];
-  } else if (typeof roles === "object" && roles !== null) {
-    return Object.keys(roles);
+export function getList(list: any): string[] {
+  if (Array.isArray(list)) {
+    return list.map(String);
+  } else if (typeof list === "string") {
+    return [list];
+  } else if (typeof list === "object" && list !== null) {
+    return Object.keys(list);
   }
   return [];
 }

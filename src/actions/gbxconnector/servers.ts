@@ -13,21 +13,29 @@ let healthStatus: boolean | null = null;
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
-  const res = await axiosAuth.get<Server[]>("/servers");
+  try {
+    const res = await axiosAuth.get<Server[]>("/servers");
 
-  if (res.status !== 200) {
-    if (isAxiosError(res) && res.code === "ECONNREFUSED") {
+    if (res.status !== 200) {
+      if (isAxiosError(res) && res.code === "ECONNREFUSED") {
+        healthStatus = false;
+      }
+      throw new ServerError("Failed to get servers");
+    }
+
+    const redis = await getRedisClient();
+
+    const servers = res.data;
+
+    await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
+    return servers;
+  } catch (error) {
+    if (isAxiosError(error) && error.code === "ECONNREFUSED") {
       healthStatus = false;
     }
-    throw new ServerError("Failed to get servers");
+    console.error("Error syncing servers:", error);
+    throw new ServerError("Failed to sync servers");
   }
-
-  const redis = await getRedisClient();
-
-  const servers = res.data;
-
-  await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
-  return servers;
 }
 
 export async function getServers(): Promise<ServerResponse<Server[]>> {

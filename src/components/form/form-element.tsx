@@ -82,7 +82,7 @@ export default function FormElement<TControl>({
             <div>
               {label && (
                 <FormLabel
-                  className="text-sm flex items-end"
+                  className="text-sm flex items-center"
                   data-error={!!error}
                 >
                   {label}{" "}

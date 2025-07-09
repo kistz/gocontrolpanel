@@ -26,8 +26,8 @@ import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
-interface PaginationTableProps<TData, TValue> {
-  createColumns: (refetch: () => void) => ColumnDef<TData, TValue>[];
+interface PaginationTableProps<TData, TValue, TArgs> {
+  createColumns: (refetch: () => void, data: TArgs) => ColumnDef<TData, TValue>[];
   fetchData: (
     pagination: {
       skip: number;
@@ -39,16 +39,18 @@ interface PaginationTableProps<TData, TValue> {
     },
     filter?: string,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>;
+  args?: TArgs;
   pageSize?: number;
   filter?: boolean;
 }
 
-export function PaginationTable<TData, TValue>({
+export function PaginationTable<TData, TValue, TArgs>({
   createColumns,
   fetchData,
+  args = {} as TArgs,
   pageSize = 10,
   filter = false,
-}: PaginationTableProps<TData, TValue>) {
+}: PaginationTableProps<TData, TValue, TArgs>) {
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
 
@@ -70,7 +72,7 @@ export function PaginationTable<TData, TValue>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalFilter]);
 
-  const columns = createColumns(refetch);
+  const columns = createColumns(refetch, args);
 
   const table = useReactTable({
     data,

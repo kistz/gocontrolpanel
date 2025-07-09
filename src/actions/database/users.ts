@@ -9,7 +9,7 @@ import {
 } from "@/types/responses";
 
 export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth([], async () => {
     const db = getClient();
     const users = await db.users.findMany({
       where: {
@@ -21,40 +21,12 @@ export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
   });
 }
 
-export async function getUserCount(): Promise<ServerResponse<number>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    return db.users.count({
-      where: {
-        deletedAt: null,
-      },
-    });
-  });
-}
-
-export async function getNewUsersCount(
-  days: number,
-): Promise<ServerResponse<number>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const date = new Date();
-    date.setDate(date.getDate() - days);
-    const count = await db.users.count({
-      where: {
-        createdAt: { gt: date },
-        deletedAt: null,
-      },
-    });
-    return count;
-  });
-}
-
 export async function getUsersPaginated(
   pagination: { skip: number; limit: number },
   sorting: { field: string; order: string },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth([], async () => {
     const db = getClient();
 
     const totalCount = await db.users.count({
@@ -94,76 +66,6 @@ export async function getUsersPaginated(
       data: users,
       totalCount,
     };
-  });
-}
-
-export async function getUserById(id: string): Promise<ServerResponse<Users>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const user = await db.users.findUniqueOrThrow({
-      where: {
-        id,
-        deletedAt: null,
-      },
-    });
-
-    return user;
-  });
-}
-
-export async function getUserByLogin(
-  login: string,
-): Promise<ServerResponse<Users>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const user = await db.users.findFirstOrThrow({
-      where: {
-        login,
-        deletedAt: null,
-      },
-    });
-
-    return user;
-  });
-}
-
-export async function createUserAuth(
-  user: Omit<Users, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<ServerResponse<Users>> {
-  return doServerAction(async () => {
-    const db = getClient();
-
-    const existingUser = await db.users.findFirst({
-      where: {
-        OR: [
-          { login: user.login },
-          { nickName: user.nickName },
-          { ubiUid: user.ubiUid },
-        ],
-      },
-    });
-
-    if (existingUser) {
-      throw new ServerError("User with this login or nickname already exists");
-    }
-
-    const newUser = {
-      ...user,
-      admin: user.admin,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    };
-
-    const result = await db.users.create({
-      data: newUser,
-    });
-
-    if (!result) {
-      throw new ServerError("Failed to create user");
-    }
-
-    return result;
   });
 }
 
