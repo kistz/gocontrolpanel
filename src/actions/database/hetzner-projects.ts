@@ -237,7 +237,7 @@ export async function updateHetznerProject(
       users: {
         deleteMany: toRemove.map((u) => ({
           userId: u.userId,
-          hetznerProjectId: projectId,
+          projectId,
         })),
         create: toAdd.map((user) => ({
           userId: user.userId,
@@ -246,7 +246,7 @@ export async function updateHetznerProject(
         updateMany: toUpdate.map((user) => ({
           where: {
             userId: user.userId,
-            hetznerProjectId: projectId,
+            projectId,
           },
           data: { role: user.role },
         })),

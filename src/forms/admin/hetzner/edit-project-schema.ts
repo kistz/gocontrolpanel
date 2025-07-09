@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-export const AddProjectSchema = z.object({
+export const EditProjectSchema = z.object({
   name: z.string().min(1, "Project name is required"),
-  apiTokens: z.array(z.string().min(1, "API token is required")).optional().describe("List of API tokens for the project"),
+  apiTokens: z
+    .array(z.string().min(1, "API Token is required"))
+    .optional()
+    .describe("List of API tokens for the project"),
   users: z
     .array(
       z.object({
@@ -14,4 +17,4 @@ export const AddProjectSchema = z.object({
     .describe("List of users in the project with their roles"),
 });
 
-export type AddProjectSchemaType = z.infer<typeof AddProjectSchema>;
+export type EditProjectSchemaType = z.infer<typeof EditProjectSchema>;
