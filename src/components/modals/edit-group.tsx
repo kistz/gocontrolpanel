@@ -4,6 +4,7 @@ import EditGroupForm from "@/forms/admin/edit-group-form";
 import { Users } from "@/lib/prisma/generated";
 import { Server } from "@/types/server";
 import { IconX } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
@@ -15,10 +16,17 @@ export default function EditGroupModal({
   servers: Server[];
   users: Users[];
 }>) {
+  const { update } = useSession();
+
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleCallback = () => {
+    closeModal?.();
+    update();
   };
 
   return (
@@ -37,7 +45,7 @@ export default function EditGroupModal({
         group={data.group}
         servers={data.servers}
         users={data.users}
-        callback={closeModal}
+        callback={handleCallback}
       />
     </Card>
   );

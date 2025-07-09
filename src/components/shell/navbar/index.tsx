@@ -24,7 +24,7 @@ export default async function Navbar() {
 
   return (
     <>
-      {session && <NavGroups groups={session.user.groups} />}
+      {session && <NavGroups />}
       {session && session.user.admin && <NavAdmin />}
       <NavFooter />
     </>

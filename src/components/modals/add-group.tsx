@@ -3,6 +3,7 @@ import AddGroupForm from "@/forms/admin/add-group-form";
 import { Users } from "@/lib/prisma/generated";
 import { Server } from "@/types/server";
 import { IconX } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
@@ -15,6 +16,7 @@ export default function AddGroupModal({
   users: Users[];
 }>) {
   const router = useRouter();
+  const { update } = useSession();
 
   if (!data) return null;
 
@@ -24,6 +26,7 @@ export default function AddGroupModal({
 
   const handleCallback = () => {
     closeModal?.();
+    update();
     router.refresh();
   };
 
