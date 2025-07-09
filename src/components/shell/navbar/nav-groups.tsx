@@ -232,7 +232,7 @@ export default function NavGroups() {
                 <SidebarMenuButton asChild>
                   <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
                     <IconServer />
-                    <span>No servers found</span>
+                    <span>No servers selected</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
