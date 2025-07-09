@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteUserById } from "@/actions/database/users";
+import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditUserModal from "@/components/modals/edit-user";
 import Modal from "@/components/modals/modal";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -46,9 +48,13 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Admin"} />
     ),
-    cell: ({ row }) => {
-      return <span>{row.getValue("admin") as string}</span>;
-    },
+    cell: ({ row }) => (
+      <BooleanDisplay
+        value={row.getValue("admin") as boolean}
+        falseIcon={IconX}
+        trueIcon={IconCheck}
+      />
+    ),
   },
   {
     accessorKey: "createdAt",
