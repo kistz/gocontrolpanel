@@ -5,17 +5,17 @@ interface SortingHook {
   sorting: SortingState;
   setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
   field: string;
-  order: string;
+  order: 'asc' | 'desc';
 }
 
 export const useSorting = (
   initialField: string = "id",
-  initialOrder: string = "ASC",
+  initialOrder: "asc" | "desc" = "asc",
 ): SortingHook => {
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: initialField,
-      desc: initialOrder === "DESC",
+      desc: initialOrder === "desc",
     },
   ]);
 
@@ -23,6 +23,6 @@ export const useSorting = (
     sorting,
     setSorting,
     field: sorting[0]?.id || "id",
-    order: sorting[0]?.desc ? "DESC" : "ASC",
+    order: sorting[0]?.desc ? "desc" : "asc",
   };
 };

@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -19,47 +20,50 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
-import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
-interface PaginationTableProps<TData, TValue, TArgs> {
-  createColumns: (refetch: () => void, data: TArgs) => ColumnDef<TData, TValue>[];
+interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
+  createColumns: (
+    refetch: () => void,
+    data: TArgs,
+  ) => ColumnDef<TData, TValue>[];
   fetchData: (
-    pagination: {
-      skip: number;
-      limit: number;
-    },
+    pagination: PaginationState,
     sorting: {
       field: string;
-      order: string;
+      order: 'asc' | 'desc';
     },
     filter?: string,
+    fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>;
   args?: TArgs;
   pageSize?: number;
   filter?: boolean;
 }
 
-export function PaginationTable<TData, TValue, TArgs>({
+export function PaginationTable<TData, TValue, TArgs, TFetch>({
   createColumns,
   fetchData,
   args = {} as TArgs,
   pageSize = 10,
   filter = false,
-}: PaginationTableProps<TData, TValue, TArgs>) {
+}: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
 
-  const { pagination, setPagination, skip, limit } = usePagination(pageSize);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageSize,
+    pageIndex: 0,
+  });
   const { sorting, setSorting, field, order } = useSorting();
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const { data, totalCount, loading, refetch } = usePaginationAPI<TData>(
     fetchData,
-    { skip, limit },
+    pagination,
     { field, order },
     globalFilter,
   );

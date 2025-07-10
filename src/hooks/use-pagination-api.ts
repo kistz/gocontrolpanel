@@ -1,4 +1,5 @@
 import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 
 interface PaginationAPIHook<TData> {
@@ -10,12 +11,15 @@ interface PaginationAPIHook<TData> {
 
 export const usePaginationAPI = <TData>(
   fetchData: (
-    pagination: { skip: number; limit: number },
-    sorting: { field: string; order: string },
+    pagination: PaginationState,
+    sorting: { field: string; order: "asc" | "desc" },
     filter?: string,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>,
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string } = { field: "id", order: "ASC" },
+  pagination: PaginationState,
+  sorting: { field: string; order: "asc" | "desc" } = {
+    field: "id",
+    order: "asc",
+  },
   filter: string = "",
 ): PaginationAPIHook<TData> => {
   const [data, setData] = useState<TData[]>([]);
@@ -46,7 +50,13 @@ export const usePaginationAPI = <TData>(
   useEffect(() => {
     fetchDataFromAPI();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.skip, pagination.limit, sorting.field, sorting.order, filter]);
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    sorting.field,
+    sorting.order,
+    filter,
+  ]);
 
   return { data, totalCount, loading, refetch: fetchDataFromAPI };
 };

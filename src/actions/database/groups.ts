@@ -4,6 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 
 const editGroups = Prisma.validator<Prisma.GroupsInclude>()({
   users: {
@@ -71,8 +72,8 @@ export async function getAllGroups(): Promise<
 }
 
 export async function getGroupsPaginated(
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string },
+  pagination: PaginationState,
+  sorting: { field: string; order: 'asc' | 'desc' },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<GroupsWithUsers>>> {
   return doServerActionWithAuth([], async () => {
@@ -100,10 +101,10 @@ export async function getGroupsPaginated(
           ],
         }),
       },
-      skip: pagination.skip,
-      take: pagination.limit,
+      skip: pagination.pageIndex * pagination.pageSize,
+      take: pagination.pageSize,
       orderBy: {
-        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc",
+        [sorting.field]: sorting.order.toLowerCase(),
       },
       include: {
         users: {

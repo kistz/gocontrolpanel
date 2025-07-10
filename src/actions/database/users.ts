@@ -1,5 +1,5 @@
 "use server";
-import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
+import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Users } from "@/lib/prisma/generated";
 import {
@@ -7,6 +7,7 @@ import {
   ServerError,
   ServerResponse,
 } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 
 export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
   return doServerActionWithAuth([], async () => {
@@ -22,8 +23,8 @@ export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
 }
 
 export async function getUsersPaginated(
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string },
+  pagination: PaginationState,
+  sorting: { field: string; order: 'asc' | 'desc' },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
   return doServerActionWithAuth([], async () => {
@@ -55,10 +56,10 @@ export async function getUsersPaginated(
           ],
         }),
       },
-      skip: pagination.skip,
-      take: pagination.limit,
+      skip: pagination.pageIndex * pagination.pageSize,
+      take: pagination.pageSize,
       orderBy: {
-        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc",
+        [sorting.field]: sorting.order.toLowerCase(),
       },
     });
 
