@@ -80,9 +80,12 @@ export interface HetznerServer {
   ingoing_traffic: number | null;
   included_traffic: number | null;
   volumes: number[];
+  labels: {
+    [key: string]: string;
+  };
 }
 
-export interface HetznerServerResponse {
+export interface HetznerServersResponse {
   servers: HetznerServer[];
   meta: {
     pagination: {
@@ -92,6 +95,17 @@ export interface HetznerServerResponse {
       next_page: number | null;
       last_page: number | null;
       total_entries: number | null;
+    };
+  };
+}
+
+export interface HetznerServerResponse {
+  server: HetznerServer;
+  meta: {
+    rate_limit: {
+      limit: number;
+      remaining: number;
+      reset: string;
     };
   };
 }

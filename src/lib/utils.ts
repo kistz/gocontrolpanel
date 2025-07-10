@@ -221,3 +221,11 @@ export function capitalizeWords(str: string): string {
     .map((word) => capitalize(word))
     .join(" ");
 }
+
+export function isValidHetznerServerName(name: string): boolean {
+  const maxLength = 253;
+
+  const hostnameRegex = /^(?!-)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
+
+  return name.length <= maxLength && hostnameRegex.test(name);
+}

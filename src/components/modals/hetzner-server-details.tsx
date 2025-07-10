@@ -20,6 +20,12 @@ export default function HetznerServerDetailsModal({
     (price) => price.location === data.server.datacenter.location.name,
   );
 
+  const passwords = {
+    superAdmin: data.server.labels["authorization.superadmin.password"],
+    admin: data.server.labels["authorization.admin.password"],
+    user: data.server.labels["authorization.user.password"],
+  };
+
   return (
     <Card
       onClick={stopPropagation}
@@ -115,6 +121,24 @@ export default function HetznerServerDetailsModal({
         </div>
 
         <div className="flex flex-col gap-2">
+          <h4 className="text-muted-foreground">Passwords</h4>
+          <div className="grid grid-cols-1 gap-2">
+            <div className="flex flex-col">
+              <span className="font-semibold">SuperAdmin Password</span>
+              <span className="truncate">{passwords.superAdmin || "-"}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Admin Password</span>
+              <span className="truncate">{passwords.admin || "-"}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">User Password</span>
+              <span className="truncate">{passwords.user || "-"}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
           <h4 className="text-muted-foreground">Pricing</h4>
           {pricing ? (
             <div className="grid grid-cols-2 gap-2">
@@ -133,13 +157,13 @@ export default function HetznerServerDetailsModal({
               <div className="flex flex-col">
                 <span className="font-semibold truncate">Included Traffic</span>
                 <span className="truncate">
-                  {(
+                  {Math.floor(
                     pricing.included_traffic /
                     1000 /
                     1000 /
                     1000 /
                     1000
-                  ).toFixed(0)}{" "}
+                  )}{" "}
                   TB
                 </span>
               </div>
@@ -165,7 +189,7 @@ export default function HetznerServerDetailsModal({
               <span className="font-semibold">Outgoing</span>
               <span className="truncate">
                 {data.server.outgoing_traffic
-                  ? `${data.server.outgoing_traffic / 1000 / 1000} MB`
+                  ? `${Math.floor(data.server.outgoing_traffic / 1000 / 1000)} MB`
                   : "-"}
               </span>
             </div>
@@ -173,7 +197,7 @@ export default function HetznerServerDetailsModal({
               <span className="font-semibold">Ingoing</span>
               <span className="truncate">
                 {data.server.ingoing_traffic
-                  ? `${data.server.ingoing_traffic / 1000 / 1000} MB`
+                  ? `${Math.floor(data.server.ingoing_traffic / 1000 / 1000)} MB`
                   : "-"}
               </span>
             </div>

@@ -6,18 +6,25 @@ import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import {
   HetznerServer,
   HetznerServerResponse,
+  HetznerServersResponse,
 } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
+import path from "path";
+import { readFileSync } from "fs";
+
+const templatePath = path.join(__dirname, 'hetzner', 'server-init.sh.hbs');
+const templateContent = readFileSync(templatePath, 'utf-8');
+const template = Handlebars.compile(templateContent);
 
 export async function getHetznerServers(
   projectId: string,
-): Promise<ServerResponse<HetznerServerResponse>> {
+): Promise<ServerResponse<HetznerServersResponse>> {
   return doServerActionWithAuth([], async () => {
     const token = await getApiToken(projectId);
 
-    const res = await axiosHetzner.get<HetznerServerResponse>("/servers", {
+    const res = await axiosHetzner.get<HetznerServersResponse>("/servers", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -53,13 +60,13 @@ export async function getHetznerServersPaginated(
       params.append("name", filter);
     }
 
-    const res = await axiosHetzner.get<HetznerServerResponse>("/servers", {
+    const res = await axiosHetzner.get<HetznerServersResponse>("/servers", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
       params,
     });
-    
+
     await setRateLimit(projectId, res);
 
     return {
@@ -107,8 +114,58 @@ export async function getRateLimit(
     const { limit, remaining } = JSON.parse(rateLimitData);
 
     return {
-      limit: parseFloat(limit).toFixed(0),
-      remaining: parseFloat(remaining).toFixed(0),
+      limit: Math.floor(parseFloat(limit)),
+      remaining: Math.floor(parseFloat(remaining)),
     };
+  });
+}
+
+export async function createHetznerServer(
+  projectId: string,
+): Promise<ServerResponse<HetznerServer>> {
+  return doServerActionWithAuth([], async () => {
+    const token = await getApiToken(projectId);
+
+    const data = {
+      dedi_login: 'gcp-test',
+      dedi_password: '%J==.E#DLEHNh$,)',
+      room_password: 'test',
+      superadmin_password: 'test',
+      admin_password: 'test',
+      user_password: 'test',
+    };
+    
+    const userData = template(data);
+
+    const body = {
+      name: "my-server",
+      server_type: "cpx11",
+      image: "ubuntu-24.04",
+      location: "fsn1",
+      user_data: userData,
+      labels: {
+        "authorization.superadmin.password": data.superadmin_password,
+        "authorization.admin.password": data.admin_password,
+        "authorization.user.password": data.user_password,
+      },
+      public_net: {
+        enable_ipv4: true,
+        enable_ipv6: false,
+      }
+    }
+
+    const res = await axiosHetzner.post<HetznerServerResponse>(
+      "/servers",
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    await setRateLimit(projectId, res);
+
+    return res.data.server;
   });
 }
