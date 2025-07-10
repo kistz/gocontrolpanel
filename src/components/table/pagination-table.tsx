@@ -44,6 +44,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
   pageSize?: number;
   filter?: boolean;
   fetchArgs?: TFetch;
+  actions?: React.ReactNode;
 }
 
 export function PaginationTable<TData, TValue, TArgs, TFetch>({
@@ -53,6 +54,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   pageSize = 10,
   filter = false,
   fetchArgs = {} as TFetch,
+  actions,
 }: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
@@ -97,13 +99,21 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
 
   return (
     <div className="flex flex-col gap-4">
-      {filter && (
-        <Input
-          placeholder="Search..."
-          value={globalFilter || ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="min-w-64 w-1/3"
-        />
+      {(filter || actions) && (
+        <div className="flex justify-between items-center gap-2">
+          {filter ? (
+            <Input
+              placeholder="Search..."
+              value={globalFilter || ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="min-w-64 w-1/3"
+            />
+          ) : (
+            <span></span>
+          )}
+
+          {actions}
+        </div>
       )}
 
       <div className="rounded-md border flex-1 overflow-hidden">

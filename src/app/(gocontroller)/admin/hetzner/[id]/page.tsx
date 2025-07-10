@@ -43,7 +43,10 @@ export default async function ProjectPage({
         args={{ projectId: id }}
         fetchData={getHetznerServersPaginated}
         fetchArgs={{ projectId: id }}
-        filter
+        // filter
+        actions={<div className="flex items-center gap-2">
+          test
+          </div>}
       />
     </div>
   );

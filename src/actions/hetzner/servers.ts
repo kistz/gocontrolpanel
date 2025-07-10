@@ -5,17 +5,19 @@ import { axiosHetzner } from "@/lib/axios/hetzner";
 import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import {
   HetznerServer,
-  HetznerServerResponse,
   HetznerServersResponse,
 } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { getApiToken, setRateLimit } from "./util";
-import path from "path";
 import { readFileSync } from "fs";
+import Handlebars from "handlebars";
+import path from "path";
+import { packageDirectorySync } from "pkg-dir";
+import { getApiToken, setRateLimit } from "./util";
 
-const templatePath = path.join(__dirname, 'hetzner', 'server-init.sh.hbs');
-const templateContent = readFileSync(templatePath, 'utf-8');
+const root = packageDirectorySync() || process.cwd();
+const templatePath = path.join(root, "hetzner", "server-init.sh.hbs");
+const templateContent = readFileSync(templatePath, "utf-8");
 const template = Handlebars.compile(templateContent);
 
 export async function getHetznerServers(
@@ -122,50 +124,52 @@ export async function getRateLimit(
 
 export async function createHetznerServer(
   projectId: string,
-): Promise<ServerResponse<HetznerServer>> {
+): Promise<ServerResponse<void>> {
   return doServerActionWithAuth([], async () => {
     const token = await getApiToken(projectId);
 
     const data = {
-      dedi_login: 'gcp-test',
-      dedi_password: '%J==.E#DLEHNh$,)',
-      room_password: 'test',
-      superadmin_password: 'test',
-      admin_password: 'test',
-      user_password: 'test',
+      dedi_login: "gcp-test",
+      dedi_password: "%J==.E#DLEHNh$,)",
+      room_password: "test",
+      superadmin_password: "test",
+      admin_password: "test",
+      user_password: "test",
     };
-    
+
     const userData = template(data);
 
-    const body = {
-      name: "my-server",
-      server_type: "cpx11",
-      image: "ubuntu-24.04",
-      location: "fsn1",
-      user_data: userData,
-      labels: {
-        "authorization.superadmin.password": data.superadmin_password,
-        "authorization.admin.password": data.admin_password,
-        "authorization.user.password": data.user_password,
-      },
-      public_net: {
-        enable_ipv4: true,
-        enable_ipv6: false,
-      }
-    }
+    console.log(userData);
 
-    const res = await axiosHetzner.post<HetznerServerResponse>(
-      "/servers",
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+    // const body = {
+    //   name: "my-server",
+    //   server_type: "cpx11",
+    //   image: "ubuntu-24.04",
+    //   location: "fsn1",
+    //   user_data: userData,
+    //   labels: {
+    //     "authorization.superadmin.password": data.superadmin_password,
+    //     "authorization.admin.password": data.admin_password,
+    //     "authorization.user.password": data.user_password,
+    //   },
+    //   public_net: {
+    //     enable_ipv4: true,
+    //     enable_ipv6: false,
+    //   }
+    // }
 
-    await setRateLimit(projectId, res);
+    // const res = await axiosHetzner.post<HetznerServerResponse>(
+    //   "/servers",
+    //   body,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   },
+    // );
 
-    return res.data.server;
+    // await setRateLimit(projectId, res);
+
+    // return res.data.server;
   });
 }
