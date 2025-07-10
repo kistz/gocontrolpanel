@@ -1,5 +1,5 @@
 import { getHetznerProject } from "@/actions/database/hetzner-projects";
-import { auth } from "@/lib/auth";
+import { auth, withAuth } from "@/lib/auth";
 import { routes } from "@/routes";
 import { redirect } from "next/navigation";
 
@@ -10,7 +10,7 @@ export default async function AdminHetznerProjectLayout({
   children: React.ReactNode;
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
+  const session = await withAuth(["admin"]);
   const { id } = await params;
 
   if (!session) {
