@@ -1,7 +1,7 @@
-"use server";
 import config from "@/lib/config";
 import { MapInfo, NadeoTokens, WebIdentity } from "@/types/api/nadeo";
 import { ServerError, ServerResponse } from "@/types/responses";
+import "server-only";
 import { doServerAction } from "../actions";
 import { getRedisClient } from "../redis";
 

@@ -6,6 +6,7 @@ import { getKeyActiveMap, getKeyJukebox, getRedisClient } from "@/lib/redis";
 import { JukeboxMap, MapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { GbxClient } from "@evotm/gbxclient";
+import { createMap } from "../database/gbx";
 import { getMapByUid } from "../database/maps";
 
 export async function getJukebox(
@@ -237,15 +238,31 @@ export async function syncMap(
   client: GbxClient,
   serverUuid: string,
 ): Promise<void> {
-  const mapInfo = await client.call("GetCurrentMapInfo");
+  const mapInfo: MapInfo = await client.call("GetCurrentMapInfo");
 
   if (!mapInfo) {
     throw new ServerError("Failed to get current map info");
   }
 
-  const { data: map } = await getMapByUid(mapInfo.uid);
+  let { data: map } = await getMapByUid(mapInfo.UId);
   if (!map) {
-    throw new ServerError(`Map with UID ${mapInfo.uid} not found`);
+    const { data, error } = await createMap({
+      name: mapInfo.Name,
+      uid: mapInfo.UId,
+      fileName: mapInfo.FileName,
+      author: mapInfo.Author,
+      authorNickname: mapInfo.AuthorNickname,
+      authorTime: mapInfo.AuthorTime,
+      goldTime: mapInfo.GoldTime,
+      silverTime: mapInfo.SilverTime,
+      bronzeTime: mapInfo.BronzeTime,
+    });
+
+    if (!data || error) {
+      throw new ServerError(`Failed to create map: ${error}`);
+    }
+
+    map = data;
   }
 
   const redis = await getRedisClient();
