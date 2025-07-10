@@ -13,6 +13,7 @@ export const createColumns = (): ColumnDef<HetznerServer>[] => [
   },
   {
     accessorKey: "status",
+    header: () => <span>Status</span>,
   },
   {
     accessorKey: "created",

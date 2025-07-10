@@ -2,6 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
+import { getRedisClient } from "@/lib/redis";
 import { getList } from "@/lib/utils";
 import {
   HetznerServer,
@@ -44,6 +45,16 @@ export async function getHetznerServersPaginated(
     if (!projectId) {
       throw new Error("Project ID is required to fetch Hetzner servers.");
     }
+    const client = await getRedisClient();
+    const data = await client.get("hetzner");
+    console.log("Hetzner servers data from cache:", data);
+    if (data) {
+      const parsedData = JSON.parse(data);
+      return {
+        data: parsedData.data,
+        totalCount: parsedData.totalCount,
+      };
+    }
 
     const { data: project } = await getHetznerProject(projectId);
     const apiTokens = getList(project?.apiTokens);
@@ -68,6 +79,14 @@ export async function getHetznerServersPaginated(
       },
       params,
     });
+
+    await client.set(
+      "hetzner",
+      JSON.stringify({
+        data: res.data.servers,
+        totalCount: res.data.meta.pagination.total_entries || 0,
+      }),
+    );
 
     return {
       data: res.data.servers,
