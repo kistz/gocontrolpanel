@@ -12,6 +12,7 @@ export default async function ProjectPage({
   return (
     <PaginationTable
       createColumns={createColumns}
+      args={{ projectId: id }}
       fetchData={getHetznerServersPaginated}
       fetchArgs={{ projectId: id }}
       filter

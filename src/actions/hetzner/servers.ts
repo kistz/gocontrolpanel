@@ -12,21 +12,26 @@ import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getHetznerProject } from "../database/hetzner-projects";
 
+async function getApiToken(projectId: string): Promise<string> {
+  const { data: project } = await getHetznerProject(projectId);
+  const apiTokens = getList(project?.apiTokens);
+
+  if (apiTokens.length === 0) {
+    throw new Error("No API tokens found for the Hetzner project.");
+  }
+
+  return apiTokens[0];
+}
+
 export async function getHetznerServers(
   projectId: string,
 ): Promise<ServerResponse<HetznerServerResponse>> {
   return doServerActionWithAuth([], async () => {
-    const { data: project } = await getHetznerProject(projectId);
-
-    const apiTokens = getList(project?.apiTokens);
-
-    if (apiTokens.length === 0) {
-      throw new Error("No API tokens found for the Hetzner project.");
-    }
+    const token = await getApiToken(projectId);
 
     const res = await axiosHetzner.get<HetznerServerResponse>("/servers", {
       headers: {
-        Authorization: `Bearer ${apiTokens[0]}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -47,7 +52,6 @@ export async function getHetznerServersPaginated(
     }
     const client = await getRedisClient();
     const data = await client.get("hetzner");
-    console.log("Hetzner servers data from cache:", data);
     if (data) {
       const parsedData = JSON.parse(data);
       return {
@@ -56,12 +60,7 @@ export async function getHetznerServersPaginated(
       };
     }
 
-    const { data: project } = await getHetznerProject(projectId);
-    const apiTokens = getList(project?.apiTokens);
-
-    if (apiTokens.length === 0) {
-      throw new Error("No API tokens found for the Hetzner project.");
-    }
+    const token = await getApiToken(projectId);
 
     const params = new URLSearchParams({
       page: pagination.pageIndex.toString(),
@@ -75,7 +74,7 @@ export async function getHetznerServersPaginated(
 
     const res = await axiosHetzner.get<HetznerServerResponse>("/servers", {
       headers: {
-        Authorization: `Bearer ${apiTokens[0]}`,
+        Authorization: `Bearer ${token}`,
       },
       params,
     });
@@ -92,5 +91,20 @@ export async function getHetznerServersPaginated(
       data: res.data.servers,
       totalCount: res.data.meta.pagination.total_entries || 0,
     };
+  });
+}
+
+export async function deleteHetznerServer(
+  projectId: string,
+  serverId: number,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth([], async () => {
+    const token = await getApiToken(projectId);
+
+    await axiosHetzner.delete(`/servers/${serverId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   });
 }

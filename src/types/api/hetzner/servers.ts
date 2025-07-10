@@ -1,5 +1,5 @@
 export interface HetznerServer {
-  id: string;
+  id: number;
   name: string;
   status: string;
   created: string;

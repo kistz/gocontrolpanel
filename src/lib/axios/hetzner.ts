@@ -13,7 +13,7 @@ axiosHetzner.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response && error.response.data) {
-      const data = error.response.data as Partial<HetznerApiError>;
+      const data = (error.response.data as { error?: Partial<HetznerApiError> }).error || {};
 
       const typedError: HetznerApiError = {
         code: data.code || "server_error",

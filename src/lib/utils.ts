@@ -1,6 +1,5 @@
 import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { routes } from "@/routes";
-import { ServerError } from "@/types/responses";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -23,13 +22,24 @@ export function formatTime(time: number): string {
 }
 
 export function getErrorMessage(error: unknown): string {
-  const errorMessage =
-    error instanceof Error || error instanceof ServerError
-      ? error.message
-      : "Something went wrong";
+  let message = "Something went wrong";
 
-  const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
-  return match ? match[1] : errorMessage;
+  // Handle Error or ServerError (with .message)
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  // Handle HetznerApiError structure
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const errMsg = (error as any).message;
+    if (typeof errMsg === "string") {
+      message = capitalize(errMsg);
+    }
+  }
+
+  // Optionally extract from XML-RPC fault
+  const match = message.match(/Error: XML-RPC fault:\s*(.*)/);
+  return match ? match[1] : message;
 }
 
 export function generatePath(
@@ -201,9 +211,13 @@ export function initGbxWebsocketClient(
   return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
 }
 
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function capitalizeWords(str: string): string {
   return str
     .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => capitalize(word))
     .join(" ");
 }
