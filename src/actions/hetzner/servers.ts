@@ -2,26 +2,14 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
-import { getRedisClient } from "@/lib/redis";
-import { getList } from "@/lib/utils";
+import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import {
   HetznerServer,
   HetznerServerResponse,
 } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { getHetznerProject } from "../database/hetzner-projects";
-
-async function getApiToken(projectId: string): Promise<string> {
-  const { data: project } = await getHetznerProject(projectId);
-  const apiTokens = getList(project?.apiTokens);
-
-  if (apiTokens.length === 0) {
-    throw new Error("No API tokens found for the Hetzner project.");
-  }
-
-  return apiTokens[0];
-}
+import { getApiToken, setRateLimit } from "./util";
 
 export async function getHetznerServers(
   projectId: string,
@@ -34,6 +22,8 @@ export async function getHetznerServers(
         Authorization: `Bearer ${token}`,
       },
     });
+
+    await setRateLimit(projectId, res);
 
     return res.data;
   });
@@ -49,15 +39,6 @@ export async function getHetznerServersPaginated(
     const { projectId } = fetchArgs || {};
     if (!projectId) {
       throw new Error("Project ID is required to fetch Hetzner servers.");
-    }
-    const client = await getRedisClient();
-    const data = await client.get("hetzner");
-    if (data) {
-      const parsedData = JSON.parse(data);
-      return {
-        data: parsedData.data,
-        totalCount: parsedData.totalCount,
-      };
     }
 
     const token = await getApiToken(projectId);
@@ -78,14 +59,8 @@ export async function getHetznerServersPaginated(
       },
       params,
     });
-
-    await client.set(
-      "hetzner",
-      JSON.stringify({
-        data: res.data.servers,
-        totalCount: res.data.meta.pagination.total_entries || 0,
-      }),
-    );
+    
+    await setRateLimit(projectId, res);
 
     return {
       data: res.data.servers,
@@ -101,10 +76,39 @@ export async function deleteHetznerServer(
   return doServerActionWithAuth([], async () => {
     const token = await getApiToken(projectId);
 
-    await axiosHetzner.delete(`/servers/${serverId}`, {
+    const res = await axiosHetzner.delete(`/servers/${serverId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    await setRateLimit(projectId, res);
+  });
+}
+
+export async function getRateLimit(
+  projectId: string,
+): Promise<ServerResponse<{ limit: number; remaining: number }>> {
+  return doServerActionWithAuth([], async () => {
+    const client = await getRedisClient();
+    const rateLimitData = await client.get(getKeyHetznerRateLimit(projectId));
+
+    if (!rateLimitData) {
+      await getHetznerServers(projectId);
+      const newRateLimitData = await client.get(
+        getKeyHetznerRateLimit(projectId),
+      );
+      if (!newRateLimitData) {
+        throw new Error("Rate limit data not found after fetching servers.");
+      }
+      return JSON.parse(newRateLimitData);
+    }
+
+    const { limit, remaining } = JSON.parse(rateLimitData);
+
+    return {
+      limit: parseFloat(limit).toFixed(0),
+      remaining: parseFloat(remaining).toFixed(0),
+    };
   });
 }

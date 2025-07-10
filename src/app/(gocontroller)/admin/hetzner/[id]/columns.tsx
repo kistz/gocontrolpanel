@@ -2,6 +2,8 @@
 
 import { deleteHetznerServer } from "@/actions/hetzner/servers";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import HetznerServerDetailsModal from "@/components/modals/hetzner-server-details";
+import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +48,7 @@ export const createColumns = (
       const server = row.original;
       const [_, startTransition] = useTransition();
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+      const [isViewOpen, setIsViewOpen] = useState(false);
 
       const handleDelete = () => {
         startTransition(async () => {
@@ -77,14 +80,14 @@ export const createColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => {}}>
+              <DropdownMenuItem onClick={() => setIsViewOpen(true)}>
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {}}>
-                Edit Server
-              </DropdownMenuItem>
               <Separator />
-              <DropdownMenuItem variant="destructive" onClick={() => setIsDeleteOpen(true)}>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setIsDeleteOpen(true)}
+              >
                 Delete Server
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -99,6 +102,14 @@ export const createColumns = (
             confirmText="Delete"
             cancelText="Cancel"
           />
+
+          <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
+            <HetznerServerDetailsModal
+              data={{
+                server,
+              }}
+            />
+          </Modal>
         </div>
       );
     },

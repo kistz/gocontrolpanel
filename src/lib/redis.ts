@@ -38,3 +38,4 @@ export async function getRedisClient() {
 export const getKeyActiveMap = (serverUuid: string) => `active-map:${serverUuid}`;
 export const getKeyJukebox = (serverUuid: string) => `jukebox:${serverUuid}`;
 export const getKeyPlayers = (serverUuid: string) => `players:${serverUuid}`;
+export const getKeyHetznerRateLimit = (projectId: string) => `hetzner-rate-limit:${projectId}`;
