@@ -35,7 +35,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
     pagination: PaginationState,
     sorting: {
       field: string;
-      order: 'asc' | 'desc';
+      order: "asc" | "desc";
     },
     filter?: string,
     fetchArgs?: TFetch,
@@ -43,6 +43,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
   args?: TArgs;
   pageSize?: number;
   filter?: boolean;
+  fetchArgs?: TFetch;
 }
 
 export function PaginationTable<TData, TValue, TArgs, TFetch>({
@@ -51,6 +52,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   args = {} as TArgs,
   pageSize = 10,
   filter = false,
+  fetchArgs = {} as TFetch,
 }: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
@@ -61,12 +63,10 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   });
   const { sorting, setSorting, field, order } = useSorting();
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const { data, totalCount, loading, refetch } = usePaginationAPI<TData>(
-    fetchData,
-    pagination,
-    { field, order },
-    globalFilter,
-  );
+  const { data, totalCount, loading, refetch } = usePaginationAPI<
+    TData,
+    TFetch
+  >(fetchData, pagination, { field, order }, globalFilter, fetchArgs);
 
   useEffect(() => {
     setPagination((prev) => ({

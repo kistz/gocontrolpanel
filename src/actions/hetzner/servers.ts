@@ -3,12 +3,17 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import { getList } from "@/lib/utils";
-import { getHetznerProject } from "../database/hetzner-projects";
-import { HetznerServerResponse } from "@/types/api/hetzner/servers";
+import {
+  HetznerServer,
+  HetznerServerResponse,
+} from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { getHetznerProject } from "../database/hetzner-projects";
 
-export async function getHetznerServers(projectId: string): Promise<ServerResponse<HetznerServerResponse>> {
+export async function getHetznerServers(
+  projectId: string,
+): Promise<ServerResponse<HetznerServerResponse>> {
   return doServerActionWithAuth([], async () => {
     const { data: project } = await getHetznerProject(projectId);
 
@@ -30,10 +35,10 @@ export async function getHetznerServers(projectId: string): Promise<ServerRespon
 
 export async function getHetznerServersPaginated(
   pagination: PaginationState,
-  sorting: { field: string; order: 'asc' | 'desc' },
+  sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
-  fetchArgs?: { projectId: string }
-): Promise<ServerResponse<PaginationResponse<HetznerServerResponse>>> {
+  fetchArgs?: { projectId: string },
+): Promise<ServerResponse<PaginationResponse<HetznerServer>>> {
   return doServerActionWithAuth([], async () => {
     const { projectId } = fetchArgs || {};
     if (!projectId) {
@@ -53,17 +58,20 @@ export async function getHetznerServersPaginated(
       sort: `${sorting.field}:${sorting.order.toLowerCase()}`,
     });
 
+    if (filter) {
+      params.append("name", filter);
+    }
+
     const res = await axiosHetzner.get<HetznerServerResponse>("/servers", {
       headers: {
         Authorization: `Bearer ${apiTokens[0]}`,
       },
-      params: {
-      },
+      params,
     });
 
     return {
-      data: res.data,
-      totalCount: res.data.length,
+      data: res.data.servers,
+      totalCount: res.data.meta.pagination.total_entries || 0,
     };
   });
 }
