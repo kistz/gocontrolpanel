@@ -5,6 +5,7 @@ import { axiosHetzner } from "@/lib/axios/hetzner";
 import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import {
   HetznerServer,
+  HetznerServerResponse,
   HetznerServersResponse,
 } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
@@ -124,7 +125,7 @@ export async function getRateLimit(
 
 export async function createHetznerServer(
   projectId: string,
-): Promise<ServerResponse<void>> {
+): Promise<ServerResponse<HetznerServer>> {
   return doServerActionWithAuth([], async () => {
     const token = await getApiToken(projectId);
 
@@ -139,37 +140,37 @@ export async function createHetznerServer(
 
     const userData = template(data);
 
-    console.log(userData);
+    const body = {
+      name: "my-server",
+      server_type: "cpx11",
+      image: "ubuntu-24.04",
+      location: "fsn1",
+      user_data: userData,
+      labels: {
+        "authorization.superadmin.password": data.superadmin_password,
+        "authorization.admin.password": data.admin_password,
+        "authorization.user.password": data.user_password,
+      },
+      public_net: {
+        enable_ipv4: true,
+        enable_ipv6: false,
+      }
+    }
 
-    // const body = {
-    //   name: "my-server",
-    //   server_type: "cpx11",
-    //   image: "ubuntu-24.04",
-    //   location: "fsn1",
-    //   user_data: userData,
-    //   labels: {
-    //     "authorization.superadmin.password": data.superadmin_password,
-    //     "authorization.admin.password": data.admin_password,
-    //     "authorization.user.password": data.user_password,
-    //   },
-    //   public_net: {
-    //     enable_ipv4: true,
-    //     enable_ipv6: false,
-    //   }
-    // }
+    const res = await axiosHetzner.post<HetznerServerResponse>(
+      "/servers",
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
 
-    // const res = await axiosHetzner.post<HetznerServerResponse>(
-    //   "/servers",
-    //   body,
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   },
-    // );
+    await setRateLimit(projectId, res);
 
-    // await setRateLimit(projectId, res);
+    console.log("Server created:", res.data);
 
-    // return res.data.server;
+    return res.data.server;
   });
 }

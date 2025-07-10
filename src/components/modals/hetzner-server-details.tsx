@@ -122,17 +122,17 @@ export default function HetznerServerDetailsModal({
 
         <div className="flex flex-col gap-2">
           <h4 className="text-muted-foreground">Passwords</h4>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col">
-              <span className="font-semibold">SuperAdmin Password</span>
+              <span className="font-semibold">SuperAdmin</span>
               <span className="truncate">{passwords.superAdmin || "-"}</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold">Admin Password</span>
+              <span className="font-semibold">Admin</span>
               <span className="truncate">{passwords.admin || "-"}</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold">User Password</span>
+              <span className="font-semibold">User</span>
               <span className="truncate">{passwords.user || "-"}</span>
             </div>
           </div>
