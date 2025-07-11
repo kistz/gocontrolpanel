@@ -7,7 +7,6 @@ import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import { generateRandomString } from "@/lib/utils";
 import {
   HetznerServer,
-  HetznerServerResponse,
   HetznerServersResponse,
 } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
@@ -162,15 +161,11 @@ export async function createHetznerServer(
 
     const res = await axiosHetzner.post<{
       server: HetznerServer;
-    }>(
-      "/servers",
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    }>("/servers", body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
 
     await setRateLimit(projectId, res);
 
