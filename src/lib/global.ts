@@ -2,9 +2,11 @@
 
 import { GbxClient } from "@evotm/gbxclient";
 import { PrismaClient } from "./prisma/generated";
+import Redis from "ioredis";
 
 type GlobalState = {
   prisma?: PrismaClient;
+  redis?: Redis;
   gbxClients?: Record<string, GbxClient>;
 };
 
