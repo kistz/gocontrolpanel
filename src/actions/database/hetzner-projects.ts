@@ -142,7 +142,7 @@ export async function getHetznerProject(
     const hetznerProject = await db.hetznerProjects.findUnique({
       where: {
         id: hetznerProjectId,
-        ...(session?.user?.admin && {
+        ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
       },
@@ -250,7 +250,7 @@ export async function updateHetznerProject(
       const updatedHetznerProject = await db.hetznerProjects.update({
         where: {
           id: projectId,
-          ...(session?.user?.admin && {
+          ...(!session?.user?.admin && {
             users: { some: { userId } },
           }),
         },
@@ -324,7 +324,7 @@ export async function updateHetznerProject(
     const updatedHetznerProject = await db.hetznerProjects.update({
       where: {
         id: projectId,
-        ...(session?.user?.admin && {
+        ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
       },
@@ -367,7 +367,7 @@ export async function deleteHetznerProject(
     await db.hetznerProjects.update({
       where: {
         id: projectId,
-        ...(session?.user?.admin && {
+        ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
       },
