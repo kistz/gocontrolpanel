@@ -14,10 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -50,6 +52,7 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const project = row.original;
+      const router = useRouter();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
@@ -81,9 +84,15 @@ export const createColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => router.push(`/admin/hetzner/${project.id}`)}
+              >
+                View Project
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
                 Edit project
               </DropdownMenuItem>
+              <Separator />
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsOpen(true)}
