@@ -1,3 +1,6 @@
+import { getHetznerImages } from "@/actions/hetzner/images";
+import { getHetznerLocations } from "@/actions/hetzner/locations";
+import { getServerTypes } from "@/actions/hetzner/server-types";
 import {
   getHetznerServersPaginated,
   getRateLimit,
@@ -8,10 +11,8 @@ import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { IconPlus } from "@tabler/icons-react";
+import Link from "next/link";
 import { createColumns } from "./columns";
-import { getServerTypes } from "@/actions/hetzner/server-types";
-import { getHetznerImages } from "@/actions/hetzner/images";
-import { getHetznerLocations } from "@/actions/hetzner/locations";
 
 export default async function ProjectPage({
   params,
@@ -56,12 +57,14 @@ export default async function ProjectPage({
         filter
         actions={
           <Modal>
-            <AddHetznerServerModal data={{
-              projectId: id,
-              serverTypes: serverTypes || [],
-              images: images || [],
-              locations: locations || [],
-            }} />
+            <AddHetznerServerModal
+              data={{
+                projectId: id,
+                serverTypes: serverTypes || [],
+                images: images || [],
+                locations: locations || [],
+              }}
+            />
             <Button>
               <IconPlus /> Add Server
             </Button>
@@ -73,8 +76,11 @@ export default async function ProjectPage({
         Important Notice: GoControlPanel is not the actual provider or host of
         your servers. It serves only as a convenience tool for managing
         deployments. You are fully responsible for any servers created through
-        the panel. Please regularly check your Hetzner Cloud Console to monitor
-        server status, usage, and billing. GoControlPanel assumes no
+        the panel. Please regularly check your{" "}
+        <Link href="https://console.hetzner.com/projects" target="_blank" rel="noopener noreferrer" className="underline">
+          Hetzner Cloud Console
+        </Link>{" "}
+        to monitor server status, usage, and billing. GoControlPanel assumes no
         responsibility for active resources or charges incurred.
       </p>
     </div>
