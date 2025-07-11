@@ -125,6 +125,7 @@ Make sure to update the environment variables for the services in your `docker-c
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins. Probably your own login, e.g., `v8vgGbx_TuKkBabAyn7nsQ`.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
+  - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
 - **GbxConnector Environment Variables**:
 
@@ -219,6 +220,7 @@ gocontrolpanel:
     NADEO_SERVER_PASSWORD:
     NADEO_CONTACT: GoControlPanel / <your contact info>
     REDIS_URI: redis://redis:6379
+    HETZNER_KEY: 
   depends_on:
     - db
     - redis
@@ -278,6 +280,7 @@ Make sure to update the environment variables for the added services in your `do
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
+  - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
 - **GbxConnector Environment Variables**:
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
