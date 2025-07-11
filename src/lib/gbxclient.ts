@@ -5,12 +5,7 @@ import { syncPlayerList } from "@/actions/gbx/player";
 import { syncServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
 import { withTimeout } from "./utils";
-
-const globalForGbx = globalThis as unknown as {
-  cachedClients?: { [key: string]: GbxClient };
-};
-
-const cachedClients = (globalForGbx.cachedClients ??= {});
+import { appGlobals } from "./global";
 
 export async function connectToGbxClient(
   serverUuid: string,
@@ -57,21 +52,26 @@ export async function connectToGbxClient(
   await syncPlayerList(client, server.uuid);
   await syncMap(client, server.uuid);
 
-  cachedClients[server.uuid] = client;
+
+  if (appGlobals.gbxClients) {
+    appGlobals.gbxClients[serverUuid] = client;
+  } else {
+    appGlobals.gbxClients = { [serverUuid]: client };
+  }
   return client;
 }
 
 export async function getGbxClient(serverUuid: string): Promise<GbxClient> {
-  if (cachedClients[serverUuid]) {
-    return cachedClients[serverUuid];
+  if (appGlobals.gbxClients && appGlobals.gbxClients[serverUuid]) {
+    return appGlobals.gbxClients[serverUuid];
   }
 
   return await connectToGbxClient(serverUuid);
 }
 
 export async function disconnectGbxClient(serverUuid: string): Promise<void> {
-  if (cachedClients[serverUuid]) {
-    delete cachedClients[serverUuid];
+  if (appGlobals.gbxClients) {
+    delete appGlobals.gbxClients[serverUuid];
   }
 }
 

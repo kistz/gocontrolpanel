@@ -1,28 +1,24 @@
+import { appGlobals } from "./global";
 import { PrismaClient } from "./prisma/generated";
 
-let cachedClient: PrismaClient | null = null;
-
 export function getClient(): PrismaClient {
-  if (cachedClient) {
-    return cachedClient;
-  }
-
-  try {
-    cachedClient = new PrismaClient();
-
-    return cachedClient;
-  } catch (error) {
-    if (process.env.NODE_ENV === "production") {
-      console.warn("Prisma not available during build, continuing...");
-    } else {
-      console.error("Error connecting to Prisma:", error);
-      throw new Error("Failed to connect to Prisma");
+  if (!appGlobals.prisma) {
+    try {
+      appGlobals.prisma = new PrismaClient();
+      console.log("Prisma client initialized");
+    } catch (error) {
+      if (process.env.NODE_ENV === "production") {
+        console.warn("Prisma not available during build, continuing...");
+      } else {
+        console.error("Error connecting to Prisma:", error);
+        throw new Error("Failed to connect to Prisma");
+      }
     }
   }
 
-  if (!cachedClient) {
+  if (!appGlobals.prisma) {
     throw new Error("Prisma client is not initialized");
   }
 
-  return cachedClient;
+  return appGlobals.prisma;
 }
