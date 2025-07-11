@@ -13,7 +13,7 @@ interface MapCardsProps {
     pagination: PaginationState,
     sorting: {
       field: string;
-      order: string;
+      order: 'asc' | 'desc';
     },
   ) => Promise<ServerResponse<PaginationResponse<Maps>>>;
 }
