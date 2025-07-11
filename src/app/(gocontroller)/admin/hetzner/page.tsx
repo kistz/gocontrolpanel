@@ -9,8 +9,6 @@ import { IconPlus } from "@tabler/icons-react";
 import { createColumns } from "./columns";
 
 export default async function AdminHetznerPage() {
-  const session = await auth();
-
   const { data: users } = await getAllUsers();
 
   return (
