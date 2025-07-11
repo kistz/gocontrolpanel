@@ -40,3 +40,5 @@ export const getKeyJukebox = (serverUuid: string) => `jukebox:${serverUuid}`;
 export const getKeyPlayers = (serverUuid: string) => `players:${serverUuid}`;
 export const getKeyHetznerRateLimit = (projectId: string) => `hetzner-rate-limit:${projectId}`;
 export const getKeyHetznerServerTypes = () => 'hetzner-server-types';
+export const getKeyHetznerImages = () => 'hetzner-images';
+export const getKeyHetznerLocations = () => 'hetzner-locations';

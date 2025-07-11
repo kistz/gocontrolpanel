@@ -12,6 +12,12 @@ import {
   AddHetznerServerSchema,
   AddHetznerServerSchemaType,
 } from "./add-hetzner-server-schema";
+import { useEffect, useState } from "react";
+import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
+import { getServerTypes } from "@/actions/hetzner/server-types";
+import { getHetznerImages } from "@/actions/hetzner/images";
+import { HetznerLocation } from "@/types/api/hetzner/locations";
+import { getHetznerLocations } from "@/actions/hetzner/locations";
 
 export default function AddHetznerServerForm({
   projectId,
@@ -20,6 +26,58 @@ export default function AddHetznerServerForm({
   projectId: string;
   callback?: () => void;
 }) {
+  const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
+  const [images, setImages] = useState<HetznerImage[]>([]);
+  const [locations, setLocations] = useState<HetznerLocation[]>([]);
+
+  useEffect(() => {
+    const fetchServerTypes = async () => {
+      try {
+        const { data, error } = await getServerTypes(projectId);
+        if (error) {
+          throw new Error(error);
+        }
+        setServerTypes(data);
+      } catch (error) {
+        toast.error("Failed to fetch server types", {
+          description: getErrorMessage(error),
+        });
+      }
+    }
+
+    const fetchImages = async () => {
+      try {
+        const { data, error } = await getHetznerImages(projectId);
+        if (error) {
+          throw new Error(error);
+        }
+        setImages(data);
+      } catch (error) {
+        toast.error("Failed to fetch images", {
+          description: getErrorMessage(error),
+        });
+      }
+    };
+
+    const fetchLocations = async () => {
+      try {
+        const { data, error } = await getHetznerLocations(projectId);
+        if (error) {
+          throw new Error(error);
+        }
+        setLocations(data);
+      } catch (error) {
+        toast.error("Failed to fetch locations", {
+          description: getErrorMessage(error),
+        });
+      }
+    };
+
+    fetchServerTypes();
+    fetchImages();
+    fetchLocations();
+  }, []);
+
   const form = useForm<AddHetznerServerSchemaType>({
     resolver: zodResolver(AddHetznerServerSchema),
   });

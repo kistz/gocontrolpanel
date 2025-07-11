@@ -7,9 +7,10 @@ import {
   HetznerServerTypesResponse,
 } from "@/types/api/hetzner/servers";
 import { ServerResponse } from "@/types/responses";
+import { getApiToken } from "./util";
 
 export async function getServerTypes(
-  apiToken: string,
+  projectId: string,
 ): Promise<ServerResponse<HetznerServerType[]>> {
   return doServerActionWithAuth([], async () => {
     const redis = await getRedisClient();
@@ -20,11 +21,12 @@ export async function getServerTypes(
       return JSON.parse(cachedData) as HetznerServerType[];
     }
 
+    const token = await getApiToken(projectId);
     const res = await axiosHetzner.get<HetznerServerTypesResponse>(
       "/server_types",
       {
         headers: {
-          Authorization: `Bearer ${apiToken}`,
+          Authorization: `Bearer ${token}`,
         },
       },
     );
