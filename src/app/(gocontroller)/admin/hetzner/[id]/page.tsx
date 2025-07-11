@@ -37,20 +37,21 @@ export default async function ProjectPage({
         </div>
 
         <div className="flex flex-col gap-1">
-          <h4 className="text-sm text-muted-foreground">
-            {rateLimit && (
-              <>
+          {rateLimit && (
+            <>
+              <h4 className="text-sm text-muted-foreground">
                 Rate Limit: {rateLimit.limit - rateLimit.remaining} /{" "}
                 {rateLimit.limit}
-              </>
-            )}
-          </h4>
-          <Progress
-            value={
-              ((rateLimit.limit - rateLimit.remaining) / rateLimit.limit) * 100
-            }
-            className="w-32"
-          />
+              </h4>
+              <Progress
+                value={
+                  ((rateLimit.limit - rateLimit.remaining) / rateLimit.limit) *
+                  100
+                }
+                className="w-32"
+              />
+            </>
+          )}
         </div>
       </div>
       <PaginationTable
@@ -81,7 +82,12 @@ export default async function ProjectPage({
         your servers. It serves only as a convenience tool for managing
         deployments. You are fully responsible for any servers created through
         the panel. Please regularly check your{" "}
-        <Link href="https://console.hetzner.com/projects" target="_blank" rel="noopener noreferrer" className="underline">
+        <Link
+          href="https://console.hetzner.com/projects"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
           Hetzner Cloud Console
         </Link>{" "}
         to monitor server status, usage, and billing. GoControlPanel assumes no
