@@ -22,7 +22,7 @@ export default async function AdminHetznerProjectLayout({
     redirect(routes.admin.hetzner);
   }
 
-  if (!data.users.some((user) => user.userId === session.user.id)) {
+  if (!session.user.admin && !data.users.some((user) => user.userId === session.user.id)) {
     redirect(routes.admin.hetzner);
   }
 
