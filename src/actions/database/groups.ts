@@ -7,6 +7,7 @@ import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editGroups = Prisma.validator<Prisma.GroupsInclude>()({
   users: {
     select: {
@@ -20,6 +21,7 @@ export type EditGroups = Prisma.GroupsGetPayload<{
   include: typeof editGroups;
 }>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const usersGroups = Prisma.validator<Prisma.GroupsInclude>()({
   users: {
     include: {

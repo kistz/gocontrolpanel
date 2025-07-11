@@ -4,6 +4,7 @@ import { Prisma, Users } from "@/lib/prisma/generated";
 import { ServerError, ServerResponse } from "@/types/responses";
 import "server-only";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const groupsUsers = Prisma.validator<Prisma.UsersInclude>()({
   groups: {
     include: {

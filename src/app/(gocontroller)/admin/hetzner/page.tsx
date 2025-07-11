@@ -4,7 +4,6 @@ import AddProjectModal from "@/components/modals/add-project";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 import { IconPlus } from "@tabler/icons-react";
 import { createColumns } from "./columns";
 

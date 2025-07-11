@@ -8,6 +8,7 @@ import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
   users: {
     select: {
@@ -21,6 +22,7 @@ export type EditHetznerProjects = Prisma.HetznerProjectsGetPayload<{
   include: typeof editHetznerProjects;
 }>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const usersHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
   users: {
     include: {
