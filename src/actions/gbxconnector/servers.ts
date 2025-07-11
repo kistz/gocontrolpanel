@@ -8,6 +8,7 @@ import { getRedisClient } from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
 import { isAxiosError } from "axios";
+import { removeServerUuidFromGroups } from "../database/groups";
 
 let healthStatus: boolean | null = null;
 
@@ -102,6 +103,7 @@ export async function removeServer(
       throw new ServerError("Failed to remove server");
     }
 
+    await removeServerUuidFromGroups(serverUuid);
     await syncServers();
   });
 }

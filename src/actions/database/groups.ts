@@ -3,6 +3,7 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
+import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
@@ -311,5 +312,36 @@ export async function deleteGroup(groupId: string): Promise<ServerResponse> {
         deletedAt: new Date(),
       },
     });
+  });
+}
+
+export async function removeServerUuidFromGroups(
+  serverUuid: string,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth([], async () => {
+    const db = getClient();
+    
+    const groups = await db.groups.findMany({
+      where: {
+        serverUuids: {
+          array_contains: [serverUuid],
+        },
+      },
+    });
+
+    if (groups.length === 0) return;
+
+    await Promise.all(
+      groups.map((group) =>
+        db.groups.update({
+          where: { id: group.id },
+          data: {
+            serverUuids: getList(group.serverUuids).filter(
+              (uuid) => uuid !== serverUuid,
+            ),
+          },
+        }),
+      ),
+    );
   });
 }

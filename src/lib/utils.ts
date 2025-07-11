@@ -225,7 +225,18 @@ export function capitalizeWords(str: string): string {
 export function isValidHetznerServerName(name: string): boolean {
   const maxLength = 253;
 
-  const hostnameRegex = /^(?!-)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
+  const hostnameRegex =
+    /^(?!-)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
 
   return name.length <= maxLength && hostnameRegex.test(name);
+}
+
+export function generateRandomString(length = 16): string {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }

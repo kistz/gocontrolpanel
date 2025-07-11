@@ -4,7 +4,7 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
 import { HetznerProjectRole, Users } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
@@ -26,6 +26,7 @@ export default function AddProjectForm({
     try {
       const { error } = await createHetznerProject({
         ...values,
+        apiTokens: getList(values.apiTokens),
         users:
           values.users?.map((user) => ({
             userId: user.userId,

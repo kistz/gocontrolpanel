@@ -1,8 +1,10 @@
 "use server";
 
+import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/add-hetzner-server-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
+import { generateRandomString } from "@/lib/utils";
 import {
   HetznerServer,
   HetznerServerResponse,
@@ -125,37 +127,38 @@ export async function getRateLimit(
 
 export async function createHetznerServer(
   projectId: string,
+  data: AddHetznerServerSchemaType,
 ): Promise<ServerResponse<HetznerServer>> {
   return doServerActionWithAuth([], async () => {
     const token = await getApiToken(projectId);
 
-    const data = {
-      dedi_login: "gcp-test",
-      dedi_password: "%J==.E#DLEHNh$,)",
-      room_password: "test",
-      superadmin_password: "test",
-      admin_password: "test",
-      user_password: "test",
+    const dediData = {
+      dedi_login: data.dediLogin,
+      dedi_password: data.dediPassword,
+      room_password: data.roomPassword,
+      superadmin_password: data.superAdminPassword || generateRandomString(16),
+      admin_password: data.adminPassword || generateRandomString(16),
+      user_password: data.userPassword || generateRandomString(16),
     };
 
-    const userData = template(data);
+    const userData = template(dediData);
 
     const body = {
-      name: "my-server",
-      server_type: "cpx11",
-      image: "ubuntu-24.04",
-      location: "fsn1",
+      name: data.name,
+      server_type: data.serverType,
+      image: data.image,
+      location: data.location,
       user_data: userData,
       labels: {
-        "authorization.superadmin.password": data.superadmin_password,
-        "authorization.admin.password": data.admin_password,
-        "authorization.user.password": data.user_password,
+        "authorization.superadmin.password": dediData.superadmin_password,
+        "authorization.admin.password": dediData.admin_password,
+        "authorization.user.password": dediData.user_password,
       },
       public_net: {
         enable_ipv4: true,
         enable_ipv6: false,
-      }
-    }
+      },
+    };
 
     const res = await axiosHetzner.post<HetznerServerResponse>(
       "/servers",
