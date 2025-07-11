@@ -140,7 +140,12 @@ export async function getHetznerProject(
     const db = getClient();
     const userId = session?.user?.id;
     const hetznerProject = await db.hetznerProjects.findUnique({
-      where: { id: hetznerProjectId, users: { some: { userId } } },
+      where: {
+        id: hetznerProjectId,
+        ...(session?.user?.admin && {
+          users: { some: { userId } },
+        }),
+      },
       include: {
         users: {
           where: {
@@ -243,7 +248,12 @@ export async function updateHetznerProject(
 
     if (!users) {
       const updatedHetznerProject = await db.hetznerProjects.update({
-        where: { id: projectId, users: { some: { userId } } },
+        where: {
+          id: projectId,
+          ...(session?.user?.admin && {
+            users: { some: { userId } },
+          }),
+        },
         data: {
           ...projectData,
           apiTokens: getList(apiTokens).map((token) =>
@@ -312,7 +322,12 @@ export async function updateHetznerProject(
     };
 
     const updatedHetznerProject = await db.hetznerProjects.update({
-      where: { id: projectId, users: { some: { userId } } },
+      where: {
+        id: projectId,
+        ...(session?.user?.admin && {
+          users: { some: { userId } },
+        }),
+      },
       data: updateData,
       include: {
         users: {
@@ -350,7 +365,12 @@ export async function deleteHetznerProject(
 
     const userId = session?.user?.id;
     await db.hetznerProjects.update({
-      where: { id: projectId, users: { some: { userId } } },
+      where: {
+        id: projectId,
+        ...(session?.user?.admin && {
+          users: { some: { userId } },
+        }),
+      },
       data: { deletedAt: new Date() },
     });
   });
