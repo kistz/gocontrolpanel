@@ -123,7 +123,7 @@ export default function AddHetznerServerForm({
           className="w-full"
           disabled={!form.formState.isValid || form.formState.isSubmitting}
         >
-          Create Server
+          Add Server
         </Button>
       </form>
     </Form>
