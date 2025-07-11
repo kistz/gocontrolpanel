@@ -39,235 +39,237 @@ export default function HetznerServerDetailsModal({
         />
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">General</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">ID</span>
-              <span className="truncate">{data.server.id}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Name</span>
-              <span className="truncate">{data.server.name}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Status</span>
-              <span className="truncate">{data.server.status}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Created At</span>
-              <span className="truncate">
-                {new Date(data.server.created).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Network</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">IP Address</span>
-              <span className="truncate">
-                {data.server.public_net.ipv4?.ip || "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Private IP Address</span>
-              <span className="truncate">
-                {data.server.private_net.map((n) => n.ip).join(", ") || "-"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Server Type</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">Name</span>
-              <span className="truncate">{data.server.server_type.name}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Description</span>
-              <span className="truncate">
-                {data.server.server_type.description}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Cores</span>
-              <span className="truncate">{data.server.server_type.cores}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Memory</span>
-              <span className="truncate">
-                {data.server.server_type.memory} GB
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Disk</span>
-              <span className="truncate">
-                {data.server.server_type.disk} GB
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">CPU Type</span>
-              <span className="truncate">
-                {data.server.server_type.cpu_type}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Passwords</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">SuperAdmin</span>
-              <span className="truncate">{passwords.superAdmin || "-"}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Admin</span>
-              <span className="truncate">{passwords.admin || "-"}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">User</span>
-              <span className="truncate">{passwords.user || "-"}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Pricing</h4>
-          {pricing ? (
+      <div className="gap-4 grid md:grid-cols-2 md:gap-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">General</h4>
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col">
-                <span className="font-semibold">Hourly Price</span>
-                <span className="truncate">
-                  &#8364;{parseFloat(pricing.price_hourly.gross).toFixed(4)}
-                </span>
+                <span className="font-semibold">ID</span>
+                <span className="truncate">{data.server.id}</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold">Monthly Price</span>
-                <span className="truncate">
-                  &#8364;{parseFloat(pricing.price_monthly.gross).toFixed(4)}
-                </span>
+                <span className="font-semibold">Name</span>
+                <span className="truncate">{data.server.name}</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold truncate">Included Traffic</span>
-                <span className="truncate">
-                  {Math.floor(
-                    pricing.included_traffic /
-                    1000 /
-                    1000 /
-                    1000 /
-                    1000
-                  )}{" "}
-                  TB
-                </span>
+                <span className="font-semibold">Status</span>
+                <span className="truncate">{data.server.status}</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold truncate">
-                  Price per TB Traffic
-                </span>
+                <span className="font-semibold">Created At</span>
                 <span className="truncate">
-                  &#8364;
-                  {parseFloat(pricing.price_per_tb_traffic.gross).toFixed(2)}
+                  {new Date(data.server.created).toLocaleString()}
                 </span>
               </div>
-            </div>
-          ) : (
-            <span>No pricing information available</span>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Traffic</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">Outgoing</span>
-              <span className="truncate">
-                {data.server.outgoing_traffic
-                  ? `${Math.floor(data.server.outgoing_traffic / 1000 / 1000)} MB`
-                  : "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Ingoing</span>
-              <span className="truncate">
-                {data.server.ingoing_traffic
-                  ? `${Math.floor(data.server.ingoing_traffic / 1000 / 1000)} MB`
-                  : "-"}
-              </span>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Datacenter</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">Name</span>
-              <span>{data.server.datacenter.name}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Description</span>
-              <span className="truncate">
-                {data.server.datacenter.description}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Location</span>
-              <span className="truncate">
-                {data.server.datacenter.location.name}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Country</span>
-              <span>
-                <Flag
-                  className="h-4"
-                  code={data.server.datacenter.location.country}
-                  fallback={data.server.datacenter.location.country}
-                />
-              </span>
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Network</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col">
+                <span className="font-semibold">IP Address</span>
+                <span className="truncate">
+                  {data.server.public_net.ipv4?.ip || "-"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Private IP Address</span>
+                <span className="truncate">
+                  {data.server.private_net.map((n) => n.ip).join(", ") || "-"}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-2">
-          <h4 className="text-muted-foreground">Image</h4>
-          {data.server.image ? (
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Server Type</h4>
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col">
                 <span className="font-semibold">Name</span>
-                <span className="truncate">{data.server.image.name}</span>
+                <span className="truncate">{data.server.server_type.name}</span>
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold">Description</span>
                 <span className="truncate">
-                  {data.server.image.description}
+                  {data.server.server_type.description}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold">Image Size</span>
+                <span className="font-semibold">Cores</span>
                 <span className="truncate">
-                  {data.server.image.image_size
-                    ? `${data.server.image.image_size} GB`
+                  {data.server.server_type.cores}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Memory</span>
+                <span className="truncate">
+                  {data.server.server_type.memory} GB
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Disk</span>
+                <span className="truncate">
+                  {data.server.server_type.disk} GB
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">CPU Type</span>
+                <span className="truncate">
+                  {data.server.server_type.cpu_type}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Passwords</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col">
+                <span className="font-semibold">SuperAdmin</span>
+                <span className="truncate">{passwords.superAdmin || "-"}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Admin</span>
+                <span className="truncate">{passwords.admin || "-"}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">User</span>
+                <span className="truncate">{passwords.user || "-"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Pricing</h4>
+            {pricing ? (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col">
+                  <span className="font-semibold">Hourly Price</span>
+                  <span className="truncate">
+                    &#8364;{parseFloat(pricing.price_hourly.gross).toFixed(4)}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Monthly Price</span>
+                  <span className="truncate">
+                    &#8364;{parseFloat(pricing.price_monthly.gross).toFixed(4)}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold truncate">
+                    Included Traffic
+                  </span>
+                  <span className="truncate">
+                    {Math.floor(
+                      pricing.included_traffic / 1000 / 1000 / 1000 / 1000,
+                    )}{" "}
+                    TB
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold truncate">
+                    Price per TB Traffic
+                  </span>
+                  <span className="truncate">
+                    &#8364;
+                    {parseFloat(pricing.price_per_tb_traffic.gross).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <span>No pricing information available</span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Traffic</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col">
+                <span className="font-semibold">Outgoing</span>
+                <span className="truncate">
+                  {data.server.outgoing_traffic
+                    ? `${Math.floor(data.server.outgoing_traffic / 1000 / 1000)} MB`
                     : "-"}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold">Disk Size</span>
+                <span className="font-semibold">Ingoing</span>
                 <span className="truncate">
-                  {data.server.image.disk_size} GB
+                  {data.server.ingoing_traffic
+                    ? `${Math.floor(data.server.ingoing_traffic / 1000 / 1000)} MB`
+                    : "-"}
                 </span>
               </div>
             </div>
-          ) : (
-            <span>No image attached</span>
-          )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Datacenter</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col">
+                <span className="font-semibold">Name</span>
+                <span>{data.server.datacenter.name}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Description</span>
+                <span className="truncate">
+                  {data.server.datacenter.description}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Location</span>
+                <span className="truncate">
+                  {data.server.datacenter.location.name}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Country</span>
+                <span>
+                  <Flag
+                    className="h-4"
+                    code={data.server.datacenter.location.country}
+                    fallback={data.server.datacenter.location.country}
+                  />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Image</h4>
+            {data.server.image ? (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col">
+                  <span className="font-semibold">Name</span>
+                  <span className="truncate">{data.server.image.name}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Description</span>
+                  <span className="truncate">
+                    {data.server.image.description}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Image Size</span>
+                  <span className="truncate">
+                    {data.server.image.image_size
+                      ? `${data.server.image.image_size} GB`
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Disk Size</span>
+                  <span className="truncate">
+                    {data.server.image.disk_size} GB
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <span>No image attached</span>
+            )}
+          </div>
         </div>
       </div>
     </Card>
