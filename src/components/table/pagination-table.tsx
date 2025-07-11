@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -19,48 +20,55 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
-import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
-interface PaginationTableProps<TData, TValue> {
-  createColumns: (refetch: () => void) => ColumnDef<TData, TValue>[];
+interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
+  createColumns: (
+    refetch: () => void,
+    data: TArgs,
+  ) => ColumnDef<TData, TValue>[];
   fetchData: (
-    pagination: {
-      skip: number;
-      limit: number;
-    },
+    pagination: PaginationState,
     sorting: {
       field: string;
-      order: string;
+      order: "asc" | "desc";
     },
     filter?: string,
+    fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>;
+  args?: TArgs;
   pageSize?: number;
   filter?: boolean;
+  fetchArgs?: TFetch;
+  actions?: React.ReactNode;
 }
 
-export function PaginationTable<TData, TValue>({
+export function PaginationTable<TData, TValue, TArgs, TFetch>({
   createColumns,
   fetchData,
+  args = {} as TArgs,
   pageSize = 10,
   filter = false,
-}: PaginationTableProps<TData, TValue>) {
+  fetchArgs = {} as TFetch,
+  actions,
+}: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
   const { ref: tableBodyRef, hasScrollbar } =
     useHasScrollbar<HTMLTableSectionElement>();
 
-  const { pagination, setPagination, skip, limit } = usePagination(pageSize);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageSize,
+    pageIndex: 0,
+  });
   const { sorting, setSorting, field, order } = useSorting();
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const { data, totalCount, loading, refetch } = usePaginationAPI<TData>(
-    fetchData,
-    { skip, limit },
-    { field, order },
-    globalFilter,
-  );
+  const { data, totalCount, loading, refetch } = usePaginationAPI<
+    TData,
+    TFetch
+  >(fetchData, pagination, { field, order }, globalFilter, fetchArgs);
 
   useEffect(() => {
     setPagination((prev) => ({
@@ -70,7 +78,7 @@ export function PaginationTable<TData, TValue>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalFilter]);
 
-  const columns = createColumns(refetch);
+  const columns = createColumns(refetch, args);
 
   const table = useReactTable({
     data,
@@ -91,13 +99,21 @@ export function PaginationTable<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-4">
-      {filter && (
-        <Input
-          placeholder="Search..."
-          value={globalFilter || ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="min-w-64 w-1/3"
-        />
+      {(filter || actions) && (
+        <div className="flex justify-between items-center gap-2">
+          {filter ? (
+            <Input
+              placeholder="Search..."
+              value={globalFilter || ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="min-w-64 w-1/3"
+            />
+          ) : (
+            <div/>
+          )}
+
+          {actions}
+        </div>
       )}
 
       <div className="rounded-md border flex-1 overflow-hidden">

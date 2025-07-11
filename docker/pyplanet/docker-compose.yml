@@ -55,6 +55,7 @@ services:
       NADEO_SERVER_PASSWORD: 
       NADEO_CONTACT: GoControlPanel / <your contact info>
       REDIS_URI: redis://redis:6379
+      HETZNER_KEY: 
     depends_on:
       - db
       - redis

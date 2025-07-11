@@ -1,16 +1,16 @@
 "use server";
-import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
+import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Users } from "@/lib/prisma/generated";
-import { getRoles } from "@/lib/utils";
 import {
   PaginationResponse,
   ServerError,
   ServerResponse,
 } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 
 export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth([], async () => {
     const db = getClient();
     const users = await db.users.findMany({
       where: {
@@ -22,40 +22,12 @@ export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
   });
 }
 
-export async function getUserCount(): Promise<ServerResponse<number>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    return db.users.count({
-      where: {
-        deletedAt: null,
-      },
-    });
-  });
-}
-
-export async function getNewUsersCount(
-  days: number,
-): Promise<ServerResponse<number>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const date = new Date();
-    date.setDate(date.getDate() - days);
-    const count = await db.users.count({
-      where: {
-        createdAt: { gt: date },
-        deletedAt: null,
-      },
-    });
-    return count;
-  });
-}
-
 export async function getUsersPaginated(
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string },
+  pagination: PaginationState,
+  sorting: { field: string; order: 'asc' | 'desc' },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth([], async () => {
     const db = getClient();
 
     const totalCount = await db.users.count({
@@ -84,10 +56,10 @@ export async function getUsersPaginated(
           ],
         }),
       },
-      skip: pagination.skip,
-      take: pagination.limit,
+      skip: pagination.pageIndex * pagination.pageSize,
+      take: pagination.pageSize,
       orderBy: {
-        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc",
+        [sorting.field]: sorting.order.toLowerCase(),
       },
     });
 
@@ -95,76 +67,6 @@ export async function getUsersPaginated(
       data: users,
       totalCount,
     };
-  });
-}
-
-export async function getUserById(id: string): Promise<ServerResponse<Users>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const user = await db.users.findUniqueOrThrow({
-      where: {
-        id,
-        deletedAt: null,
-      },
-    });
-
-    return user;
-  });
-}
-
-export async function getUserByLogin(
-  login: string,
-): Promise<ServerResponse<Users>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const user = await db.users.findFirstOrThrow({
-      where: {
-        login,
-        deletedAt: null,
-      },
-    });
-
-    return user;
-  });
-}
-
-export async function createUserAuth(
-  user: Omit<Users, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<ServerResponse<Users>> {
-  return doServerAction(async () => {
-    const db = getClient();
-
-    const existingUser = await db.users.findFirst({
-      where: {
-        OR: [
-          { login: user.login },
-          { nickName: user.nickName },
-          { ubiUid: user.ubiUid },
-        ],
-      },
-    });
-
-    if (existingUser) {
-      throw new ServerError("User with this login or nickname already exists");
-    }
-
-    const newUser = {
-      ...user,
-      roles: getRoles(user.roles),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    };
-
-    const result = await db.users.create({
-      data: newUser,
-    });
-
-    if (!result) {
-      throw new ServerError("Failed to create user");
-    }
-
-    return result;
   });
 }
 
@@ -191,9 +93,7 @@ export async function updateUser(
       },
     });
 
-    const isRemovingAdmin =
-      getRoles(existingUser.roles).includes("admin") &&
-      !getRoles(data.roles).includes("admin");
+    const isRemovingAdmin = existingUser.admin && !data.admin;
 
     if (isRemovingAdmin) {
       throw new ServerError("Cannot remove admin role");
@@ -203,7 +103,7 @@ export async function updateUser(
       where: { id },
       data: {
         ...data,
-        roles: getRoles(data.roles),
+        admin: data.admin,
         updatedAt: new Date(),
         deletedAt: null,
       },

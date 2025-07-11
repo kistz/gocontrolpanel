@@ -1,11 +1,10 @@
 import Redis from "ioredis";
 import config from "./config";
-
-let cachedClient: Redis | null = null;
+import { appGlobals } from "./global";
 
 export async function connectToRedis() {
-  if (cachedClient) {
-    return cachedClient;
+  if (appGlobals.redis) {
+    return appGlobals.redis;
   }
 
   try {
@@ -15,7 +14,9 @@ export async function connectToRedis() {
       reconnectOnError: () => false,
     });
 
-    cachedClient = client;
+    console.log("Redis client initialized");
+
+    appGlobals.redis = client;
     return client;
   } catch (error) {
     if (process.env.NODE_ENV === "production") {
@@ -35,6 +36,12 @@ export async function getRedisClient() {
   return client;
 }
 
-export const getKeyActiveMap = (serverUuid: string) => `active-map:${serverUuid}`;
+export const getKeyActiveMap = (serverUuid: string) =>
+  `active-map:${serverUuid}`;
 export const getKeyJukebox = (serverUuid: string) => `jukebox:${serverUuid}`;
 export const getKeyPlayers = (serverUuid: string) => `players:${serverUuid}`;
+export const getKeyHetznerRateLimit = (projectId: string) =>
+  `hetzner-rate-limit:${projectId}`;
+export const getKeyHetznerServerTypes = () => "hetzner-server-types";
+export const getKeyHetznerImages = () => "hetzner-images";
+export const getKeyHetznerLocations = () => "hetzner-locations";

@@ -1,5 +1,5 @@
 "use client";
-import EditUserForm from "@/forms/admin/edit-user-form";
+import EditUserForm from "@/forms/admin/user/edit-user-form";
 import { Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";

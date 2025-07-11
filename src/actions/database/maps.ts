@@ -10,6 +10,7 @@ import {
   ServerError,
   ServerResponse,
 } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 
 export async function getAllMaps(): Promise<ServerResponse<Maps[]>> {
   return doServerAction(async () => {
@@ -115,8 +116,8 @@ export async function getNewMapsCount(
 }
 
 export async function getMapsPaginated(
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string },
+  pagination: PaginationState,
+  sorting: { field: string; order: 'asc' | 'desc' },
 ): Promise<ServerResponse<PaginationResponse<Maps>>> {
   return doServerAction(async () => {
     const db = getClient();
@@ -128,10 +129,10 @@ export async function getMapsPaginated(
       where: {
         deletedAt: null,
       },
-      skip: pagination.skip,
-      take: pagination.limit,
+      skip: pagination.pageSize * pagination.pageIndex,
+      take: pagination.pageSize,
       orderBy: {
-        [sorting.field]: sorting.order.toLowerCase() as "asc" | "desc", // 'asc' | 'desc'
+        [sorting.field]: sorting.order.toLowerCase(),
       },
     });
 

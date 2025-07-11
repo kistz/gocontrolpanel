@@ -28,7 +28,7 @@ export async function doServerActionWithAuth<T>(
 ): Promise<ServerResponse<T>> {
   let session: Session | undefined;
   try {
-    session = await withAuth(roles);
+    session = await withAuth();
   } catch (error) {
     console.error("Error during server action with auth:", error);
     return {

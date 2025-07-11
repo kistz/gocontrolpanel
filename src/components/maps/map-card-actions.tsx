@@ -31,7 +31,7 @@ export default function MapCardActions({
   const [isCompact, setIsCompact] = useState(false);
   const { data: session, status } = useSession();
   const isAdmin =
-    status === "authenticated" && session.user.roles.includes("admin");
+    status === "authenticated" && session.user.admin;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {

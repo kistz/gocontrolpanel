@@ -1,23 +1,30 @@
 import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 
-interface PaginationAPIHook<TData> {
+interface PaginationAPIHook<TData, TFetch> {
   data: TData[];
   totalCount: number;
   loading: boolean;
   refetch: () => Promise<void>;
+  fetchArgs?: TFetch;
 }
 
-export const usePaginationAPI = <TData>(
+export const usePaginationAPI = <TData, TFetch>(
   fetchData: (
-    pagination: { skip: number; limit: number },
-    sorting: { field: string; order: string },
+    pagination: PaginationState,
+    sorting: { field: string; order: "asc" | "desc" },
     filter?: string,
+    fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>,
-  pagination: { skip: number; limit: number },
-  sorting: { field: string; order: string } = { field: "id", order: "ASC" },
+  pagination: PaginationState,
+  sorting: { field: string; order: "asc" | "desc" } = {
+    field: "id",
+    order: "asc",
+  },
   filter: string = "",
-): PaginationAPIHook<TData> => {
+  fetchArgs?: TFetch,
+): PaginationAPIHook<TData, TFetch> => {
   const [data, setData] = useState<TData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,7 +35,7 @@ export const usePaginationAPI = <TData>(
       const {
         data: { data: fetchedData, totalCount: fetchedTotalCount },
         error,
-      } = await fetchData(pagination, sorting, filter);
+      } = await fetchData(pagination, sorting, filter, fetchArgs);
 
       if (error) {
         throw new Error(error);
@@ -46,7 +53,13 @@ export const usePaginationAPI = <TData>(
   useEffect(() => {
     fetchDataFromAPI();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.skip, pagination.limit, sorting.field, sorting.order, filter]);
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    sorting.field,
+    sorting.order,
+    filter,
+  ]);
 
   return { data, totalCount, loading, refetch: fetchDataFromAPI };
 };

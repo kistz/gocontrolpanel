@@ -1,19 +1,16 @@
 "use client";
 import { getMapsPaginated } from "@/actions/database/maps";
-import { usePagination } from "@/hooks/use-pagination";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { Maps } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import GridPagination from "../grid/grid-pagination";
 import MapCard from "./map-card";
 
 interface MapCardsProps {
   fetchData?: (
-    pagination: {
-      skip: number;
-      limit: number;
-    },
+    pagination: PaginationState,
     sorting: {
       field: string;
       order: string;
@@ -26,11 +23,14 @@ export default function MapCards({
 }: MapCardsProps) {
   const [cols, setCols] = useState(3);
   const [rows, setRows] = useState(2);
-  const { pagination, setPagination, skip, limit } = usePagination(cols * rows);
-  const { data, totalCount, loading, refetch } = usePaginationAPI(fetchData, {
-    skip,
-    limit,
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageSize: cols * rows,
+    pageIndex: 0,
   });
+  const { data, totalCount, loading, refetch } = usePaginationAPI(
+    fetchData,
+    pagination,
+  );
 
   useEffect(() => {
     const handleResize = () => {

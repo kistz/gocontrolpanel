@@ -40,12 +40,15 @@ model Users {
   login     String @unique
   nickName  String
   path      String
-  roles     Json
+  admin     Boolean @default(false)
   ubiUid    String @unique
+  groups GroupMember[]
+  hetznerProjects HetznerProjectUser[]
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime?
+
 
   @@index([deletedAt])
   @@map("users")
@@ -80,4 +83,68 @@ model Interfaces {
 
   @@index([deletedAt])
   @@map("interfaces")
+}
+
+model Groups {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  serverUuids  Json
+  users        GroupMember[]
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  @@index([deletedAt])
+  @@map("groups")
+}
+
+model GroupMember {
+  userId   String
+  groupId  String
+  role     GroupRole
+
+  user     Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    Groups  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+  @@map("group_members")
+}
+
+enum GroupRole {
+  Admin
+  Moderator
+  Member
+}
+
+model HetznerProjects {
+  id          String   @id @default(uuid())
+  name       String
+  apiTokens Json
+  users HetznerProjectUser[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([deletedAt])
+  @@map("hetzner_projects")
+}
+
+model HetznerProjectUser {
+  userId     String
+  projectId  String
+  role       HetznerProjectRole
+
+  user       Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project    HetznerProjects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([userId, projectId])
+  @@map("hetzner_project_users")
+}
+
+enum HetznerProjectRole {
+  Admin
+  Moderator
 }

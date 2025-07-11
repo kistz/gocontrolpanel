@@ -1,6 +1,5 @@
 import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { routes } from "@/routes";
-import { ServerError } from "@/types/responses";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -23,13 +22,24 @@ export function formatTime(time: number): string {
 }
 
 export function getErrorMessage(error: unknown): string {
-  const errorMessage =
-    error instanceof Error || error instanceof ServerError
-      ? error.message
-      : "Something went wrong";
+  let message = "Something went wrong";
 
-  const match = errorMessage.match(/Error: XML-RPC fault:\s*(.*)/);
-  return match ? match[1] : errorMessage;
+  // Handle Error or ServerError (with .message)
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  // Handle HetznerApiError structure
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const errMsg = (error as any).message;
+    if (typeof errMsg === "string") {
+      message = capitalize(errMsg);
+    }
+  }
+
+  // Optionally extract from XML-RPC fault
+  const match = message.match(/Error: XML-RPC fault:\s*(.*)/);
+  return match ? match[1] : message;
 }
 
 export function generatePath(
@@ -156,13 +166,13 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
   return Buffer.from(buffer).toString("base64");
 }
 
-export function getRoles(roles: any): string[] {
-  if (Array.isArray(roles)) {
-    return roles.map(String);
-  } else if (typeof roles === "string") {
-    return [roles];
-  } else if (typeof roles === "object" && roles !== null) {
-    return Object.keys(roles);
+export function getList(list: any): string[] {
+  if (Array.isArray(list)) {
+    return list.map(String);
+  } else if (typeof list === "string") {
+    return [list];
+  } else if (typeof list === "object" && list !== null) {
+    return Object.keys(list);
   }
   return [];
 }
@@ -174,15 +184,59 @@ export function removePrefix(str: string, prefix: string): string {
   return str;
 }
 
-export function initGbxWebsocketClient(path: string, token: string): WebSocket {
+export function initGbxWebsocketClient(
+  path: string,
+  token: string,
+  params?: Record<string, string | string[]>,
+): WebSocket {
   const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-  const baseUri = envUrl && envUrl != "" ? envUrl : "/gbx";
-  return new WebSocket(`${baseUri}${path}?token=${token}`);
+  const baseUri = envUrl && envUrl !== "" ? envUrl : "/gbx";
+
+  const searchParams = new URLSearchParams();
+
+  if (params) {
+    for (const key in params) {
+      const value = params[key];
+      if (Array.isArray(value)) {
+        value.forEach((v) => searchParams.append(key, v));
+      } else {
+        searchParams.append(key, value);
+      }
+    }
+  }
+
+  // Append the token param first, so token is always included
+  searchParams.append("token", token);
+
+  return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
+}
+
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function capitalizeWords(str: string): string {
   return str
     .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => capitalize(word))
     .join(" ");
+}
+
+export function isValidHetznerServerName(name: string): boolean {
+  const maxLength = 253;
+
+  const hostnameRegex =
+    /^(?!-)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
+
+  return name.length <= maxLength && hostnameRegex.test(name);
+}
+
+export function generateRandomString(length = 16): string {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
