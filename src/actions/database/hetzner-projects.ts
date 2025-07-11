@@ -5,7 +5,8 @@ import { getClient } from "@/lib/dbclient";
 import { decryptHetznerToken, encryptHetznerToken } from "@/lib/hetzner";
 import { Prisma } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
-import { ServerResponse } from "@/types/responses";
+import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 
 const editHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
   users: {
@@ -72,6 +73,61 @@ export async function getAllHetznerProjects(): Promise<
         decryptHetznerToken(token),
       ),
     }));
+  });
+}
+
+export async function getHetznerProjectsPaginated(
+  pagination: PaginationState,
+  sorting: { field: string; order: "asc" | "desc" },
+  filter?: string,
+): Promise<ServerResponse<PaginationResponse<HetznerProjectsWithUsers>>> {
+  return doServerActionWithAuth([], async () => {
+    const db = getClient();
+
+    const totalCount = await db.hetznerProjects.count({
+      where: {
+        deletedAt: null,
+      },
+    });
+
+    const projects = await db.hetznerProjects.findMany({
+      where: {
+        deletedAt: null,
+        ...(filter && {
+          OR: [{ name: { contains: filter } }],
+        }),
+      },
+      include: {
+        users: {
+          where: {
+            user: {
+              deletedAt: null,
+            },
+          },
+          include: {
+            user: true,
+          },
+        },
+        _count: {
+          select: {
+            users: true,
+          },
+        },
+      },
+      orderBy: { [sorting.field]: sorting.order },
+      skip: pagination.pageIndex * pagination.pageSize,
+      take: pagination.pageSize,
+    });
+
+    return {
+      totalCount,
+      data: projects.map((project) => ({
+        ...project,
+        apiTokens: getList(project.apiTokens).map((token) =>
+          decryptHetznerToken(token),
+        ),
+      })),
+    };
   });
 }
 

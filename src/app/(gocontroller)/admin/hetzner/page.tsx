@@ -1,17 +1,17 @@
-import { getAllHetznerProjects } from "@/actions/database/hetzner-projects";
+import { getHetznerProjectsPaginated } from "@/actions/database/hetzner-projects";
 import { getAllUsers } from "@/actions/database/users";
-import ProjectCard from "@/components/hetzner/project-card";
 import AddProjectModal from "@/components/modals/add-project";
 import Modal from "@/components/modals/modal";
+import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { IconPlus } from "@tabler/icons-react";
+import { createColumns } from "./columns";
 
 export default async function AdminHetznerPage() {
   const session = await auth();
 
   const { data: users } = await getAllUsers();
-  const { data: projects } = await getAllHetznerProjects();
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,11 +31,13 @@ export default async function AdminHetznerPage() {
         </Modal>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {projects.map((project, index) => (
-          <ProjectCard project={project} users={users} key={index} />
-        ))}
-      </div>
+      <PaginationTable
+        fetchData={getHetznerProjectsPaginated}
+        createColumns={createColumns}
+        args={{
+          users,
+        }}
+      />
     </div>
   );
 }
