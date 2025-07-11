@@ -84,7 +84,7 @@ export default function RenderInput<TControl extends FieldValues>({
       );
     case "password":
       return (
-        <div className={cn("relative", className)}>
+        <div className={cn("relative w-full", className)}>
           <Input
             type={showPassword ? "text" : "password"}
             placeholder={placeholder}
