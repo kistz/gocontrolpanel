@@ -14,7 +14,9 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
     - [Files Management](#files-management)
     - [Interface Editor](#interface-editor)
     - [User Management](#user-management)
+    - [Group Management](#group-management)
     - [Server Management](#server-management)
+    - [Hetzner Management](#hetzner-management)
 - [Docker Setup](#docker-setup)
   - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
@@ -82,11 +84,26 @@ Manage users, including adding new users, managing roles and permissions.
 
 ![User Management Page](https://i.imgur.com/aOoWkWl.png "User Management Page")
 
+**Group Management**
+
+Manage groups, including adding new groups, managing group permissions and roles.
+
+![Group Management Page](https://i.imgur.com/rbWYZ6a.png "Group Management Page")
+
 **Server Management**
 
 Manage your servers, add new servers and configure the server settings.
 
 ![Server Management Page](https://i.imgur.com/3XMGL6m.png "Server Management Page")
+
+**Hetzner Management**
+
+Manage your Hetzner Cloud servers, including creating, deleting and managing servers.
+
+![Hetzner Management Page](https://i.imgur.com/rJNWz31.png "Hetzner Management Page")
+![Hetzner Servers Page](https://i.imgur.com/iuFuFvQ.png "Hetzner Servers Page")
+![Hetzner Server Details Page](https://i.imgur.com/KAFo9P0.png "Hetzner Server Details Page")
+![Hetzner Server Create Page](https://i.imgur.com/gvI5x4W.png "Hetzner Server Create Page")
 
 # Docker Setup
 
@@ -211,7 +228,7 @@ gocontrolpanel:
   restart: unless-stopped
   environment:
     NEXTAUTH_URL: http://localhost:3000
-    NEXTAUTH_SECRET: 
+    NEXTAUTH_SECRET:
     DEFAULT_ADMINS:
     NADEO_CLIENT_ID:
     NADEO_CLIENT_SECRET:
@@ -220,7 +237,7 @@ gocontrolpanel:
     NADEO_SERVER_PASSWORD:
     NADEO_CONTACT: GoControlPanel / <your contact info>
     REDIS_URI: redis://redis:6379
-    HETZNER_KEY: 
+    HETZNER_KEY:
   depends_on:
     - db
     - redis
@@ -231,7 +248,7 @@ gbxconnector:
   environment:
     PORT: 6980
     SERVER_RECONNECT_INTERVAL: 15
-    JWT_SECRET: 
+    JWT_SECRET:
     LOG_LEVEL: DEBUG
   volumes:
     - ./gocontrolpanel/servers.json:/app/servers.json
