@@ -172,8 +172,6 @@ export async function createHetznerServer(
 
     await setRateLimit(projectId, res);
 
-    console.log("Server created:", res.data);
-
     return res.data.server;
   });
 }

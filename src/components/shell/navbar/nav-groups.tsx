@@ -110,7 +110,7 @@ export default function NavGroups() {
 
         socket.onmessage = async (event) => {
           const data: Server[] = JSON.parse(event.data);
-
+          
           setHealthStatus(true);
           setServers(data);
 
