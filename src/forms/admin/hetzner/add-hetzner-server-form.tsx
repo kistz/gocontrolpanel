@@ -5,81 +5,49 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
+import { HetznerLocation } from "@/types/api/hetzner/locations";
+import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import Flag from "react-world-flags";
 import { toast } from "sonner";
 import {
   AddHetznerServerSchema,
   AddHetznerServerSchemaType,
 } from "./add-hetzner-server-schema";
-import { useEffect, useState } from "react";
-import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
-import { getServerTypes } from "@/actions/hetzner/server-types";
-import { getHetznerImages } from "@/actions/hetzner/images";
-import { HetznerLocation } from "@/types/api/hetzner/locations";
-import { getHetznerLocations } from "@/actions/hetzner/locations";
 
 export default function AddHetznerServerForm({
   projectId,
+  serverTypes,
+  images,
+  locations,
   callback,
 }: {
   projectId: string;
+  serverTypes: HetznerServerType[];
+  images: HetznerImage[];
+  locations: HetznerLocation[];
   callback?: () => void;
 }) {
-  const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
-  const [images, setImages] = useState<HetznerImage[]>([]);
-  const [locations, setLocations] = useState<HetznerLocation[]>([]);
-
-  useEffect(() => {
-    const fetchServerTypes = async () => {
-      try {
-        const { data, error } = await getServerTypes(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setServerTypes(data);
-      } catch (error) {
-        toast.error("Failed to fetch server types", {
-          description: getErrorMessage(error),
-        });
-      }
-    }
-
-    const fetchImages = async () => {
-      try {
-        const { data, error } = await getHetznerImages(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setImages(data);
-      } catch (error) {
-        toast.error("Failed to fetch images", {
-          description: getErrorMessage(error),
-        });
-      }
-    };
-
-    const fetchLocations = async () => {
-      try {
-        const { data, error } = await getHetznerLocations(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setLocations(data);
-      } catch (error) {
-        toast.error("Failed to fetch locations", {
-          description: getErrorMessage(error),
-        });
-      }
-    };
-
-    fetchServerTypes();
-    fetchImages();
-    fetchLocations();
-  }, []);
-
   const form = useForm<AddHetznerServerSchemaType>({
     resolver: zodResolver(AddHetznerServerSchema),
+    defaultValues: {
+      location:
+        locations.length > 0
+          ? locations.find((loc) => loc.name === "fsn1")?.name ||
+            locations[0].name
+          : "",
+      serverType:
+        serverTypes.length > 0
+          ? serverTypes.find((st) => st.name === "cpx11")?.id.toString() ||
+            serverTypes[0].id.toString()
+          : "",
+      image:
+        images.length > 0
+          ? images.find((img) => img.name === "ubuntu-24.04")?.id.toString() ||
+            images[0].id.toString()
+          : "",
+    },
   });
 
   async function onSubmit(values: AddHetznerServerSchemaType) {
@@ -100,6 +68,23 @@ export default function AddHetznerServerForm({
     }
   }
 
+  const selectedServerType = serverTypes.find(
+    (type) => type.id.toString() === form.watch("serverType"),
+  );
+
+  const selectedLocation = locations.find(
+    (location) => location.name === form.watch("location"),
+  );
+
+  const selectedImage = images.find(
+    (image) => image.id.toString() === form.watch("image"),
+  );
+
+  const pricing =
+    selectedServerType?.prices.find(
+      (price) => price.location === selectedLocation?.name,
+    ) || selectedServerType?.prices.find((price) => price.location === "fsn1");
+
   return (
     <Form {...form}>
       <form
@@ -116,23 +101,147 @@ export default function AddHetznerServerForm({
         <FormElement
           name={"serverType"}
           label="Server Type"
-          placeholder="Enter server type"
+          placeholder="Select server type"
+          type="select"
+          className="w-32"
+          options={serverTypes.map((type) => ({
+            value: type.id.toString(),
+            label: type.name,
+          }))}
           isRequired
         />
+
+        {/* Server Type Info */}
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex flex-col">
+            <span className="font-semibold">Description</span>
+            <span className="truncate">
+              {selectedServerType?.description || "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Cores</span>
+            <span className="truncate">{selectedServerType?.cores || "-"}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Memory</span>
+            <span className="truncate">
+              {selectedServerType?.memory
+                ? `${selectedServerType.memory} GB`
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Disk</span>
+            <span className="truncate">
+              {selectedServerType?.disk ? `${selectedServerType.disk} GB` : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">CPU Type</span>
+            <span className="truncate">
+              {selectedServerType?.cpu_type || "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Hourly Price</span>
+            <span className="truncate">
+              {pricing
+                ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Monthly Price</span>
+            <span className="truncate">
+              {pricing
+                ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Included Traffic</span>
+            <span className="truncate">
+              {pricing
+                ? `${Math.floor(
+                    pricing.included_traffic / 1000 / 1000 / 1000 / 1000,
+                  )} TB`
+                : "-"}
+            </span>
+          </div>
+        </div>
 
         <FormElement
           name={"image"}
           label="Image"
-          placeholder="Enter image name"
+          placeholder="Select image"
+          type="select"
+          className="w-64"
+          options={images.map((image) => ({
+            value: image.id.toString(),
+            label: image.name || image.os_flavor,
+          }))}
           isRequired
         />
+
+        {/* Image Info */}
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex flex-col">
+            <span className="font-semibold">Description</span>
+            <span className="truncate">
+              {selectedImage?.description || "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">OS Version</span>
+            <span className="truncate">{selectedImage?.os_version || "-"}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Image Size</span>
+            <span className="truncate">
+              {selectedImage?.disk_size ? `${selectedImage.disk_size} GB` : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">Disk Size</span>
+            <span className="truncate">
+              {selectedImage?.image_size
+                ? `${selectedImage.image_size} GB`
+                : "-"}
+            </span>
+          </div>
+        </div>
 
         <FormElement
           name={"location"}
           label="Location"
-          placeholder="Enter server location"
+          placeholder="Select server location"
+          type="select"
+          className="w-64"
+          options={locations.map((location) => ({
+            value: location.name,
+            label: location.description,
+          }))}
           isRequired
         />
+
+        {/* Location Info */}
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex flex-col">
+            <span className="font-semibold">Country</span>
+            <span className="truncate">
+              <Flag
+                className="h-4"
+                code={selectedLocation?.country}
+                fallback={selectedLocation?.country || "-"}
+              />
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">City</span>
+            <span className="truncate">{selectedLocation?.city || "-"}</span>
+          </div>
+        </div>
 
         <FormElement
           name={"dediLogin"}

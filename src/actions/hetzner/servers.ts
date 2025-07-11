@@ -144,8 +144,8 @@ export async function createHetznerServer(
 
     const body = {
       name: data.name,
-      server_type: data.serverType,
-      image: data.image,
+      server_type: parseInt(data.serverType),
+      image: parseInt(data.image),
       location: data.location,
       user_data: userData,
       labels: {

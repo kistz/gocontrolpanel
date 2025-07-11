@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { IconPlus } from "@tabler/icons-react";
 import { createColumns } from "./columns";
+import { getServerTypes } from "@/actions/hetzner/server-types";
+import { getHetznerImages } from "@/actions/hetzner/images";
+import { getHetznerLocations } from "@/actions/hetzner/locations";
 
 export default async function ProjectPage({
   params,
@@ -18,6 +21,9 @@ export default async function ProjectPage({
   const { id } = await params;
 
   const { data: rateLimit } = await getRateLimit(id);
+  const { data: serverTypes } = await getServerTypes(id);
+  const { data: images } = await getHetznerImages(id);
+  const { data: locations } = await getHetznerLocations(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,7 +56,12 @@ export default async function ProjectPage({
         filter
         actions={
           <Modal>
-            <AddHetznerServerModal data={id} />
+            <AddHetznerServerModal data={{
+              projectId: id,
+              serverTypes: serverTypes || [],
+              images: images || [],
+              locations: locations || [],
+            }} />
             <Button>
               <IconPlus /> Add Server
             </Button>
