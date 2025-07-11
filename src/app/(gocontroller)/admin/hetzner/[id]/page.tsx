@@ -37,20 +37,18 @@ export default async function ProjectPage({
         </div>
 
         <div className="flex flex-col gap-1">
-          <h4 className="text-sm text-muted-foreground">
-            {rateLimit && (
-              <>
-                Rate Limit: {rateLimit.limit - rateLimit.remaining} /{" "}
-                {rateLimit.limit}
-              </>
-            )}
-          </h4>
-          <Progress
+          {rateLimit && (
+            <h4 className="text-sm text-muted-foreground">
+              Rate Limit: {rateLimit.limit - rateLimit.remaining} /{" "}
+              {rateLimit.limit}
+            </h4>
+            <Progress
             value={
               ((rateLimit.limit - rateLimit.remaining) / rateLimit.limit) * 100
             }
             className="w-32"
           />
+        )}
         </div>
       </div>
       <PaginationTable
