@@ -4,8 +4,8 @@ import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { syncPlayerList } from "@/actions/gbx/player";
 import { syncServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
-import { withTimeout } from "./utils";
 import { appGlobals } from "./global";
+import { withTimeout } from "./utils";
 
 export async function connectToGbxClient(
   serverUuid: string,
@@ -25,6 +25,10 @@ export async function connectToGbxClient(
     showErrors: true,
     throwErrors: true,
   });
+
+  console.log(
+    `Connecting to GBX client for server ${serverUuid} at ${server.host}:${server.xmlrpcPort}`,
+  );
 
   try {
     const status = await withTimeout(
@@ -51,7 +55,6 @@ export async function connectToGbxClient(
   await setupListeners(client, server.uuid);
   await syncPlayerList(client, server.uuid);
   await syncMap(client, server.uuid);
-
 
   if (appGlobals.gbxClients) {
     appGlobals.gbxClients[serverUuid] = client;
