@@ -38,8 +38,12 @@ export default async function ProjectPage({
 
         <div className="flex flex-col gap-1">
           <h4 className="text-sm text-muted-foreground">
-            Rate Limit: {rateLimit.limit - rateLimit.remaining} /{" "}
-            {rateLimit.limit}
+            {rateLimit && (
+              <>
+                Rate Limit: {rateLimit.limit - rateLimit.remaining} /{" "}
+                {rateLimit.limit}
+              </>
+            )}
           </h4>
           <Progress
             value={

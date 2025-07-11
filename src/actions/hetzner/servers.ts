@@ -112,7 +112,13 @@ export async function getRateLimit(
       if (!newRateLimitData) {
         throw new Error("Rate limit data not found after fetching servers.");
       }
-      return JSON.parse(newRateLimitData);
+
+      const { limit, remaining } = JSON.parse(newRateLimitData);
+
+      return {
+        limit: Math.floor(parseFloat(limit)),
+        remaining: Math.floor(parseFloat(remaining)),
+      };
     }
 
     const { limit, remaining } = JSON.parse(rateLimitData);
