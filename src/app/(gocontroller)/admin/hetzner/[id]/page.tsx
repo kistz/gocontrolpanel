@@ -2,13 +2,13 @@ import {
   getHetznerServersPaginated,
   getRateLimit,
 } from "@/actions/hetzner/servers";
-import { PaginationTable } from "@/components/table/pagination-table";
-import { Progress } from "@/components/ui/progress";
-import { createColumns } from "./columns";
 import AddHetznerServerModal from "@/components/modals/add-hetzner-server";
 import Modal from "@/components/modals/modal";
+import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { IconPlus } from "@tabler/icons-react";
+import { createColumns } from "./columns";
 
 export default async function ProjectPage({
   params,
@@ -31,7 +31,7 @@ export default async function ProjectPage({
 
         <div className="flex flex-col gap-1">
           <h4 className="text-sm text-muted-foreground">
-            Rate Limit: {(rateLimit.limit - rateLimit.remaining)} /{" "}
+            Rate Limit: {rateLimit.limit - rateLimit.remaining} /{" "}
             {rateLimit.limit}
           </h4>
           <Progress
@@ -48,13 +48,24 @@ export default async function ProjectPage({
         fetchData={getHetznerServersPaginated}
         fetchArgs={{ projectId: id }}
         filter
-        actions={<Modal>
+        actions={
+          <Modal>
             <AddHetznerServerModal data={id} />
             <Button>
               <IconPlus /> Add Server
             </Button>
-          </Modal>}
+          </Modal>
+        }
       />
+
+      <p className="text-sm text-muted-foreground">
+        Important Notice: GoControlPanel is not the actual provider or host of
+        your servers. It serves only as a convenience tool for managing
+        deployments. You are fully responsible for any servers created through
+        the panel. Please regularly check your Hetzner Cloud Console to monitor
+        server status, usage, and billing. GoControlPanel assumes no
+        responsibility for active resources or charges incurred.
+      </p>
     </div>
   );
 }

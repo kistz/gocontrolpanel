@@ -160,7 +160,9 @@ export async function createHetznerServer(
       },
     };
 
-    const res = await axiosHetzner.post<HetznerServerResponse>(
+    const res = await axiosHetzner.post<{
+      server: HetznerServer;
+    }>(
       "/servers",
       body,
       {

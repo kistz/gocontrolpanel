@@ -17,34 +17,7 @@ export interface HetznerServer {
     alias_ips?: string[];
     mac_address?: string;
   }[];
-  server_type: {
-    id: number;
-    name: string;
-    description: string;
-    cores: number;
-    memory: number;
-    disk: number;
-    deprecated: boolean;
-    prices: {
-      location: string;
-      price_hourly: {
-        net: string;
-        gross: string;
-      };
-      price_monthly: {
-        net: string;
-        gross: string;
-      };
-      included_traffic: number;
-      price_per_tb_traffic: {
-        net: string;
-        gross: string;
-      };
-    }[];
-    storage_type: string;
-    cpu_type: string;
-    architecture: string;
-  };
+  server_type: HetznerServerType;
   datacenter: {
     id: number;
     name: string;
@@ -88,24 +61,51 @@ export interface HetznerServer {
 export interface HetznerServersResponse {
   servers: HetznerServer[];
   meta: {
-    pagination: {
-      page: number;
-      per_page: number;
-      previous_page: number | null;
-      next_page: number | null;
-      last_page: number | null;
-      total_entries: number | null;
-    };
+    pagination: HetznerPagination;
   };
 }
 
-export interface HetznerServerResponse {
-  server: HetznerServer;
-  meta: {
-    rate_limit: {
-      limit: number;
-      remaining: number;
-      reset: string;
+export interface HetznerServerType {
+  id: number;
+  name: string;
+  description: string;
+  cores: number;
+  memory: number;
+  disk: number;
+  deprecated: boolean;
+  prices: {
+    location: string;
+    price_hourly: {
+      net: string;
+      gross: string;
     };
+    price_monthly: {
+      net: string;
+      gross: string;
+    };
+    included_traffic: number;
+    price_per_tb_traffic: {
+      net: string;
+      gross: string;
+    };
+  }[];
+  storage_type: string;
+  cpu_type: string;
+  architecture: string;
+}
+
+export interface HetznerServerTypesResponse {
+  server_types: HetznerServerType[];
+  meta: {
+    pagination: HetznerPagination;
   };
+}
+
+export interface HetznerPagination {
+  page: number;
+  per_page: number;
+  previous_page: number | null;
+  next_page: number | null;
+  last_page: number | null;
+  total_entries: number | null;
 }
