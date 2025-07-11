@@ -56,7 +56,7 @@ interface ServerNavGroup {
   }[];
 }
 
-export default function NavServers() {
+export default function NavGroups() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const router = useRouter();
@@ -101,11 +101,16 @@ export default function NavServers() {
         const socket = initGbxWebsocketClient(
           "/ws/servers",
           session.jwt as string,
+          {
+            serverUuid: session?.user.groups
+              .map((group) => group.serverUuids)
+              .flat(),
+          },
         );
 
         socket.onmessage = async (event) => {
           const data: Server[] = JSON.parse(event.data);
-
+          
           setHealthStatus(true);
           setServers(data);
 
@@ -123,80 +128,88 @@ export default function NavServers() {
     fetchData();
   }, [session]);
 
-  const group: ServerNavGroup = {
-    name: "Servers",
-    servers: servers.map((server) => ({
-      uuid: server.uuid,
-      name: server.name,
-      isConnected: server.isConnected,
-      icon: IconServer,
-      isActive: serverUuid === server.uuid,
-      items: [
-        {
-          name: "Settings",
-          url: generatePath(routes.servers.settings, {
+  const groupsSidebarGroup: ServerNavGroup[] =
+    session?.user.groups.map((group) => ({
+      name: group.name,
+      servers: group.serverUuids
+        .map((s) => {
+          const server = servers.find((server) => server.uuid === s);
+          if (!server) return undefined;
+
+          return {
             uuid: server.uuid,
-          }),
-          icon: IconAdjustmentsAlt,
-        },
-        {
-          name: "Game",
-          url: generatePath(routes.servers.game, {
-            uuid: server.uuid,
-          }),
-          icon: IconDeviceGamepad,
-        },
-        {
-          name: "Maps",
-          url: generatePath(routes.servers.maps, {
-            uuid: server.uuid,
-          }),
-          icon: IconMap,
-        },
-        {
-          name: "Players",
-          url: generatePath(routes.servers.players, {
-            uuid: server.uuid,
-          }),
-          icon: IconUsers,
-        },
-        {
-          name: "Live",
-          url: generatePath(routes.servers.live, {
-            uuid: server.uuid,
-          }),
-          icon: IconActivity,
-        },
-        ...(session?.user.roles.includes("admin") && server.fmUrl
-          ? [
+            name: server.name,
+            isConnected: server.isConnected,
+            icon: IconServer,
+            isActive: serverUuid === server.uuid,
+            items: [
               {
-                name: "Files",
-                url: generatePath(routes.servers.files, {
+                name: "Settings",
+                url: generatePath(routes.servers.settings, {
                   uuid: server.uuid,
                 }),
-                icon: IconFileDescription,
+                icon: IconAdjustmentsAlt,
               },
-            ]
-          : []),
-        {
-          name: "Interface",
-          url: generatePath(routes.servers.interface, {
-            uuid: server.uuid,
-          }),
-          icon: IconDeviceDesktop,
-        },
-        // {
-        //   name: "Dev",
-        //   url: generatePath(routes.servers.dev, {
-        //     uuid: server.uuid,
-        //   }),
-        //   icon: IconCode,
-        // }
-      ],
-    })),
-  };
+              {
+                name: "Game",
+                url: generatePath(routes.servers.game, {
+                  uuid: server.uuid,
+                }),
+                icon: IconDeviceGamepad,
+              },
+              {
+                name: "Maps",
+                url: generatePath(routes.servers.maps, {
+                  uuid: server.uuid,
+                }),
+                icon: IconMap,
+              },
+              {
+                name: "Players",
+                url: generatePath(routes.servers.players, {
+                  uuid: server.uuid,
+                }),
+                icon: IconUsers,
+              },
+              {
+                name: "Live",
+                url: generatePath(routes.servers.live, {
+                  uuid: server.uuid,
+                }),
+                icon: IconActivity,
+              },
+              ...(session?.user.admin && server.fmUrl
+                ? [
+                    {
+                      name: "Files",
+                      url: generatePath(routes.servers.files, {
+                        uuid: server.uuid,
+                      }),
+                      icon: IconFileDescription,
+                    },
+                  ]
+                : []),
+              {
+                name: "Interface",
+                url: generatePath(routes.servers.interface, {
+                  uuid: server.uuid,
+                }),
+                icon: IconDeviceDesktop,
+              },
+              // {
+              //   name: "Dev",
+              //   url: generatePath(routes.servers.dev, {
+              //     uuid: server.uuid,
+              //   }),
+              //   icon: IconCode,
+              // }
+            ],
+          };
+        })
+        .filter((server): server is NonNullable<typeof server> => !!server),
+    })) || [];
 
-  return (
+  return groupsSidebarGroup.map((group) => (
     <SidebarGroup
       className="group-data-[collapsible=icon]:hidden select-none"
       key={group.name || "default"}
@@ -219,7 +232,7 @@ export default function NavServers() {
                 <SidebarMenuButton asChild>
                   <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
                     <IconServer />
-                    <span>No servers found</span>
+                    <span>No servers selected</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -305,5 +318,5 @@ export default function NavServers() {
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  );
+  ));
 }

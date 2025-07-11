@@ -93,6 +93,18 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
       const end = Math.max(lastSelectedIndex, index);
       const newSelected = allItems.slice(start, end + 1);
       setSelectedItems(newSelected);
+    } else if (e.ctrlKey || e.metaKey) {
+      const isSelected = selectedItems.some(
+        (item) => item.path === fileEntry.path,
+      );
+      if (isSelected) {
+        setSelectedItems((prev) =>
+          prev.filter((item) => item.path !== fileEntry.path),
+        );
+      } else {
+        setSelectedItems((prev) => [...prev, fileEntry]);
+      }
+      setLastSelectedIndex(index);
     } else {
       setSelectedItems([fileEntry]);
       setLastSelectedIndex(index);

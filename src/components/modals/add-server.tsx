@@ -1,13 +1,11 @@
 "use client";
-import AddServerForm from "@/forms/admin/add-server-form";
+import AddServerForm from "@/forms/admin/server/add-server-form";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddServerModal({
-  closeModal,
-}: DefaultModalProps) {
+export default function AddServerModal({ closeModal }: DefaultModalProps) {
   const router = useRouter();
 
   const stopPropagation = (e: React.MouseEvent) => {

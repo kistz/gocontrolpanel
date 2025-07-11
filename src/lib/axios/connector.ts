@@ -7,13 +7,3 @@ export const axiosAuth = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-axiosAuth.interceptors.request.use(
-  (request) => {
-    request.headers["Authorization"] = `Bearer ${config.CONNECTOR_API_KEY}`;
-    return request;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);

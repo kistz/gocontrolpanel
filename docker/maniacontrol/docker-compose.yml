@@ -53,7 +53,6 @@ services:
     environment:
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: 
-      CONNECTOR_API_KEY: 
       DEFAULT_ADMINS: 
       NADEO_CLIENT_ID: 
       NADEO_CLIENT_SECRET: 
@@ -62,6 +61,7 @@ services:
       NADEO_SERVER_PASSWORD: 
       NADEO_CONTACT: GoControlPanel / <your contact info>
       REDIS_URI: redis://redis:6379
+      HETZNER_KEY: 
     depends_on:
       - db
       - redis
@@ -73,7 +73,6 @@ services:
       PORT: 6980
       SERVER_RECONNECT_INTERVAL: 15
       JWT_SECRET: 
-      INTERNAL_API_KEY: 
       LOG_LEVEL: DEBUG
     volumes:
       - ./../../servers.json:/app/servers.json

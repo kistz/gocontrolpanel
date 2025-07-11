@@ -1,6 +1,6 @@
 "use server";
-import { AddServerSchemaType } from "@/forms/admin/add-server-schema";
-import { EditServerSchemaType } from "@/forms/admin/edit-server-schema";
+import { AddServerSchemaType } from "@/forms/admin/server/add-server-schema";
+import { EditServerSchemaType } from "@/forms/admin/server/edit-server-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosAuth } from "@/lib/axios/connector";
 import { connectToGbxClient } from "@/lib/gbxclient";
@@ -8,30 +8,41 @@ import { getRedisClient } from "@/lib/redis";
 import { ServerError, ServerResponse } from "@/types/responses";
 import { Server } from "@/types/server";
 import { isAxiosError } from "axios";
+import { removeServerUuidFromGroups } from "../database/groups";
 
 let healthStatus: boolean | null = null;
 
 // Sync the servers
 export async function syncServers(): Promise<Server[]> {
-  const res = await axiosAuth.get<Server[]>("/servers");
+  try {
+    const res = await axiosAuth.get<Server[]>("/servers");
 
-  if (res.status !== 200) {
-    if (isAxiosError(res) && res.code === "ECONNREFUSED") {
+    if (res.status !== 200) {
+      if (isAxiosError(res) && res.code === "ECONNREFUSED") {
+        healthStatus = false;
+      }
+      throw new ServerError("Failed to get servers");
+    }
+
+    const redis = await getRedisClient();
+
+    const servers = res.data;
+
+    await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
+    return servers;
+  } catch (error) {
+    if (isAxiosError(error) && error.code === "ECONNREFUSED") {
       healthStatus = false;
     }
-    throw new ServerError("Failed to get servers");
+    console.error("Error syncing servers:", error);
+    throw new ServerError("Failed to sync servers");
   }
-
-  const redis = await getRedisClient();
-
-  const servers = res.data;
-
-  await redis.set("servers", JSON.stringify(servers), "EX", 60 * 60); // Cache for 1 hour
-  return servers;
 }
 
-export async function getServers(): Promise<Server[]> {
-  return await syncServers();
+export async function getServers(): Promise<ServerResponse<Server[]>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    return await syncServers();
+  });
 }
 
 export async function getHealthStatus(): Promise<boolean> {
@@ -92,6 +103,7 @@ export async function removeServer(
       throw new ServerError("Failed to remove server");
     }
 
+    await removeServerUuidFromGroups(serverUuid);
     await syncServers();
   });
 }

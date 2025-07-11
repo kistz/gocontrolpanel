@@ -16,7 +16,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
-import { IconServerCog, IconUserCog } from "@tabler/icons-react";
+import { IconCloud, IconServerCog, IconUserCog, IconUsersGroup } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NavGroup } from ".";
@@ -33,10 +33,20 @@ export default async function NavAdmin() {
         icon: IconUserCog,
       },
       {
+        name: "Groups",
+        url: routes.admin.groups,
+        icon: IconUsersGroup,
+      },
+      {
         name: "Servers",
         url: routes.admin.servers,
         icon: IconServerCog,
         healthStatus: !healthStatus ? "Connector offline" : undefined,
+      },
+      {
+        name: "Hetzner",
+        url: routes.admin.hetzner,
+        icon: IconCloud,
       },
     ],
   };

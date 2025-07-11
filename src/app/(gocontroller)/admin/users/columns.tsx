@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteUserById } from "@/actions/database/users";
+import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditUserModal from "@/components/modals/edit-user";
 import Modal from "@/components/modals/modal";
@@ -10,11 +11,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -42,18 +43,17 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     ),
   },
   {
-    accessorKey: "roles",
+    accessorKey: "admin",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Roles"} />
+      <DataTableColumnHeader column={column} title={"Admin"} />
     ),
-    cell: ({ row }) => {
-      const roles = row.getValue("roles") as string[];
-      // Capitalize the first letter of each role
-      const formattedRoles = roles
-        .map((role) => role.charAt(0).toUpperCase() + role.slice(1))
-        .join(", ");
-      return <span>{formattedRoles}</span>;
-    },
+    cell: ({ row }) => (
+      <BooleanDisplay
+        value={row.getValue("admin") as boolean}
+        falseIcon={IconX}
+        trueIcon={IconCheck}
+      />
+    ),
   },
   {
     accessorKey: "createdAt",
@@ -87,7 +87,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
               throw new Error(error);
             }
             refetch();
-            toast.success("Player successfully deleted");
+            toast.success("User successfully deleted");
           } catch (error) {
             toast.error("Error deleting user", {
               description: getErrorMessage(error),
@@ -106,8 +106,6 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>View user</DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
                 Edit user
               </DropdownMenuItem>

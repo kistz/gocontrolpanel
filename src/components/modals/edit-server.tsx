@@ -1,5 +1,5 @@
 "use client";
-import EditServerForm from "@/forms/admin/edit-server-form";
+import EditServerForm from "@/forms/admin/server/edit-server-form";
 import { Server } from "@/types/server";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";

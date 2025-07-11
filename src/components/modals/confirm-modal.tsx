@@ -55,7 +55,7 @@ export default function ConfirmModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-bold">{title}</h2>
-        <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        <p className="text-sm text-muted-foreground mt-1 text-wrap">{description}</p>
 
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>

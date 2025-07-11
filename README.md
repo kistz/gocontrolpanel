@@ -14,7 +14,9 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
     - [Files Management](#files-management)
     - [Interface Editor](#interface-editor)
     - [User Management](#user-management)
+    - [Group Management](#group-management)
     - [Server Management](#server-management)
+    - [Hetzner Management](#hetzner-management)
 - [Docker Setup](#docker-setup)
   - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
@@ -82,11 +84,26 @@ Manage users, including adding new users, managing roles and permissions.
 
 ![User Management Page](https://i.imgur.com/aOoWkWl.png "User Management Page")
 
+**Group Management**
+
+Manage groups, including adding new groups, managing group permissions and roles.
+
+![Group Management Page](https://i.imgur.com/rbWYZ6a.png "Group Management Page")
+
 **Server Management**
 
 Manage your servers, add new servers and configure the server settings.
 
 ![Server Management Page](https://i.imgur.com/3XMGL6m.png "Server Management Page")
+
+**Hetzner Management**
+
+Manage your Hetzner Cloud servers, including creating, deleting and managing servers.
+
+![Hetzner Management Page](https://i.imgur.com/rJNWz31.png "Hetzner Management Page")
+![Hetzner Servers Page](https://i.imgur.com/iuFuFvQ.png "Hetzner Servers Page")
+![Hetzner Server Details Page](https://i.imgur.com/KAFo9P0.png "Hetzner Server Details Page")
+![Hetzner Server Create Page](https://i.imgur.com/gvI5x4W.png "Hetzner Server Create Page")
 
 # Docker Setup
 
@@ -122,16 +139,15 @@ Make sure to update the environment variables for the services in your `docker-c
 
 - **GoControlPanel Environment Variables**:
 
-  - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
-  - `CONNECTOR_API_KEY`: API key for the GbxConnector (can be any string).
+  - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins. Probably your own login, e.g., `v8vgGbx_TuKkBabAyn7nsQ`.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
+  - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
 - **GbxConnector Environment Variables**:
 
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
-  - `INTERNAL_API_KEY`: Internal API key for GbxConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
 
 - **Dedicated Server Environment Variables**:
@@ -213,7 +229,6 @@ gocontrolpanel:
   environment:
     NEXTAUTH_URL: http://localhost:3000
     NEXTAUTH_SECRET:
-    CONNECTOR_API_KEY:
     DEFAULT_ADMINS:
     NADEO_CLIENT_ID:
     NADEO_CLIENT_SECRET:
@@ -222,6 +237,7 @@ gocontrolpanel:
     NADEO_SERVER_PASSWORD:
     NADEO_CONTACT: GoControlPanel / <your contact info>
     REDIS_URI: redis://redis:6379
+    HETZNER_KEY:
   depends_on:
     - db
     - redis
@@ -233,7 +249,6 @@ gbxconnector:
     PORT: 6980
     SERVER_RECONNECT_INTERVAL: 15
     JWT_SECRET:
-    INTERNAL_API_KEY: # Same as the one in gocontrolpanel
     LOG_LEVEL: DEBUG
   volumes:
     - ./gocontrolpanel/servers.json:/app/servers.json
@@ -279,15 +294,14 @@ Make sure to update the environment variables for the added services in your `do
 
 - **GoControlPanel Environment Variables**:
 
-  - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication.
-  - `CONNECTOR_API_KEY`: API key for the GbxConnector (can be any string).
+  - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
+  - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
 - **GbxConnector Environment Variables**:
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
-  - `INTERNAL_API_KEY`: Internal API key for GbxConnector. Same key as `CONNECTOR_API_KEY` in GoControlPanel.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
 
 ### 5. Modify the `servers.json` File
