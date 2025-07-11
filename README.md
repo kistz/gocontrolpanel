@@ -149,6 +149,7 @@ Make sure to update the environment variables for the services in your `docker-c
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
+  - `DOCKER_NETWORK_RANGE`: The Docker network range to use for the containers. This is optional, but if you want to use a custom network range, you can set it here. The default is `172.16.0.0/16`.
 
 - **Dedicated Server Environment Variables**:
   - `TM_MASTERSERVER_LOGIN`: Login for the dedicated server (same as `NADEO_SERVER_LOGIN` in GoControlPanel).
@@ -249,6 +250,7 @@ gbxconnector:
     PORT: 6980
     SERVER_RECONNECT_INTERVAL: 15
     JWT_SECRET:
+    DOCKER_NETWORK_RANGE: 172.16.0.0/16
     LOG_LEVEL: DEBUG
   volumes:
     - ./gocontrolpanel/servers.json:/app/servers.json
@@ -303,6 +305,7 @@ Make sure to update the environment variables for the added services in your `do
   - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
   - `JWT_SECRET`: Secret key for JWT authentication.
   - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
+  - `DOCKER_NETWORK_RANGE`: The Docker network range to use for the containers. This is optional, but if you want to use a custom network range, you can set it here. The default is `172.16.0.0/16`.
 
 ### 5. Modify the `servers.json` File
 

@@ -75,6 +75,7 @@ services:
       PORT: 6980
       SERVER_RECONNECT_INTERVAL: 15
       JWT_SECRET: 
+      DOCKER_NETWORK_RANGE: 172.16.0.0/16
       LOG_LEVEL: DEBUG
     volumes:
       - ./../../servers.json:/app/servers.json
