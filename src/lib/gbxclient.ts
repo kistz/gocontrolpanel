@@ -144,7 +144,7 @@ export async function getGbxClient(id: string): Promise<GbxClient> {
 
 async function setupListeners(
   client: GbxClient,
-  serverUuid: string,
+  id: string,
 ): Promise<void> {
   client.on("callback", (method: string, data: any) => {
     if (method === "ManiaPlanet.ModeScriptCallbackArray") {
@@ -155,11 +155,11 @@ async function setupListeners(
 
       switch (methodName) {
         case "Maniaplanet.Podium_Start":
-          onPodiumStart(serverUuid);
+          onPodiumStart(id);
           break;
         case "Trackmania.Event.WayPoint":
           if (params.isendrace) {
-            onPlayerFinish(serverUuid, params.login, params.racetime);
+            onPlayerFinish(id, params.login, params.racetime);
           }
           break;
       }
