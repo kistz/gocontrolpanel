@@ -5,7 +5,7 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { ModeScriptInfo } from "@/types/server";
+import { ModeScriptInfo } from "@/types/gbx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -16,11 +16,11 @@ import {
 } from "./game-schema";
 
 export default function ModeScriptSettingsForm({
-  id,
+  serverId,
   modeScriptSettings,
   modeScriptInfo,
 }: {
-  id: string;
+  serverId: string;
   modeScriptSettings: Record<string, unknown>;
   modeScriptInfo: ModeScriptInfo;
 }) {
@@ -42,7 +42,7 @@ export default function ModeScriptSettingsForm({
           }),
         );
 
-        const { error } = await setModeScriptSettings(id, parsedValues);
+        const { error } = await setModeScriptSettings(serverId, parsedValues);
         if (error) {
           throw new Error(error);
         }
@@ -53,7 +53,7 @@ export default function ModeScriptSettingsForm({
         });
       }
     },
-    [id],
+    [serverId],
   );
 
   const descriptions = useMemo(() => {

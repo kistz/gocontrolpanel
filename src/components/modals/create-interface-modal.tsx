@@ -7,12 +7,12 @@ import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function CreateInterfaceModal({
-  id,
+  serverId,
   closeModal,
   onSubmit,
 }: DefaultModalProps<void, Interfaces>) {
-  if (!id) {
-    throw new Error("id is required for CreateInterfaceModal");
+  if (!serverId) {
+    throw new Error("serverId is required for CreateInterfaceModal");
   }
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -39,7 +39,7 @@ export default function CreateInterfaceModal({
         />
       </div>
 
-      <CreateInterfaceForm id={id} callback={handleSubmit} />
+      <CreateInterfaceForm serverId={serverId} callback={handleSubmit} />
     </Card>
   );
 }

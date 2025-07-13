@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { guestlistSchema, GuestlistSchemaType } from "./guestlist-schema";
 
-export default function GuestlistForm({ id }: { id: string }) {
+export default function GuestlistForm({ serverId }: { serverId: string }) {
   const form = useForm<GuestlistSchemaType>({
     resolver: zodResolver(guestlistSchema),
     defaultValues: {
@@ -22,7 +22,7 @@ export default function GuestlistForm({ id }: { id: string }) {
     try {
       form.trigger("filename");
       const filename = form.getValues("filename");
-      const { error } = await loadGuestlist(id, filename);
+      const { error } = await loadGuestlist(serverId, filename);
       if (error) {
         throw new Error(error);
       }
@@ -39,7 +39,7 @@ export default function GuestlistForm({ id }: { id: string }) {
     try {
       form.trigger("filename");
       const filename = form.getValues("filename");
-      const { error } = await saveGuestlist(id, filename);
+      const { error } = await saveGuestlist(serverId, filename);
       if (error) {
         throw new Error(error);
       }

@@ -8,12 +8,12 @@ import React from "react";
 
 export default function FolderCard({
   fileEntry,
-  id,
+  serverId,
   onClick,
   active,
 }: {
   fileEntry: FileEntry;
-  id: string;
+  serverId: string;
   onClick?: (e: React.MouseEvent) => void;
   active?: boolean;
 }) {
@@ -21,7 +21,7 @@ export default function FolderCard({
 
   const handleDoubleClick = () => {
     router.push(
-      `${generatePath(routes.servers.files, { uuid: id })}?path=${fileEntry.path}`,
+      `${generatePath(routes.servers.files, { id: serverId })}?path=${fileEntry.path}`,
     );
   };
 

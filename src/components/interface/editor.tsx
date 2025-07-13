@@ -81,11 +81,11 @@ export const EDITOR_DEFAULT_WIDTH = 1169;
 export const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
 export default function InterfaceEditor({
-  id,
+  serverId,
   defaultInterface,
   defaultInterfaces = [],
 }: {
-  id: string;
+  serverId: string;
   defaultInterface?: Interfaces | null;
   defaultInterfaces?: Interfaces[];
 }) {
@@ -187,7 +187,7 @@ export default function InterfaceEditor({
       .filter((d) => d !== null && d !== undefined);
 
     const { data: savedInterface, error } = await saveInterface(
-      id,
+      serverId,
       selectedInterface.id,
       JSON.stringify(data),
     );
@@ -356,7 +356,7 @@ export default function InterfaceEditor({
 
           <Modal>
             <CreateInterfaceModal
-              id={id}
+              serverId={serverId}
               onSubmit={(newInterface?: Interfaces) => {
                 if (!newInterface) return;
                 setInterfaces((prev) => [...prev, newInterface]);

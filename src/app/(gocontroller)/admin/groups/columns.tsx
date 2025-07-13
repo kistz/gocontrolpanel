@@ -11,9 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Users } from "@/lib/prisma/generated";
+import { Servers, Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { Server } from "@/types/server";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -23,7 +22,7 @@ import { toast } from "sonner";
 export const createColumns = (
   refetch: () => void,
   data: {
-    servers: Server[];
+    servers: Servers[];
     users: Users[];
   },
 ): ColumnDef<GroupsWithUsers>[] => [

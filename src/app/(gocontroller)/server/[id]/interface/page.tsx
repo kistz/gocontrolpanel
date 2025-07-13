@@ -8,13 +8,13 @@ import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
 export default async function ServerInterfacePage({
   params,
 }: {
-  params: Promise<{ uuid: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { uuid } = await params;
+  const { id } = await params;
 
-  const { data } = await getChatConfig(uuid);
+  const { data } = await getChatConfig(id);
 
-  const { data: interfaces } = await getInterfaces(uuid);
+  const { data: interfaces } = await getInterfaces(id);
 
   return (
     <div className="flex flex-col gap-6 h-full">
@@ -34,7 +34,7 @@ export default async function ServerInterfacePage({
         <TabsContent value="interface" className="flex flex-col gap-6 h-full">
           {process.env.NODE_ENV === "development" ? (
             <InterfaceEditor
-              id={uuid}
+              serverId={id}
               defaultInterface={interfaces[0]}
               defaultInterfaces={interfaces}
             />
@@ -46,7 +46,7 @@ export default async function ServerInterfacePage({
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
-            <ChatConfigForm id={uuid} chatConfig={data} />
+            <ChatConfigForm serverId={id} chatConfig={data} />
           </Card>
         </TabsContent>
       </Tabs>

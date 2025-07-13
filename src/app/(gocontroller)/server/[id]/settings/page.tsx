@@ -4,9 +4,9 @@ import SettingsForm from "@/forms/server/settings/settings-form";
 export default async function ServerSettingsPage({
   params,
 }: {
-  params: Promise<{ uuid: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { uuid } = await params;
+  const { id } = await params;
 
   return (
     <div className="flex flex-col gap-6">
@@ -17,7 +17,7 @@ export default async function ServerSettingsPage({
         </h4>
       </div>
       <Card className="p-6">
-        <SettingsForm id={uuid} />
+        <SettingsForm serverId={id} />
       </Card>
     </div>
   );

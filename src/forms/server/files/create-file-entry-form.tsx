@@ -15,12 +15,12 @@ import {
 } from "./create-file-entry-schema";
 
 export default function CreateFileEntryForm({
-  id,
+  serverId,
   path,
   isDir = false,
   callback,
 }: {
-  id: string;
+  serverId: string;
   path: string;
   isDir?: boolean;
   callback?: (fileEntry: FileEntry) => void;
@@ -37,7 +37,7 @@ export default function CreateFileEntryForm({
   async function onSubmit(values: CreateFileEntrySchemaType) {
     try {
       values.path = path + "/" + values.path;
-      const { data, error } = await createFileEntry(id, values);
+      const { data, error } = await createFileEntry(serverId, values);
       if (error) {
         throw new Error(error);
       }

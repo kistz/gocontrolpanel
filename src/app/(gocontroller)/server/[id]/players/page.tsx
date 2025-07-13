@@ -8,9 +8,9 @@ import { TabsContent } from "@radix-ui/react-tabs";
 export default async function ServerPlayersPage({
   params,
 }: {
-  params: Promise<{ uuid: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { uuid } = await params;
+  const { id } = await params;
 
   return (
     <div className="flex flex-col gap-6">
@@ -28,16 +28,16 @@ export default async function ServerPlayersPage({
         </TabsList>
 
         <TabsContent value="players" className="flex flex-col gap-2">
-          <PlayerList id={uuid} />
+          <PlayerList serverId={id} />
         </TabsContent>
         <TabsContent value="banlist" className="flex flex-col gap-2">
-          <BanlistList id={uuid} />
+          <BanlistList serverId={id} />
         </TabsContent>
         <TabsContent value="blacklist" className="flex flex-col gap-2">
-          <BlacklistList id={uuid} />
+          <BlacklistList serverId={id} />
         </TabsContent>
         <TabsContent value="guestlist" className="flex flex-col gap-2">
-          <GuestlistList id={uuid} />
+          <GuestlistList serverId={id} />
         </TabsContent>
       </Tabs>
     </div>

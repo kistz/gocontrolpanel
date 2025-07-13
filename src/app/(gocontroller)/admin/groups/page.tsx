@@ -1,6 +1,6 @@
 import { getGroupsPaginated } from "@/actions/database/groups";
+import { getServers } from "@/actions/database/servers";
 import { getAllUsers } from "@/actions/database/users";
-import { getServers } from "@/actions/gbxconnector/servers";
 import AddGroupModal from "@/components/modals/add-group";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";

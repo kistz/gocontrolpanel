@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PlaylistSchema, PlaylistSchemaType } from "./game-schema";
 
-export default function PlaylistForm({ id }: { id: string }) {
+export default function PlaylistForm({ serverId }: { serverId: string }) {
   const playlistForm = useForm<PlaylistSchemaType>({
     resolver: zodResolver(PlaylistSchema),
     defaultValues: {
@@ -22,7 +22,7 @@ export default function PlaylistForm({ id }: { id: string }) {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      const { error } = await appendPlaylist(id, filename);
+      const { error } = await appendPlaylist(serverId, filename);
       if (error) {
         throw new Error(error);
       }
@@ -38,7 +38,7 @@ export default function PlaylistForm({ id }: { id: string }) {
     try {
       playlistForm.trigger("filename");
       const filename = playlistForm.getValues("filename");
-      const { error } = await insertPlaylist(id, filename);
+      const { error } = await insertPlaylist(serverId, filename);
       if (error) {
         throw new Error(error);
       }

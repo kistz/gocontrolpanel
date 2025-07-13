@@ -19,22 +19,22 @@ import { parseTmTags } from "tmtags";
 
 const MapActionsCell = memo(function MapActionsCell({
   data,
-  id,
+  serverId,
   onRemoveMap,
 }: {
   data: JukeboxMap;
-  id?: string;
+  serverId?: string;
   onRemoveMap: (map: JukeboxMap) => void;
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!id) return null;
+  if (!serverId) return null;
 
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        const { error } = await removeMapFromJukebox(id, data.id);
+        const { error } = await removeMapFromJukebox(serverId, data.id);
         if (error) {
           throw new Error(error);
         }
@@ -119,8 +119,8 @@ export const createColumns = (
   },
   {
     id: "actions",
-    cell: ({ data, id }) => (
-      <MapActionsCell data={data} id={id} onRemoveMap={onRemoveMap} />
+    cell: ({ data, serverId }) => (
+      <MapActionsCell data={data} serverId={serverId} onRemoveMap={onRemoveMap} />
     ),
   },
 ];

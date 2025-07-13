@@ -1,5 +1,5 @@
 export interface DefaultModalProps<T = void, TRes = void> {
-  id?: string;
+  serverId?: string;
   closeModal?: () => void;
   onSubmit?: (data?: TRes) => void;
   data?: T;

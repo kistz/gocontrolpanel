@@ -19,7 +19,7 @@ import { Separator } from "../ui/separator";
 import LiveActions from "./live-actions";
 
 interface MapInfoProps {
-  id: string;
+  serverId: string;
   map?: string;
   mode?: string;
   pauseAvailable: boolean;
@@ -28,7 +28,7 @@ interface MapInfoProps {
 }
 
 export default function MapInfo({
-  id,
+  serverId,
   map,
   mode,
   pauseAvailable,
@@ -120,7 +120,7 @@ export default function MapInfo({
           <>
             <Separator />
             <LiveActions
-              id={id}
+              serverId={serverId}
               pauseAvailable={pauseAvailable}
               isPaused={isPaused}
               isWarmUp={isWarmUp}

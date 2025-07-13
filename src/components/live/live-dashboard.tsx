@@ -16,7 +16,7 @@ import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
 
-export default function LiveDashboard({ id }: { id: string }) {
+export default function LiveDashboard({ serverId }: { serverId: string }) {
   const { data: session } = useSession();
 
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
@@ -34,9 +34,7 @@ export default function LiveDashboard({ id }: { id: string }) {
     }
 
     const socket = initGbxWebsocketClient(
-      `/ws/live/${id}`,
-      session.jwt as string,
-    );
+      `/ws/live/${serverId}`);
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
@@ -155,7 +153,7 @@ export default function LiveDashboard({ id }: { id: string }) {
     return () => {
       socket.close();
     };
-  }, [id, session]);
+  }, [serverId, session]);
 
   useEffect(() => {
     if (!liveInfo?.players) {
@@ -164,7 +162,7 @@ export default function LiveDashboard({ id }: { id: string }) {
 
     const fetchData = async () => {
       try {
-        const { data, error } = await getPlayerList(id);
+        const { data, error } = await getPlayerList(serverId);
         if (error) {
           throw new Error(error);
         }
@@ -223,7 +221,7 @@ export default function LiveDashboard({ id }: { id: string }) {
 
       <div className="flex flex-col min-[1200px]:flex-row min-[1528px]:flex-col gap-4">
         <MapInfo
-          id={id}
+          serverId={serverId}
           map={mapInfo?.map}
           mode={mapInfo?.mode}
           pauseAvailable={liveInfo.pauseAvailable}

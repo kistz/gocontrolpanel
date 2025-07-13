@@ -11,10 +11,10 @@ import { toast } from "sonner";
 import { ShowOpponentsSchema, ShowOpponentsSchemaType } from "./game-schema";
 
 export default function ShowOpponentsForm({
-  id,
+  serverId,
   showOpponents,
 }: {
-  id: string;
+  serverId: string;
   showOpponents: number;
 }) {
   const showOpponentsForm = useForm<ShowOpponentsSchemaType>({
@@ -26,7 +26,7 @@ export default function ShowOpponentsForm({
 
   async function onSubmitShowOpponents(values: ShowOpponentsSchemaType) {
     try {
-      const { error } = await setShowOpponents(id, values.showOpponents);
+      const { error } = await setShowOpponents(serverId, values.showOpponents);
       if (error) {
         throw new Error(error);
       }

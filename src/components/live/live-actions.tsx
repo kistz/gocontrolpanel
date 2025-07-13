@@ -5,14 +5,14 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 
 interface LiveActionsProps {
-  id: string;
+  serverId: string;
   pauseAvailable: boolean;
   isPaused: boolean;
   isWarmUp: boolean;
 }
 
 export default function LiveActions({
-  id,
+  serverId,
   pauseAvailable,
   isPaused,
   isWarmUp,
@@ -20,7 +20,7 @@ export default function LiveActions({
   const handlePause = async () => {
     try {
       const { error } = await triggerModeScriptEventArray(
-        id,
+        serverId,
         "Maniaplanet.Pause.SetActive",
         [isPaused ? "false" : "true"],
       );
@@ -39,7 +39,7 @@ export default function LiveActions({
   const handleEndWarmUpRound = async () => {
     try {
       const { error } = await triggerModeScriptEventArray(
-        id,
+        serverId,
         "Trackmania.WarmUp.ForceStopRound",
         [],
       );
@@ -58,7 +58,7 @@ export default function LiveActions({
   const handleEndWarmUp = async () => {
     try {
       const { error } = await triggerModeScriptEventArray(
-        id,
+        serverId,
         "Trackmania.WarmUp.ForceStop",
         [],
       );

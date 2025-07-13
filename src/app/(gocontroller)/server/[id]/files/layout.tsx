@@ -7,7 +7,7 @@ export default async function FilesLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ uuid: string }>;
+  params: Promise<{ id: string }>;
 }) {
   try {
     await withAuth(["admin"]);
@@ -15,10 +15,10 @@ export default async function FilesLayout({
     redirect("/");
   }
 
-  const { uuid } = await params;
+  const { id } = await params;
 
   try {
-    const fileManager = await getFileManager(uuid);
+    const fileManager = await getFileManager(id);
     if (!fileManager?.health) {
       throw new Error("File Manager is not available");
     }

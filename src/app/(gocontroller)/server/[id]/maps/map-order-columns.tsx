@@ -19,22 +19,22 @@ import { parseTmTags } from "tmtags";
 
 const MapActionsCell = memo(function MapActionsCell({
   data,
-  id,
+  serverId,
   onRemoveMap,
 }: {
   data: Maps;
-  id?: string;
+  serverId?: string;
   onRemoveMap: (map: Maps) => void;
 }) {
   const [_, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!id) return null;
+  if (!serverId) return null;
 
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        const { error } = await removeMap(id, data.fileName);
+        const { error } = await removeMap(serverId, data.fileName);
         if (error) {
           throw new Error(error);
         }
@@ -111,8 +111,8 @@ export const createColumns = (
   },
   {
     id: "actions",
-    cell: ({ data, id }) => (
-      <MapActionsCell data={data} id={id} onRemoveMap={onRemoveMap} />
+    cell: ({ data, serverId }) => (
+      <MapActionsCell data={data} serverId={serverId} onRemoveMap={onRemoveMap} />
     ),
   },
 ];

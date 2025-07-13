@@ -1,6 +1,6 @@
 "use client";
 
-import { createColumns } from "@/app/(gocontroller)/server/[uuid]/players/players-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[id]/players/players-columns";
 import { initGbxWebsocketClient } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
@@ -8,10 +8,10 @@ import { useEffect, useRef, useState } from "react";
 import { DataTable } from "../table/data-table";
 
 interface PlayerListProps {
-  id: string;
+  serverId: string;
 }
 
-export default function PlayerList({ id }: PlayerListProps) {
+export default function PlayerList({ serverId }: PlayerListProps) {
   const { data: session } = useSession();
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
 
@@ -23,9 +23,7 @@ export default function PlayerList({ id }: PlayerListProps) {
     }
 
     const socket = initGbxWebsocketClient(
-      `/ws/players/${id}`,
-      session.jwt as string,
-    );
+      `/ws/players/${serverId}`);
     wsRef.current = socket;
 
     socket.onmessage = (event) => {
@@ -64,9 +62,9 @@ export default function PlayerList({ id }: PlayerListProps) {
     return () => {
       socket.close();
     };
-  }, [session, id]);
+  }, [session, serverId]);
 
-  const columns = createColumns(id);
+  const columns = createColumns(serverId);
 
   return <DataTable columns={columns} data={playerList} pagination />;
 }

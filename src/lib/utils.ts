@@ -186,7 +186,6 @@ export function removePrefix(str: string, prefix: string): string {
 
 export function initGbxWebsocketClient(
   path: string,
-  token: string,
   params?: Record<string, string | string[]>,
 ): WebSocket {
   const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
@@ -204,9 +203,6 @@ export function initGbxWebsocketClient(
       }
     }
   }
-
-  // Append the token param first, so token is always included
-  searchParams.append("token", token);
 
   return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
 }

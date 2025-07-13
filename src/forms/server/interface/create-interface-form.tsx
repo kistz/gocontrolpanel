@@ -15,10 +15,10 @@ import {
 } from "./create-interface-schema";
 
 export default function CreateInterfaceForm({
-  id,
+  serverId,
   callback,
 }: {
-  id: string;
+  serverId: string;
   callback?: (newInterface: Interfaces) => void;
 }) {
   const form = useForm<CreateInterfaceSchemaType>({
@@ -30,7 +30,7 @@ export default function CreateInterfaceForm({
 
   async function onSubmit(values: CreateInterfaceSchemaType) {
     try {
-      const { data, error } = await createInterface(id, values.name, "");
+      const { data, error } = await createInterface(serverId, values.name, "");
       if (error) {
         throw new Error(error);
       }
