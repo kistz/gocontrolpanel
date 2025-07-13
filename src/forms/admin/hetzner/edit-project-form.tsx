@@ -31,7 +31,7 @@ export default function EditProjectForm({
     defaultValues: {
       ...project,
       apiTokens: getList(project.apiTokens),
-      users: project.users.map((user) => ({
+      users: project.hetznerProjectUsers.map((user) => ({
         userId: user.userId,
         role: user.role,
       })),
@@ -43,7 +43,7 @@ export default function EditProjectForm({
       const { error } = await updateHetznerProject(project.id, {
         ...values,
         apiTokens: getList(values.apiTokens),
-        users: values.users?.map((user) => ({
+        hetznerProjectUsers: values.users?.map((user) => ({
           userId: user.userId,
           role: user.role as HetznerProjectRole,
         })),
