@@ -2,110 +2,63 @@ import { onPlayerFinish } from "@/actions/gbx/listeners/records";
 import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { syncPlayerList } from "@/actions/gbx/player";
 import { GbxClient } from "@evotm/gbxclient";
+import EventEmitter from "events";
 import "server-only";
 import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
 import { withTimeout } from "./utils";
 
-class GbxClientManager {
+type Listener = {
+  [key: string]: (...args: any[]) => void;
+};
+
+export class GbxClientManager extends EventEmitter {
   private client: GbxClient;
   private serverId: string;
-  private listeners: Record<string, (...args: any[]) => void> = {};
   private initialized = false;
+  private isConnected = false;
 
   constructor(serverId: string) {
+    super();
     this.serverId = serverId;
     this.client = new GbxClient({
       showErrors: true,
       throwErrors: true,
     });
+    appGlobals.gbxClients = appGlobals.gbxClients || {};
+    appGlobals.gbxClients[serverId] = this;
   }
 
   async connect(): Promise<GbxClient> {
-    if (!appGlobals.gbxClients?.[this.serverId]) {
-      const db = getClient();
-
-      const server = await db.servers.findUnique({
-        where: { id: this.serverId },
-      });
-
-      if (!server) {
-        throw new Error(`Server ${this.serverId} not found`);
-      }
-
-      const client = new GbxClient({
-        showErrors: true,
-        throwErrors: true,
-      });
-
-      console.log(
-        `Connecting to GBX client for server ${server.id} at ${server.host}:${server.port}`,
-      );
-
-      try {
-        const status = await withTimeout(
-          client.connect(server.host, server.port),
-          3000,
-          "Connection to GBX client timed out",
-        );
-        if (!status) {
-          throw new Error("Failed to connect to GBX client");
-        }
-      } catch (error) {
-        throw new Error(`Failed to connect to GBX client: ${error}`);
-      }
-
-      try {
-        await client.call("Authenticate", server.user, server.password);
-      } catch {
-        throw new Error("Failed to authenticate with GBX client");
-      }
-
-      await client.call("SetApiVersion", "2023-04-24");
-      await client.call("EnableCallbacks", true);
-      await client.callScript("XmlRpc.EnableCallbacks", "true");
-      await setupListeners(client, server.id);
-      await syncPlayerList(client, server.id);
-      await syncMap(client, server.id);
-
-      appGlobals.gbxClients = appGlobals.gbxClients || {};
-      appGlobals.gbxClients[server.id] = client;
-
-      return client;
-    }
-
-    if (!appGlobals.gbxClients[this.serverId]) {
-      throw new Error(`GbxClient for server ${this.serverId} not found`);
-    }
-
-    return appGlobals.gbxClients[this.serverId];
-  }
-}
-
-export async function getGbxClient(serverId: string): Promise<GbxClient> {
-  if (!appGlobals.gbxClients?.[serverId]) {
     const db = getClient();
 
     const server = await db.servers.findUnique({
-      where: { id: serverId },
+      where: { id: this.serverId },
     });
 
     if (!server) {
-      throw new Error(`Server ${serverId} not found`);
+      throw new Error(`Server ${this.serverId} not found`);
     }
-
-    const client = new GbxClient({
-      showErrors: true,
-      throwErrors: true,
-    });
 
     console.log(
       `Connecting to GBX client for server ${server.id} at ${server.host}:${server.port}`,
     );
 
+    this.client.on("connect", () => {
+      console.log(`Connected to GBX client for server ${server.id}`);
+      this.isConnected = true;
+      this.emit("connect", server.id);
+    });
+
+    this.client.on("disconnect", () => {
+      console.log(`Disconnected from GBX client for server ${server.id}`);
+      this.isConnected = false;
+      this.emit("disconnect", server.id);
+    });
+
     try {
       const status = await withTimeout(
-        client.connect(server.host, server.port),
+        this.client.connect(server.host, server.port),
         3000,
         "Connection to GBX client timed out",
       );
@@ -117,26 +70,47 @@ export async function getGbxClient(serverId: string): Promise<GbxClient> {
     }
 
     try {
-      await client.call("Authenticate", server.user, server.password);
+      await this.client.call("Authenticate", server.user, server.password);
     } catch {
       throw new Error("Failed to authenticate with GBX client");
     }
 
-    await client.call("SetApiVersion", "2023-04-24");
-    await client.call("EnableCallbacks", true);
-    await client.callScript("XmlRpc.EnableCallbacks", "true");
-    await setupListeners(client, server.id);
-    await syncPlayerList(client, server.id);
-    await syncMap(client, server.id);
+    await this.client.call("SetApiVersion", "2023-04-24");
+    await this.client.call("EnableCallbacks", true);
+    await this.client.callScript("XmlRpc.EnableCallbacks", "true");
+    await setupListeners(this.client, server.id);
+    await syncPlayerList(this.client, server.id);
+    await syncMap(this.client, server.id);
 
-    appGlobals.gbxClients = appGlobals.gbxClients || {};
-    appGlobals.gbxClients[server.id] = client;
-
-    return client;
+    return this.client;
   }
 
-  if (!appGlobals.gbxClients[serverId]) {
-    throw new Error(`GbxClient for server ${serverId} not found`);
+  getClient(): GbxClient {
+    return this.client;
+  }
+
+  getIsConnected(): boolean {
+    return this.isConnected;
+  }
+}
+
+export async function getGbxClient(serverId: string): Promise<GbxClient> {
+  const manager = await getGbxClientManager(serverId);
+  return manager.getClient();
+}
+
+export async function getGbxClientManager(
+  serverId: string,
+): Promise<GbxClientManager> {
+  if (!appGlobals.gbxClients?.[serverId]) {
+    const manager = new GbxClientManager(serverId);
+    try {
+      await manager.connect();
+    } catch {}
+  }
+
+  if (!appGlobals.gbxClients?.[serverId]) {
+    throw new Error(`GbxClientManager for server ${serverId} not found`);
   }
 
   return appGlobals.gbxClients[serverId];

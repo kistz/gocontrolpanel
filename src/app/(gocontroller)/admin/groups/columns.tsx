@@ -1,5 +1,5 @@
 "use client";
-import { deleteGroup, GroupsWithUsers } from "@/actions/database/groups";
+import { deleteGroup, GroupsWithUsersWithServers } from "@/actions/database/groups";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditGroupModal from "@/components/modals/edit-group";
 import Modal from "@/components/modals/modal";
@@ -25,7 +25,7 @@ export const createColumns = (
     servers: Servers[];
     users: Users[];
   },
-): ColumnDef<GroupsWithUsers>[] => [
+): ColumnDef<GroupsWithUsersWithServers>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -39,7 +39,7 @@ export const createColumns = (
     ),
   },
   {
-    accessorKey: "_count.users",
+    accessorKey: "_count.groupMembers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Members"} />
     ),

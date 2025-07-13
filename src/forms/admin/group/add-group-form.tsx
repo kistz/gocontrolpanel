@@ -30,11 +30,11 @@ export default function AddGroupForm({
         ...values,
         description: values.description || "",
         groupServers:
-          values.serverIds?.map((id) => ({
+          values.groupServers?.map((id) => ({
             serverId: id,
           })) || [],
         groupMembers:
-          values.users?.map((user) => ({
+          values.groupMembers?.map((user) => ({
             userId: user.userId,
             role: user.role as GroupRole,
           })) || [],
@@ -73,7 +73,7 @@ export default function AddGroupForm({
         />
 
         <FormElement
-          name="serverIds"
+          name="groupServers"
           label="Servers"
           placeholder="Select servers"
           options={servers.map((server) => ({
@@ -86,11 +86,11 @@ export default function AddGroupForm({
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Members</FormLabel>
-          {form.watch("users")?.map((_, index) => (
+          {form.watch("groupMembers")?.map((_, index) => (
             <div key={index} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
-                  name={`users.${index}.userId`}
+                  name={`groupMembers.${index}.userId`}
                   className="w-full"
                   placeholder="Select user"
                   options={users.map((u) => ({
@@ -101,7 +101,7 @@ export default function AddGroupForm({
                 />
               </div>
               <FormElement
-                name={`users.${index}.role`}
+                name={`groupMembers.${index}.role`}
                 className="w-30"
                 placeholder="Select role"
                 options={Object.values(GroupRole).map((role) => ({
@@ -115,9 +115,9 @@ export default function AddGroupForm({
                 variant="destructive"
                 size={"icon"}
                 onClick={() => {
-                  const currentUsers = form.getValues("users");
+                  const currentUsers = form.getValues("groupMembers");
                   form.setValue(
-                    "users",
+                    "groupMembers",
                     currentUsers?.filter((_, i) => i !== index),
                   );
                 }}
@@ -132,8 +132,8 @@ export default function AddGroupForm({
             type="button"
             variant="outline"
             onClick={() => {
-              const currentUsers = form.getValues("users") || [];
-              form.setValue("users", [
+              const currentUsers = form.getValues("groupMembers") || [];
+              form.setValue("groupMembers", [
                 ...currentUsers,
                 { userId: "", role: GroupRole.Member },
               ]);

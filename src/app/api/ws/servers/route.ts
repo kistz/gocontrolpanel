@@ -1,51 +1,61 @@
 import { auth } from "@/lib/auth";
+import { GbxClientManager, getGbxClientManager } from "@/lib/gbxclient";
+import { createSSEStream, SSEHeaders } from "@/lib/sse";
+import { ServerInfo } from "@/types/api/server";
 
-export async function GET(req: Request) {
+export async function GET() {
   const session = await auth();
 
-  const allowedids = [
-    ...new Set(session?.user.groups.map((group) => group.ids).flat() || []),
-  ];
-  if (allowedids.length === 0) {
-    return new Response("No servers available", { status: 403 });
+  const servers =
+    session?.user?.groups?.flatMap((group) => group.servers) || [];
+
+  if (servers.length === 0) {
+    return new Response("No servers found", { status: 404 });
   }
 
-  let selectedids = allowedids;
-  const searchParams = new URL(req.url).searchParams;
-  const serverParam = searchParams.get("servers");
-  if (serverParam) {
-    selectedids = serverParam
-      .split(",")
-      .filter((uuid) => allowedids.includes(uuid));
+  const serverManagers: {
+    manager: GbxClientManager;
+    server: ServerInfo;
+  }[] = [];
+
+  for (const server of servers) {
+    const manager = await getGbxClientManager(server.id);
+    if (manager) {
+      serverManagers.push({
+        manager,
+        server: {
+          id: server.id,
+          name: server.name,
+          filemanagerUrl: server.filemanagerUrl,
+          isConnected: manager.getIsConnected(),
+        },
+      });
+    }
   }
 
-  if (selectedids.length === 0) {
-    return new Response("No valid servers selected", { status: 400 });
-  }
+  const stream = createSSEStream((push) => {
+    const onConnect = (serverId: string) => push("connect", { serverId });
+    const onDisconnect = (serverId: string) => push("disconnect", { serverId });
 
-  // const stream = createSSEStream((push) => {
-  //   push("connected", { timestamp: new Date().toISOString() })
+    for (const serverManager of serverManagers) {
+      serverManager.manager.on("connect", onConnect);
+      serverManager.manager.on("disconnect", onDisconnect);
+    }
 
-  //   getGbxClient(uuid).then((gbx) => {
-  //     const onConnect = (data: any) => push("connect", data)
-  //     const onDisconnect = (data: any) => push("disconnect", data)
+    push("servers", serverManagers.map((sm) => sm.server));
 
-  //     gbx.on("ManiaPlanet.PlayerConnect", onConnect)
-  //     gbx.on("ManiaPlanet.PlayerDisconnect", onDisconnect)
+    return () => {
+      console.log("Cleaning up SSE connections");
 
-  //     // Return cleanup function
-  //     return () => {
-  //       gbx.off("ManiaPlanet.PlayerConnect", onConnect)
-  //       gbx.off("ManiaPlanet.PlayerDisconnect", onDisconnect)
-  //     }
-  //   })
-  // })
+      for (const serverManager of serverManagers) {
+        serverManager.manager.off("connect", onConnect);
+        serverManager.manager.off("disconnect", onDisconnect);
+      }
+    };
+  });
 
-  // return new Response(stream, {
-  //   headers: {
-  //     "Content-Type": "text/event-stream",
-  //     "Cache-Control": "no-cache",
-  //     "Connection": "keep-alive",
-  //   },
-  // })
+  console.log("SSE stream created for servers", serverManagers.map(sm => sm.server.name));
+  return new Response(stream, {
+    headers: SSEHeaders,
+  });
 }

@@ -34,3 +34,10 @@ export function createSSEStream(setup: (push: (event: string, data?: Record<stri
 
   return stream
 }
+
+
+export const SSEHeaders = {
+  "Content-Type": "text/event-stream",
+  "Cache-Control": "no-cache",
+  Connection: "keep-alive",
+};

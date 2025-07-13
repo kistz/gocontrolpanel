@@ -4,11 +4,12 @@ import { GbxClient } from "@evotm/gbxclient";
 import { PrismaClient } from "./prisma/generated";
 import Redis from "ioredis";
 import { FileManager } from "@/types/filemanager";
+import { GbxClientManager } from "./gbxclient";
 
 type GlobalState = {
   prisma?: PrismaClient;
   redis?: Redis;
-  gbxClients?: Record<string, GbxClient>;
+  gbxClients?: Record<string, GbxClientManager>;
   fileManagers?: Record<string, FileManager>;
 };
 
