@@ -6,13 +6,13 @@ import { Interfaces } from "@/lib/prisma/generated";
 import { ServerError, ServerResponse } from "@/types/responses";
 
 export async function getInterfaces(
-  serverUuid: string,
+  id: string,
 ): Promise<ServerResponse<Interfaces[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
     const interfaces = await db.interfaces.findMany({
       where: {
-        serverUuid,
+        id,
       },
       orderBy: {
         createdAt: "desc",
@@ -24,7 +24,7 @@ export async function getInterfaces(
 }
 
 export async function createInterface(
-  serverUuid: string,
+  id: string,
   name: string,
   interfaceString: string,
 ): Promise<ServerResponse<Interfaces>> {
@@ -32,7 +32,7 @@ export async function createInterface(
     const db = getClient();
     const result = await db.interfaces.create({
       data: {
-        serverUuid,
+        id,
         name,
         interfaceString,
       },
@@ -47,7 +47,7 @@ export async function createInterface(
 }
 
 export async function saveInterface(
-  serverUuid: string,
+  id: string,
   interfaceId: string,
   interfaceString: string,
 ): Promise<ServerResponse<Interfaces>> {
@@ -56,7 +56,7 @@ export async function saveInterface(
     const result = await db.interfaces.update({
       where: {
         id: interfaceId,
-        serverUuid,
+        id,
       },
       data: {
         interfaceString,

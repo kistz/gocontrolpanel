@@ -21,5 +21,5 @@ export default async function ServerFilesPage({
     );
   }
 
-  return <Browser data={data} serverUuid={uuid} path={path || "/UserData"} />;
+  return <Browser data={data} id={uuid} path={path || "/UserData"} />;
 }

@@ -29,7 +29,7 @@ export default async function EditorPage({
       <div className="flex flex-col w-full h-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
-          serverUuid={uuid}
+          id={uuid}
           className="h-9 flex items-center"
         />
 
@@ -57,11 +57,7 @@ export default async function EditorPage({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <TextEditor
-        defaultText={data.value as string}
-        path={path}
-        serverUuid={uuid}
-      />
+      <TextEditor defaultText={data.value as string} path={path} id={uuid} />
     </div>
   );
 }

@@ -12,10 +12,10 @@ import { toast } from "sonner";
 import { ChatConfigSchema, ChatConfigSchemaType } from "./chatconfig-schema";
 
 export default function ChatConfigForm({
-  serverUuid,
+  id,
   chatConfig,
 }: {
-  serverUuid: string;
+  id: string;
   chatConfig: ChatConfigSchemaType;
 }) {
   const session = useSession();
@@ -27,7 +27,7 @@ export default function ChatConfigForm({
 
   async function onSubmit(values: ChatConfigSchemaType) {
     try {
-      const { error } = await updateChatConfig(serverUuid, values);
+      const { error } = await updateChatConfig(id, values);
       if (error) {
         throw new Error(error);
       }

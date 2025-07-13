@@ -17,7 +17,7 @@ export default async function ServerSettingsPage({
         </h4>
       </div>
       <Card className="p-6">
-        <SettingsForm serverUuid={uuid} />
+        <SettingsForm id={uuid} />
       </Card>
     </div>
   );

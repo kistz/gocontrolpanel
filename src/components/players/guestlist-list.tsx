@@ -12,21 +12,21 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface GuestlistListProps {
-  serverUuid: string;
+  id: string;
 }
 
-export default function GuestlistList({ serverUuid }: GuestlistListProps) {
+export default function GuestlistList({ id }: GuestlistListProps) {
   const [guestlist, setGuestlist] = useState<PlayerInfo[]>([]);
 
   const [confirmClearGuestlist, setConfirmClearGuestlist] = useState(false);
 
   useEffect(() => {
     refetch();
-  }, [serverUuid]);
+  }, [id]);
 
   const refetch = async () => {
     try {
-      const { data, error } = await getGuestlist(serverUuid);
+      const { data, error } = await getGuestlist(id);
       if (error) {
         throw new Error(error);
       }
@@ -41,7 +41,7 @@ export default function GuestlistList({ serverUuid }: GuestlistListProps) {
 
   const handleClearGuestlist = async () => {
     try {
-      const { error } = await cleanGuestlist(serverUuid);
+      const { error } = await cleanGuestlist(id);
       if (error) {
         throw new Error(error);
       }
@@ -55,12 +55,12 @@ export default function GuestlistList({ serverUuid }: GuestlistListProps) {
     }
   };
 
-  const columns = createColumns(serverUuid, refetch);
+  const columns = createColumns(id, refetch);
 
   return (
     <>
       <div className="flex flex-row max-[800px]:flex-col justify-between gap-2">
-        <GuestlistForm serverUuid={serverUuid} />
+        <GuestlistForm id={id} />
         <div>
           <Button
             variant="destructive"

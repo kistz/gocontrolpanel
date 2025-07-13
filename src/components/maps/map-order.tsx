@@ -11,10 +11,10 @@ import { Button } from "../ui/button";
 
 export default function MapOrder({
   mapList,
-  serverUuid,
+  id,
 }: {
   mapList: Maps[];
-  serverUuid: string;
+  id: string;
 }) {
   const [defaultMapList, setDefaultMapList] = useState<Maps[]>(mapList);
   const [mapOrder, setMapOrder] = useState<Maps[]>(defaultMapList);
@@ -27,12 +27,12 @@ export default function MapOrder({
 
       if (!files.length || files.length == 0) return;
 
-      const { error: removeError } = await removeMapList(serverUuid, files);
+      const { error: removeError } = await removeMapList(id, files);
       if (removeError) {
         throw new Error(removeError);
       }
 
-      const { error: addError } = await addMapList(serverUuid, files);
+      const { error: addError } = await addMapList(id, files);
       if (addError) {
         throw new Error(addError);
       }
@@ -67,7 +67,7 @@ export default function MapOrder({
           columns={columns}
           data={mapOrder}
           setData={setMapOrder}
-          serverUuid={serverUuid}
+          id={id}
         />
       </div>
       <div className="flex flex-row-reverse gap-2">

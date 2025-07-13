@@ -8,10 +8,10 @@ import { ServerResponse } from "@/types/responses";
 import { GbxClient } from "@evotm/gbxclient";
 
 export async function getPlayerList(
-  serverUuid: string,
+  id: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     const playerList = await client.call("GetPlayerList", 1000, 0);
 
     if (!playerList || !Array.isArray(playerList)) {
@@ -44,31 +44,31 @@ export async function getPlayerList(
 }
 
 export async function banPlayer(
-  serverUuid: string,
+  id: string,
   login: string,
   reason: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("Ban", login, reason);
   });
 }
 
 export async function unbanPlayer(
-  serverUuid: string,
+  id: string,
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("UnBan", login);
   });
 }
 
 export async function getBanList(
-  serverUuid: string,
+  id: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     const banList = await client.call("GetBanList", 1000, 0);
 
     const playerList: PlayerInfo[] = [];
@@ -97,40 +97,38 @@ export async function getBanList(
   });
 }
 
-export async function cleanBanList(
-  serverUuid: string,
-): Promise<ServerResponse> {
+export async function cleanBanList(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("CleanBanList");
   });
 }
 
 export async function blacklistPlayer(
-  serverUuid: string,
+  id: string,
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("BlackList", login);
   });
 }
 
 export async function unblacklistPlayer(
-  serverUuid: string,
+  id: string,
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("UnBlackList", login);
   });
 }
 
 export async function getBlacklist(
-  serverUuid: string,
+  id: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     const blacklist = await client.call("GetBlackList", 1000, 0);
 
     const playerList: PlayerInfo[] = [];
@@ -160,59 +158,57 @@ export async function getBlacklist(
 }
 
 export async function loadBlacklist(
-  serverUuid: string,
+  id: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("LoadBlackList", filename);
   });
 }
 
 export async function saveBlacklist(
-  serverUuid: string,
+  id: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("SaveBlackList", filename);
   });
 }
 
-export async function cleanBlacklist(
-  serverUuid: string,
-): Promise<ServerResponse> {
+export async function cleanBlacklist(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("CleanBlackList");
   });
 }
 
 export async function addGuest(
-  serverUuid: string,
+  id: string,
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("AddGuest", login);
   });
 }
 
 export async function removeGuest(
-  serverUuid: string,
+  id: string,
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("RemoveGuest", login);
   });
 }
 
 export async function getGuestlist(
-  serverUuid: string,
+  id: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     const guestlist = await client.call("GetGuestList", 1000, 0);
 
     const playerList: PlayerInfo[] = [];
@@ -242,67 +238,63 @@ export async function getGuestlist(
 }
 
 export async function loadGuestlist(
-  serverUuid: string,
+  id: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("LoadGuestList", filename);
   });
 }
 
 export async function saveGuestlist(
-  serverUuid: string,
+  id: string,
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("SaveGuestList", filename);
   });
 }
 
-export async function cleanGuestlist(
-  serverUuid: string,
-): Promise<ServerResponse> {
+export async function cleanGuestlist(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("CleanGuestList");
   });
 }
 
 export async function kickPlayer(
-  serverUuid: string,
+  id: string,
   login: string,
   reason: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("Kick", login, reason);
   });
 }
 
 // Status: (0: user selectable, 1: spectator, 2: player, 3: spectator but keep selectable)
 export async function forceSpectator(
-  serverUuid: string,
+  id: string,
   login: string,
   status: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("ForceSpectator", login, status);
   });
 }
 
-export async function connectFakePlayer(
-  serverUuid: string,
-): Promise<ServerResponse> {
+export async function connectFakePlayer(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     await client.call("ConnectFakePlayer");
   });
 }
 
-export async function syncPlayerList(client: GbxClient, serverUuid: string) {
+export async function syncPlayerList(client: GbxClient, id: string) {
   const playerList = await client.call("GetPlayerList", 1000, 0);
   if (!playerList || !Array.isArray(playerList)) {
     throw new Error("Failed to retrieve player list");
@@ -330,7 +322,7 @@ export async function syncPlayerList(client: GbxClient, serverUuid: string) {
   }
 
   const redis = await getRedisClient();
-  const key = getKeyPlayers(serverUuid);
+  const key = getKeyPlayers(id);
 
   await redis.set(key, JSON.stringify(players));
 }

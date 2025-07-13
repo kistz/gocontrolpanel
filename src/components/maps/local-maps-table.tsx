@@ -6,21 +6,21 @@ import { LocalMapInfo } from "@/types/map";
 import { useEffect, useState } from "react";
 import { DataTable } from "../table/data-table";
 
-export default function LocalMapsTable({ serverUuid }: { serverUuid: string }) {
+export default function LocalMapsTable({ id }: { id: string }) {
   const [data, setData] = useState<LocalMapInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchLocalMaps() {
-      const { data } = await getLocalMaps(serverUuid);
+      const { data } = await getLocalMaps(id);
       setData(data);
       setIsLoading(false);
     }
 
     fetchLocalMaps();
-  }, [serverUuid]);
+  }, [id]);
 
-  const columns = createLocalMapColumns(serverUuid);
+  const columns = createLocalMapColumns(id);
 
   return (
     <DataTable

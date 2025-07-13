@@ -13,9 +13,7 @@ import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
-import { axiosAuth } from "./axios/connector";
 import config from "./config";
-import { Users } from "./prisma/generated";
 import { getList } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
@@ -138,7 +136,7 @@ export const authOptions: NextAuthOptions = {
       token.groups = dbUser.groups.map((group) => ({
         id: group.group.id,
         name: group.group.name,
-        serverUuids: getList(group.group.serverUuids),
+        ids: getList(group.group.ids),
         role: group.role,
       }));
 

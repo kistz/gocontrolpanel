@@ -117,7 +117,7 @@ export async function getNewMapsCount(
 
 export async function getMapsPaginated(
   pagination: PaginationState,
-  sorting: { field: string; order: 'asc' | 'desc' },
+  sorting: { field: string; order: "asc" | "desc" },
 ): Promise<ServerResponse<PaginationResponse<Maps>>> {
   return doServerAction(async () => {
     const db = getClient();
@@ -154,12 +154,12 @@ export async function deleteMapById(id: string): Promise<ServerResponse> {
 }
 
 export async function getMapList(
-  serverUuid: string,
+  id: string,
   count?: number,
   start: number = 0,
 ): Promise<ServerResponse<Maps[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(id);
     const pageSize = 100;
     let allMapList: MapInfoMinimal[] = [];
 

@@ -8,12 +8,12 @@ import React from "react";
 
 export default function FileCard({
   fileEntry,
-  serverUuid,
+  id,
   onClick,
   active,
 }: {
   fileEntry: FileEntry;
-  serverUuid: string;
+  id: string;
   onClick?: (e: React.MouseEvent) => void;
   active?: boolean;
 }) {
@@ -21,7 +21,7 @@ export default function FileCard({
 
   const handleDoubleClick = () => {
     router.push(
-      `${generatePath(routes.servers.editor, { uuid: serverUuid })}?path=${fileEntry.path}`,
+      `${generatePath(routes.servers.editor, { uuid: id })}?path=${fileEntry.path}`,
     );
   };
 

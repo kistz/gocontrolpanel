@@ -81,11 +81,11 @@ export const EDITOR_DEFAULT_WIDTH = 1169;
 export const EDITOR_DEFAULT_HEIGHT = (EDITOR_DEFAULT_WIDTH / 16) * 9; // 16:9 aspect ratio
 
 export default function InterfaceEditor({
-  serverUuid,
+  id,
   defaultInterface,
   defaultInterfaces = [],
 }: {
-  serverUuid: string;
+  id: string;
   defaultInterface?: Interfaces | null;
   defaultInterfaces?: Interfaces[];
 }) {
@@ -187,7 +187,7 @@ export default function InterfaceEditor({
       .filter((d) => d !== null && d !== undefined);
 
     const { data: savedInterface, error } = await saveInterface(
-      serverUuid,
+      id,
       selectedInterface.id,
       JSON.stringify(data),
     );
@@ -289,7 +289,9 @@ export default function InterfaceEditor({
   };
 
   const handleSelect = (entry: ComponentEntry) => {
-    const ref = componentRefs.current.find((r) => r.current?.uuid === entry.uuid);
+    const ref = componentRefs.current.find(
+      (r) => r.current?.uuid === entry.uuid,
+    );
     if (!ref) {
       console.warn("Component ref not found:", entry.uuid);
       return;
@@ -354,7 +356,7 @@ export default function InterfaceEditor({
 
           <Modal>
             <CreateInterfaceModal
-              serverUuid={serverUuid}
+              id={id}
               onSubmit={(newInterface?: Interfaces) => {
                 if (!newInterface) return;
                 setInterfaces((prev) => [...prev, newInterface]);

@@ -2,20 +2,20 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
+import { Handlebars } from "@/lib/handlebars";
 import { Interfaces } from "@/lib/prisma/generated";
 import { ServerResponse } from "@/types/responses";
 import fs from "fs/promises";
 import path from "path";
 import { renderLabelComponent } from "./components/label";
 import { renderQuadComponent } from "./components/quad";
-import { Handlebars } from "@/lib/handlebars";
 
 export async function renderInterface(
   interfaceData: Interfaces,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     // Hide any existing Manialink pages before rendering the new interface
-    const client = await getGbxClient(interfaceData.serverUuid);
+    const client = await getGbxClient(interfaceData.id);
     await client.call("SendHideManialinkPage");
 
     if (!interfaceData.interfaceString) {

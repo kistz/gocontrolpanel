@@ -16,11 +16,11 @@ import {
 } from "./game-schema";
 
 export default function ModeScriptSettingsForm({
-  serverUuid,
+  id,
   modeScriptSettings,
   modeScriptInfo,
 }: {
-  serverUuid: string;
+  id: string;
   modeScriptSettings: Record<string, unknown>;
   modeScriptInfo: ModeScriptInfo;
 }) {
@@ -42,7 +42,7 @@ export default function ModeScriptSettingsForm({
           }),
         );
 
-        const { error } = await setModeScriptSettings(serverUuid, parsedValues);
+        const { error } = await setModeScriptSettings(id, parsedValues);
         if (error) {
           throw new Error(error);
         }
@@ -53,7 +53,7 @@ export default function ModeScriptSettingsForm({
         });
       }
     },
-    [serverUuid],
+    [id],
   );
 
   const descriptions = useMemo(() => {

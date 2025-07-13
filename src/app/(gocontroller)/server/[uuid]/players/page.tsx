@@ -28,16 +28,16 @@ export default async function ServerPlayersPage({
         </TabsList>
 
         <TabsContent value="players" className="flex flex-col gap-2">
-          <PlayerList serverUuid={uuid} />
+          <PlayerList id={uuid} />
         </TabsContent>
         <TabsContent value="banlist" className="flex flex-col gap-2">
-          <BanlistList serverUuid={uuid} />
+          <BanlistList id={uuid} />
         </TabsContent>
         <TabsContent value="blacklist" className="flex flex-col gap-2">
-          <BlacklistList serverUuid={uuid} />
+          <BlacklistList id={uuid} />
         </TabsContent>
         <TabsContent value="guestlist" className="flex flex-col gap-2">
-          <GuestlistList serverUuid={uuid} />
+          <GuestlistList id={uuid} />
         </TabsContent>
       </Tabs>
     </div>

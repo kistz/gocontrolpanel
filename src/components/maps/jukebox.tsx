@@ -19,12 +19,12 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface JukeboxProps {
-  serverUuid: string;
+  id: string;
   jukebox: JukeboxMap[];
   maps: Maps[];
 }
 
-export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
+export default function Jukebox({ id, jukebox, maps }: JukeboxProps) {
   const [defaultJukebox, setDefaultJukebox] = useState<JukeboxMap[]>(
     jukebox || [],
   );
@@ -33,7 +33,7 @@ export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
 
   useEffect(() => {
     const intervalIndex = setInterval(async () => {
-      const { data: jukebox } = await getJukebox(serverUuid);
+      const { data: jukebox } = await getJukebox(id);
 
       if (jukebox[0]?.id !== jukeboxOrder[0]?.id) {
         setJukeboxOrder(jukebox);
@@ -42,11 +42,11 @@ export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
     }, 10000);
 
     return () => clearInterval(intervalIndex);
-  }, [jukeboxOrder, serverUuid]);
+  }, [jukeboxOrder, id]);
 
   async function saveJukebox() {
     try {
-      const { error } = await setJukebox(serverUuid, jukeboxOrder);
+      const { error } = await setJukebox(id, jukeboxOrder);
       if (error) {
         throw new Error(error);
       }
@@ -67,7 +67,7 @@ export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
 
   async function onAddMap(map: Maps) {
     try {
-      const { data: newMap, error } = await addMapToJukebox(serverUuid, map);
+      const { data: newMap, error } = await addMapToJukebox(id, map);
       if (error) {
         throw new Error(error);
       }
@@ -83,7 +83,7 @@ export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
 
   async function onClearJukebox() {
     try {
-      const { error } = await clearJukebox(serverUuid);
+      const { error } = await clearJukebox(id);
       if (error) {
         throw new Error(error);
       }
@@ -111,7 +111,7 @@ export default function Jukebox({ serverUuid, jukebox, maps }: JukeboxProps) {
             columns={jukeboxColumns}
             data={jukeboxOrder}
             setData={setJukeboxOrder}
-            serverUuid={serverUuid}
+            id={id}
           />
           <div className="flex flex-row-reverse gap-2">
             <Button onClick={saveJukebox}>Save Jukebox</Button>

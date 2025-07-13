@@ -52,7 +52,7 @@ export default async function ServerGamePage({
 
         <TabsContent value="map" className="flex flex-col gap-6">
           <MapCarousel
-            serverUuid={uuid}
+            id={uuid}
             maps={mapList}
             startIndex={currentIndex}
             loop={true}
@@ -63,18 +63,18 @@ export default async function ServerGamePage({
             <div className="flex gap-6 flex-col min-[960px]:flex-row">
               <div className="flex flex-col gap-4 flex-1">
                 <ShowOpponentsForm
-                  serverUuid={uuid}
+                  id={uuid}
                   showOpponents={showOpponents.NextValue}
                 />
                 <ScriptNameForm
-                  serverUuid={uuid}
+                  id={uuid}
                   scriptName={scriptName.NextValue}
                   scripts={scripts}
                 />
               </div>
               <div className="flex flex-col gap-4 flex-1">
-                <MatchSettingsForm serverUuid={uuid} />
-                <PlaylistForm serverUuid={uuid} />
+                <MatchSettingsForm id={uuid} />
+                <PlaylistForm id={uuid} />
               </div>
             </div>
           </Card>
@@ -98,7 +98,7 @@ export default async function ServerGamePage({
               </div>
 
               <ModeScriptSettingsForm
-                serverUuid={uuid}
+                id={uuid}
                 modeScriptSettings={modeScriptSettings}
                 modeScriptInfo={modeScriptInfo}
               />

@@ -27,7 +27,7 @@ export default function EditGroupForm({
     resolver: zodResolver(EditGroupSchema),
     defaultValues: {
       ...group,
-      serverUuids: getList(group.serverUuids) || [],
+      ids: getList(group.ids) || [],
       users: group.users.map((user) => ({
         userId: user.userId,
         role: user.role,
@@ -39,7 +39,7 @@ export default function EditGroupForm({
     try {
       const { error } = await updateGroup(group.id, {
         ...values,
-        serverUuids: getList(values.serverUuids),
+        ids: getList(values.ids),
         users: values.users?.map((user) => ({
           userId: user.userId,
           role: user.role as GroupRole,
@@ -79,7 +79,7 @@ export default function EditGroupForm({
         />
 
         <FormElement
-          name="serverUuids"
+          name="ids"
           label="Servers"
           placeholder="Select servers"
           options={servers.map((server) => ({

@@ -29,7 +29,7 @@ export default function AddGroupForm({
       const { error } = await createGroup({
         ...values,
         description: values.description || "",
-        serverUuids: getList(values.serverUuids),
+        ids: getList(values.ids),
         users:
           values.users?.map((user) => ({
             userId: user.userId,
@@ -70,7 +70,7 @@ export default function AddGroupForm({
         />
 
         <FormElement
-          name="serverUuids"
+          name="ids"
           label="Servers"
           placeholder="Select servers"
           options={servers.map((server) => ({

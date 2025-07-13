@@ -84,7 +84,7 @@ function pathToRegex(path: string) {
 }
 
 // Use in a React client component
-export function useCurrentServerUuid(pathname: string): string | null {
+export function useCurrentid(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);

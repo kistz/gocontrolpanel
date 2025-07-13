@@ -1,24 +1,26 @@
-import { auth } from "@/lib/auth"
-import { getGbxClient } from "@/lib/gbxclient"
-import { createSSEStream } from "@/lib/sse"
+import { auth } from "@/lib/auth";
 
 export async function GET(req: Request) {
-  const session = await auth()
+  const session = await auth();
 
-  const allowedServerUuids = [... new Set(session?.user.groups.map((group) => group.serverUuids).flat() || [])];
-  if (allowedServerUuids.length === 0) {
-    return new Response("No servers available", { status: 403 })
+  const allowedids = [
+    ...new Set(session?.user.groups.map((group) => group.ids).flat() || []),
+  ];
+  if (allowedids.length === 0) {
+    return new Response("No servers available", { status: 403 });
   }
 
-  let selectedServerUuids = allowedServerUuids;
+  let selectedids = allowedids;
   const searchParams = new URL(req.url).searchParams;
   const serverParam = searchParams.get("servers");
   if (serverParam) {
-    selectedServerUuids = serverParam.split(",").filter(uuid => allowedServerUuids.includes(uuid));
+    selectedids = serverParam
+      .split(",")
+      .filter((uuid) => allowedids.includes(uuid));
   }
 
-  if (selectedServerUuids.length === 0) {
-    return new Response("No valid servers selected", { status: 400 })
+  if (selectedids.length === 0) {
+    return new Response("No valid servers selected", { status: 400 });
   }
 
   // const stream = createSSEStream((push) => {

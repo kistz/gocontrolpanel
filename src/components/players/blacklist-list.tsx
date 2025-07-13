@@ -12,21 +12,21 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface BlacklistListProps {
-  serverUuid: string;
+  id: string;
 }
 
-export default function BlacklistList({ serverUuid }: BlacklistListProps) {
+export default function BlacklistList({ id }: BlacklistListProps) {
   const [blacklist, setBlacklist] = useState<PlayerInfo[]>([]);
 
   const [confirmClearBlacklist, setConfirmClearBlacklist] = useState(false);
 
   useEffect(() => {
     refetch();
-  }, [serverUuid]);
+  }, [id]);
 
   const refetch = async () => {
     try {
-      const { data, error } = await getBlacklist(serverUuid);
+      const { data, error } = await getBlacklist(id);
       if (error) {
         throw new Error(error);
       }
@@ -39,11 +39,11 @@ export default function BlacklistList({ serverUuid }: BlacklistListProps) {
     }
   };
 
-  const columns = createColumns(serverUuid, refetch);
+  const columns = createColumns(id, refetch);
 
   const handleClearBlacklist = async () => {
     try {
-      const { error } = await cleanBlacklist(serverUuid);
+      const { error } = await cleanBlacklist(id);
       if (error) {
         throw new Error(error);
       }
@@ -60,7 +60,7 @@ export default function BlacklistList({ serverUuid }: BlacklistListProps) {
   return (
     <>
       <div className="flex flex-row max-[800px]:flex-col justify-between gap-2">
-        <BlacklistForm serverUuid={serverUuid} />
+        <BlacklistForm id={id} />
         <div>
           <Button
             variant="destructive"

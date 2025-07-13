@@ -8,10 +8,10 @@ import { useEffect, useRef, useState } from "react";
 import { DataTable } from "../table/data-table";
 
 interface PlayerListProps {
-  serverUuid: string;
+  id: string;
 }
 
-export default function PlayerList({ serverUuid }: PlayerListProps) {
+export default function PlayerList({ id }: PlayerListProps) {
   const { data: session } = useSession();
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
 
@@ -23,7 +23,7 @@ export default function PlayerList({ serverUuid }: PlayerListProps) {
     }
 
     const socket = initGbxWebsocketClient(
-      `/ws/players/${serverUuid}`,
+      `/ws/players/${id}`,
       session.jwt as string,
     );
     wsRef.current = socket;
@@ -64,9 +64,9 @@ export default function PlayerList({ serverUuid }: PlayerListProps) {
     return () => {
       socket.close();
     };
-  }, [session, serverUuid]);
+  }, [session, id]);
 
-  const columns = createColumns(serverUuid);
+  const columns = createColumns(id);
 
   return <DataTable columns={columns} data={playerList} pagination />;
 }

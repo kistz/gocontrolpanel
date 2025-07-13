@@ -76,7 +76,7 @@ export async function getAllGroups(): Promise<
 
 export async function getGroupsPaginated(
   pagination: PaginationState,
-  sorting: { field: string; order: 'asc' | 'desc' },
+  sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<GroupsWithUsers>>> {
   return doServerActionWithAuth([], async () => {
@@ -171,11 +171,11 @@ export async function createGroup(
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
-    const { users, serverUuids, ...groupData } = group;
+    const { users, ids, ...groupData } = group;
     const newGroup = await db.groups.create({
       data: {
         ...groupData,
-        serverUuids: serverUuids ?? [],
+        ids: ids ?? [],
         users: {
           create: users.map((member) => ({
             role: member.role,
@@ -215,7 +215,7 @@ export async function updateGroup(
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
-    const { users, serverUuids, ...scalarFields } = group;
+    const { users, ids, ...scalarFields } = group;
 
     const currentMembers = await db.groupMember.findMany({
       where: { groupId },
@@ -227,7 +227,7 @@ export async function updateGroup(
         where: { id: groupId },
         data: {
           ...scalarFields,
-          serverUuids: serverUuids ?? [],
+          ids: ids ?? [],
         },
         include: {
           users: {
@@ -262,7 +262,7 @@ export async function updateGroup(
 
     const updateData: any = {
       ...scalarFields,
-      serverUuids: serverUuids ?? [],
+      ids: ids ?? [],
       users: {
         deleteMany: toRemove.map((m) => ({
           userId: m.userId,
@@ -317,16 +317,14 @@ export async function deleteGroup(groupId: string): Promise<ServerResponse> {
   });
 }
 
-export async function removeServerUuidFromGroups(
-  serverUuid: string,
-): Promise<ServerResponse> {
+export async function removeidFromGroups(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
-    
+
     const groups = await db.groups.findMany({
       where: {
-        serverUuids: {
-          array_contains: [serverUuid],
+        ids: {
+          array_contains: [id],
         },
       },
     });
@@ -338,9 +336,7 @@ export async function removeServerUuidFromGroups(
         db.groups.update({
           where: { id: group.id },
           data: {
-            serverUuids: getList(group.serverUuids).filter(
-              (uuid) => uuid !== serverUuid,
-            ),
+            ids: getList(group.ids).filter((uuid) => uuid !== id),
           },
         }),
       ),

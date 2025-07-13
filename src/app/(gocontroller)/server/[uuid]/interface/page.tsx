@@ -34,7 +34,7 @@ export default async function ServerInterfacePage({
         <TabsContent value="interface" className="flex flex-col gap-6 h-full">
           {process.env.NODE_ENV === "development" ? (
             <InterfaceEditor
-              serverUuid={uuid}
+              id={uuid}
               defaultInterface={interfaces[0]}
               defaultInterfaces={interfaces}
             />
@@ -46,7 +46,7 @@ export default async function ServerInterfacePage({
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
-            <ChatConfigForm serverUuid={uuid} chatConfig={data} />
+            <ChatConfigForm id={uuid} chatConfig={data} />
           </Card>
         </TabsContent>
       </Tabs>

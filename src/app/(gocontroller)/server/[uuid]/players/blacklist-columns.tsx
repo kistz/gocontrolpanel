@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
 export const createColumns = (
-  serverUuid: string,
+  id: string,
   refetch: () => void,
 ): ColumnDef<PlayerInfo>[] => [
   {
@@ -49,7 +49,7 @@ export const createColumns = (
 
       const handleUnblacklist = async () => {
         try {
-          const { error } = await unblacklistPlayer(serverUuid, player.login);
+          const { error } = await unblacklistPlayer(id, player.login);
           if (error) {
             throw new Error(error);
           }

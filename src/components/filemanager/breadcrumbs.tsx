@@ -15,13 +15,13 @@ import React from "react";
 
 interface BreadcrumbsProps {
   crumbs: TBreadcrumb[];
-  serverUuid: string;
+  id: string;
   className?: string;
 }
 
 export default function FilesBreadcrumbs({
   crumbs,
-  serverUuid,
+  id,
   className,
 }: BreadcrumbsProps) {
   return (
@@ -31,7 +31,7 @@ export default function FilesBreadcrumbs({
           <BreadcrumbLink asChild>
             <Link
               href={generatePath(routes.servers.files, {
-                uuid: serverUuid,
+                uuid: id,
               })}
             >
               <IconHome size={20} />
@@ -51,7 +51,7 @@ export default function FilesBreadcrumbs({
                         className="max-w-20 truncate md:max-w-none"
                       >
                         <Link
-                          href={`${generatePath(routes.servers.files, { uuid: serverUuid })}?path=${item.path}`}
+                          href={`${generatePath(routes.servers.files, { uuid: id })}?path=${item.path}`}
                         >
                           {item.label}
                         </Link>

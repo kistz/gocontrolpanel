@@ -4,6 +4,7 @@ import { createInterface } from "@/actions/database/interfaces";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Interfaces } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,13 +13,12 @@ import {
   CreateInterfaceSchema,
   CreateInterfaceSchemaType,
 } from "./create-interface-schema";
-import { Interfaces } from "@/lib/prisma/generated";
 
 export default function CreateInterfaceForm({
-  serverUuid,
+  id,
   callback,
 }: {
-  serverUuid: string;
+  id: string;
   callback?: (newInterface: Interfaces) => void;
 }) {
   const form = useForm<CreateInterfaceSchemaType>({
@@ -30,7 +30,7 @@ export default function CreateInterfaceForm({
 
   async function onSubmit(values: CreateInterfaceSchemaType) {
     try {
-      const { data, error } = await createInterface(serverUuid, values.name, "");
+      const { data, error } = await createInterface(id, values.name, "");
       if (error) {
         throw new Error(error);
       }

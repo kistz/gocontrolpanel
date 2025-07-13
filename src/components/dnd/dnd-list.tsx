@@ -24,7 +24,7 @@ import DndListRow from "./dnd-list-row";
 
 export interface DndListColumn<TData> {
   id: string;
-  cell?: React.ComponentType<{ data: TData; serverUuid?: string }>;
+  cell?: React.ComponentType<{ data: TData; id?: string }>;
   visibility?: boolean;
 }
 
@@ -32,14 +32,14 @@ interface DndListProps<TData extends { id: string | number }> {
   columns: DndListColumn<TData>[];
   data: TData[];
   setData: (value: SetStateAction<TData[]>) => void;
-  serverUuid?: string;
+  id?: string;
 }
 
 export function DndList<TData extends { id: string | number }>({
   columns,
   data,
   setData,
-  serverUuid,
+  id,
 }: DndListProps<TData>) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -79,7 +79,7 @@ export function DndList<TData extends { id: string | number }>({
                   (column) => column.visibility !== false,
                 )}
                 key={item.id}
-                serverUuid={serverUuid}
+                id={id}
               />
             ))}
           </div>

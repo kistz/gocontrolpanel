@@ -11,21 +11,21 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface BanlistListProps {
-  serverUuid: string;
+  id: string;
 }
 
-export default function BanlistList({ serverUuid }: BanlistListProps) {
+export default function BanlistList({ id }: BanlistListProps) {
   const [banlist, setBanlist] = useState<PlayerInfo[]>([]);
 
   const [confirmClearBanlist, setConfirmClearBanlist] = useState(false);
 
   useEffect(() => {
     refetch();
-  }, [serverUuid]);
+  }, [id]);
 
   const refetch = async () => {
     try {
-      const { data, error } = await getBanList(serverUuid);
+      const { data, error } = await getBanList(id);
       if (error) {
         throw new Error(error);
       }
@@ -40,7 +40,7 @@ export default function BanlistList({ serverUuid }: BanlistListProps) {
 
   const handleClearBanlist = async () => {
     try {
-      const { error } = await cleanBanList(serverUuid);
+      const { error } = await cleanBanList(id);
       if (error) {
         throw new Error(error);
       }
@@ -54,7 +54,7 @@ export default function BanlistList({ serverUuid }: BanlistListProps) {
     }
   };
 
-  const columns = createColumns(serverUuid, refetch);
+  const columns = createColumns(id, refetch);
 
   return (
     <>

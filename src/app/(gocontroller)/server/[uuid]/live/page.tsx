@@ -7,5 +7,5 @@ export default async function LivePage({
 }) {
   const { uuid } = await params;
 
-  return <LiveDashboard serverUuid={uuid} />;
+  return <LiveDashboard id={uuid} />;
 }

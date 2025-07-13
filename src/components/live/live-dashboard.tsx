@@ -16,7 +16,7 @@ import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
 
-export default function LiveDashboard({ serverUuid }: { serverUuid: string }) {
+export default function LiveDashboard({ id }: { id: string }) {
   const { data: session } = useSession();
 
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
@@ -34,7 +34,7 @@ export default function LiveDashboard({ serverUuid }: { serverUuid: string }) {
     }
 
     const socket = initGbxWebsocketClient(
-      `/ws/live/${serverUuid}`,
+      `/ws/live/${id}`,
       session.jwt as string,
     );
     wsRef.current = socket;
@@ -155,7 +155,7 @@ export default function LiveDashboard({ serverUuid }: { serverUuid: string }) {
     return () => {
       socket.close();
     };
-  }, [serverUuid, session]);
+  }, [id, session]);
 
   useEffect(() => {
     if (!liveInfo?.players) {
@@ -164,7 +164,7 @@ export default function LiveDashboard({ serverUuid }: { serverUuid: string }) {
 
     const fetchData = async () => {
       try {
-        const { data, error } = await getPlayerList(serverUuid);
+        const { data, error } = await getPlayerList(id);
         if (error) {
           throw new Error(error);
         }
@@ -223,7 +223,7 @@ export default function LiveDashboard({ serverUuid }: { serverUuid: string }) {
 
       <div className="flex flex-col min-[1200px]:flex-row min-[1528px]:flex-col gap-4">
         <MapInfo
-          serverUuid={serverUuid}
+          id={id}
           map={mapInfo?.map}
           mode={mapInfo?.mode}
           pauseAvailable={liveInfo.pauseAvailable}

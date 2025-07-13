@@ -1,7 +1,7 @@
 import Redis from "ioredis";
+import "server-only";
 import config from "./config";
 import { appGlobals } from "./global";
-import "server-only";
 
 export async function getRedisClient() {
   if (!appGlobals.redis) {
@@ -31,10 +31,9 @@ export async function getRedisClient() {
   return appGlobals.redis;
 }
 
-export const getKeyActiveMap = (serverUuid: string) =>
-  `active-map:${serverUuid}`;
-export const getKeyJukebox = (serverUuid: string) => `jukebox:${serverUuid}`;
-export const getKeyPlayers = (serverUuid: string) => `players:${serverUuid}`;
+export const getKeyActiveMap = (id: string) => `active-map:${id}`;
+export const getKeyJukebox = (id: string) => `jukebox:${id}`;
+export const getKeyPlayers = (id: string) => `players:${id}`;
 export const getKeyHetznerRateLimit = (projectId: string) =>
   `hetzner-rate-limit:${projectId}`;
 export const getKeyHetznerServerTypes = () => "hetzner-server-types";

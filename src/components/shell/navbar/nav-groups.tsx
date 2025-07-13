@@ -20,7 +20,7 @@
 // import {
 //   generatePath,
 //   initGbxWebsocketClient,
-//   useCurrentServerUuid,
+//   useCurrentid,
 // } from "@/lib/utils";
 // import { routes } from "@/routes";
 // import {
@@ -63,11 +63,11 @@
 //   const [servers, setServers] = useState<Servers[]>([]);
 //   const [loading, setLoading] = useState(true);
 //   const [healthStatus, setHealthStatus] = useState(false);
-//   const [serverUuid, setServerUuid] = useState<string | null>(null);
+//   const [id, setid] = useState<string | null>(null);
 
 //   useEffect(() => {
-//     const uuid = useCurrentServerUuid(pathname);
-//     setServerUuid(uuid);
+//     const uuid = useCurrentid(pathname);
+//     setid(uuid);
 //   }, [pathname]);
 
 //   useEffect(() => {
@@ -78,7 +78,7 @@
 //     }
 
 //     for (const server of servers) {
-//       if (server.id === serverUuid && !server.isConnected) {
+//       if (server.id === id && !server.isConnected) {
 //         toast.error(`Server ${server.name} is offline`);
 //         router.push("/");
 //       }
@@ -102,15 +102,15 @@
 //           "/ws/servers",
 //           session.jwt as string,
 //           {
-//             serverUuid: session?.user.groups
-//               .map((group) => group.serverUuids)
+//             id: session?.user.groups
+//               .map((group) => group.ids)
 //               .flat(),
 //           },
 //         );
 
 //         socket.onmessage = async (event) => {
 //           const data: Server[] = JSON.parse(event.data);
-          
+
 //           setHealthStatus(true);
 //           setServers(data);
 
@@ -131,7 +131,7 @@
 //   const groupsSidebarGroup: ServerNavGroup[] =
 //     session?.user.groups.map((group) => ({
 //       name: group.name,
-//       servers: group.serverUuids
+//       servers: group.ids
 //         .map((s) => {
 //           const server = servers.find((server) => server.uuid === s);
 //           if (!server) return undefined;
@@ -141,7 +141,7 @@
 //             name: server.name,
 //             isConnected: server.isConnected,
 //             icon: IconServer,
-//             isActive: serverUuid === server.uuid,
+//             isActive: id === server.uuid,
 //             items: [
 //               {
 //                 name: "Settings",

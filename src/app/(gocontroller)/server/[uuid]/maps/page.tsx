@@ -32,9 +32,9 @@ export default async function ServerMapsPage({
           <TabsTrigger value="jukebox">Jukebox</TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
-          <MapOrder mapList={maps} serverUuid={uuid} />
+          <MapOrder mapList={maps} id={uuid} />
 
-          {filemanager?.health && <LocalMapsTable serverUuid={uuid} />}
+          {filemanager?.health && <LocalMapsTable id={uuid} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">
@@ -42,7 +42,7 @@ export default async function ServerMapsPage({
             server, the jukeboxes might conflict.
           </p>
 
-          <Jukebox serverUuid={uuid} jukebox={jukebox} maps={maps} />
+          <Jukebox id={uuid} jukebox={jukebox} maps={maps} />
         </TabsContent>
       </Tabs>
     </div>
