@@ -1,15 +1,14 @@
 "use client";
-import { editServer } from "@/actions/gbxconnector/servers";
+import { updateServer } from "@/actions/database/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Servers } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
-import { Servers } from "@/lib/prisma/generated";
-import { updateServer } from "@/actions/database/servers";
 
 export default function EditServerForm({
   server,

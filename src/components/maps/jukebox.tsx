@@ -111,7 +111,7 @@ export default function Jukebox({ id, jukebox, maps }: JukeboxProps) {
             columns={jukeboxColumns}
             data={jukeboxOrder}
             setData={setJukeboxOrder}
-            id={id}
+            serverId={id}
           />
           <div className="flex flex-row-reverse gap-2">
             <Button onClick={saveJukebox}>Save Jukebox</Button>

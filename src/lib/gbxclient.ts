@@ -10,7 +10,7 @@ import { withTimeout } from "./utils";
 class GbxClientManager {
   private client: GbxClient;
   private id: string;
-  private listeners: Record<string, Function> = {};
+  private listeners: Record<string, (...args: any[]) => void> = {};
   private initialized = false;
 
   constructor(id: string) {

@@ -67,7 +67,7 @@ export default function MapOrder({
           columns={columns}
           data={mapOrder}
           setData={setMapOrder}
-          id={id}
+          serverId={id}
         />
       </div>
       <div className="flex flex-row-reverse gap-2">

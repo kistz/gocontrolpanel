@@ -1,5 +1,5 @@
 "use client";
-import { addServer } from "@/actions/gbxconnector/servers";
+import { createServer } from "@/actions/database/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -8,11 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddServerSchema, AddServerSchemaType } from "./add-server-schema";
-import { createServer } from "@/actions/database/servers";
 
 export default function AddServerForm({ callback }: { callback?: () => void }) {
   const form = useForm<AddServerSchemaType>({
-    resolver: zodResolver(AddServerSchema)
+    resolver: zodResolver(AddServerSchema),
   });
 
   async function onSubmit(values: AddServerSchemaType) {

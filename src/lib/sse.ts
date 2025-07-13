@@ -2,7 +2,6 @@ export function createSSEStream(setup: (push: (event: string, data?: Record<stri
   const encoder = new TextEncoder()
   const queue: Uint8Array[] = []
   let resolver: ((chunk: Uint8Array) => void) | null = null
-  let closed = false
 
   const push: (event: string, data?: Record<string, any>) => void = (event, data = {}) => {
     const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
@@ -29,7 +28,6 @@ export function createSSEStream(setup: (push: (event: string, data?: Record<stri
       }
     },
     cancel() {
-      closed = true
       cleanup()
     },
   })
