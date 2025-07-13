@@ -1,13 +1,12 @@
-import { getServers } from "@/actions/gbxconnector/servers";
+import { getServersPaginated } from "@/actions/database/servers";
 import AddServerModal from "@/components/modals/add-server";
 import Modal from "@/components/modals/modal";
-import ServerOrder from "@/components/servers/server-order";
+import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
+import { createColumns } from "./columns";
 
 export default async function AdminServersPage() {
-  const { data: servers } = await getServers();
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex gap-2 justify-between items-end">
@@ -26,13 +25,11 @@ export default async function AdminServersPage() {
         </Modal>
       </div>
 
-      {servers.length === 0 ? (
-        <div className="text-muted-foreground">No servers found.</div>
-      ) : (
-        <ServerOrder servers={servers} />
-      )}
+      <PaginationTable
+        createColumns={createColumns}
+        fetchData={getServersPaginated}
+        filter
+      />
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";

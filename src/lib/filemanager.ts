@@ -1,5 +1,6 @@
 import { syncServers } from "@/actions/gbxconnector/servers";
 import { FileManager } from "@/types/filemanager";
+import "server-only";
 
 const cachedFileManagers: {
   [key: string]: FileManager;

@@ -3,9 +3,8 @@ import { createGroup } from "@/actions/database/groups";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Users } from "@/lib/prisma/generated";
+import { GroupRole, Servers, Users } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
-import { Server } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
@@ -17,7 +16,7 @@ export default function AddGroupForm({
   users,
   callback,
 }: {
-  servers: Server[];
+  servers: Servers[];
   users: Users[];
   callback?: () => void;
 }) {
@@ -76,7 +75,7 @@ export default function AddGroupForm({
           placeholder="Select servers"
           options={servers.map((server) => ({
             label: server.name,
-            value: server.uuid,
+            value: server.id,
           }))}
           type="multi-select"
         />

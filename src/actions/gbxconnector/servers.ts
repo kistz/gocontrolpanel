@@ -5,8 +5,13 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosAuth } from "@/lib/axios/connector";
 import { connectToGbxClient } from "@/lib/gbxclient";
 import { getRedisClient } from "@/lib/redis";
-import { ServerError, ServerResponse } from "@/types/responses";
+import {
+  PaginationResponse,
+  ServerError,
+  ServerResponse,
+} from "@/types/responses";
 import { Server } from "@/types/server";
+import { PaginationState } from "@tanstack/react-table";
 import { isAxiosError } from "axios";
 import { removeServerUuidFromGroups } from "../database/groups";
 
@@ -42,6 +47,20 @@ export async function syncServers(): Promise<Server[]> {
 export async function getServers(): Promise<ServerResponse<Server[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     return await syncServers();
+  });
+}
+
+export async function getServersPaginated(
+  pagination: PaginationState,
+  sorting: { field: string; order: "asc" | "desc" },
+  filter?: string,
+): Promise<ServerResponse<PaginationResponse<Server>>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const servers = await syncServers();
+    return {
+      data: servers,
+      totalCount: servers.length,
+    };
   });
 }
 

@@ -19,7 +19,6 @@ declare module "next-auth" {
       groups: UserGroup[];
     };
     expires: ISODateString;
-    jwt?: string;
   }
 
   interface Profile {
@@ -37,6 +36,5 @@ declare module "next-auth/jwt" {
     admin: boolean;
     ubiId: string;
     groups: UserGroup[];
-    jwt?: string;
   }
 }

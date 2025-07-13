@@ -148,3 +148,21 @@ enum HetznerProjectRole {
   Admin
   Moderator
 }
+
+model Servers {
+  id         String   @id @default(uuid())
+  name      String
+  description String
+  host      String
+  port Int
+  user    String
+  password String
+  filemanagerUrl String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([deletedAt])
+  @@map("servers")
+}

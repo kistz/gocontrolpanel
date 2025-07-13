@@ -4,35 +4,36 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
-import { Server } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
+import { Servers } from "@/lib/prisma/generated";
+import { updateServer } from "@/actions/database/servers";
 
 export default function EditServerForm({
   server,
   callback,
 }: {
-  server: Server;
+  server: Servers;
   callback?: () => void;
 }) {
   const form = useForm<EditServerSchemaType>({
     resolver: zodResolver(EditServerSchema),
     defaultValues: {
       name: server.name,
-      description: server.description,
+      description: server.description || undefined,
       host: server.host,
-      xmlrpcPort: server.xmlrpcPort,
+      port: server.port,
       user: server.user,
-      pass: server.pass,
-      fmUrl: server.fmUrl,
+      password: server.password,
+      filemanagerUrl: server.filemanagerUrl || undefined,
     },
   });
 
   async function onSubmit(values: EditServerSchemaType) {
     try {
-      const { error } = await editServer(server.uuid, values);
+      const { error } = await updateServer(server.id, values);
       if (error) {
         throw new Error(error);
       }
@@ -77,8 +78,8 @@ export default function EditServerForm({
         />
 
         <FormElement
-          name={"xmlrpcPort"}
-          label="XMLRPC Port"
+          name={"port"}
+          label="Port"
           description="The XMLRPC port of the server."
           placeholder="Enter server XMLRPC port"
           type="number"
@@ -94,7 +95,7 @@ export default function EditServerForm({
         />
 
         <FormElement
-          name={"pass"}
+          name={"password"}
           label="Password"
           description="The XMLRPC password."
           placeholder="Enter password"
@@ -102,7 +103,7 @@ export default function EditServerForm({
         />
 
         <FormElement
-          name={"fmUrl"}
+          name={"filemanagerUrl"}
           label="Filemanager url"
           description="The url of the filemanager."
           placeholder="Enter filemanager url"

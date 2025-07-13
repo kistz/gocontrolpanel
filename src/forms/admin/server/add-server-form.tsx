@@ -8,22 +8,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddServerSchema, AddServerSchemaType } from "./add-server-schema";
+import { createServer } from "@/actions/database/servers";
 
 export default function AddServerForm({ callback }: { callback?: () => void }) {
   const form = useForm<AddServerSchemaType>({
-    resolver: zodResolver(AddServerSchema),
-    defaultValues: {
-      name: "",
-      host: "",
-      xmlrpcPort: 0,
-      user: "",
-      pass: "",
-    },
+    resolver: zodResolver(AddServerSchema)
   });
 
   async function onSubmit(values: AddServerSchemaType) {
     try {
-      const { error } = await addServer(values);
+      const { error } = await createServer({
+        ...values,
+        description: values.description || "",
+        filemanagerUrl: values.filemanagerUrl || "",
+      });
       if (error) {
         throw new Error(error);
       }
@@ -68,8 +66,8 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
         />
 
         <FormElement
-          name={"xmlrpcPort"}
-          label="XMLRPC Port"
+          name={"port"}
+          label="Port"
           description="The XMLRPC port of the server."
           placeholder="Enter server XMLRPC port"
           type="number"
@@ -85,7 +83,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
         />
 
         <FormElement
-          name={"pass"}
+          name={"password"}
           label="Password"
           description="The XMLRPC password."
           placeholder="Enter password"
@@ -93,7 +91,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
         />
 
         <FormElement
-          name={"fmUrl"}
+          name={"filemanagerUrl"}
           label="Filemanager url"
           description="The url of the filemanager."
           placeholder="Enter filemanager url"

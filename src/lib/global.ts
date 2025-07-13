@@ -1,4 +1,4 @@
-// lib/global-state.ts
+import "server-only";
 
 import { GbxClient } from "@evotm/gbxclient";
 import { PrismaClient } from "./prisma/generated";

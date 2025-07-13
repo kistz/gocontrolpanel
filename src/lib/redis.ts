@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import config from "./config";
 import { appGlobals } from "./global";
+import "server-only";
 
 export async function connectToRedis() {
   if (appGlobals.redis) {

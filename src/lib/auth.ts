@@ -88,8 +88,6 @@ export const authOptions: NextAuthOptions = {
         groups: token.groups,
       };
 
-      session.jwt = token.jwt;
-
       return session;
     },
     async jwt({ token, user }) {
@@ -134,12 +132,6 @@ export const authOptions: NextAuthOptions = {
         throw new Error("Failed to fetch user from database");
       }
 
-      try {
-        token.jwt = await getConnectorToken(dbUser);
-      } catch (error) {
-        console.error("Failed to fetch connector token", error);
-      }
-
       token.id = dbUser.id;
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid;
@@ -178,19 +170,4 @@ export async function withAuth(roles?: string[]): Promise<Session> {
     throw new Error("Not authorized");
   }
   return session;
-}
-
-async function getConnectorToken(user: Users): Promise<string> {
-  const res = await axiosAuth.post("/auth", user);
-
-  if (res.status !== 200) {
-    throw new Error("Failed to fetch connector token");
-  }
-
-  const data = res.data;
-  if (!data.token) {
-    throw new Error("Failed to fetch connector token");
-  }
-
-  return data.token;
 }

@@ -1,0 +1,121 @@
+"use client";
+
+import { deleteServer } from "@/actions/database/servers";
+import ConfirmModal from "@/components/modals/confirm-modal";
+import EditServerModal from "@/components/modals/edit-server";
+import Modal from "@/components/modals/modal";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Servers } from "@/lib/prisma/generated";
+import { getErrorMessage } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+
+export const createColumns = (refetch: () => void): ColumnDef<Servers>[] => [
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+  },
+  {
+    accessorKey: "description",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Description" />
+    ),
+  },
+  {
+    accessorKey: "host",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Host" />
+    ),
+  },
+  {
+    accessorKey: "port",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Port" />
+    ),
+  },
+  {
+    accessorKey: "filemanagerUrl",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="File Manager Url" />
+    ),
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const server = row.original;
+      const [_, startTransition] = useTransition();
+      const [isOpen, setIsOpen] = useState(false);
+      const [editIsOpen, setEditIsOpen] = useState(false);
+
+      const handleDelete = () => {
+        startTransition(async () => {
+          try {
+            const { error } = await deleteServer(server.id);
+            if (error) {
+              throw new Error(error);
+            }
+            refetch();
+            toast.success("Server successfully deleted");
+          } catch (error) {
+            toast.error("Error deleting server", {
+              description: getErrorMessage(error),
+            });
+          }
+        });
+      };
+
+      return (
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setEditIsOpen(true)}>
+                Edit server
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setIsOpen(true)}
+              >
+                Delete server
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <ConfirmModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onConfirm={handleDelete}
+            title="Delete server"
+            description="Are you sure you want to delete this server?"
+            confirmText="Delete"
+            cancelText="Cancel"
+          />
+
+          <Modal
+            isOpen={editIsOpen}
+            setIsOpen={setEditIsOpen}
+            onClose={() => refetch()}
+          >
+            <EditServerModal data={server} />
+          </Modal>
+        </div>
+      );
+    },
+  },
+];

@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { Icon } from "@tabler/icons-react";
 import NavAdmin from "./nav-admin";
 import NavFooter from "./nav-footer";
-import NavGroups from "./nav-groups";
 
 export interface NavItem {
   id?: number;
@@ -11,7 +10,6 @@ export interface NavItem {
   icon: Icon;
   items?: NavItem[];
   isActive?: boolean;
-  healthStatus?: string;
 }
 
 export interface NavGroup {
@@ -24,7 +22,7 @@ export default async function Navbar() {
 
   return (
     <>
-      {session && <NavGroups />}
+      {/* {session && <NavGroups />} */}
       {session && session.user.admin && <NavAdmin />}
       <NavFooter />
     </>
