@@ -135,7 +135,7 @@ export const authOptions: NextAuthOptions = {
       token.groups = dbUser.groupMembers.map((g) => ({
         id: g.group.id,
         name: g.group.name,
-        servers: g.group.servers.map((s) => s.server),
+        servers: g.group.groupServers.map((s) => s.server),
         role: g.role,
       }));
 

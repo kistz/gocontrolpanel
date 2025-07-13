@@ -3,15 +3,15 @@ import "server-only";
 import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
 
-export async function getFileManager(id: string): Promise<FileManager> {
-  if (!appGlobals.fileManagers?.[id]) {
+export async function getFileManager(serverId: string): Promise<FileManager> {
+  if (!appGlobals.fileManagers?.[serverId]) {
     const db = getClient();
     const server = await db.servers.findUnique({
-      where: { id },
+      where: { id: serverId },
     });
 
     if (!server) {
-      throw new Error(`Server with id ${id} not found`);
+      throw new Error(`Server with id ${serverId} not found`);
     }
 
     if (!server.filemanagerUrl) {
@@ -34,14 +34,14 @@ export async function getFileManager(id: string): Promise<FileManager> {
     };
 
     appGlobals.fileManagers = appGlobals.fileManagers || {};
-    appGlobals.fileManagers[id] = fileManager;
+    appGlobals.fileManagers[serverId] = fileManager;
 
     return fileManager;
   }
 
-  if (!appGlobals.fileManagers[id]) {
-    throw new Error(`FileManager with id ${id} not found`);
+  if (!appGlobals.fileManagers[serverId]) {
+    throw new Error(`FileManager with id ${serverId} not found`);
   }
 
-  return appGlobals.fileManagers[id];
+  return appGlobals.fileManagers[serverId];
 }

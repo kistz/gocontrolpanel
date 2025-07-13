@@ -9,12 +9,12 @@ import { withTimeout } from "./utils";
 
 class GbxClientManager {
   private client: GbxClient;
-  private id: string;
+  private serverId: string;
   private listeners: Record<string, (...args: any[]) => void> = {};
   private initialized = false;
 
-  constructor(id: string) {
-    this.id = id;
+  constructor(serverId: string) {
+    this.serverId = serverId;
     this.client = new GbxClient({
       showErrors: true,
       throwErrors: true,
@@ -22,15 +22,15 @@ class GbxClientManager {
   }
 
   async connect(): Promise<GbxClient> {
-    if (!appGlobals.gbxClients?.[this.id]) {
+    if (!appGlobals.gbxClients?.[this.serverId]) {
       const db = getClient();
 
       const server = await db.servers.findUnique({
-        where: { id: this.id },
+        where: { id: this.serverId },
       });
 
       if (!server) {
-        throw new Error(`Server ${this.id} not found`);
+        throw new Error(`Server ${this.serverId} not found`);
       }
 
       const client = new GbxClient({
@@ -74,24 +74,24 @@ class GbxClientManager {
       return client;
     }
 
-    if (!appGlobals.gbxClients[this.id]) {
-      throw new Error(`GbxClient for server ${this.id} not found`);
+    if (!appGlobals.gbxClients[this.serverId]) {
+      throw new Error(`GbxClient for server ${this.serverId} not found`);
     }
 
-    return appGlobals.gbxClients[this.id];
+    return appGlobals.gbxClients[this.serverId];
   }
 }
 
-export async function getGbxClient(id: string): Promise<GbxClient> {
-  if (!appGlobals.gbxClients?.[id]) {
+export async function getGbxClient(serverId: string): Promise<GbxClient> {
+  if (!appGlobals.gbxClients?.[serverId]) {
     const db = getClient();
 
     const server = await db.servers.findUnique({
-      where: { id },
+      where: { id: serverId },
     });
 
     if (!server) {
-      throw new Error(`Server ${id} not found`);
+      throw new Error(`Server ${serverId} not found`);
     }
 
     const client = new GbxClient({
@@ -135,16 +135,16 @@ export async function getGbxClient(id: string): Promise<GbxClient> {
     return client;
   }
 
-  if (!appGlobals.gbxClients[id]) {
-    throw new Error(`GbxClient for server ${id} not found`);
+  if (!appGlobals.gbxClients[serverId]) {
+    throw new Error(`GbxClient for server ${serverId} not found`);
   }
 
-  return appGlobals.gbxClients[id];
+  return appGlobals.gbxClients[serverId];
 }
 
 async function setupListeners(
   client: GbxClient,
-  id: string,
+  serverId: string,
 ): Promise<void> {
   client.on("callback", (method: string, data: any) => {
     if (method === "ManiaPlanet.ModeScriptCallbackArray") {
@@ -155,11 +155,11 @@ async function setupListeners(
 
       switch (methodName) {
         case "Maniaplanet.Podium_Start":
-          onPodiumStart(id);
+          onPodiumStart(serverId);
           break;
         case "Trackmania.Event.WayPoint":
           if (params.isendrace) {
-            onPlayerFinish(id, params.login, params.racetime);
+            onPlayerFinish(serverId, params.login, params.racetime);
           }
           break;
       }
