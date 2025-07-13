@@ -1,29 +1,29 @@
-import { syncServers } from "@/actions/gbxconnector/servers";
 import { FileManager } from "@/types/filemanager";
 import "server-only";
-
-const cachedFileManagers: {
-  [key: string]: FileManager;
-} = {};
+import { getClient } from "./dbclient";
+import { appGlobals } from "./global";
 
 export async function syncFileManager(
-  serverUuid: string,
+  id: string,
 ): Promise<FileManager> {
-  const servers = await syncServers();
+  const db = getClient();
+  const server = await db.servers.findUnique({
+    where: { id },
+  });
 
-  const server = servers.find((server) => server.uuid == serverUuid);
   if (!server) {
-    throw new Error(`Server ${serverUuid} not found`);
+    throw new Error(`Server with id ${id} not found`);
   }
 
-  if (!server.fmUrl) {
+
+  if (!server.filemanagerUrl) {
     return {
-      url: server.fmUrl,
+      url: server.filemanagerUrl,
       health: false,
     };
   }
 
-  const res = await fetch(`${server.fmUrl}/health`, {
+  const res = await fetch(`${server.filemanagerUrl}/health`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -31,19 +31,21 @@ export async function syncFileManager(
   });
 
   const fileManager = {
-    url: server.fmUrl,
+    url: server.filemanagerUrl,
     health: res.status === 200,
   };
 
-  cachedFileManagers[serverUuid] = fileManager;
+  appGlobals.fileManagers = appGlobals.fileManagers || {};
+  appGlobals.fileManagers[id] = fileManager;
+
   return fileManager;
 }
 
 export async function getFileManager(
   serverUuid: string,
 ): Promise<FileManager | null> {
-  if (cachedFileManagers[serverUuid]) {
-    return cachedFileManagers[serverUuid];
+  if (appGlobals.fileManagers?.[serverUuid]) {
+    return appGlobals.fileManagers[serverUuid];
   }
 
   try {

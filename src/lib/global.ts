@@ -3,11 +3,13 @@ import "server-only";
 import { GbxClient } from "@evotm/gbxclient";
 import { PrismaClient } from "./prisma/generated";
 import Redis from "ioredis";
+import { FileManager } from "@/types/filemanager";
 
 type GlobalState = {
   prisma?: PrismaClient;
   redis?: Redis;
   gbxClients?: Record<string, GbxClient>;
+  fileManagers?: Record<string, FileManager>;
 };
 
 const globalState = globalThis as unknown as { __appGlobals__?: GlobalState };
@@ -15,6 +17,7 @@ const globalState = globalThis as unknown as { __appGlobals__?: GlobalState };
 if (!globalState.__appGlobals__) {
   globalState.__appGlobals__ = {
     gbxClients: {},
+    fileManagers: {},
   };
 }
 

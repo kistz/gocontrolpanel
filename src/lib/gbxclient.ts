@@ -3,9 +3,9 @@ import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { syncPlayerList } from "@/actions/gbx/player";
 import { syncServers } from "@/actions/gbxconnector/servers";
 import { GbxClient } from "@evotm/gbxclient";
+import "server-only";
 import { appGlobals } from "./global";
 import { withTimeout } from "./utils";
-import "server-only";
 
 class GbxClientManager {
   private client: GbxClient;
@@ -59,7 +59,7 @@ class GbxClientManager {
     await this.client.call("SetApiVersion", "2023-04-24");
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
-    
+
     await setupListeners(this.client, this.serverUuid);
     await syncPlayerList(this.client, this.serverUuid);
     await syncMap(this.client, this.serverUuid);
@@ -130,7 +130,7 @@ export async function connectToGbxClient(
 }
 
 export async function getGbxClient(serverUuid: string): Promise<GbxClient> {
-  if (appGlobals.gbxClients && appGlobals.gbxClients[serverUuid]) {
+  if (appGlobals.gbxClients?.[serverUuid]) {
     return appGlobals.gbxClients[serverUuid];
   }
 
@@ -138,9 +138,7 @@ export async function getGbxClient(serverUuid: string): Promise<GbxClient> {
 }
 
 export async function disconnectGbxClient(serverUuid: string): Promise<void> {
-  if (appGlobals.gbxClients) {
-    delete appGlobals.gbxClients[serverUuid];
-  }
+  delete appGlobals.gbxClients?.[serverUuid];
 }
 
 async function setupListeners(

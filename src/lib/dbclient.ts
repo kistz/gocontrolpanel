@@ -7,6 +7,7 @@ export function getClient(): PrismaClient {
     try {
       appGlobals.prisma = new PrismaClient();
       console.log("Prisma client initialized");
+      return appGlobals.prisma;
     } catch (error) {
       if (process.env.NODE_ENV === "production") {
         console.warn("Prisma not available during build, continuing...");
