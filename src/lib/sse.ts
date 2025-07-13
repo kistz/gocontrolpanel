@@ -28,6 +28,7 @@ export function createSSEStream(setup: (push: (event: string, data?: Record<stri
       }
     },
     cancel() {
+      console.log("SSE stream cancelled")
       cleanup()
     },
   })

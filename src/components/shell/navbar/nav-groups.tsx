@@ -57,17 +57,17 @@ export default function NavGroups() {
   const router = useRouter();
   const [servers, setServers] = useState<ServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [healthStatus, setHealthStatus] = useState(false);
-  const [id, setid] = useState<string | null>(null);
+  const [serverId, setServerId] = useState<string | null>(null);
+  const [es, setEs] = useState<EventSource | null>(null);
 
   useEffect(() => {
     const uuid = useCurrentid(pathname);
-    setid(uuid);
+    setServerId(uuid);
   }, [pathname]);
 
   useEffect(() => {
     for (const server of servers) {
-      if (server.id === id && !server.isConnected) {
+      if (server.id === serverId && !server.isConnected) {
         toast.error(`Server ${server.name} is offline`);
         router.push("/");
       }
@@ -76,19 +76,47 @@ export default function NavGroups() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!session) {
+      if (!session || es) {
         return;
       }
 
       try {
-        const eventSource = new EventSource("/api/ws/servers");
+        const es = new EventSource("/api/ws/servers");
 
-        eventSource.onmessage = (event) => {
-          console.log(event);
-        };
+        setEs(es);
+
+        es.addEventListener("servers", (e) => {
+          const serversInfo: ServerInfo[] = JSON.parse(e.data);
+          setServers(serversInfo);
+          setLoading(false);
+        });
+
+        es.addEventListener("connect", (e) => {
+          const data = JSON.parse(e.data);
+          setServers((prev) =>
+            prev.map((server) =>
+              server.id === data.serverId
+                ? { ...server, isConnected: true }
+                : server,
+            ),
+          );
+        });
+
+        es.addEventListener("disconnect", (e) => {
+          const data = JSON.parse(e.data);
+          setServers((prev) =>
+            prev.map((server) =>
+              server.id === data.serverId
+                ? { ...server, isConnected: false }
+                : server,
+            ),
+          );
+        });
 
         return () => {
-          eventSource.close();
+          console.log("Cleaning up SSE connections");
+          es.close();
+          setEs(null);
         };
       } catch {
         setLoading(false);
@@ -108,7 +136,7 @@ export default function NavGroups() {
             name: server.name,
             isConnected: server.isConnected,
             icon: IconServer,
-            isActive: id === server.id,
+            isActive: serverId === server.id,
             items: [
               {
                 name: "Settings",
@@ -184,32 +212,12 @@ export default function NavGroups() {
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {loading ? (
+          {loading && (
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <div className="flex items-center gap-2">
                   <IconServer />
                   <span>Loading...</span>
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ) : healthStatus ? (
-            group.servers.length === 0 && (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
-                    <IconServer />
-                    <span>No servers selected</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )
-          ) : (
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
-                  <IconServer />
-                  <span>Connector offline</span>
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>

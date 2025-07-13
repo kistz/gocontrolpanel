@@ -8,15 +8,12 @@ import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
 import { withTimeout } from "./utils";
 
-type Listener = {
-  [key: string]: (...args: any[]) => void;
-};
-
 export class GbxClientManager extends EventEmitter {
   private client: GbxClient;
   private serverId: string;
   private initialized = false;
   private isConnected = false;
+  private reconnectTimeout: NodeJS.Timeout | null = null;
 
   constructor(serverId: string) {
     super();
@@ -25,36 +22,43 @@ export class GbxClientManager extends EventEmitter {
       showErrors: true,
       throwErrors: true,
     });
+
+    this.client.on("disconnect", () => {
+      if (!this.isConnected) return;
+      console.log(`Disconnected from GBX client for server ${serverId}`);
+      this.isConnected = false;
+      this.emit("disconnect", serverId);
+      this.scheduleReconnect(); // retry on disconnect
+    });
+
     appGlobals.gbxClients = appGlobals.gbxClients || {};
     appGlobals.gbxClients[serverId] = this;
   }
 
+  private scheduleReconnect() {
+    if (this.reconnectTimeout) return; // avoid multiple schedules
+
+    this.reconnectTimeout = setTimeout(() => {
+      this.reconnectTimeout = null;
+      this.tryConnectWithRetry();
+    }, 15000);
+  }
+
+  private async tryConnectWithRetry() {
+    try {
+      await this.connect();
+    } catch (err) {
+      this.scheduleReconnect();
+    }
+  }
+
   async connect(): Promise<GbxClient> {
     const db = getClient();
-
     const server = await db.servers.findUnique({
       where: { id: this.serverId },
     });
 
-    if (!server) {
-      throw new Error(`Server ${this.serverId} not found`);
-    }
-
-    console.log(
-      `Connecting to GBX client for server ${server.id} at ${server.host}:${server.port}`,
-    );
-
-    this.client.on("connect", () => {
-      console.log(`Connected to GBX client for server ${server.id}`);
-      this.isConnected = true;
-      this.emit("connect", server.id);
-    });
-
-    this.client.on("disconnect", () => {
-      console.log(`Disconnected from GBX client for server ${server.id}`);
-      this.isConnected = false;
-      this.emit("disconnect", server.id);
-    });
+    if (!server) throw new Error(`Server ${this.serverId} not found`);
 
     try {
       const status = await withTimeout(
@@ -62,10 +66,9 @@ export class GbxClientManager extends EventEmitter {
         3000,
         "Connection to GBX client timed out",
       );
-      if (!status) {
-        throw new Error("Failed to connect to GBX client");
-      }
+      if (!status) throw new Error("Failed to connect to GBX client");
     } catch (error) {
+      this.scheduleReconnect();
       throw new Error(`Failed to connect to GBX client: ${error}`);
     }
 
@@ -75,9 +78,14 @@ export class GbxClientManager extends EventEmitter {
       throw new Error("Failed to authenticate with GBX client");
     }
 
+    this.isConnected = true;
+    this.emit("connect", server.id);
+    console.log(`Connected to GBX client for server ${server.name}`);
+
     await this.client.call("SetApiVersion", "2023-04-24");
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
+
     await setupListeners(this.client, server.id);
     await syncPlayerList(this.client, server.id);
     await syncMap(this.client, server.id);
