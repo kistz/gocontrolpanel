@@ -1,11 +1,13 @@
 "use client";
-import { GroupsWithUsers, updateGroup } from "@/actions/database/groups";
+import {
+  GroupsWithUsersWithServers,
+  updateGroup,
+} from "@/actions/database/groups";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Users } from "@/lib/prisma/generated";
-import { getErrorMessage, getList } from "@/lib/utils";
-import { Server } from "@/types/server";
+import { GroupRole, Servers, Users } from "@/lib/prisma/generated";
+import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
@@ -18,8 +20,8 @@ export default function EditGroupForm({
   users,
   callback,
 }: {
-  group: GroupsWithUsers;
-  servers: Server[];
+  group: GroupsWithUsersWithServers;
+  servers: Servers[];
   users: Users[];
   callback?: () => void;
 }) {
@@ -27,8 +29,8 @@ export default function EditGroupForm({
     resolver: zodResolver(EditGroupSchema),
     defaultValues: {
       ...group,
-      ids: getList(group.ids) || [],
-      users: group.users.map((user) => ({
+      serverIds: group.groupServers.map((server) => server.serverId),
+      users: group.groupMembers.map((user) => ({
         userId: user.userId,
         role: user.role,
       })),
@@ -39,8 +41,11 @@ export default function EditGroupForm({
     try {
       const { error } = await updateGroup(group.id, {
         ...values,
-        ids: getList(values.ids),
-        users: values.users?.map((user) => ({
+        groupServers:
+          values.serverIds?.map((id) => ({
+            serverId: id,
+          })) || [],
+        groupMembers: values.users?.map((user) => ({
           userId: user.userId,
           role: user.role as GroupRole,
         })),
@@ -79,12 +84,12 @@ export default function EditGroupForm({
         />
 
         <FormElement
-          name="ids"
+          name="serverIds"
           label="Servers"
           placeholder="Select servers"
           options={servers.map((server) => ({
             label: server.name,
-            value: server.uuid,
+            value: server.id,
           }))}
           type="multi-select"
         />

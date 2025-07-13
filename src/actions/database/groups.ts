@@ -25,7 +25,7 @@ export type EditGroups = Prisma.GroupsGetPayload<{
   include: typeof editGroup;
 }>;
 
-const groupUsersSchema = Prisma.validator<Prisma.GroupsInclude>()({
+const groupUsersServersSchema = Prisma.validator<Prisma.GroupsInclude>()({
   groupMembers: {
     where: {
       user: {
@@ -36,6 +36,16 @@ const groupUsersSchema = Prisma.validator<Prisma.GroupsInclude>()({
       user: true,
     },
   },
+  groupServers: {
+    where: {
+      server: {
+        deletedAt: null,
+      },
+    },
+    include: {
+      server: true,
+    },
+  },
   _count: {
     select: {
       groupMembers: true,
@@ -43,15 +53,15 @@ const groupUsersSchema = Prisma.validator<Prisma.GroupsInclude>()({
   },
 });
 
-export type GroupsWithUsers = Prisma.GroupsGetPayload<{
-  include: typeof groupUsersSchema;
+export type GroupsWithUsersWithServers = Prisma.GroupsGetPayload<{
+  include: typeof groupUsersServersSchema;
 }>;
 
 export async function getGroupsPaginated(
   pagination: PaginationState,
   sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
-): Promise<ServerResponse<PaginationResponse<GroupsWithUsers>>> {
+): Promise<ServerResponse<PaginationResponse<GroupsWithUsersWithServers>>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
@@ -82,7 +92,7 @@ export async function getGroupsPaginated(
       orderBy: {
         [sorting.field]: sorting.order.toLowerCase(),
       },
-      include: groupUsersSchema,
+      include: groupUsersServersSchema,
     });
 
     return {
@@ -94,12 +104,12 @@ export async function getGroupsPaginated(
 
 export async function getGroup(
   groupId: string,
-): Promise<ServerResponse<GroupsWithUsers | null>> {
+): Promise<ServerResponse<GroupsWithUsersWithServers | null>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
     const group = await db.groups.findUnique({
       where: { id: groupId },
-      include: groupUsersSchema,
+      include: groupUsersServersSchema,
     });
 
     return group;
@@ -108,7 +118,7 @@ export async function getGroup(
 
 export async function createGroup(
   group: Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<ServerResponse<GroupsWithUsers>> {
+): Promise<ServerResponse<GroupsWithUsersWithServers>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
@@ -128,7 +138,7 @@ export async function createGroup(
           })),
         },
       },
-      include: groupUsersSchema,
+      include: groupUsersServersSchema,
     });
 
     return newGroup;
@@ -140,7 +150,7 @@ export async function updateGroup(
   group: Partial<
     Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
-): Promise<ServerResponse<GroupsWithUsers>> {
+): Promise<ServerResponse<GroupsWithUsersWithServers>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
@@ -164,7 +174,7 @@ export async function updateGroup(
           })),
         },
       },
-      include: groupUsersSchema,
+      include: groupUsersServersSchema,
     });
 
     return updatedGroup;

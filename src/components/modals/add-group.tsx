@@ -1,7 +1,6 @@
 "use client";
 import AddGroupForm from "@/forms/admin/group/add-group-form";
-import { Users } from "@/lib/prisma/generated";
-import { Server } from "@/types/server";
+import { Servers, Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -12,7 +11,7 @@ export default function AddGroupModal({
   closeModal,
   data,
 }: DefaultModalProps<{
-  servers: Server[];
+  servers: Servers[];
   users: Users[];
 }>) {
   const router = useRouter();

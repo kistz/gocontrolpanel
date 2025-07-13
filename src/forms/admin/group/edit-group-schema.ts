@@ -8,7 +8,7 @@ const UserWithRoleSchema = z.object({
 export const EditGroupSchema = z.object({
   name: z.string().min(1, "Group name is required"),
   description: z.string().optional(),
-  ids: z.array(z.string()).optional(),
+  serverIds: z.array(z.string()).optional(),
   users: z
     .array(UserWithRoleSchema)
     .optional()

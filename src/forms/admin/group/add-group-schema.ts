@@ -3,7 +3,7 @@ import { z } from "zod";
 export const AddGroupSchema = z.object({
   name: z.string().min(1, { message: "Group name is required" }),
   description: z.string().optional(),
-  ids: z.array(z.string()).optional(),
+  serverIds: z.array(z.string()).optional(),
   users: z
     .array(
       z.object({
