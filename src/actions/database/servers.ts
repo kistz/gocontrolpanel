@@ -51,24 +51,24 @@ export async function createServer(
 }
 
 export async function updateServer(
-  id: string,
+  serverId: string,
   server: Partial<Omit<Servers, "id" | "createdAt" | "updatedAt">>,
 ): Promise<ServerResponse<Servers>> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
     const updatedServer = await db.servers.update({
-      where: { id },
+      where: { id: serverId },
       data: server,
     });
     return updatedServer;
   });
 }
 
-export async function deleteServer(id: string): Promise<ServerResponse> {
+export async function deleteServer(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
     await db.servers.update({
-      where: { id },
+      where: { id: serverId },
       data: { deletedAt: new Date() },
     });
   });

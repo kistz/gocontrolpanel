@@ -41,12 +41,12 @@ export type UsersWithGroupsWithServers = Prisma.UsersGetPayload<{
 }>;
 
 export async function getUserById(
-  id: string,
+  userId: string,
 ): Promise<UsersWithGroupsWithServers> {
   const db = getClient();
   const user = await db.users.findUniqueOrThrow({
     where: {
-      id,
+      id: userId,
       deletedAt: null,
     },
     include: includeGroupsWithServers,

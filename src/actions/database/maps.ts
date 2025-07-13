@@ -143,23 +143,23 @@ export async function getMapsPaginated(
   });
 }
 
-export async function deleteMapById(id: string): Promise<ServerResponse> {
+export async function deleteMapById(mapId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
     await db.maps.update({
-      where: { id },
+      where: { id: mapId },
       data: { deletedAt: new Date() },
     });
   });
 }
 
 export async function getMapList(
-  id: string,
+  serverId: string,
   count?: number,
   start: number = 0,
 ): Promise<ServerResponse<Maps[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(id);
+    const client = await getGbxClient(serverId);
     const pageSize = 100;
     let allMapList: MapInfoMinimal[] = [];
 

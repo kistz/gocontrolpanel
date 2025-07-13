@@ -3,7 +3,6 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
-import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
@@ -154,7 +153,7 @@ export async function updateGroup(
         groupServers: {
           deleteMany: {},
           create: groupServers?.map((gs) => ({
-            serverId: gs.serverId
+            serverId: gs.serverId,
           })),
         },
         groupMembers: {
@@ -184,14 +183,16 @@ export async function deleteGroup(groupId: string): Promise<ServerResponse> {
   });
 }
 
-export async function removeServerFromGroups(id: string): Promise<ServerResponse> {
+export async function removeServerFromGroups(
+  serverId: string,
+): Promise<ServerResponse> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
     // First, find all group-server relations with the given serverId
     await db.groupServers.deleteMany({
       where: {
-        serverId: id,
+        serverId,
       },
     });
   });

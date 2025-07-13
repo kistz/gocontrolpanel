@@ -171,7 +171,7 @@ export async function createHetznerProject(
 }
 
 export async function updateHetznerProject(
-  projectId: string,
+  hetznerProjectId: string,
   hetznerProject: Partial<
     Omit<EditHetznerProjects, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
@@ -184,7 +184,7 @@ export async function updateHetznerProject(
 
     const updatedHetznerProject = await db.hetznerProjects.update({
       where: {
-        id: projectId,
+        id: hetznerProjectId,
         ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
@@ -215,7 +215,7 @@ export async function updateHetznerProject(
 }
 
 export async function deleteHetznerProject(
-  projectId: string,
+  hetznerProjectId: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth([], async (session) => {
     const db = getClient();
@@ -223,7 +223,7 @@ export async function deleteHetznerProject(
     const userId = session?.user?.id;
     await db.hetznerProjects.update({
       where: {
-        id: projectId,
+        id: hetznerProjectId,
         ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
