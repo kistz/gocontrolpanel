@@ -1,8 +1,8 @@
 "use server";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
+import { ModeScriptInfo } from "@/types/gbx";
 import { ServerResponse } from "@/types/responses";
-import { ModeScriptInfo } from "@/types/server";
 
 export async function restartMap(id: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
