@@ -1,8 +1,8 @@
-import { GroupRole } from "@/lib/prisma/generated";
+import { GroupRole, Servers } from "@/lib/prisma/generated";
 
 export interface UserGroup {
   id: string;
   name: string;
   role: GroupRole;
-  ids: string[];
+  servers: Omit<Servers, "user" | "password" | "createdAt" | "updatedAt" | "deletedAt">[];
 }

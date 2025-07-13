@@ -1,8 +1,7 @@
-import { doServerAction } from "@/lib/actions";
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { Maps } from "@/lib/prisma/generated";
-import { ServerError, ServerResponse } from "@/types/responses";
+import { ServerError } from "@/types/responses";
 import "server-only";
 
 export async function createMap(
@@ -17,31 +16,29 @@ export async function createMap(
     | "updatedAt"
     | "deletedAt"
   >,
-): Promise<ServerResponse<Maps>> {
-  return doServerAction(async () => {
-    const db = getClient();
+): Promise<Maps> {
+  const db = getClient();
 
-    const { data: mapsInfo, error } = await getMapsInfo([map.uid]);
-    if (error) {
-      throw new ServerError(
-        `Failed to fetch map info for UID ${map.uid}: ${error}`,
-      );
-    }
+  const { data: mapsInfo, error } = await getMapsInfo([map.uid]);
+  if (error) {
+    throw new ServerError(
+      `Failed to fetch map info for UID ${map.uid}: ${error}`,
+    );
+  }
 
-    const info = mapsInfo.find((m) => m.mapUid === map.uid);
-    if (!info) {
-      throw new ServerError(`Map info not found for UID ${map.uid}`);
-    }
+  const info = mapsInfo.find((m) => m.mapUid === map.uid);
+  if (!info) {
+    throw new ServerError(`Map info not found for UID ${map.uid}`);
+  }
 
-    const newMap = await db.maps.create({
-      data: {
-        ...map,
-        submitter: info.submitter,
-        timestamp: info.timestamp,
-        fileUrl: info.fileUrl,
-        thumbnailUrl: info.thumbnailUrl,
-      },
-    });
-    return newMap;
+  const newMap = await db.maps.create({
+    data: {
+      ...map,
+      submitter: info.submitter,
+      timestamp: info.timestamp,
+      fileUrl: info.fileUrl,
+      thumbnailUrl: info.thumbnailUrl,
+    },
   });
+  return newMap;
 }

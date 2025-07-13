@@ -64,7 +64,7 @@ export async function addMapToJukebox(
 
 export async function removeMapFromJukebox(
   id: string,
-  id: string,
+  mapId: string,
 ): Promise<ServerResponse> {
   return doServerAction(async () => {
     const redis = await getRedisClient();
@@ -73,7 +73,7 @@ export async function removeMapFromJukebox(
 
     const filtered = items.filter((item) => {
       const parsed = JSON.parse(item);
-      return parsed.id !== id;
+      return parsed.id !== mapId;
     });
 
     await redis.del(key);
@@ -241,7 +241,7 @@ export async function syncMap(client: GbxClient, id: string): Promise<void> {
 
   let { data: map } = await getMapByUid(mapInfo.UId);
   if (!map) {
-    const { data, error } = await createMap({
+    const data = await createMap({
       name: mapInfo.Name,
       uid: mapInfo.UId,
       fileName: mapInfo.FileName,
@@ -253,8 +253,8 @@ export async function syncMap(client: GbxClient, id: string): Promise<void> {
       bronzeTime: mapInfo.BronzeTime,
     });
 
-    if (!data || error) {
-      throw new ServerError(`Failed to create map: ${error}`);
+    if (!data) {
+      throw new ServerError(`Failed to create map`);
     }
 
     map = data;

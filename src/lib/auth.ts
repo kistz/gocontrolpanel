@@ -2,7 +2,7 @@ import {
   createUserAuth,
   getUserById,
   getUserByLogin,
-  UsersWithGroups,
+  UsersWithGroupsWithServers,
 } from "@/actions/database/auth";
 import {
   GetServerSidePropsContext,
@@ -14,7 +14,6 @@ import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
-import { getList } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -89,16 +88,16 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      let dbUser: UsersWithGroups | null;
+      let dbUser: UsersWithGroupsWithServers | null;
       if (user) {
         const login = slugid.encode(user.accountId);
-        ({ data: dbUser } = await getUserByLogin(login));
+        dbUser = await getUserByLogin(login);
 
         token.accountId = user.accountId;
         token.login = login;
         token.displayName = user.displayName;
       } else {
-        ({ data: dbUser } = await getUserById(token.id));
+        dbUser = await getUserById(token.id);
       }
 
       if (!dbUser) {
@@ -117,13 +116,13 @@ export const authOptions: NextAuthOptions = {
           console.error("Failed to fetch web identities", error);
         }
 
-        ({ data: dbUser } = await createUserAuth({
+        dbUser = await createUserAuth({
           login: token.login,
           nickName: token.displayName,
           admin: config.DEFAULT_ADMINS.includes(token.login),
           path: "",
           ubiUid,
-        }));
+        });
       }
 
       if (!dbUser) {
@@ -133,11 +132,11 @@ export const authOptions: NextAuthOptions = {
       token.id = dbUser.id;
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid;
-      token.groups = dbUser.groups.map((group) => ({
-        id: group.group.id,
-        name: group.group.name,
-        ids: getList(group.group.ids),
-        role: group.role,
+      token.groups = dbUser.groupMembers.map((g) => ({
+        id: g.group.id,
+        name: g.group.name,
+        servers: g.group.servers.map((s) => s.server),
+        role: g.role,
       }));
 
       return token;

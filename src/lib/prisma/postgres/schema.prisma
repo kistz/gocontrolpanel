@@ -36,14 +36,14 @@ model Maps {
 }
 
 model Users {
-  id              String               @id @default(uuid())
-  login           String
-  nickName        String
-  path            String
-  admin           Boolean              @default(false)
-  ubiUid          String
-  groups          GroupMember[]
-  hetznerProjects HetznerProjectUser[]
+  id                  String               @id @default(uuid())
+  login               String
+  nickName            String
+  path                String
+  admin               Boolean              @default(false)
+  ubiUid              String
+  groupMembers        GroupMember[]
+  hetznerProjectUsers HetznerProjectUser[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -91,8 +91,8 @@ model Groups {
   name        String
   description String
 
-  servers GroupServers[]
-  users   GroupMember[]
+  groupServers GroupServers[]
+  groupMembers GroupMember[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -121,10 +121,10 @@ enum GroupRole {
 }
 
 model HetznerProjects {
-  id        String               @id @default(uuid())
-  name      String
-  apiTokens String[]
-  users     HetznerProjectUser[]
+  id                  String               @id @default(uuid())
+  name                String
+  apiTokens           String[]
+  hetznerProjectUsers HetznerProjectUser[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -161,8 +161,8 @@ model Servers {
   password       String
   filemanagerUrl String
 
-  interfaces Interfaces[]
-  groups     GroupServers[]
+  interfaces   Interfaces[]
+  groupServers GroupServers[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
