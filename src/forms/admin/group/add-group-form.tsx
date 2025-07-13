@@ -4,7 +4,7 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
 import { GroupRole, Servers, Users } from "@/lib/prisma/generated";
-import { getErrorMessage, getList } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
@@ -29,9 +29,10 @@ export default function AddGroupForm({
       const { error } = await createGroup({
         ...values,
         description: values.description || "",
-        groupServers: values.serverIds?.map((id) => ({
-          serverId: id
-        })) || [],
+        groupServers:
+          values.serverIds?.map((id) => ({
+            serverId: id,
+          })) || [],
         groupMembers:
           values.users?.map((user) => ({
             userId: user.userId,
