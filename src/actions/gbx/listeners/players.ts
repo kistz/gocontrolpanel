@@ -4,8 +4,8 @@ import { getGbxClient } from "@/lib/gbxclient";
 import { getKeyPlayers, getRedisClient } from "@/lib/redis";
 import { PlayerInfo } from "@/types/player";
 
-export async function onPlayerConnect(id: string, login: string) {
-  const client = await getGbxClient(id);
+export async function onPlayerConnect(serverId: string, login: string) {
+  const client = await getGbxClient(serverId);
   const playerData = await client.call("GetPlayerInfo", login);
   if (!playerData) {
     throw new Error(`Player data not found for login: ${login}`);
@@ -20,7 +20,7 @@ export async function onPlayerConnect(id: string, login: string) {
   };
 
   const redis = await getRedisClient();
-  const key = getKeyPlayers(id);
+  const key = getKeyPlayers(serverId);
 
   const players = await redis.get(key);
   const playerList: PlayerInfo[] = players ? JSON.parse(players) : [];
@@ -36,13 +36,13 @@ export async function onPlayerConnect(id: string, login: string) {
   await redis.set(key, JSON.stringify(playerList));
 }
 
-export async function onPlayerDisconnect(id: string, login: string) {
+export async function onPlayerDisconnect(serverId: string, login: string) {
   const redis = await getRedisClient();
-  const key = getKeyPlayers(id);
+  const key = getKeyPlayers(serverId);
 
   const playersData = await redis.get(key);
   if (!playersData) {
-    throw new Error(`No players found for server ${id}`);
+    throw new Error(`No players found for server ${serverId}`);
   }
 
   const playerList: PlayerInfo[] = JSON.parse(playersData);
