@@ -1,13 +1,26 @@
-import { auth } from "@/lib/auth";
+import { parseTokenFromRequest } from "@/lib/auth";
 import { GbxClientManager, getGbxClientManager } from "@/lib/gbxclient";
-import { createSSEStream, SSEHeaders } from "@/lib/sse";
 import { ServerInfo } from "@/types/api/server";
 
-export async function GET(req: Request) {
-  const session = await auth();
+export function GET() {
+  const headers = new Headers();
+  headers.set("Connection", "Upgrade");
+  headers.set("Upgrade", "websocket");
+  return new Response("Upgrade Required", { status: 426, headers });
+}
 
-  const servers =
-    session?.user?.groups?.flatMap((group) => group.servers) || [];
+export async function SOCKET(
+  client: import("ws").WebSocket,
+  req: import("node:http").IncomingMessage,
+) {
+  const token = await parseTokenFromRequest(req);
+
+  if (!token) {
+    client.close();
+    return;
+  }
+
+  const servers = token?.groups?.flatMap((group) => group.servers) || [];
 
   if (servers.length === 0) {
     return new Response("No servers found", { status: 404 });
@@ -33,41 +46,46 @@ export async function GET(req: Request) {
     }
   }
 
-  const stream = createSSEStream((push) => {
-    push(
-      "servers",
-      serverManagers.map((sm) => sm.server),
+  client.send(
+    JSON.stringify({
+      type: "servers",
+      data: serverManagers.map((sm) => sm.server),
+    }),
+  );
+
+  const onConnect = (serverId: string) =>
+    client.send(
+      JSON.stringify({
+        type: "connect",
+        data: { serverId },
+      }),
+    );
+  const onDisconnect = (serverId: string) =>
+    client.send(
+      JSON.stringify({
+        type: "disconnect",
+        data: { serverId },
+      }),
     );
 
-    const onConnect = (serverId: string) => push("connect", { serverId });
-    const onDisconnect = (serverId: string) => push("disconnect", { serverId });
+  for (const serverManager of serverManagers) {
+    serverManager.manager.on("connect", onConnect);
+    serverManager.manager.on("disconnect", onDisconnect);
+  }
 
-    for (const serverManager of serverManagers) {
-      serverManager.manager.on("connect", onConnect);
-      serverManager.manager.on("disconnect", onDisconnect);
+  const interval = setInterval(() => {
+    client.send(JSON.stringify({ type: "ping", data: "Ping!" }));
+  }, 5000);
+
+  const cleanup = () => {
+    for (const { manager } of serverManagers) {
+      manager.off("connect", onConnect);
+      manager.off("disconnect", onDisconnect);
     }
+    clearInterval(interval);
+  };
 
-    const cleanup = () => {
-      console.log("🧹 Cleaning up SSE connections");
-      for (const { manager } of serverManagers) {
-        manager.off("connect", onConnect);
-        manager.off("disconnect", onDisconnect);
-      }
-    };
-
-    req.signal?.addEventListener("abort", () => {
-      console.log("❌ Request aborted by client (e.g., refresh)");
-      cleanup();
-    });
-
-    return cleanup;
-  });
-
-  console.log(
-    "SSE stream created for servers",
-    serverManagers.map((sm) => sm.server.name),
-  );
-  return new Response(stream, {
-    headers: SSEHeaders,
-  });
+  return () => {
+    cleanup();
+  };
 }

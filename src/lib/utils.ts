@@ -188,9 +188,6 @@ export function initGbxWebsocketClient(
   path: string,
   params?: Record<string, string | string[]>,
 ): WebSocket {
-  const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-  const baseUri = envUrl && envUrl !== "" ? envUrl : "/gbx";
-
   const searchParams = new URLSearchParams();
 
   if (params) {
@@ -204,7 +201,7 @@ export function initGbxWebsocketClient(
     }
   }
 
-  return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
+  return new WebSocket(`${path}?${searchParams.toString()}`);
 }
 
 export function capitalize(str: string): string {

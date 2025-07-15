@@ -32,7 +32,7 @@ import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface ServerNavGroup {
@@ -58,7 +58,7 @@ export default function NavGroups() {
   const [servers, setServers] = useState<ServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [serverId, setServerId] = useState<string | null>(null);
-  const [es, setEs] = useState<EventSource | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     const uuid = useCurrentid(pathname);
@@ -75,56 +75,65 @@ export default function NavGroups() {
   }, [servers]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!session || es) {
-        return;
-      }
+    if (!session || wsRef.current) {
+      return;
+    }
 
-      try {
-        const es = new EventSource("/api/ws/servers");
+    try {
+      const ws = new WebSocket("/api/ws/servers");
+      wsRef.current = ws;
 
-        setEs(es);
-
-        es.addEventListener("servers", (e) => {
-          const serversInfo: ServerInfo[] = JSON.parse(e.data);
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "servers") {
+          const serversInfo: ServerInfo[] = data.data;
           setServers(serversInfo);
           setLoading(false);
-        });
-
-        es.addEventListener("connect", (e) => {
-          const data = JSON.parse(e.data);
+        } else if (data.type === "connect") {
+          const { serverId } = data.data;
           setServers((prev) =>
             prev.map((server) =>
-              server.id === data.serverId
+              server.id === serverId
                 ? { ...server, isConnected: true }
                 : server,
             ),
           );
-        });
-
-        es.addEventListener("disconnect", (e) => {
-          const data = JSON.parse(e.data);
+        } else if (data.type === "disconnect") {
+          const { serverId } = data.data;
           setServers((prev) =>
             prev.map((server) =>
-              server.id === data.serverId
+              server.id === serverId
                 ? { ...server, isConnected: false }
                 : server,
             ),
           );
-        });
+        } else if (data.type === "ping") {
+          console.log("Ping received:", data.data);
+        }
+      };
 
-        return () => {
-          console.log("Cleaning up SSE connections");
-          es.close();
-          setEs(null);
-        };
-      } catch {
-        setLoading(false);
+      ws.onclose = () => {
+        console.log("WebSocket closed");
+        wsRef.current = null;
+      };
+
+      ws.onerror = (err) => {
+        console.error("WebSocket error", err);
+        ws.close();
+      };
+    } catch {
+      setLoading(false);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
       }
     };
-
-    fetchData();
-  }, [session]);
+  }, []);
 
   const groupsSidebarGroup: ServerNavGroup[] =
     session?.user.groups.map((group) => ({

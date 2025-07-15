@@ -14,6 +14,9 @@ import { OAuthConfig } from "next-auth/providers/oauth";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
+import { parse } from "cookie";
+import { IncomingMessage } from "node:http";
+import { getToken } from "next-auth/jwt";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -143,6 +146,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   session: {
+    strategy: "jwt",
     maxAge: 1 * 86400, // 1 day,
     updateAge: 6 * 3600, // 6 hours
   },
@@ -167,4 +171,14 @@ export async function withAuth(roles?: string[]): Promise<Session> {
     throw new Error("Not authorized");
   }
   return session;
+}
+
+export async function parseTokenFromRequest(req: IncomingMessage) {
+  const cookies = parse(req.headers.cookie || "");
+  (req as any).cookies = cookies;
+
+  return getToken({
+    req: req as any,
+    secret: process.env.NEXTAUTH_SECRET!,
+  });
 }
