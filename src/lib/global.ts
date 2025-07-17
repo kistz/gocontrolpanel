@@ -1,10 +1,9 @@
 import "server-only";
 
-import { GbxClient } from "@evotm/gbxclient";
-import { PrismaClient } from "./prisma/generated";
-import Redis from "ioredis";
 import { FileManager } from "@/types/filemanager";
+import Redis from "ioredis";
 import { GbxClientManager } from "./gbxclient";
+import { PrismaClient } from "./prisma/generated";
 
 type GlobalState = {
   prisma?: PrismaClient;

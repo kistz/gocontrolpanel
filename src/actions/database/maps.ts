@@ -4,7 +4,8 @@ import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Maps } from "@/lib/prisma/generated";
-import { MapInfo, MapInfoMinimal } from "@/types/map";
+import { SMapInfo } from "@/types/gbx/map";
+import { MapInfoMinimal } from "@/types/map";
 import {
   PaginationResponse,
   ServerError,
@@ -31,7 +32,7 @@ export async function getMapByUid(
 ): Promise<ServerResponse<Maps | null>> {
   return doServerAction(async () => {
     const db = getClient();
-    let map = await db.maps.findFirst({
+    const map = await db.maps.findFirst({
       where: { uid, deletedAt: null },
     });
 
@@ -154,7 +155,7 @@ export async function getMapList(
 
         for (const map of missingMaps) {
           try {
-            const mapInfo: MapInfo = await client.call(
+            const mapInfo: SMapInfo = await client.call(
               "GetMapInfo",
               map.FileName,
             );

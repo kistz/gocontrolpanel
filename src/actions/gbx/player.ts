@@ -2,10 +2,8 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
-import { getKeyPlayers, getRedisClient } from "@/lib/redis";
 import { PlayerInfo } from "@/types/player";
 import { ServerResponse } from "@/types/responses";
-import { GbxClient } from "@evotm/gbxclient";
 
 export async function getPlayerList(
   serverId: string,
@@ -177,7 +175,9 @@ export async function saveBlacklist(
   });
 }
 
-export async function cleanBlacklist(serverId: string): Promise<ServerResponse> {
+export async function cleanBlacklist(
+  serverId: string,
+): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverId);
     await client.call("CleanBlackList");
@@ -257,7 +257,9 @@ export async function saveGuestlist(
   });
 }
 
-export async function cleanGuestlist(serverId: string): Promise<ServerResponse> {
+export async function cleanGuestlist(
+  serverId: string,
+): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverId);
     await client.call("CleanGuestList");
@@ -287,7 +289,9 @@ export async function forceSpectator(
   });
 }
 
-export async function connectFakePlayer(serverId: string): Promise<ServerResponse> {
+export async function connectFakePlayer(
+  serverId: string,
+): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverId);
     await client.call("ConnectFakePlayer");

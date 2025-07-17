@@ -2,7 +2,6 @@ import { getInterfaces } from "@/actions/database/interfaces";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
 
 export default async function ServerInterfacePage({
   params,

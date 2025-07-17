@@ -73,7 +73,7 @@ export class GbxClientManager extends EventEmitter {
   private async tryConnectWithRetry() {
     try {
       await this.connect();
-    } catch (err) {
+    } catch {
       this.scheduleReconnect();
     }
   }
@@ -120,9 +120,15 @@ export class GbxClientManager extends EventEmitter {
       disconnectMessage: "",
     };
 
+    console.log("setupListeners");
     await setupListeners(this, server.id);
+    console.log("syncPlayers");
     await syncPlayerList(this, server.id);
+    console.log("syncMap");
     await syncMap(this, server.id);
+
+    console.log("sync live");
+    await syncLiveInfo(this);
 
     return this.client;
   }
@@ -661,6 +667,8 @@ async function syncLiveInfo(manager: GbxClientManager) {
   manager.info.liveInfo.mode = currentMode;
   const modeLower = currentMode.toLowerCase();
 
+  console.log(modeLower);
+
   const types = [
     "timeattack",
     "rounds",
@@ -841,7 +849,10 @@ async function onEcho(
   }
 }
 
-async function onElimination(manager: GbxClientManager, elimination: Elmination) {
+async function onElimination(
+  manager: GbxClientManager,
+  elimination: Elmination,
+) {
   elimination.accountids.forEach((accountId) => {
     const player = Object.values(manager.info.liveInfo.players).find(
       (p) => p.accountId === accountId,

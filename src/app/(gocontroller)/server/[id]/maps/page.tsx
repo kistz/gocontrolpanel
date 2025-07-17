@@ -16,7 +16,12 @@ export default async function ServerMapsPage({
   const { data: maps } = await getMapList(id);
   const { data: jukebox } = await getJukebox(id);
 
-  const filemanager = await getFileManager(id);
+  let filemanager = null;
+  try {
+    filemanager = await getFileManager(id);
+  } catch (err) {
+    console.error("Failed to fetch file manager:", err);
+  }
 
   return (
     <div className="flex flex-col gap-6">

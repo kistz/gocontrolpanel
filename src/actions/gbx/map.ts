@@ -3,9 +3,9 @@ import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
 import { GbxClientManager, getGbxClient } from "@/lib/gbxclient";
 import { Maps } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getKeyJukebox, getRedisClient } from "@/lib/redis";
-import { JukeboxMap, MapInfo } from "@/types/map";
+import { SMapInfo } from "@/types/gbx/map";
+import { JukeboxMap } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
-import { GbxClient } from "@evotm/gbxclient";
 import { createMap } from "../database/gbx";
 import { getMapByUid } from "../database/maps";
 
@@ -101,7 +101,7 @@ export async function onPodiumStart(serverId: string) {
 
 export async function getCurrentMapInfo(
   serverId: string,
-): Promise<ServerResponse<MapInfo>> {
+): Promise<ServerResponse<SMapInfo>> {
   return doServerActionWithAuth(["admin"], async () => {
     const client = await getGbxClient(serverId);
     const mapInfo = await client.call("GetCurrentMapInfo");
@@ -236,7 +236,7 @@ export async function syncMap(
   manager: GbxClientManager,
   serverId: string,
 ): Promise<void> {
-  const mapInfo: MapInfo = await manager.getClient().call("GetCurrentMapInfo");
+  const mapInfo: SMapInfo = await manager.client.call("GetCurrentMapInfo");
 
   if (!mapInfo) {
     throw new ServerError("Failed to get current map info");
@@ -263,7 +263,7 @@ export async function syncMap(
     map = data;
   }
 
-  manager.setActiveMap(map.uid);
+  manager.info.activeMap = map.uid;
 
   const redis = await getRedisClient();
   const key = getKeyActiveMap(serverId);

@@ -34,7 +34,7 @@ export interface SMapInfo {
   UId: string;
   Name: string;
   FileName: string;
-  Autor: string;
+  Author: string;
   AuthorNickname: string;
   Environnement: string;
   Mood: string;
