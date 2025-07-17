@@ -1,6 +1,7 @@
 import { onPlayerFinish } from "@/actions/gbx/listeners/records";
 import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { syncPlayerList } from "@/actions/gbx/player";
+import { ServerClientInfo } from "@/types/server";
 import { GbxClient } from "@evotm/gbxclient";
 import EventEmitter from "events";
 import "server-only";
@@ -11,7 +12,7 @@ import { withTimeout } from "./utils";
 export class GbxClientManager extends EventEmitter {
   private client: GbxClient;
   private serverId: string;
-  private initialized = false;
+  private info: ServerClientInfo;
   private isConnected = false;
   private reconnectTimeout: NodeJS.Timeout | null = null;
 
@@ -22,6 +23,9 @@ export class GbxClientManager extends EventEmitter {
       showErrors: true,
       throwErrors: true,
     });
+    this.info = {
+      activePlayers: [],
+    };
 
     this.client.on("disconnect", () => {
       if (!this.isConnected) return;
@@ -86,7 +90,7 @@ export class GbxClientManager extends EventEmitter {
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
 
-    await setupListeners(this.client, server.id);
+    await setupListeners(this, server.id);
     await syncPlayerList(this.client, server.id);
     await syncMap(this.client, server.id);
 
@@ -99,6 +103,14 @@ export class GbxClientManager extends EventEmitter {
 
   getIsConnected(): boolean {
     return this.isConnected;
+  }
+
+  setActiveMap(map: string): void {
+    this.info.activeMap = map;
+  }
+
+  getActiveMap(): string | undefined {
+    return this.info.activeMap;
   }
 }
 
@@ -125,10 +137,10 @@ export async function getGbxClientManager(
 }
 
 async function setupListeners(
-  client: GbxClient,
+  manager: GbxClientManager,
   serverId: string,
 ): Promise<void> {
-  client.on("callback", (method: string, data: any) => {
+  manager.getClient().on("callback", (method: string, data: any) => {
     if (method === "ManiaPlanet.ModeScriptCallbackArray") {
       if (!data || data.length === 0) return;
 
@@ -143,6 +155,14 @@ async function setupListeners(
           if (params.isendrace) {
             onPlayerFinish(serverId, params.login, params.racetime);
           }
+          break;
+        case "Maniaplanet.EndMap_Start":
+          manager.setActiveMap(params.map.uid);
+          manager.emit("endMap", params.map.uid);
+          break;
+        case "Maniaplanet.StartMap_Start":
+          manager.setActiveMap(params.map.uid);
+          manager.emit("startMap", params.map.uid);
           break;
       }
     }

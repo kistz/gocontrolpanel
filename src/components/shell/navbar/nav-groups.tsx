@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { generatePath, useCurrentid } from "@/lib/utils";
 import { routes } from "@/routes";
-import { ServerInfo } from "@/types/api/server";
+import { ServerInfo } from "@/types/server";
 import {
   IconActivity,
   IconAdjustmentsAlt,
@@ -53,7 +53,7 @@ interface ServerNavGroup {
 
 export default function NavGroups() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [servers, setServers] = useState<ServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +75,7 @@ export default function NavGroups() {
   }, [servers]);
 
   useEffect(() => {
-    if (!session || wsRef.current) {
+    if (!status) {
       return;
     }
 
@@ -112,7 +112,7 @@ export default function NavGroups() {
               ),
             );
             break;
-          }
+        }
       };
 
       ws.onclose = () => {
@@ -127,16 +127,14 @@ export default function NavGroups() {
     } catch {
       setLoading(false);
     }
-  }, [session]);
 
-  useEffect(() => {
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
         wsRef.current = null;
       }
     };
-  }, []);
+  }, [status]);
 
   const groupsSidebarGroup: ServerNavGroup[] =
     session?.user.groups.map((group) => ({

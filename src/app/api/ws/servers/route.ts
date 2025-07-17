@@ -1,6 +1,6 @@
 import { parseTokenFromRequest } from "@/lib/auth";
 import { GbxClientManager, getGbxClientManager } from "@/lib/gbxclient";
-import { ServerInfo } from "@/types/api/server";
+import { ServerInfo } from "@/types/server";
 
 export function GET() {
   const headers = new Headers();
@@ -81,7 +81,7 @@ export async function SOCKET(
   };
 
   return () => {
-    console.log("WebSocket connection closed");
     cleanup();
+    client.close();
   };
 }
