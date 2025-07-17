@@ -73,19 +73,15 @@ export async function SOCKET(
     serverManager.manager.on("disconnect", onDisconnect);
   }
 
-  const interval = setInterval(() => {
-    client.send(JSON.stringify({ type: "ping", data: "Ping!" }));
-  }, 5000);
-
   const cleanup = () => {
     for (const { manager } of serverManagers) {
       manager.off("connect", onConnect);
       manager.off("disconnect", onDisconnect);
     }
-    clearInterval(interval);
   };
 
   return () => {
+    console.log("WebSocket connection closed");
     cleanup();
   };
 }

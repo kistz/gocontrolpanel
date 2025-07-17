@@ -11,6 +11,7 @@ import {
   ServerResponse,
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
 
 export async function getAllMaps(): Promise<ServerResponse<Maps[]>> {
   return doServerAction(async () => {
@@ -21,33 +22,7 @@ export async function getAllMaps(): Promise<ServerResponse<Maps[]>> {
       },
     });
 
-    const mapsMissingApiInfo = maps.filter((map) => !map.thumbnailUrl);
-    if (mapsMissingApiInfo.length > 0) {
-      const mapUids = mapsMissingApiInfo.map((map) => map.uid);
-      const BATCH_SIZE = 200;
-
-      for (let i = 0; i < mapUids.length; i += BATCH_SIZE) {
-        const batch = mapUids.slice(i, i + BATCH_SIZE);
-        const { data: apiMapsInfo } = await getMapsInfo(batch);
-
-        for (const map of mapsMissingApiInfo) {
-          const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === map.uid);
-          if (mapInfoFromApi) {
-            await db.maps.update({
-              where: { id: map.id },
-              data: {
-                submitter: mapInfoFromApi.submitter,
-                timestamp: mapInfoFromApi.timestamp,
-                fileUrl: mapInfoFromApi.fileUrl,
-                thumbnailUrl: mapInfoFromApi.thumbnailUrl,
-              },
-            });
-          }
-        }
-      }
-    }
-
-    return maps;
+    return await checkAndUpdateMapsInfoIfNeeded(maps);
   });
 }
 
@@ -64,27 +39,9 @@ export async function getMapByUid(
       return null;
     }
 
-    if (!map.thumbnailUrl) {
-      const { data: apiMapsInfo } = await getMapsInfo([uid]);
-      const mapInfoFromApi = apiMapsInfo.find((m) => m.mapUid === uid);
-      if (mapInfoFromApi) {
-        await db.maps.update({
-          where: { id: map.id },
-          data: {
-            submitter: mapInfoFromApi.submitter,
-            timestamp: mapInfoFromApi.timestamp,
-            fileUrl: mapInfoFromApi.fileUrl,
-            thumbnailUrl: mapInfoFromApi.thumbnailUrl,
-          },
-        });
-      }
+    const [updatedMap] = await checkAndUpdateMapsInfoIfNeeded([map]);
 
-      map = await db.maps.findFirst({
-        where: { uid, deletedAt: null },
-      });
-    }
-
-    return map;
+    return updatedMap;
   });
 }
 
@@ -93,23 +50,6 @@ export async function getMapCount(): Promise<ServerResponse<number>> {
     const db = getClient();
     const count = await db.maps.count({
       where: { deletedAt: null },
-    });
-    return count;
-  });
-}
-
-export async function getNewMapsCount(
-  days: number,
-): Promise<ServerResponse<number>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const date = new Date();
-    date.setDate(date.getDate() - days);
-    const count = await db.maps.count({
-      where: {
-        createdAt: { gt: date },
-        deletedAt: null,
-      },
     });
     return count;
   });
@@ -233,10 +173,11 @@ export async function getMapList(
               goldTime: mapInfo.GoldTime || 0,
               silverTime: mapInfo.SilverTime || 0,
               bronzeTime: mapInfo.BronzeTime || 0,
-              submitter: mapInfoFromApi?.submitter || "",
-              timestamp: mapInfoFromApi?.timestamp || new Date(),
-              fileUrl: mapInfoFromApi?.fileUrl || "",
-              thumbnailUrl: mapInfoFromApi?.thumbnailUrl || "",
+              submitter: mapInfoFromApi?.submitter || null,
+              timestamp: mapInfoFromApi?.timestamp || null,
+              fileUrl: mapInfoFromApi?.fileUrl || null,
+              thumbnailUrl: mapInfoFromApi?.thumbnailUrl || null,
+              uploadCheck: new Date(),
               createdAt: now,
               updatedAt: now,
               deletedAt: null,

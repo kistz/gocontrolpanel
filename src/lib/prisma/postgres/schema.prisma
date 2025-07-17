@@ -24,6 +24,7 @@ model Maps {
   timestamp    DateTime?
   fileUrl      String?   @unique
   thumbnailUrl String?   @unique
+  uploadCheck  DateTime?
 
   records Records[]
 

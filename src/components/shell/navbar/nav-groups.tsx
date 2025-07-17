@@ -85,31 +85,34 @@ export default function NavGroups() {
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === "servers") {
-          const serversInfo: ServerInfo[] = data.data;
-          setServers(serversInfo);
-          setLoading(false);
-        } else if (data.type === "connect") {
-          const { serverId } = data.data;
-          setServers((prev) =>
-            prev.map((server) =>
-              server.id === serverId
-                ? { ...server, isConnected: true }
-                : server,
-            ),
-          );
-        } else if (data.type === "disconnect") {
-          const { serverId } = data.data;
-          setServers((prev) =>
-            prev.map((server) =>
-              server.id === serverId
-                ? { ...server, isConnected: false }
-                : server,
-            ),
-          );
-        } else if (data.type === "ping") {
-          console.log("Ping received:", data.data);
-        }
+
+        switch (data.type) {
+          case "servers":
+            const serversInfo: ServerInfo[] = data.data;
+            setServers(serversInfo);
+            setLoading(false);
+            break;
+          case "connect":
+            const { serverId } = data.data;
+            setServers((prev) =>
+              prev.map((server) =>
+                server.id === serverId
+                  ? { ...server, isConnected: true }
+                  : server,
+              ),
+            );
+            break;
+          case "disconnect":
+            const { serverId: disconnectedServerId } = data.data;
+            setServers((prev) =>
+              prev.map((server) =>
+                server.id === disconnectedServerId
+                  ? { ...server, isConnected: false }
+                  : server,
+              ),
+            );
+            break;
+          }
       };
 
       ws.onclose = () => {
