@@ -1,7 +1,6 @@
 "use client";
 
 import { createColumns } from "@/app/(gocontroller)/server/[id]/players/players-columns";
-import { initGbxWebsocketClient } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
@@ -12,57 +11,58 @@ interface PlayerListProps {
 }
 
 export default function PlayerList({ serverId }: PlayerListProps) {
-  const { data: session } = useSession();
+  const { status } = useSession();
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
 
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!session) {
-      return;
-    }
+    if (status !== "authenticated") return;
 
-    const socket = initGbxWebsocketClient(
-      `/ws/players/${serverId}`);
-    wsRef.current = socket;
+    const ws = new WebSocket(`/api/ws/players/${serverId}`);
+    wsRef.current = ws;
 
-    socket.onmessage = (event) => {
-      try {
-        const message: {
-          [key: string]: any;
-        } = JSON.parse(event.data);
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
 
-        switch (Object.keys(message)[0]) {
-          case "playerList":
-            setPlayerList(message.playerList as PlayerInfo[]);
-            break;
-          case "infoChanged":
-            setPlayerList((prev) =>
-              prev.map((player) =>
-                player.login === message.infoChanged.login
-                  ? { ...player, ...message.infoChanged }
-                  : player,
-              ),
-            );
-            break;
-          case "connect":
-            setPlayerList((prev) => [...prev, message.connect as PlayerInfo]);
-            break;
-          case "disconnect":
-            setPlayerList((prev) =>
-              prev.filter((player) => player.login !== message.disconnect),
-            );
-            break;
-        }
-      } catch {
-        console.error("Error parsing WebSocket message:", event.data);
+      switch (data.type) {
+        case "playerList":
+          setPlayerList(data.data as PlayerInfo[]);
+          break;
+        case "playerInfo":
+          setPlayerList((prev) =>
+            prev.map((player) =>
+              player.login === data.data.login
+                ? { ...player, ...data.data }
+                : player,
+            ),
+          );
+          break;
+        case "playerConnect":
+          setPlayerList((prev) => [...prev, data.data as PlayerInfo]);
+          break;
+        case "playerDisconnect":
+          setPlayerList((prev) =>
+            prev.filter((player) => player.login !== data.data.login),
+          );
+          break;
       }
     };
 
-    return () => {
-      socket.close();
+    ws.onclose = () => {
+      wsRef.current = null;
     };
-  }, [session, serverId]);
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      ws.close();
+    };
+
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, [status, serverId]);
 
   const columns = createColumns(serverId);
 

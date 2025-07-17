@@ -116,7 +116,6 @@ export default function NavGroups() {
       };
 
       ws.onclose = () => {
-        console.log("WebSocket closed");
         wsRef.current = null;
       };
 

@@ -1,6 +1,7 @@
 import { onPlayerFinish } from "@/actions/gbx/listeners/records";
 import { onPodiumStart, syncMap } from "@/actions/gbx/map";
-import { syncPlayerList } from "@/actions/gbx/player";
+import { getPlayerInfo, syncPlayerList } from "@/actions/gbx/server-only";
+import { PlayerInfo } from "@/types/player";
 import { ServerClientInfo } from "@/types/server";
 import { GbxClient } from "@evotm/gbxclient";
 import EventEmitter from "events";
@@ -89,10 +90,18 @@ export class GbxClientManager extends EventEmitter {
     await this.client.call("SetApiVersion", "2023-04-24");
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
+    
+    await this.client.call("ChatEnableManualRouting", false);
+    this.info.chat = {
+      manualRouting: false,
+      messageFormat: "",
+      connectMessage: "",
+      disconnectMessage: "",
+    }
 
     await setupListeners(this, server.id);
-    await syncPlayerList(this.client, server.id);
-    await syncMap(this.client, server.id);
+    await syncPlayerList(this, server.id);
+    await syncMap(this, server.id);
 
     return this.client;
   }
@@ -105,12 +114,32 @@ export class GbxClientManager extends EventEmitter {
     return this.isConnected;
   }
 
+  getActiveMap(): string | undefined {
+    return this.info.activeMap;
+  }
+
   setActiveMap(map: string): void {
     this.info.activeMap = map;
   }
 
-  getActiveMap(): string | undefined {
-    return this.info.activeMap;
+  addActivePlayer(player: PlayerInfo): void {
+    if (!this.info.activePlayers.includes(player)) {
+      this.info.activePlayers.push(player);
+    }
+  }
+
+  removeActivePlayer(playerLogin: string): void {
+    this.info.activePlayers = this.info.activePlayers.filter(
+      (p) => p.login !== playerLogin,
+    );
+  }
+
+  getActivePlayers(): PlayerInfo[] {
+    return this.info.activePlayers;
+  }
+
+  setActivePlayers(players: PlayerInfo[]): void {
+    this.info.activePlayers = players;
   }
 }
 
@@ -140,31 +169,61 @@ async function setupListeners(
   manager: GbxClientManager,
   serverId: string,
 ): Promise<void> {
-  manager.getClient().on("callback", (method: string, data: any) => {
-    if (method === "ManiaPlanet.ModeScriptCallbackArray") {
-      if (!data || data.length === 0) return;
+  manager.getClient().removeAllListeners("callback");
+  manager.getClient().on("callback", async (method: string, data: any) => {
+    switch (method) {
+      case "ManiaPlanet.PlayerConnect":
+        const playerInfo = await getPlayerInfo(
+          manager.getClient(),
+          data[0],
+        );
+        manager.addActivePlayer(playerInfo);
+        manager.emit("playerConnect", playerInfo);
+        break;
+      case "ManiaPlanet.PlayerDisconnect":
+        manager.removeActivePlayer(data[0]);
+        manager.emit("playerDisconnect", data[0]);
+        break;
+      case "ManiaPlanet.PlayerInfo":
+        const changedInfo = {
+          login: data.login,
+          nickName: data.nickName,
+          playerId: data.playerId,
+          spectatorStatus: data.spectatorStatus,
+          teamId: data.teamId,
+        } as PlayerInfo;
 
-      const methodName = data[0];
-      const params = JSON.parse(data[1]) ?? data[1];
+        if (!changedInfo.login) return;
 
-      switch (methodName) {
-        case "Maniaplanet.Podium_Start":
-          onPodiumStart(serverId);
-          break;
-        case "Trackmania.Event.WayPoint":
-          if (params.isendrace) {
-            onPlayerFinish(serverId, params.login, params.racetime);
-          }
-          break;
-        case "Maniaplanet.EndMap_Start":
-          manager.setActiveMap(params.map.uid);
-          manager.emit("endMap", params.map.uid);
-          break;
-        case "Maniaplanet.StartMap_Start":
-          manager.setActiveMap(params.map.uid);
-          manager.emit("startMap", params.map.uid);
-          break;
-      }
+        manager.removeActivePlayer(changedInfo.login);
+        manager.addActivePlayer(changedInfo);
+        manager.emit("playerInfo", changedInfo);
+        break;
+
+      case "ManiaPlanet.ModeScriptCallbackArray":
+        if (!data || data.length === 0) return;
+
+        const methodName = data[0];
+        const params = JSON.parse(data[1]) ?? data[1];
+
+        switch (methodName) {
+          case "Maniaplanet.Podium_Start":
+            onPodiumStart(serverId);
+            break;
+          case "Trackmania.Event.WayPoint":
+            if (params.isendrace) {
+              onPlayerFinish(serverId, params.login, params.racetime);
+            }
+            break;
+          case "Maniaplanet.EndMap_Start":
+            manager.setActiveMap(params.map.uid);
+            manager.emit("endMap", params.map.uid);
+            break;
+          case "Maniaplanet.StartMap_Start":
+            manager.setActiveMap(params.map.uid);
+            manager.emit("startMap", params.map.uid);
+            break;
+        }
     }
   });
 }

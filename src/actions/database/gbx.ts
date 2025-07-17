@@ -12,6 +12,7 @@ export async function createMap(
     | "timestamp"
     | "fileUrl"
     | "thumbnailUrl"
+    | "uploadCheck"
     | "createdAt"
     | "updatedAt"
     | "deletedAt"
@@ -38,6 +39,7 @@ export async function createMap(
       timestamp: info.timestamp,
       fileUrl: info.fileUrl,
       thumbnailUrl: info.thumbnailUrl,
+      uploadCheck: new Date(),
     },
   });
   return newMap;
