@@ -10,9 +10,7 @@ const webSocketServer = new WebSocketServer({ noServer: true });
 setWebSocketServer(webSocketServer);
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
-const port = Number.parseInt(process.env.PORT ?? '3000');
-const app = next({ dev, hostname, port, customServer: true, turbo: true, turbopack: true });
+const app = next({ dev, customServer: true, turbo: true, turbopack: true });
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
@@ -21,7 +19,7 @@ app.prepare().then(() => {
       const parsedUrl = parse(req.url!, true);
       await handle(req, res, parsedUrl);
     })
-    .listen(port, () => {
-      console.log(` ▲ Ready on http://${hostname}:${port}`);
+    .listen(3000, () => {
+      console.log("▲ Ready on http://localhost:3000");
     });
 });

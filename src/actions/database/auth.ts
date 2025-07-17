@@ -17,6 +17,11 @@ const includeGroupsWithServers = Prisma.validator<Prisma.UsersInclude>()({
           id: true,
           name: true,
           groupServers: {
+            where: {
+              server: {
+                deletedAt: null,
+              },
+            },
             select: {
               server: {
                 select: {

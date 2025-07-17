@@ -1,5 +1,4 @@
 import { getInterfaces } from "@/actions/database/interfaces";
-import { getChatConfig } from "@/actions/gbxconnector/chat";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +11,7 @@ export default async function ServerInterfacePage({
 }) {
   const { id } = await params;
 
-  const { data } = await getChatConfig(id);
+  // const { data } = await getChatConfig(id);
 
   const { data: interfaces } = await getInterfaces(id);
 
@@ -46,7 +45,7 @@ export default async function ServerInterfacePage({
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
-            <ChatConfigForm serverId={id} chatConfig={data} />
+            {/* <ChatConfigForm serverId={id} chatConfig={data} /> */}
           </Card>
         </TabsContent>
       </Tabs>

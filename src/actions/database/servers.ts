@@ -9,7 +9,11 @@ import { PaginationState } from "@tanstack/react-table";
 export async function getServers(): Promise<ServerResponse<Servers[]>> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
-    return await db.servers.findMany();
+    return await db.servers.findMany({
+      where: {
+        deletedAt: null,
+      }
+    });
   });
 }
 
@@ -24,11 +28,17 @@ export async function getServersPaginated(
       skip: pagination.pageIndex * pagination.pageSize,
       take: pagination.pageSize,
       orderBy: { [sorting.field]: sorting.order },
-      where: filter ? { name: { contains: filter } } : undefined,
+      where: {
+        deletedAt: null,
+        ...(filter ? { name: { contains: filter } } : {}),
+      },
     });
 
     const totalCount = await db.servers.count({
-      where: filter ? { name: { contains: filter } } : undefined,
+      where: {
+        deletedAt: null,
+        ...(filter ? { name: { contains: filter } } : {}),
+      }
     });
 
     return {
