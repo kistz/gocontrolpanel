@@ -1,4 +1,5 @@
 import { Maps } from "@/lib/prisma/generated";
+import { SMapInfo } from "./gbx/map";
 
 export interface MapInfoMinimal {
   Name: string;
@@ -13,27 +14,7 @@ export interface MapInfoMinimal {
   MapStyle: string;
 }
 
-export interface MapInfo {
-  Name: string;
-  UId: string;
-  FileName: string;
-  Author: string;
-  AuthorNickname: string;
-  Environnement: string;
-  Mood: string;
-  BronzeTime: number;
-  SilverTime: number;
-  GoldTime: number;
-  AuthorTime: number;
-  CopperPrice: number;
-  LapRace: boolean;
-  NbLaps: number;
-  NbCheckpoints: number;
-  MapType: string;
-  MapStyle: string;
-}
-
-export interface LocalMapInfo extends MapInfo {
+export interface LocalMapInfo extends SMapInfo {
   Path: string;
 }
 

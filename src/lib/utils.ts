@@ -233,3 +233,23 @@ export function generateRandomString(length = 16): string {
   }
   return result;
 }
+
+export function isFinalist(matchPoints: number, pointsLimit?: number): boolean {
+  if (pointsLimit === undefined) {
+    return false;
+  }
+
+  return matchPoints > pointsLimit;
+}
+
+export function isWinner(matchPoints: number, pointsLimit?: number): boolean {
+  if (pointsLimit === undefined) {
+    return false;
+  }
+
+  return matchPoints > pointsLimit;
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

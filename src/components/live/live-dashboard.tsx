@@ -1,6 +1,6 @@
 "use client";
 import { getPlayerList } from "@/actions/gbx/player";
-import { getErrorMessage, initGbxWebsocketClient } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
@@ -17,7 +17,7 @@ import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: string }) {
-  const { data: session } = useSession();
+  const { status } = useSession();
 
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
   const [liveInfo, setLiveInfo] = useState<LiveInfo | null>(null);
@@ -29,131 +29,170 @@ export default function LiveDashboard({ serverId }: { serverId: string }) {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!session) {
-      return;
-    }
+    if (status !== "authenticated") return;
 
-    const socket = initGbxWebsocketClient(
-      `/ws/live/${serverId}`);
-    wsRef.current = socket;
+    const ws = new WebSocket(`/api/ws/live/${serverId}`);
+    wsRef.current = ws;
 
-    socket.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
 
-        if (message.beginMatch) {
-          // Returns LiveInfo
-          setLiveInfo(message.beginMatch);
+      switch (data.type) {
+        case "beginMatch": {
+          const { info } = data.data;
+          setLiveInfo(info);
           setMapInfo({
-            map: message.beginMatch.currentMap,
-            mode: message.beginMatch.mode,
+            map: info.currentMap,
+            mode: info.mode,
           });
-        } else if (message.finish) {
-          // Returns ActiveRound
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: message.finish,
-            };
-          });
-        } else if (message.personalBest) {
-          // Returns LiveInfo
-          setLiveInfo(message.personalBest);
-        } else if (message.checkpoint) {
-          // Returns ActiveRound
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: message.checkpoint,
-            };
-          });
-        } else if (message.endRound) {
-          // Returns LiveInfo
-          setLiveInfo(message.endRound);
-        } else if (message.beginMap) {
-          // Returns string
-          setMapInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              map: message.beginMap,
-            };
-          });
-        } else if (message.endMap) {
-          // Returns string
-          setMapInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              map: message.endMap,
-            };
-          });
-        } else if (message.giveUp) {
-          // Returns ActiveRound
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: message.giveUp,
-            };
-          });
-        } else if (message.beginRound) {
-          // Returns ActiveRound
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: message.beginRound,
-            };
-          });
-        } else if (message.warmUpStart) {
-          // Returns LiveInfo
-          setLiveInfo(message.warmUpStart);
-        } else if (message.warmUpEnd) {
-          // Returns LiveInfo
-          setLiveInfo(message.warmUpEnd);
-        } else if (message.warmUpStartRound) {
-          // Returns LiveInfo
-          setLiveInfo(message.warmUpStartRound);
-        } else if (message.playerInfoChanged) {
-          // Returns LiveInfo
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: message.playerInfoChanged,
-            };
-          });
-        } else if (message.playerConnect) {
-          // Returns LiveInfo
-          setLiveInfo(message.playerConnect);
-        } else if (message.playerDisconnect) {
-          // Returns ActiveRound
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: message.playerDisconnect,
-            };
-          });
-        } else if (message.updatedSettings) {
-          // Returns LiveInfo
-          setLiveInfo(message.updatedSettings);
-        } else if (message.elimination) {
-          // Returns LiveInfo
-          setLiveInfo(message.elimination);
+          break;
         }
-      } catch {
-        console.error("Failed to parse message", event.data);
+        case "finish": {
+          const { round } = data.data;
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: round,
+            };
+          });
+          break;
+        }
+        case "personalBest": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
+        case "checkpoint": {
+          const { round } = data.data;
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: round,
+            };
+          });
+          break;
+        }
+        case "beginRound": {
+          const { round } = data.data;
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: round,
+            };
+          });
+          break;
+        }
+        case "endRound": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
+        case "beginMap": {
+          const { mapUid } = data.data;
+          setMapInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              map: mapUid,
+            };
+          });
+          break;
+        }
+        case "endMap": {
+          const { mapUid } = data.data;
+          setMapInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              map: mapUid,
+            };
+          });
+          break;
+        }
+        case "giveUp": {
+          const { round } = data.data;
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: round,
+            };
+          });
+          break;
+        }
+        case "warmUpStart": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
+        case "warmUpEnd": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
+        case "warmUpStartRound": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
+        case "playerInfoChanged": {
+          const { round } = data.data;
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: round,
+            };
+          });
+          break;
+        }
+        case "playerConnect": {
+          const { live } = data.data;
+          setLiveInfo(live);
+          break;
+        }
+        case "playerDisconnect": {
+          const { round } = data.data;
+          setLiveInfo((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              activeRound: round,
+            };
+          });
+          break;
+        }
+        case "updatedSettings": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
+        case "elimination": {
+          const { info } = data.data;
+          setLiveInfo(info);
+          break;
+        }
       }
     };
 
-    return () => {
-      socket.close();
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+      wsRef.current = null;
     };
-  }, [serverId, session]);
+
+    ws.onerror = (err) => {
+      console.error("WebSocket error", err);
+      ws.close();
+    };
+
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, [serverId, status]);
 
   useEffect(() => {
     if (!liveInfo?.players) {

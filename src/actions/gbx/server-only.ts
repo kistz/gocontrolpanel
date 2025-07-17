@@ -8,14 +8,12 @@ export async function syncPlayerList(
   manager: GbxClientManager,
   serverId: string,
 ) {
-  const playerList = await manager.getClient().call("GetPlayerList", 1000, 0);
+  const playerList = await manager.client.call("GetPlayerList", 1000, 0);
   if (!playerList || !Array.isArray(playerList)) {
     throw new Error("Failed to retrieve player list");
   }
 
-  const mainServerInfo = await manager
-    .getClient()
-    .call("GetMainServerPlayerInfo");
+  const mainServerInfo = await manager.client.call("GetMainServerPlayerInfo");
 
   const players: PlayerInfo[] = [];
   for (const player of playerList) {
@@ -42,7 +40,7 @@ export async function syncPlayerList(
     }
   }
 
-  manager.setActivePlayers(players);
+  manager.info.activePlayers = players;
   manager.emit("playerList", players);
 
   const redis = await getRedisClient();

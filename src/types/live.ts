@@ -14,7 +14,7 @@ export interface LiveInfo {
   isPaused: boolean;
   maps: string[];
   teams?: Record<number, Team>;
-  players?: Record<string, PlayerRound>;
+  players: Record<string, PlayerRound>;
   activeRound: ActiveRound;
 }
 
@@ -43,7 +43,7 @@ export interface PlayerRound {
 }
 
 export interface ActiveRound {
-  players?: Record<string, PlayerWaypoint>;
+  players: Record<string, PlayerWaypoint>;
 }
 
 export interface PlayerWaypoint {
@@ -52,5 +52,6 @@ export interface PlayerWaypoint {
   time: number;
   hasFinished: boolean;
   hasGivenUp: boolean;
+  isFinalist: boolean;
   checkpoint: number;
 }

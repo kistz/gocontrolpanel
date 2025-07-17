@@ -18,6 +18,6 @@ export interface ChatConfig {
 export interface ServerClientInfo {
   activeMap?: string;
   activePlayers: PlayerInfo[];
-  liveInfo?: LiveInfo;
+  liveInfo: LiveInfo;
   chat?: ChatConfig;
 }

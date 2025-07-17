@@ -1,5 +1,4 @@
-"use server";
-
+import "server-only";
 import { saveRecord } from "@/actions/database/records";
 import { Maps } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";

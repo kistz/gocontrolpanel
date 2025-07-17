@@ -43,7 +43,7 @@ export async function SOCKET(
   client.send(
     JSON.stringify({
       type: "playerList",
-      data: manager.getActivePlayers(),
+      data: manager.info.activePlayers,
     }),
   );
 

@@ -1,6 +1,13 @@
 import { onPlayerFinish } from "@/actions/gbx/listeners/records";
 import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { getPlayerInfo, syncPlayerList } from "@/actions/gbx/server-only";
+import { EndMap, SMapInfo, StartMap } from "@/types/gbx/map";
+import { PauseStatus } from "@/types/gbx/pause";
+import { SPlayerInfo } from "@/types/gbx/player";
+import { Elmination, Scores } from "@/types/gbx/scores";
+import { WarmUp, WarmUpStatus } from "@/types/gbx/warmup";
+import { GiveUp, Waypoint } from "@/types/gbx/waypoint";
+import { PlayerRound, PlayerWaypoint, Team } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { ServerClientInfo } from "@/types/server";
 import { GbxClient } from "@evotm/gbxclient";
@@ -8,12 +15,12 @@ import EventEmitter from "events";
 import "server-only";
 import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
-import { withTimeout } from "./utils";
+import { isFinalist, isWinner, sleep, withTimeout } from "./utils";
 
 export class GbxClientManager extends EventEmitter {
-  private client: GbxClient;
+  client: GbxClient;
   private serverId: string;
-  private info: ServerClientInfo;
+  info: ServerClientInfo;
   private isConnected = false;
   private reconnectTimeout: NodeJS.Timeout | null = null;
 
@@ -26,6 +33,20 @@ export class GbxClientManager extends EventEmitter {
     });
     this.info = {
       activePlayers: [],
+      liveInfo: {
+        maps: [],
+        players: {},
+        activeRound: {
+          players: {},
+        },
+        isWarmUp: false,
+        mode: "",
+        type: "",
+        currentMap: "",
+        pointsRepartition: [],
+        pauseAvailable: false,
+        isPaused: false,
+      },
     };
 
     this.client.on("disconnect", () => {
@@ -90,14 +111,14 @@ export class GbxClientManager extends EventEmitter {
     await this.client.call("SetApiVersion", "2023-04-24");
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
-    
+
     await this.client.call("ChatEnableManualRouting", false);
     this.info.chat = {
       manualRouting: false,
       messageFormat: "",
       connectMessage: "",
       disconnectMessage: "",
-    }
+    };
 
     await setupListeners(this, server.id);
     await syncPlayerList(this, server.id);
@@ -106,8 +127,8 @@ export class GbxClientManager extends EventEmitter {
     return this.client;
   }
 
-  getClient(): GbxClient {
-    return this.client;
+  getServerId(): string {
+    return this.serverId;
   }
 
   getIsConnected(): boolean {
@@ -116,10 +137,6 @@ export class GbxClientManager extends EventEmitter {
 
   getActiveMap(): string | undefined {
     return this.info.activeMap;
-  }
-
-  setActiveMap(map: string): void {
-    this.info.activeMap = map;
   }
 
   addActivePlayer(player: PlayerInfo): void {
@@ -134,18 +151,54 @@ export class GbxClientManager extends EventEmitter {
     );
   }
 
-  getActivePlayers(): PlayerInfo[] {
-    return this.info.activePlayers;
+  setActiveRoundPlayer(
+    login: string,
+    player: PlayerWaypoint | undefined,
+  ): void {
+    if (!this.info.liveInfo?.activeRound) {
+      this.info.liveInfo.activeRound = {
+        players: {},
+      };
+    }
+
+    if (player) {
+      this.info.liveInfo.activeRound.players = {
+        ...this.info.liveInfo.activeRound.players,
+        [login]: player,
+      };
+    } else {
+      delete this.info.liveInfo.activeRound.players?.[login];
+    }
   }
 
-  setActivePlayers(players: PlayerInfo[]): void {
-    this.info.activePlayers = players;
+  setTeam(teamId: number, team: Team | undefined): void {
+    if (!this.info.liveInfo.teams) {
+      this.info.liveInfo.teams = {};
+    }
+
+    if (team) {
+      this.info.liveInfo.teams[teamId] = team;
+    } else {
+      delete this.info.liveInfo.teams[teamId];
+    }
+  }
+
+  setPlayer(login: string, player: PlayerRound | undefined): void {
+    if (!this.info.liveInfo.players) {
+      this.info.liveInfo.players = {};
+    }
+
+    if (player) {
+      this.info.liveInfo.players[login] = player;
+    } else {
+      delete this.info.liveInfo.players[login];
+    }
   }
 }
 
 export async function getGbxClient(serverId: string): Promise<GbxClient> {
   const manager = await getGbxClientManager(serverId);
-  return manager.getClient();
+  return manager.client;
 }
 
 export async function getGbxClientManager(
@@ -169,35 +222,29 @@ async function setupListeners(
   manager: GbxClientManager,
   serverId: string,
 ): Promise<void> {
-  manager.getClient().removeAllListeners("callback");
-  manager.getClient().on("callback", async (method: string, data: any) => {
+  manager.client.removeAllListeners("callback");
+  manager.client.on("callback", async (method: string, data: any) => {
     switch (method) {
       case "ManiaPlanet.PlayerConnect":
-        const playerInfo = await getPlayerInfo(
-          manager.getClient(),
-          data[0],
-        );
-        manager.addActivePlayer(playerInfo);
-        manager.emit("playerConnect", playerInfo);
+        await onPlayerConnect(manager, data[0]);
         break;
       case "ManiaPlanet.PlayerDisconnect":
-        manager.removeActivePlayer(data[0]);
-        manager.emit("playerDisconnect", data[0]);
+        onPlayerDisconnect(manager, data[0]);
         break;
-      case "ManiaPlanet.PlayerInfo":
-        const changedInfo = {
-          login: data.login,
-          nickName: data.nickName,
-          playerId: data.playerId,
-          spectatorStatus: data.spectatorStatus,
-          teamId: data.teamId,
-        } as PlayerInfo;
-
-        if (!changedInfo.login) return;
-
-        manager.removeActivePlayer(changedInfo.login);
-        manager.addActivePlayer(changedInfo);
-        manager.emit("playerInfo", changedInfo);
+      case "ManiaPlanet.PlayerInfoChanged":
+        onPlayerInfoChanged(manager, data[0]);
+        break;
+      case "ManiaPlanet.BeginMap":
+        onBeginMap(manager, data[0]);
+        break;
+      case "ManiaPlanet.EndMap":
+        onEndMap(manager, data[0]);
+        break;
+      case "ManiaPlanet.BeginMatch":
+        await onBeginMatch(manager);
+        break;
+      case "ManiaPlanet.Echo":
+        await onEcho(manager, data[0]);
         break;
 
       case "ManiaPlanet.ModeScriptCallbackArray":
@@ -208,22 +255,607 @@ async function setupListeners(
 
         switch (methodName) {
           case "Maniaplanet.Podium_Start":
-            onPodiumStart(serverId);
+            onPodiumStartScript(manager, serverId);
             break;
           case "Trackmania.Event.WayPoint":
             if (params.isendrace) {
-              onPlayerFinish(serverId, params.login, params.racetime);
+              onPlayerFinishScript(manager, serverId, params);
+            } else {
+              onPlayerCheckpointScript(manager, params);
             }
             break;
           case "Maniaplanet.EndMap_Start":
-            manager.setActiveMap(params.map.uid);
-            manager.emit("endMap", params.map.uid);
+            onEndMapStartScript(manager, params);
             break;
           case "Maniaplanet.StartMap_Start":
-            manager.setActiveMap(params.map.uid);
-            manager.emit("startMap", params.map.uid);
+            onStartMapStartScript(manager, params);
+            break;
+          case "Maniaplanet.StartRound_Start":
+            await onStartRoundStartScript(manager);
+            break;
+          case "Trackmania.Scores":
+            await onScoresScript(manager, params);
+            if (params.section === "EndRound") {
+              await onEndRoundScript(manager, params);
+            }
+            break;
+          case "Trackmania.WarmUp.Status":
+            onWarmUpStatusScript(manager, params);
+            break;
+          case "Maniaplanet.Pause.Status":
+            onPauseStatusScript(manager, params);
+            break;
+          case "Trackmania.Event.GiveUp":
+            onPlayerGiveUpScript(manager, params);
+            break;
+          case "Trackmania.WarmUp.Start":
+            onWarmUpStartScript(manager);
+            break;
+          case "Trackmania.WarmUp.End":
+            onWarmUpEndScript(manager);
+            break;
+          case "Trackmania.WarmUp.StartRound":
+            await onWarmUpStartRoundScript(manager, params);
+            break;
+          case "Trackmania.Knockout.Elimination":
+            await onElimination(manager, params);
             break;
         }
     }
   });
+}
+
+async function onPlayerConnect(manager: GbxClientManager, login: string) {
+  const playerInfo = await getPlayerInfo(manager.client, login);
+  manager.addActivePlayer(playerInfo);
+  manager.emit("playerConnect", playerInfo);
+
+  manager.setPlayer(playerInfo.login, {
+    ...manager.info.liveInfo.players?.[playerInfo.login],
+    login: playerInfo.login,
+    name: playerInfo.nickName,
+    team: playerInfo.teamId,
+  });
+
+  if (playerInfo.spectatorStatus === 0) {
+    const playerWaypoint: PlayerWaypoint = {
+      login: playerInfo.login,
+      accountId: "",
+      time: 0,
+      hasFinished: false,
+      hasGivenUp: false,
+      isFinalist: false,
+      checkpoint: 0,
+    };
+
+    manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+  } else {
+    manager.setActiveRoundPlayer(playerInfo.login, undefined);
+  }
+
+  manager.emit("playerConnectInfo", manager.info.liveInfo);
+}
+
+function onPlayerDisconnect(manager: GbxClientManager, login: string) {
+  manager.removeActivePlayer(login);
+  manager.emit("playerDisconnect", login);
+
+  manager.setActiveRoundPlayer(login, undefined);
+  manager.emit("playerDisconnectInfo", manager.info.liveInfo.activeRound);
+}
+
+function onPlayerInfoChanged(
+  manager: GbxClientManager,
+  playerInfo: SPlayerInfo,
+) {
+  const changedInfo: PlayerInfo = {
+    login: playerInfo.Login,
+    nickName: playerInfo.NickName,
+    playerId: playerInfo.PlayerId,
+    spectatorStatus: playerInfo.SpectatorStatus,
+    teamId: playerInfo.TeamId,
+  };
+
+  if (!changedInfo.login) return;
+
+  manager.removeActivePlayer(changedInfo.login);
+  manager.addActivePlayer(changedInfo);
+  manager.emit("playerInfo", changedInfo);
+
+  const playerRound: PlayerRound = {
+    ...manager.info.liveInfo.players?.[changedInfo.login],
+    team: changedInfo.teamId,
+    name: changedInfo.nickName,
+  };
+
+  manager.setPlayer(changedInfo.login, playerRound);
+
+  if (playerInfo.SpectatorStatus !== 0) {
+    manager.setActiveRoundPlayer(changedInfo.login, undefined);
+  } else {
+    const playerWaypoint: PlayerWaypoint = {
+      login: changedInfo.login,
+      accountId: "",
+      time: 0,
+      hasFinished: false,
+      hasGivenUp: false,
+      isFinalist: isFinalist(
+        playerRound.matchPoints,
+        manager.info.liveInfo.pointsLimit,
+      ),
+      checkpoint: 0,
+    };
+
+    manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+  }
+
+  manager.emit("playerInfoChanged", manager.info.liveInfo.activeRound);
+}
+
+function onPodiumStartScript(manager: GbxClientManager, serverId: string) {
+  onPodiumStart(serverId);
+}
+
+function onPlayerFinishScript(
+  manager: GbxClientManager,
+  serverId: string,
+  waypoint: Waypoint,
+) {
+  onPlayerFinish(serverId, waypoint.login, waypoint.racetime);
+
+  const playerWaypoint = {
+    ...manager.info.liveInfo.activeRound?.players?.[waypoint.login],
+    login: waypoint.login,
+    accountId: waypoint.accountid,
+    time: waypoint.racetime,
+    hasFinished: true,
+    hasGivenUp: false,
+    checkpoint: waypoint.checkpointinrace + 1,
+  };
+
+  manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+  manager.emit("finish", manager.info.liveInfo?.activeRound);
+
+  if (manager.info.liveInfo?.type !== "timeattack") {
+    return;
+  }
+
+  const playerRound = manager.info.liveInfo.players?.[playerWaypoint.login];
+  if (
+    !playerRound ||
+    (playerRound.bestTime > 0 && playerRound.bestTime <= waypoint.racetime)
+  )
+    return;
+
+  manager.info.liveInfo.players[playerWaypoint.login] = {
+    ...playerRound,
+    bestTime: waypoint.racetime,
+    bestCheckpoints: waypoint.curracecheckpoints,
+  };
+
+  manager.emit("personalBest", manager.info.liveInfo);
+}
+
+function onPlayerCheckpointScript(
+  manager: GbxClientManager,
+  waypoint: Waypoint,
+) {
+  const playerWaypoint: PlayerWaypoint = {
+    ...manager.info.liveInfo.activeRound?.players?.[waypoint.login],
+    login: waypoint.login,
+    accountId: waypoint.accountid,
+    time: waypoint.racetime,
+    hasFinished: false,
+    hasGivenUp: false,
+    checkpoint: waypoint.checkpointinrace + 1,
+  };
+
+  manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+  manager.emit("checkpoint", manager.info.liveInfo?.activeRound);
+}
+
+function onEndMapStartScript(manager: GbxClientManager, endMap: EndMap) {
+  manager.info.activeMap = endMap.map.uid;
+  manager.emit("endMap", endMap.map.uid);
+}
+
+function onStartMapStartScript(manager: GbxClientManager, startMap: StartMap) {
+  manager.info.activeMap = startMap.map.uid;
+  manager.emit("startMap", startMap.map.uid);
+}
+
+async function onStartRoundStartScript(manager: GbxClientManager) {
+  const playerList: SPlayerInfo[] = await manager.client.call(
+    "GetPlayerList",
+    1000,
+    0,
+  );
+
+  manager.info.liveInfo.activeRound = {
+    players: {},
+  };
+
+  playerList.forEach((player) => {
+    if (player.SpectatorStatus === 0) {
+      const playerInfo = manager.info.liveInfo.players[player.Login];
+
+      const playerWaypoint: PlayerWaypoint = {
+        login: player.Login,
+        accountId: playerInfo.accountId,
+        time: 0,
+        hasFinished: false,
+        hasGivenUp: false,
+        isFinalist: isFinalist(
+          playerInfo.matchPoints,
+          manager.info.liveInfo.pointsLimit,
+        ),
+        checkpoint: 0,
+      };
+
+      manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+    }
+  });
+
+  manager.emit("beginRound", manager.info.liveInfo.activeRound);
+}
+
+async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
+  if (scores.useteams) {
+    scores.teams.forEach((team) => {
+      const updatedTeam: Team = {
+        ...manager.info.liveInfo.teams?.[team.id],
+        id: team.id,
+        name: team.name,
+        matchPoints: team.matchpoints,
+        roundPoints:
+          manager.info.liveInfo.type === "tmwc" ||
+          manager.info.liveInfo.type === "tmwt"
+            ? team.mappoints
+            : team.roundpoints,
+      };
+
+      manager.setTeam(team.id, updatedTeam);
+    });
+  }
+
+  scores.players.forEach((player) => {
+    const playerRound: PlayerRound = {
+      ...manager.info.liveInfo.players?.[player.login],
+      roundPoints: player.roundpoints,
+      matchPoints: player.matchpoints,
+      finalist: isFinalist(
+        player.matchpoints,
+        manager.info.liveInfo.pointsLimit,
+      ),
+      winner: isWinner(player.matchpoints, manager.info.liveInfo.pointsLimit),
+      bestTime: player.bestracetime,
+      bestCheckpoints: player.bestracecheckpoints,
+      prevTime: player.prevracetime,
+      prevCheckpoints: player.prevracecheckpoints,
+    };
+
+    manager.setPlayer(playerRound.login, playerRound);
+  });
+
+  await manager.client.callScript("Maniaplanet.Pause.GetStatus", [
+    "gocontrolpanel",
+  ]);
+
+  await sleep(300); // wait for the pause status to be updated
+
+  manager.emit("endRound", manager.info.liveInfo);
+}
+
+function onPauseStatusScript(manager: GbxClientManager, status: PauseStatus) {
+  if (status.responseid !== "gocontrolpanel") return;
+
+  manager.info.liveInfo.pauseAvailable = status.available;
+  manager.info.liveInfo.isPaused = status.active;
+}
+
+function onBeginMap(manager: GbxClientManager, mapInfo: SMapInfo) {
+  manager.info.liveInfo.currentMap = mapInfo.UId;
+
+  manager.emit("beginMap", mapInfo.UId);
+}
+
+function onEndMap(manager: GbxClientManager, mapInfo: SMapInfo) {
+  manager.emit("endMap", mapInfo.UId);
+}
+
+async function onBeginMatch(manager: GbxClientManager) {
+  await syncLiveInfo(manager);
+
+  await sleep(300);
+
+  manager.emit("beginMatch", manager.info.liveInfo);
+}
+
+function onWarmUpStatusScript(manager: GbxClientManager, status: WarmUpStatus) {
+  if (status.responseid !== "gocontrolpanel") return;
+
+  manager.info.liveInfo.isWarmUp = status.active;
+}
+
+async function onScoresScript(manager: GbxClientManager, scores: Scores) {
+  if (scores.responseid !== "gocontrolpanel") return;
+
+  if (scores.useteams) {
+    scores.teams.forEach((team) => {
+      const updatedTeam: Team = {
+        id: team.id,
+        name: team.name,
+        matchPoints: team.matchpoints,
+        roundPoints:
+          manager.info.liveInfo.type === "tmwc" ||
+          manager.info.liveInfo.type === "tmwt"
+            ? team.mappoints
+            : team.roundpoints,
+      };
+
+      manager.setTeam(team.id, updatedTeam);
+    });
+  }
+
+  scores.players.forEach((player) => {
+    const playerRound: PlayerRound = {
+      login: player.login,
+      accountId: player.accountid,
+      name: player.name,
+      team: player.team,
+      rank: player.rank,
+      finalist: isFinalist(
+        player.matchpoints,
+        manager.info.liveInfo.pointsLimit,
+      ),
+      winner: isWinner(player.matchpoints, manager.info.liveInfo.pointsLimit),
+      eliminated: false,
+      roundPoints: player.roundpoints,
+      matchPoints: player.matchpoints,
+      bestTime: player.bestracetime,
+      bestCheckpoints: player.bestracecheckpoints,
+      prevTime: player.prevracetime,
+      prevCheckpoints: player.prevracecheckpoints,
+    };
+
+    manager.setPlayer(playerRound.login, playerRound);
+  });
+
+  const playerList: SPlayerInfo[] = await manager.client.call(
+    "GetPlayerList",
+    1000,
+    0,
+  );
+
+  manager.info.liveInfo.activeRound = {
+    players: {},
+  };
+
+  playerList.forEach((player) => {
+    if (player.SpectatorStatus === 0) {
+      const playerInfo = manager.info.liveInfo.players[player.Login];
+
+      const playerWaypoint: PlayerWaypoint = {
+        login: player.Login,
+        accountId: playerInfo.accountId,
+        time: 0,
+        hasFinished: false,
+        hasGivenUp: false,
+        isFinalist: playerInfo.finalist,
+        checkpoint: 0,
+      };
+
+      manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+    }
+  });
+}
+
+async function syncLiveInfo(manager: GbxClientManager) {
+  await manager.client.callScript("Trackmania.WarmUp.GetStatus", [
+    "gocontrolpanel",
+  ]);
+
+  const mode = await manager.client.call("GetScriptName");
+  const currentMode: string = mode.CurrentValue;
+
+  manager.info.liveInfo.mode = currentMode;
+  const modeLower = currentMode.toLowerCase();
+
+  const types = [
+    "timeattack",
+    "rounds",
+    "cup",
+    "tmwc",
+    "tmwt",
+    "teams",
+    "knockout",
+  ] as const;
+
+  const matched = types.find((t) => modeLower.includes(t));
+  manager.info.liveInfo.type = matched ?? "rounds";
+
+  const mapInfo = await manager.client.call("GetCurrentMapInfo");
+
+  manager.info.liveInfo.currentMap = mapInfo.UId;
+
+  await setScriptSettings(manager);
+
+  const mapList = await manager.client.call("GetMapList", 1000, 0);
+  manager.info.liveInfo.maps = mapList.map((map: SMapInfo) => map.UId);
+
+  await manager.client.callScript("Trackmania.GetScores", ["gocontrolpanel"]);
+  await manager.client.callScript("Maniaplanet.Pause.GetStatus", [
+    "gocontrolpanel",
+  ]);
+}
+
+async function setScriptSettings(manager: GbxClientManager) {
+  const scriptSettings = await manager.client.call("GetModeScriptSettings");
+
+  const type = manager.info.liveInfo.type;
+  let plVar = "S_PointsLimit";
+  let mlVar = "S_MapsPerMatch";
+  let prVar = "S_PointsRepartition";
+
+  if (type === "tmwc" || type === "tmwt") {
+    plVar = "S_MapPointsLimit";
+    mlVar = "S_MatchPointsLimit";
+  }
+
+  if (type === "knockout") {
+    prVar = "S_EliminatedPlayersNbRanks";
+  }
+
+  // Points limit
+  const pointsLimit = Number(scriptSettings[plVar]);
+  if (!isNaN(pointsLimit) && pointsLimit > 0) {
+    manager.info.liveInfo.pointsLimit = pointsLimit;
+  } else {
+    console.debug(
+      "PointsLimit not found or invalid for server",
+      manager.getServerId(),
+    );
+  }
+
+  // Rounds limit
+  const roundsLimit = Number(scriptSettings["S_RoundsPerMap"]);
+  if (!isNaN(roundsLimit) && roundsLimit > 0) {
+    manager.info.liveInfo.roundsLimit = roundsLimit;
+  } else {
+    console.debug(
+      "RoundsLimit not found or invalid for server",
+      manager.getServerId(),
+    );
+  }
+
+  // Map limit
+  const mapLimit = Number(scriptSettings[mlVar]);
+  if (!isNaN(mapLimit) && mapLimit > 0) {
+    manager.info.liveInfo.mapLimit = mapLimit;
+  } else {
+    console.debug(
+      "MapLimit not found or invalid for server",
+      manager.getServerId(),
+    );
+  }
+
+  // Number of winners
+  const nbWinners = Number(scriptSettings["S_NbOfWinners"]);
+  if (!isNaN(nbWinners) && nbWinners > 0) {
+    manager.info.liveInfo.nbWinners = nbWinners;
+  } else {
+    console.debug(
+      "NbOfWinners not found or invalid for server",
+      manager.getServerId(),
+    );
+  }
+
+  // Points repartition
+  const pointsRepartition = scriptSettings[prVar];
+  if (typeof pointsRepartition === "string" && pointsRepartition.length > 0) {
+    const list = pointsRepartition
+      .split(",")
+      .map((x: string) => parseInt(x.trim(), 10))
+      .filter((x) => !isNaN(x));
+    manager.info.liveInfo.pointsRepartition = list;
+  } else {
+    console.debug(
+      "PointsRepartition not found or invalid for server",
+      manager.getServerId(),
+    );
+  }
+}
+
+function onPlayerGiveUpScript(manager: GbxClientManager, giveUp: GiveUp) {
+  const playerWaypoint: PlayerWaypoint = {
+    ...manager.info.liveInfo.activeRound?.players?.[giveUp.login],
+    hasGivenUp: true,
+  };
+
+  manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+  manager.emit("giveUp", manager.info.liveInfo?.activeRound);
+}
+
+function onWarmUpStartScript(manager: GbxClientManager) {
+  manager.info.liveInfo.isWarmUp = true;
+  manager.emit("warmUpStart", manager.info.liveInfo);
+}
+
+function onWarmUpEndScript(manager: GbxClientManager) {
+  manager.info.liveInfo.isWarmUp = false;
+  manager.emit("warmUpEnd", manager.info.liveInfo);
+}
+
+async function onWarmUpStartRoundScript(
+  manager: GbxClientManager,
+  warmUp: WarmUp,
+) {
+  manager.info.liveInfo.isWarmUp = true;
+  manager.info.liveInfo.warmUpRound = warmUp.current;
+  manager.info.liveInfo.warmUpTotalRounds = warmUp.total;
+
+  const playerList: SPlayerInfo[] = await manager.client.call(
+    "GetPlayerList",
+    1000,
+    0,
+  );
+
+  manager.info.liveInfo.activeRound = {
+    players: {},
+  };
+
+  playerList.forEach((player) => {
+    if (player.SpectatorStatus === 0) {
+      const playerInfo = manager.info.liveInfo.players[player.Login];
+
+      const playerWaypoint: PlayerWaypoint = {
+        login: player.Login,
+        accountId: playerInfo.accountId,
+        time: 0,
+        hasFinished: false,
+        hasGivenUp: false,
+        isFinalist: isFinalist(
+          playerInfo.matchPoints,
+          manager.info.liveInfo.pointsLimit,
+        ),
+        checkpoint: 0,
+      };
+
+      manager.setActiveRoundPlayer(playerWaypoint.login, playerWaypoint);
+    }
+  });
+
+  manager.emit("warmUpStartRound", manager.info.liveInfo);
+}
+
+async function onEcho(
+  manager: GbxClientManager,
+  echo: {
+    Internal: string;
+    Public: string;
+  },
+) {
+  if (echo.Internal === "UpdatedSettings") {
+    await setScriptSettings(manager);
+    manager.emit("updatedSettings", manager.info.liveInfo);
+  }
+}
+
+async function onElimination(manager: GbxClientManager, elimination: Elmination) {
+  elimination.accountids.forEach((accountId) => {
+    const player = Object.values(manager.info.liveInfo.players).find(
+      (p) => p.accountId === accountId,
+    );
+
+    if (player) {
+      const playerRound: PlayerRound = {
+        ...manager.info.liveInfo.players?.[player.login],
+        eliminated: true,
+      };
+
+      manager.setPlayer(playerRound.login, playerRound);
+    }
+  });
+
+  manager.emit("elimination", manager.info.liveInfo);
 }
