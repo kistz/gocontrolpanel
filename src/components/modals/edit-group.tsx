@@ -1,5 +1,5 @@
 "use client";
-import { GroupsWithUsers } from "@/actions/database/groups";
+import { GroupsWithUsersWithServers } from "@/actions/database/groups";
 import EditGroupForm from "@/forms/admin/group/edit-group-form";
 import { Servers, Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
@@ -11,7 +11,7 @@ export default function EditGroupModal({
   closeModal,
   data,
 }: DefaultModalProps<{
-  group: GroupsWithUsers;
+  group: GroupsWithUsersWithServers;
   servers: Servers[];
   users: Users[];
 }>) {

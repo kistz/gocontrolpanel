@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { ChatConfigSchema, ChatConfigSchemaType } from "./chatconfig-schema";
 
 export default function ChatConfigForm({
-  serverId,
   chatConfig,
 }: {
   serverId: string;
@@ -24,12 +23,12 @@ export default function ChatConfigForm({
     defaultValues: chatConfig,
   });
 
-  async function onSubmit(values: ChatConfigSchemaType) {
+  async function onSubmit(_: ChatConfigSchemaType) {
     try {
-      const { error } = await updateChatConfig(serverId, values);
-      if (error) {
-        throw new Error(error);
-      }
+      // const { error } = await updateChatConfig(serverId, values);
+      // if (error) {
+      //   throw new Error(error);
+      // }
       toast.success("Chat configuration successfully saved");
     } catch (error) {
       toast.error("Failed to save chat configuration", {

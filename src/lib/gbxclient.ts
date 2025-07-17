@@ -120,14 +120,10 @@ export class GbxClientManager extends EventEmitter {
       disconnectMessage: "",
     };
 
-    console.log("setupListeners");
     await setupListeners(this, server.id);
-    console.log("syncPlayers");
     await syncPlayerList(this, server.id);
-    console.log("syncMap");
     await syncMap(this, server.id);
 
-    console.log("sync live");
     await syncLiveInfo(this);
 
     return this.client;
@@ -543,9 +539,10 @@ async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
     manager.setPlayer(playerRound.login, playerRound);
   });
 
-  await manager.client.callScript("Maniaplanet.Pause.GetStatus", [
+  await manager.client.callScript(
+    "Maniaplanet.Pause.GetStatus",
     "gocontrolpanel",
-  ]);
+  );
 
   await sleep(300); // wait for the pause status to be updated
 
@@ -657,17 +654,16 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
 }
 
 async function syncLiveInfo(manager: GbxClientManager) {
-  await manager.client.callScript("Trackmania.WarmUp.GetStatus", [
+  await manager.client.callScript(
+    "Trackmania.WarmUp.GetStatus",
     "gocontrolpanel",
-  ]);
+  );
 
   const mode = await manager.client.call("GetScriptName");
   const currentMode: string = mode.CurrentValue;
 
   manager.info.liveInfo.mode = currentMode;
   const modeLower = currentMode.toLowerCase();
-
-  console.log(modeLower);
 
   const types = [
     "timeattack",
@@ -691,10 +687,11 @@ async function syncLiveInfo(manager: GbxClientManager) {
   const mapList = await manager.client.call("GetMapList", 1000, 0);
   manager.info.liveInfo.maps = mapList.map((map: SMapInfo) => map.UId);
 
-  await manager.client.callScript("Trackmania.GetScores", ["gocontrolpanel"]);
-  await manager.client.callScript("Maniaplanet.Pause.GetStatus", [
+  await manager.client.callScript("Trackmania.GetScores", "gocontrolpanel");
+  await manager.client.callScript(
+    "Maniaplanet.Pause.GetStatus",
     "gocontrolpanel",
-  ]);
+  );
 }
 
 async function setScriptSettings(manager: GbxClientManager) {
