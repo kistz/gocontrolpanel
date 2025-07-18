@@ -14,23 +14,10 @@ import {
 import { PaginationState } from "@tanstack/react-table";
 import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
 
-export async function getAllMaps(): Promise<ServerResponse<Maps[]>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const maps = await db.maps.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
-
-    return await checkAndUpdateMapsInfoIfNeeded(maps);
-  });
-}
-
 export async function getMapByUid(
   uid: string,
 ): Promise<ServerResponse<Maps | null>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth([], async () => {
     const db = getClient();
     const map = await db.maps.findFirst({
       where: { uid, deletedAt: null },
@@ -46,21 +33,11 @@ export async function getMapByUid(
   });
 }
 
-export async function getMapCount(): Promise<ServerResponse<number>> {
-  return doServerAction(async () => {
-    const db = getClient();
-    const count = await db.maps.count({
-      where: { deletedAt: null },
-    });
-    return count;
-  });
-}
-
 export async function getMapsPaginated(
   pagination: PaginationState,
   sorting: { field: string; order: "asc" | "desc" },
 ): Promise<ServerResponse<PaginationResponse<Maps>>> {
-  return doServerAction(async () => {
+  return doServerActionWithAuth([], async () => {
     const db = getClient();
     const totalCount = await db.maps.count({
       where: { deletedAt: null },

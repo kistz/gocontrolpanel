@@ -114,3 +114,29 @@ export async function checkAndUpdateMapsInfoIfNeeded(
 
   return maps.map((map) => updatedMapByUid.get(map.uid) ?? map);
 }
+
+export async function syncAllMaps(): Promise<Maps[]> {
+  const db = getClient();
+  const maps = await db.maps.findMany({
+    where: {
+      deletedAt: null,
+    },
+  });
+
+  return await checkAndUpdateMapsInfoIfNeeded(maps);
+}
+
+export async function getMapByUid(uid: string): Promise<Maps | null> {
+  const db = getClient();
+  const map = await db.maps.findFirst({
+    where: { uid, deletedAt: null },
+  });
+
+  if (!map) {
+    return null;
+  }
+
+  const [updatedMap] = await checkAndUpdateMapsInfoIfNeeded([map]);
+
+  return updatedMap;
+}

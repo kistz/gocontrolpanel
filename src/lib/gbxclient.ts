@@ -1,6 +1,5 @@
 import { onPlayerFinish } from "@/actions/gbx/listeners/records";
-import { onPodiumStart, syncMap } from "@/actions/gbx/map";
-import { getPlayerInfo, syncPlayerList } from "@/actions/gbx/server-only";
+import { getPlayerInfo, onPodiumStart, syncMap, syncPlayerList } from "@/actions/gbx/server-only";
 import { EndMap, SMapInfo, StartMap } from "@/types/gbx/map";
 import { PauseStatus } from "@/types/gbx/pause";
 import { PlayerChat, SPlayerInfo } from "@/types/gbx/player";
@@ -127,7 +126,7 @@ export class GbxClientManager extends EventEmitter {
     };
 
     await setupListeners(this, server.id);
-    await syncPlayerList(this, server.id);
+    await syncPlayerList(this);
     await syncMap(this, server.id);
 
     await syncLiveInfo(this);
@@ -440,7 +439,7 @@ function onPlayerInfoChanged(
   manager.emit("playerInfoChanged", manager.info.liveInfo.activeRound);
 }
 
-function onPodiumStartScript(manager: GbxClientManager, serverId: string) {
+function onPodiumStartScript(_: GbxClientManager, serverId: string) {
   onPodiumStart(serverId);
 }
 

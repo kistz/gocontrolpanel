@@ -1,4 +1,4 @@
-import { getAllMaps } from "./actions/database/maps";
+import { syncAllMaps } from "./actions/database/gbx";
 import { authenticate, getTokens } from "./lib/api/nadeo";
 
 export async function register() {
@@ -6,5 +6,5 @@ export async function register() {
   if (!tokens) {
     await authenticate();
   }
-  getAllMaps();
+  syncAllMaps();
 }
