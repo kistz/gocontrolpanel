@@ -246,7 +246,10 @@ async function setupListeners(
         await onBeginMatch(manager);
         break;
       case "ManiaPlanet.Echo":
-        await onEcho(manager, data[0]);
+        await onEcho(manager, {
+          Internal: data[0],
+          Public: data[1],
+        });
         break;
 
       case "ManiaPlanet.ModeScriptCallbackArray":

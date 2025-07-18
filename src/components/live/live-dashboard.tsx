@@ -36,8 +36,6 @@ export default function LiveDashboard({ serverId }: { serverId: string }) {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
-      console.log(liveInfo)
 
       switch (data.type) {
         case "beginMatch": {

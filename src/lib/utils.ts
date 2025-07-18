@@ -7,8 +7,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatTime(time: number): string {
-  if (time <= 0) {
+export function formatTime(time?: number): string {
+  if (!time || time <= 0) {
     return "--:--.---";
   }
 
@@ -239,7 +239,7 @@ export function isFinalist(matchPoints: number, pointsLimit?: number): boolean {
     return false;
   }
 
-  return matchPoints > pointsLimit;
+  return matchPoints == pointsLimit;
 }
 
 export function isWinner(matchPoints: number, pointsLimit?: number): boolean {
