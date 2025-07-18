@@ -16,6 +16,7 @@ declare module "next-auth" {
       accountId: string;
       ubiId: string;
       login: string;
+      permissions: string[];
       groups: UserGroup[];
       projects: UserProject[];
     };
@@ -36,6 +37,7 @@ declare module "next-auth/jwt" {
     displayName: string;
     admin: boolean;
     ubiId: string;
+    permissions: string[];
     groups: UserGroup[];
     projects: UserProject[];
   }

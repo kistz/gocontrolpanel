@@ -17,6 +17,7 @@ import { IncomingMessage } from "node:http";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
+import { getList } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -85,6 +86,7 @@ export const authOptions: NextAuthOptions = {
         displayName: token.displayName,
         admin: token.admin,
         ubiId: token.ubiId,
+        permissions: token.permissions,
         groups: token.groups,
         projects: token.projects,
       };
@@ -96,7 +98,7 @@ export const authOptions: NextAuthOptions = {
       try {
         if (user) {
           const login = slugid.encode(user.accountId);
-          
+
           token.accountId = user.accountId;
           token.login = login;
           token.displayName = user.displayName;
@@ -140,6 +142,7 @@ export const authOptions: NextAuthOptions = {
       token.id = dbUser.id;
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid;
+      token.permissions = getList(dbUser.permissions);
       token.groups = dbUser.groupMembers.map((g) => ({
         id: g.group.id,
         name: g.group.name,
@@ -171,26 +174,20 @@ export function auth(
   return getServerSession(...args, authOptions);
 }
 
-export async function withAuth(roles?: string[]): Promise<Session> {
+export async function withAuth(roles?: string[], id = ""): Promise<Session> {
   const session = await auth();
   if (!session) {
     throw new Error("Not authenticated");
   }
 
-  // If no roles are specified, only allow admin users
+  if (session.user.admin) return session;
+
   if (!roles || roles.length === 0) {
-    if (!session.user.admin) {
-      throw new Error("Unauthorized");
-    }
-    return session;
+    throw new Error("Unauthorized");
   }
 
-  let userRoles: string[] = [];
-
-  if (session.user.admin) {
-    userRoles.push("app:admin");
-  }
-
+  let userRoles = session.user.permissions;
+  
   session.user.groups.forEach((group) => {
     userRoles.push(`group:${group.id}:${group.role.toLowerCase()}`);
     group.servers.forEach((server) => {
@@ -201,6 +198,8 @@ export async function withAuth(roles?: string[]): Promise<Session> {
   session.user.projects.forEach((project) => {
     userRoles.push(`project:${project.id}:${project.role.toLowerCase()}`);
   });
+
+  roles = roles.map((role) => role.replace(":id", `:${id}`));
 
   if (!roles.some((role) => userRoles.includes(role))) {
     throw new Error("Unauthorized");
