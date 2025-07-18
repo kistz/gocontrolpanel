@@ -1,9 +1,10 @@
 "use client";
 import { createGroup } from "@/actions/database/groups";
+import { UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Servers, Users } from "@/lib/prisma/generated";
+import { GroupRole, Servers } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -17,7 +18,7 @@ export default function AddGroupForm({
   callback,
 }: {
   servers: Servers[];
-  users: Users[];
+  users: UserMinimal[];
   callback?: () => void;
 }) {
   const form = useForm<AddGroupSchemaType>({

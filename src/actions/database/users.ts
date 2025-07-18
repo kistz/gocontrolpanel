@@ -2,6 +2,7 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Users } from "@/lib/prisma/generated";
+import { getList } from "@/lib/utils";
 import {
   PaginationResponse,
   ServerError,
@@ -9,12 +10,22 @@ import {
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
-export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
+export type UserMinimal = Pick<
+  Users,
+  "id" | "login" | "nickName"
+>;
+
+export async function getAllUsers(): Promise<ServerResponse<UserMinimal[]>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
     const users = await db.users.findMany({
       where: {
         deletedAt: null,
+      },
+      select: {
+        id: true,
+        login: true,
+        nickName: true,
       },
     });
 
@@ -27,7 +38,7 @@ export async function getUsersPaginated(
   sorting: { field: string; order: 'asc' | 'desc' },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["app:admin"], async () => {
     const db = getClient();
 
     const totalCount = await db.users.count({
@@ -84,7 +95,7 @@ export async function updateUser(
     | "deletedAt"
   >,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth(["app:admin"], async () => {
     const db = getClient();
 
     const existingUser = await db.users.findUniqueOrThrow({
@@ -103,16 +114,14 @@ export async function updateUser(
       where: { id: userId },
       data: {
         ...data,
-        admin: data.admin,
-        updatedAt: new Date(),
-        deletedAt: null,
+        permissions: getList(data.permissions),
       },
     });
   });
 }
 
 export async function deleteUserById(userId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async (session) => {
+  return doServerActionWithAuth(["app:admin"], async (session) => {
     if (userId === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }

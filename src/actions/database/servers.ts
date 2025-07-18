@@ -133,11 +133,14 @@ export async function updateServerChatConfig(
 ): Promise<ServerResponse<Servers>> {
   return doServerActionWithAuth(["admin"], async () => {
     const manager = await getGbxClientManager(serverId);
-    const canManualRoute = await manager.client.call(
-      "ChatEnableManualRouting",
-      chatConfig.manualRouting,
-    );
-    if (!canManualRoute) {
+    let err;
+    try {
+      await manager.client.call(
+        "ChatEnableManualRouting",
+        chatConfig.manualRouting,
+      );
+    } catch (e) {
+      err = e;
       chatConfig.manualRouting = false;
     }
 
@@ -149,8 +152,8 @@ export async function updateServerChatConfig(
 
     manager.info.chat = chatConfig;
 
-    if (!canManualRoute) {
-      throw new Error("Failed to update manual routing setting.");
+    if (err) {
+      throw err;
     }
 
     return updatedServer;

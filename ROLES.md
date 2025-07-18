@@ -1,0 +1,9 @@
+- Application
+  - Users
+    - View
+      - Admin
+    - Edit
+      - Admin
+    - Delete
+      - Admin
+  - Groups

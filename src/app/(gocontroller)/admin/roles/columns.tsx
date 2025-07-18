@@ -1,11 +1,8 @@
 "use client";
-import {
-  deleteHetznerProject,
-  HetznerProjectsWithUsers,
-} from "@/actions/database/hetzner-projects";
-import { UserMinimal } from "@/actions/database/users";
+
+import { deleteRole } from "@/actions/database/roles";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditProjectModal from "@/components/modals/edit-project";
+import EditRoleModal from "@/components/modals/edit-role";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -15,44 +12,50 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
+import { Roles } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const createColumns = (
-  refetch: () => void,
-  data: {
-    users: UserMinimal[];
-  },
-): ColumnDef<HetznerProjectsWithUsers>[] => [
+export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project Name" />
+      <DataTableColumnHeader column={column} title={"Name"} />
     ),
   },
   {
-    accessorKey: "apiTokens",
-    header: "API Tokens",
-    cell: ({ row }) => (
-      <span>{(row.getValue("apiTokens") as string[])?.length}</span>
-    ),
-  },
-  {
-    accessorKey: "_count.hetznerProjectUsers",
+    accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Users" />
+      <DataTableColumnHeader column={column} title={"Description"} />
     ),
+  },
+  {
+    accessorKey: "permissions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Permissions"} />
+    ),
+    cell: ({ row }) => {
+      const permissions = row.getValue("permissions") as string[];
+
+      return (
+        <span className="truncate">
+          {permissions.map((perm: string, index: number) => (
+            <span key={index} className="mr-1">
+              {perm}
+              {index < permissions.length - 1 ? ", " : ""}
+            </span>
+          ))}
+        </span>
+      );
+    },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const project = row.original;
-      const router = useRouter();
+      const role = row.original;
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
@@ -60,14 +63,14 @@ export const createColumns = (
       const handleDelete = () => {
         startTransition(async () => {
           try {
-            const { error } = await deleteHetznerProject(project.id);
+            const { error } = await deleteRole(role.id);
             if (error) {
               throw new Error(error);
             }
             refetch();
-            toast.success("Project successfully deleted");
+            toast.success("Role successfully deleted");
           } catch (error) {
-            toast.error("Error deleting project", {
+            toast.error("Error deleting role", {
               description: getErrorMessage(error),
             });
           }
@@ -84,20 +87,14 @@ export const createColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => router.push(`/admin/hetzner/${project.id}`)}
-              >
-                View Project
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit project
+                Edit role
               </DropdownMenuItem>
-              <Separator />
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsOpen(true)}
               >
-                Delete project
+                Delete role
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -106,8 +103,8 @@ export const createColumns = (
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onConfirm={handleDelete}
-            title="Delete project"
-            description={`Are you sure you want to delete ${project.name}? Deleting a project does not delete the servers in it. You can manage those servers again when you create a new project with the same API Token.`}
+            title="Delete role"
+            description={`Are you sure you want to delete ${role.name}?`}
             confirmText="Delete"
             cancelText="Cancel"
           />
@@ -117,12 +114,7 @@ export const createColumns = (
             setIsOpen={setIsEditOpen}
             onClose={() => refetch()}
           >
-            <EditProjectModal
-              data={{
-                project,
-                users: data.users,
-              }}
-            />
+            <EditRoleModal data={role} />
           </Modal>
         </div>
       );

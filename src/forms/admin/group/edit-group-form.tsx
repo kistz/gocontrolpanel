@@ -3,10 +3,11 @@ import {
   GroupsWithUsersWithServers,
   updateGroup,
 } from "@/actions/database/groups";
+import { UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Servers, Users } from "@/lib/prisma/generated";
+import { GroupRole, Servers } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconTrash } from "@tabler/icons-react";
@@ -22,7 +23,7 @@ export default function EditGroupForm({
 }: {
   group: GroupsWithUsersWithServers;
   servers: Servers[];
-  users: Users[];
+  users: UserMinimal[];
   callback?: () => void;
 }) {
   const form = useForm<EditGroupSchemaType>({

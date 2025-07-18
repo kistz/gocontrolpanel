@@ -37,12 +37,14 @@ model Maps {
 }
 
 model Users {
-  id                  String               @id @default(uuid())
-  login               String
-  nickName            String
-  path                String
-  admin               Boolean              @default(false)
-  ubiUid              String
+  id          String   @id @default(uuid())
+  login       String
+  nickName    String
+  path        String
+  admin       Boolean  @default(false)
+  ubiUid      String
+  permissions String[] @default([])
+
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]
 
@@ -153,7 +155,7 @@ enum HetznerProjectRole {
 }
 
 model Servers {
-  id             String @id @default(uuid())
+  id             String  @id @default(uuid())
   name           String
   description    String
   host           String
@@ -187,4 +189,18 @@ model GroupServers {
 
   @@id([groupId, serverId])
   @@map("group_servers")
+}
+
+model Roles {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  permissions String[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("roles")
 }

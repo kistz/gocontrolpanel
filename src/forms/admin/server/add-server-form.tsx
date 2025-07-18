@@ -12,6 +12,9 @@ import { AddServerSchema, AddServerSchemaType } from "./add-server-schema";
 export default function AddServerForm({ callback }: { callback?: () => void }) {
   const form = useForm<AddServerSchemaType>({
     resolver: zodResolver(AddServerSchema),
+    defaultValues: {
+      port: 5000,
+    }
   });
 
   async function onSubmit(values: AddServerSchemaType) {

@@ -4,7 +4,7 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Users } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ export default function EditUserForm({
     try {
       const { error } = await updateUser(user.id, {
         admin: values.admin,
+        permissions: getList(values.permissions),
       });
       if (error) {
         throw new Error(error);

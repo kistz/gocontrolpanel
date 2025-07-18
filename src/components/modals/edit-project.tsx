@@ -1,7 +1,7 @@
 "use client";
 import { HetznerProjectsWithUsers } from "@/actions/database/hetzner-projects";
+import { UserMinimal } from "@/actions/database/users";
 import EditProjectForm from "@/forms/admin/hetzner/edit-project-form";
-import { Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { Card } from "../ui/card";
@@ -12,7 +12,7 @@ export default function EditProjectModal({
   data,
 }: DefaultModalProps<{
   project: HetznerProjectsWithUsers;
-  users: Users[];
+  users: UserMinimal[];
 }>) {
   const { update } = useSession();
 

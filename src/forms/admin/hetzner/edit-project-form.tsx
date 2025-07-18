@@ -3,10 +3,11 @@ import {
   HetznerProjectsWithUsers,
   updateHetznerProject,
 } from "@/actions/database/hetzner-projects";
+import { UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { HetznerProjectRole, Users } from "@/lib/prisma/generated";
+import { HetznerProjectRole } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -23,7 +24,7 @@ export default function EditProjectForm({
   callback,
 }: {
   project: HetznerProjectsWithUsers;
-  users: Users[];
+  users: UserMinimal[];
   callback?: () => void;
 }) {
   const form = useForm<EditProjectSchemaType>({

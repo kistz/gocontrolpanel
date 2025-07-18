@@ -1,5 +1,9 @@
 "use client";
-import { deleteGroup, GroupsWithUsersWithServers } from "@/actions/database/groups";
+import {
+  deleteGroup,
+  GroupsWithUsersWithServers,
+} from "@/actions/database/groups";
+import { UserMinimal } from "@/actions/database/users";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditGroupModal from "@/components/modals/edit-group";
 import Modal from "@/components/modals/modal";
@@ -11,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Servers, Users } from "@/lib/prisma/generated";
+import { Servers } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -23,7 +27,7 @@ export const createColumns = (
   refetch: () => void,
   data: {
     servers: Servers[];
-    users: Users[];
+    users: UserMinimal[];
   },
 ): ColumnDef<GroupsWithUsersWithServers>[] => [
   {

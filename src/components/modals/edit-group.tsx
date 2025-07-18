@@ -1,7 +1,8 @@
 "use client";
 import { GroupsWithUsersWithServers } from "@/actions/database/groups";
+import { UserMinimal } from "@/actions/database/users";
 import EditGroupForm from "@/forms/admin/group/edit-group-form";
-import { Servers, Users } from "@/lib/prisma/generated";
+import { Servers } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { Card } from "../ui/card";
@@ -13,7 +14,7 @@ export default function EditGroupModal({
 }: DefaultModalProps<{
   group: GroupsWithUsersWithServers;
   servers: Servers[];
-  users: Users[];
+  users: UserMinimal[];
 }>) {
   const { update } = useSession();
 

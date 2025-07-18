@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
 import {
+  IconClipboardText,
   IconCloud,
   IconServerCog,
   IconUserCog,
@@ -38,6 +39,11 @@ export default async function NavAdmin() {
         name: "Groups",
         url: routes.admin.groups,
         icon: IconUsersGroup,
+      },
+      {
+        name: "Roles",
+        url: routes.admin.roles,
+        icon: IconClipboardText
       },
       {
         name: "Servers",

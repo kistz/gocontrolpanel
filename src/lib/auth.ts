@@ -86,6 +86,7 @@ export const authOptions: NextAuthOptions = {
         admin: token.admin,
         ubiId: token.ubiId,
         groups: token.groups,
+        projects: token.projects,
       };
 
       return session;
@@ -127,6 +128,7 @@ export const authOptions: NextAuthOptions = {
             admin: config.DEFAULT_ADMINS.includes(token.login),
             path: "",
             ubiUid,
+            permissions: [],
           });
         }
       }
@@ -143,6 +145,11 @@ export const authOptions: NextAuthOptions = {
         name: g.group.name,
         servers: g.group.groupServers.map((s) => s.server),
         role: g.role,
+      }));
+      token.projects = dbUser.hetznerProjectUsers.map((p) => ({
+        id: p.project.id,
+        name: p.project.name,
+        role: p.role,
       }));
 
       return token;
@@ -170,9 +177,35 @@ export async function withAuth(roles?: string[]): Promise<Session> {
     throw new Error("Not authenticated");
   }
 
-  if (roles && !session.user.admin) {
-    throw new Error("Not authorized");
+  // If no roles are specified, only allow admin users
+  if (!roles || roles.length === 0) {
+    if (!session.user.admin) {
+      throw new Error("Unauthorized");
+    }
+    return session;
   }
+
+  let userRoles: string[] = [];
+
+  if (session.user.admin) {
+    userRoles.push("app:admin");
+  }
+
+  session.user.groups.forEach((group) => {
+    userRoles.push(`group:${group.id}:${group.role.toLowerCase()}`);
+    group.servers.forEach((server) => {
+      userRoles.push(`server:${server.id}:${group.role.toLowerCase()}`);
+    });
+  });
+
+  session.user.projects.forEach((project) => {
+    userRoles.push(`project:${project.id}:${project.role.toLowerCase()}`);
+  });
+
+  if (!roles.some((role) => userRoles.includes(role))) {
+    throw new Error("Unauthorized");
+  }
+
   return session;
 }
 

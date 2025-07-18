@@ -1,24 +1,14 @@
 "use client";
-import { UserMinimal } from "@/actions/database/users";
-import AddGroupForm from "@/forms/admin/group/add-group-form";
-import { Servers } from "@/lib/prisma/generated";
+import AddRoleForm from "@/forms/admin/role/add-role-form";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddGroupModal({
-  closeModal,
-  data,
-}: DefaultModalProps<{
-  servers: Servers[];
-  users: UserMinimal[];
-}>) {
+export default function AddRoleModal({ closeModal }: DefaultModalProps) {
   const router = useRouter();
   const { update } = useSession();
-
-  if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -36,17 +26,13 @@ export default function AddGroupModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Add Group</h1>
+        <h1 className="text-xl font-bold">Add Role</h1>
         <IconX
           className="h-6 w-6 cursor-pointer text-muted-foreground"
           onClick={closeModal}
         />
       </div>
-      <AddGroupForm
-        servers={data.servers}
-        users={data.users}
-        callback={handleCallback}
-      />
+      <AddRoleForm callback={handleCallback} />
     </Card>
   );
 }

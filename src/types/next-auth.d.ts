@@ -1,6 +1,6 @@
 import "next-auth";
 import "next-auth/jwt";
-import { UserGroup } from "./auth";
+import { UserGroup, UserProject } from "./auth";
 
 declare module "next-auth" {
   interface User {
@@ -17,6 +17,7 @@ declare module "next-auth" {
       ubiId: string;
       login: string;
       groups: UserGroup[];
+      projects: UserProject[];
     };
     expires: ISODateString;
   }
@@ -36,5 +37,6 @@ declare module "next-auth/jwt" {
     admin: boolean;
     ubiId: string;
     groups: UserGroup[];
+    projects: UserProject[];
   }
 }
