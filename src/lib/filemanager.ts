@@ -16,7 +16,7 @@ export async function getFileManager(serverId: string): Promise<FileManager> {
 
     if (!server.filemanagerUrl) {
       return {
-        url: server.filemanagerUrl,
+        url: server.filemanagerUrl || undefined,
         health: false,
       };
     }

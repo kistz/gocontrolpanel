@@ -1,6 +1,6 @@
 import { cn, formatTime } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
-import { IconHash, IconStar, IconTrophy, IconTrophyFilled } from "@tabler/icons-react";
+import { IconHash, IconStar, IconTrophyFilled } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import {
   Table,

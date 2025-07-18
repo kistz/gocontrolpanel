@@ -39,7 +39,7 @@ export async function SOCKET(
         server: {
           id: server.id,
           name: server.name,
-          filemanagerUrl: server.filemanagerUrl,
+          filemanagerUrl: server.filemanagerUrl || undefined,
           isConnected: manager.getIsConnected(),
         },
       });

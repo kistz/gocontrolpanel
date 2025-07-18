@@ -4,19 +4,19 @@ import {
   getUserByLogin,
   UsersWithGroupsWithServers,
 } from "@/actions/database/auth";
+import { parse } from "cookie";
 import {
   GetServerSidePropsContext,
   NextApiRequest,
   NextApiResponse,
 } from "next";
 import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import { OAuthConfig } from "next-auth/providers/oauth";
+import { IncomingMessage } from "node:http";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
-import { parse } from "cookie";
-import { IncomingMessage } from "node:http";
-import { getToken } from "next-auth/jwt";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -91,41 +91,44 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      let dbUser: UsersWithGroupsWithServers | null;
-      if (user) {
-        const login = slugid.encode(user.accountId);
-        dbUser = await getUserByLogin(login);
+      let dbUser: UsersWithGroupsWithServers | null = null;
+      try {
+        if (user) {
+          const login = slugid.encode(user.accountId);
+          
+          token.accountId = user.accountId;
+          token.login = login;
+          token.displayName = user.displayName;
 
-        token.accountId = user.accountId;
-        token.login = login;
-        token.displayName = user.displayName;
-      } else {
-        dbUser = await getUserById(token.id);
-      }
-
-      if (!dbUser) {
-        let ubiUid = "";
-        try {
-          const { data: webidentities, error } = await getWebIdentities([
-            token.accountId,
-          ]);
-          if (error) {
-            throw new Error(error);
-          }
-          if (webidentities && webidentities.length > 0) {
-            ubiUid = webidentities[0].uid;
-          }
-        } catch (error) {
-          console.error("Failed to fetch web identities", error);
+          dbUser = await getUserByLogin(login);
+        } else {
+          dbUser = await getUserById(token.id);
         }
+      } catch {
+        if (!dbUser) {
+          let ubiUid = "";
+          try {
+            const { data: webidentities, error } = await getWebIdentities([
+              token.accountId,
+            ]);
+            if (error) {
+              throw new Error(error);
+            }
+            if (webidentities && webidentities.length > 0) {
+              ubiUid = webidentities[0].uid;
+            }
+          } catch (error) {
+            console.error("Failed to fetch web identities", error);
+          }
 
-        dbUser = await createUserAuth({
-          login: token.login,
-          nickName: token.displayName,
-          admin: config.DEFAULT_ADMINS.includes(token.login),
-          path: "",
-          ubiUid,
-        });
+          dbUser = await createUserAuth({
+            login: token.login,
+            nickName: token.displayName,
+            admin: config.DEFAULT_ADMINS.includes(token.login),
+            path: "",
+            ubiUid,
+          });
+        }
       }
 
       if (!dbUser) {

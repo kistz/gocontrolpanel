@@ -64,7 +64,7 @@ export async function getUserByLogin(
   login: string,
 ): Promise<UsersWithGroupsWithServers> {
   const db = getClient();
-  const user = await db.users.findFirstOrThrow({
+  const user = await db.users.findUniqueOrThrow({
     where: {
       login,
       deletedAt: null,

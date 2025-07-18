@@ -2,7 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { getGbxClient, getGbxClientManager } from "@/lib/gbxclient";
+import { getGbxClientManager } from "@/lib/gbxclient";
 import { Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
