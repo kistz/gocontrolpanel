@@ -1,8 +1,10 @@
 "use client";
 
+import { updateServerChatConfig } from "@/actions/database/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Servers } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -11,24 +13,38 @@ import { toast } from "sonner";
 import { ChatConfigSchema, ChatConfigSchemaType } from "./chatconfig-schema";
 
 export default function ChatConfigForm({
+  serverId,
   chatConfig,
 }: {
   serverId: string;
-  chatConfig: ChatConfigSchemaType;
+  chatConfig: Pick<
+    Servers,
+    "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
+  >;
 }) {
   const session = useSession();
 
   const form = useForm<ChatConfigSchemaType>({
     resolver: zodResolver(ChatConfigSchema),
-    defaultValues: chatConfig,
+    defaultValues: {
+      manualRouting: chatConfig.manualRouting,
+      messageFormat: chatConfig.messageFormat ?? "",
+      connectMessage: chatConfig.connectMessage ?? "",
+      disconnectMessage: chatConfig.disconnectMessage ?? "",
+    },
   });
 
-  async function onSubmit(_: ChatConfigSchemaType) {
+  async function onSubmit(values: ChatConfigSchemaType) {
     try {
-      // const { error } = await updateChatConfig(serverId, values);
-      // if (error) {
-      //   throw new Error(error);
-      // }
+      const { error } = await updateServerChatConfig(serverId, {
+        manualRouting: values.manualRouting,
+        messageFormat: values.messageFormat ?? null,
+        connectMessage: values.connectMessage ?? null,
+        disconnectMessage: values.disconnectMessage ?? null,
+      });
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Chat configuration successfully saved");
     } catch (error) {
       toast.error("Failed to save chat configuration", {

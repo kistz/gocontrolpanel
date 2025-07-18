@@ -160,7 +160,12 @@ model Servers {
   port           Int
   user           String
   password       String
-  filemanagerUrl String
+  filemanagerUrl String?
+
+  manualRouting     Boolean @default(false)
+  messageFormat     String?
+  connectMessage    String?
+  disconnectMessage String?
 
   interfaces   Interfaces[]
   groupServers GroupServers[]

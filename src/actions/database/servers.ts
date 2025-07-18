@@ -2,6 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
+import { getGbxClient } from "@/lib/gbxclient";
 import { Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
@@ -12,7 +13,7 @@ export async function getServers(): Promise<ServerResponse<Servers[]>> {
     return await db.servers.findMany({
       where: {
         deletedAt: null,
-      }
+      },
     });
   });
 }
@@ -38,7 +39,7 @@ export async function getServersPaginated(
       where: {
         deletedAt: null,
         ...(filter ? { name: { contains: filter } } : {}),
-      }
+      },
     });
 
     return {
@@ -49,7 +50,17 @@ export async function getServersPaginated(
 }
 
 export async function createServer(
-  server: Omit<Servers, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  server: Omit<
+    Servers,
+    | "id"
+    | "manualRouting"
+    | "messageFormat"
+    | "connectMessage"
+    | "disconnectMessage"
+    | "createdAt"
+    | "updatedAt"
+    | "deletedAt"
+  >,
 ): Promise<ServerResponse<Servers>> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
@@ -62,7 +73,18 @@ export async function createServer(
 
 export async function updateServer(
   serverId: string,
-  server: Partial<Omit<Servers, "id" | "createdAt" | "updatedAt">>,
+  server: Partial<
+    Omit<
+      Servers,
+      | "id"
+      | "manualRouting"
+      | "messageFormat"
+      | "connectMessage"
+      | "disconnectMessage"
+      | "createdAt"
+      | "updatedAt"
+    >
+  >,
 ): Promise<ServerResponse<Servers>> {
   return doServerActionWithAuth(["admin"], async () => {
     const db = getClient();
@@ -70,6 +92,65 @@ export async function updateServer(
       where: { id: serverId },
       data: server,
     });
+    return updatedServer;
+  });
+}
+
+export async function getServerChatConfig(
+  serverId: string,
+): Promise<
+  ServerResponse<
+    Pick<
+      Servers,
+      "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
+    >
+  >
+> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const db = getClient();
+    const server = await db.servers.findUnique({
+      where: { id: serverId },
+      select: {
+        manualRouting: true,
+        messageFormat: true,
+        connectMessage: true,
+        disconnectMessage: true,
+      },
+    });
+    if (!server) {
+      throw new Error("Server not found");
+    }
+    return server;
+  });
+}
+
+export async function updateServerChatConfig(
+  serverId: string,
+  chatConfig: Pick<
+    Servers,
+    "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
+  >,
+): Promise<ServerResponse<Servers>> {
+  return doServerActionWithAuth(["admin"], async () => {
+    const client = await getGbxClient(serverId);
+    const canManualRoute = await client.call(
+      "ChatEnableManualRouting",
+      chatConfig.manualRouting,
+    );
+    if (!canManualRoute) {
+      chatConfig.manualRouting = false;
+    }
+
+    const db = getClient();
+    const updatedServer = await db.servers.update({
+      where: { id: serverId },
+      data: { ...chatConfig },
+    });
+
+    if (!canManualRoute) {
+      throw new Error("Failed to update manual routing setting.");
+    }
+
     return updatedServer;
   });
 }

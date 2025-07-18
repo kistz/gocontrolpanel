@@ -1,7 +1,9 @@
 import { getInterfaces } from "@/actions/database/interfaces";
+import { getServerChatConfig } from "@/actions/database/servers";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
 
 export default async function ServerInterfacePage({
   params,
@@ -10,7 +12,7 @@ export default async function ServerInterfacePage({
 }) {
   const { id } = await params;
 
-  // const { data } = await getChatConfig(id);
+  const { data } = await getServerChatConfig(id);
 
   const { data: interfaces } = await getInterfaces(id);
 
@@ -44,7 +46,7 @@ export default async function ServerInterfacePage({
         </TabsContent>
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
-            {/* <ChatConfigForm serverId={id} chatConfig={data} /> */}
+            <ChatConfigForm serverId={id} chatConfig={data} />
           </Card>
         </TabsContent>
       </Tabs>
