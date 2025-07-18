@@ -1,6 +1,5 @@
 export interface Config {
   NODE_ENV: string;
-  CONNECTOR_URL: string;
   HETZNER: {
     URL: string;
     KEY: string;

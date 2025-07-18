@@ -144,13 +144,6 @@ Make sure to update the environment variables for the services in your `docker-c
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
   - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
-- **GbxConnector Environment Variables**:
-
-  - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
-  - `JWT_SECRET`: Secret key for JWT authentication.
-  - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
-  - `DOCKER_NETWORK_RANGE`: The Docker network range to use for the containers. This is optional, but if you want to use a custom network range, you can set it here. The default is `172.16.0.0/16`.
-
 - **Dedicated Server Environment Variables**:
   - `TM_MASTERSERVER_LOGIN`: Login for the dedicated server (same as `NADEO_SERVER_LOGIN` in GoControlPanel).
   - `TM_MASTERSERVER_PASSWORD`: Password for the dedicated server (same as `NADEO_SERVER_PASSWORD` in GoControlPanel).
@@ -223,9 +216,10 @@ gocontrolpanel:
     context: ./gocontrolpanel
     dockerfile: Dockerfile
     args:
-      - CONNECTOR_URL=http://gbxconnector:6980 # Use the internal Docker network for communication
       - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
       - DB_TYPE=mysql
+  ports:
+    - 3000:3000
   restart: unless-stopped
   environment:
     NEXTAUTH_URL: http://localhost:3000
@@ -242,29 +236,6 @@ gocontrolpanel:
   depends_on:
     - db
     - redis
-
-gbxconnector:
-  image: marijnregterschot/gbxconnector:latest
-  restart: unless-stopped
-  environment:
-    PORT: 6980
-    SERVER_RECONNECT_INTERVAL: 15
-    JWT_SECRET:
-    DOCKER_NETWORK_RANGE: 172.16.0.0/16
-    LOG_LEVEL: DEBUG
-  volumes:
-    - ./gocontrolpanel/servers.json:/app/servers.json
-
-nginx:
-  image: nginx:latest
-  restart: unless-stopped
-  ports:
-    - 3000:80
-  volumes:
-    - ./gocontrolpanel/nginx.conf:/etc/nginx/nginx.conf
-  depends_on:
-    - gocontrolpanel
-    - gbxconnector
 
 filemanager:
   image: marijnregterschot/trackmania-server-fm:latest
@@ -300,30 +271,6 @@ Make sure to update the environment variables for the added services in your `do
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
   - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
-
-- **GbxConnector Environment Variables**:
-  - `SERVER_RECONNECT_INTERVAL`: Interval time in seconds for the server to reconnect.
-  - `JWT_SECRET`: Secret key for JWT authentication.
-  - `LOG_LEVEL`: Set the desired logging level (e.g., `DEBUG`).
-  - `DOCKER_NETWORK_RANGE`: The Docker network range to use for the containers. This is optional, but if you want to use a custom network range, you can set it here. The default is `172.16.0.0/16`.
-
-### 5. Modify the `servers.json` File
-
-The `servers.json` file is used by the **GbxConnector** to configure the servers it connects to. You will need to modify this file with the correct server details. Paste this configuration into your existing `servers.json` file:
-
-```json
-[
-  {
-    "id": 0,
-    "name": "Dedicated Server",
-    "host": "dedicated",
-    "xmlrpcPort": 5000,
-    "fmUrl": "http://filemanager:3300",
-    "user": "SuperAdmin",
-    "pass": "SuperAdmin"
-  }
-]
-```
 
 > **Note:** Make sure you are using the correct service name for the dedicated server. For **PyPlanet**, the service name is usually `dedicated`, and for **EvoSC**, it is `trackmania`.
 
