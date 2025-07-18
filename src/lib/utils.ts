@@ -266,3 +266,11 @@ export function formatMessage(
     .replaceAll("{message}", message);
   return msg.trim();
 }
+
+export const permissions: string[] = [
+  "test",
+  "test2",
+  "test3",
+  "test4",
+  "test5",
+] as const;

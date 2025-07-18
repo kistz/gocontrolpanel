@@ -3,15 +3,13 @@ import { createRole } from "@/actions/database/roles";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { getErrorMessage, getList } from "@/lib/utils";
+import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddRoleSchema, AddRoleSchemaType } from "./add-role-schema";
 
 export default function AddRoleForm({ callback }: { callback?: () => void }) {
-  const permissions = ["test", "test2"];
-
   const form = useForm<AddRoleSchemaType>({
     resolver: zodResolver(AddRoleSchema),
   });

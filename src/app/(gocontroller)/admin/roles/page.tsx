@@ -9,7 +9,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { createColumns } from "./columns";
 
-export default async function AdminUsersPage() {
+export default async function AdminRolesPage() {
   try {
     await withAuth(["app:admin"]);
   } catch {

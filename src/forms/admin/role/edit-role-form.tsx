@@ -4,12 +4,11 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Roles } from "@/lib/prisma/generated";
-import { getErrorMessage, getList } from "@/lib/utils";
+import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditRoleSchema, EditRoleSchemaType } from "./edit-role-schema";
-
 export default function EditRoleForm({
   role,
   callback,
@@ -17,8 +16,6 @@ export default function EditRoleForm({
   role: Roles;
   callback?: () => void;
 }) {
-  const permissions = ["test", "test2"];
-
   const form = useForm<EditRoleSchemaType>({
     resolver: zodResolver(EditRoleSchema),
     defaultValues: {

@@ -7,6 +7,16 @@ import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
+export async function getRoles(): Promise<ServerResponse<Roles[]>> {
+  return doServerActionWithAuth([], async () => {
+    const db = getClient();
+    const roles = await db.roles.findMany({
+      where: { deletedAt: null },
+    });
+    return roles;
+  });
+}
+
 export async function getRolesPaginated(
   pagination: PaginationState,
   sorting: { field: string; order: "asc" | "desc" },

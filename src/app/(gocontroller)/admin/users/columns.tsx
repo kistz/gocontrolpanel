@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Users } from "@/lib/prisma/generated";
+import { Roles, Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -22,7 +22,12 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
+export const createColumns = (
+  refetch: () => void,
+  data: {
+    roles: Roles[];
+  },
+): ColumnDef<Users>[] => [
   {
     accessorKey: "nickName",
     header: ({ column }) => (
@@ -54,6 +59,25 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
         trueIcon={IconCheck}
       />
     ),
+  },
+  {
+    accessorKey: "permissions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Permissions"} />
+    ),
+    cell: ({ row }) => {
+      const permissions = row.getValue("permissions") as string[];
+      return (
+        <span className="truncate">
+          {permissions.map((perm: string, index: number) => (
+            <span key={index} className="mr-1">
+              {perm}
+              {index < permissions.length - 1 ? ", " : ""}
+            </span>
+          ))}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "createdAt",
@@ -133,7 +157,12 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             setIsOpen={setIsEditOpen}
             onClose={() => refetch()}
           >
-            <EditUserModal data={user} />
+            <EditUserModal
+              data={{
+                user,
+                roles: data.roles,
+              }}
+            />
           </Modal>
         </div>
       );

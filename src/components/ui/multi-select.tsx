@@ -74,6 +74,8 @@ interface MultiSelectProps
    */
   onValueChange: (value: string[]) => void;
 
+  value?: string[];
+
   /** The default selected values when the component mounts. */
   defaultValue?: string[];
 
@@ -119,6 +121,7 @@ export const MultiSelect = React.forwardRef<
       options,
       onValueChange,
       variant,
+      value,
       defaultValue = [],
       originalValue = [],
       placeholder = "Select options",
@@ -130,8 +133,11 @@ export const MultiSelect = React.forwardRef<
     },
     ref,
   ) => {
-    const [selectedValues, setSelectedValues] =
+    const isControlled = value !== undefined;
+    const [uncontrolledValue, setUncontrolledValue] =
       React.useState<string[]>(defaultValue);
+
+    const selectedValues = isControlled ? value : uncontrolledValue;
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
 
@@ -143,7 +149,9 @@ export const MultiSelect = React.forwardRef<
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
         const newSelectedValues = [...selectedValues];
         newSelectedValues.pop();
-        setSelectedValues(newSelectedValues);
+        if (!isControlled) {
+          setUncontrolledValue(newSelectedValues);
+        }
         onValueChange(newSelectedValues);
       }
     };
@@ -162,7 +170,9 @@ export const MultiSelect = React.forwardRef<
       const newSelectedValues = selectedValues.includes(option)
         ? selectedValues.filter((value) => value !== option)
         : [...selectedValues, option];
-      setSelectedValues(newSelectedValues);
+      if (!isControlled) {
+        setUncontrolledValue(newSelectedValues);
+      }
       onValueChange(newSelectedValues);
     };
 

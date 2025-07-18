@@ -174,7 +174,7 @@ export default function RenderInput<TControl extends FieldValues>({
       return (
         <MultiSelect
           options={options || []}
-          defaultValue={field.value}
+          value={field.value}
           originalValue={defaultValues}
           onValueChange={field.onChange}
           placeholder={placeholder}
