@@ -1,7 +1,7 @@
 "use client";
 
 import { cleanGuestlist, getGuestlist } from "@/actions/gbx/player";
-import { createColumns } from "@/app/(gocontroller)/server/[uuid]/players/guestlist-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[id]/players/guestlist-columns";
 import GuestlistForm from "@/forms/server/players/guestlist-form";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
@@ -12,21 +12,21 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface GuestlistListProps {
-  serverUuid: string;
+  serverId: string;
 }
 
-export default function GuestlistList({ serverUuid }: GuestlistListProps) {
+export default function GuestlistList({ serverId }: GuestlistListProps) {
   const [guestlist, setGuestlist] = useState<PlayerInfo[]>([]);
 
   const [confirmClearGuestlist, setConfirmClearGuestlist] = useState(false);
 
   useEffect(() => {
     refetch();
-  }, [serverUuid]);
+  }, [serverId]);
 
   const refetch = async () => {
     try {
-      const { data, error } = await getGuestlist(serverUuid);
+      const { data, error } = await getGuestlist(serverId);
       if (error) {
         throw new Error(error);
       }
@@ -41,7 +41,7 @@ export default function GuestlistList({ serverUuid }: GuestlistListProps) {
 
   const handleClearGuestlist = async () => {
     try {
-      const { error } = await cleanGuestlist(serverUuid);
+      const { error } = await cleanGuestlist(serverId);
       if (error) {
         throw new Error(error);
       }
@@ -55,12 +55,12 @@ export default function GuestlistList({ serverUuid }: GuestlistListProps) {
     }
   };
 
-  const columns = createColumns(serverUuid, refetch);
+  const columns = createColumns(serverId, refetch);
 
   return (
     <>
       <div className="flex flex-row max-[800px]:flex-col justify-between gap-2">
-        <GuestlistForm serverUuid={serverUuid} />
+        <GuestlistForm serverId={serverId} />
         <div>
           <Button
             variant="destructive"

@@ -37,10 +37,26 @@ export const createColumns = (
     header: () => <span>Status</span>,
   },
   {
+    accessorKey: "public_net.ipv4.ip",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"IP Address"} />
+    ),
+  },
+  {
+    accessorKey: "server_type.name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Server Type"} />
+    ),
+  },
+  {
     accessorKey: "created",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Created At"} />
     ),
+    cell: ({ row }) => {
+      const date = new Date(row.original.created);
+      return <span>{date.toLocaleDateString()} {date.toLocaleTimeString()}</span>;
+    }
   },
   {
     id: "actions",

@@ -1,35 +1,23 @@
-export interface ModeScriptInfo {
-  Name: string;
-  CompatibleMapTypes: string;
-  Description: string;
-  Version: string;
-  ParamDescs: ScriptParamDescs[];
-  CommandDescs: ScriptCommandDescs[];
-}
+import { LiveInfo } from "./live";
+import { PlayerInfo } from "./player";
 
-export interface ScriptParamDescs {
-  Name: string;
-  Desc: string;
-  Type: string;
-  Default: string;
-}
-
-export interface ScriptCommandDescs {
-  Name: string;
-  Desc: string;
-  Type: string;
-  Default: string;
-}
-
-export interface Server {
-  id: number;
-  uuid: string;
+export interface ServerInfo {
+  id: string;
   name: string;
-  description?: string;
-  host: string;
-  xmlrpcPort: number;
-  user: string;
-  pass: string;
-  fmUrl?: string;
+  filemanagerUrl?: string;
   isConnected: boolean;
+}
+
+export interface ChatConfig {
+  manualRouting: boolean;
+  messageFormat: string | null;
+  connectMessage: string | null;
+  disconnectMessage: string | null;
+}
+
+export interface ServerClientInfo {
+  activeMap?: string;
+  activePlayers: PlayerInfo[];
+  liveInfo: LiveInfo;
+  chat?: ChatConfig;
 }

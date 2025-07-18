@@ -1,5 +1,5 @@
 "use client";
-import { deleteGroup, GroupsWithUsers } from "@/actions/database/groups";
+import { deleteGroup, GroupsWithUsersWithServers } from "@/actions/database/groups";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditGroupModal from "@/components/modals/edit-group";
 import Modal from "@/components/modals/modal";
@@ -11,9 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Users } from "@/lib/prisma/generated";
+import { Servers, Users } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { Server } from "@/types/server";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -23,10 +22,10 @@ import { toast } from "sonner";
 export const createColumns = (
   refetch: () => void,
   data: {
-    servers: Server[];
+    servers: Servers[];
     users: Users[];
   },
-): ColumnDef<GroupsWithUsers>[] => [
+): ColumnDef<GroupsWithUsersWithServers>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -40,7 +39,7 @@ export const createColumns = (
     ),
   },
   {
-    accessorKey: "_count.users",
+    accessorKey: "_count.groupMembers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Members"} />
     ),

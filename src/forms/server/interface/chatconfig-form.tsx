@@ -1,10 +1,14 @@
 "use client";
 
-import { updateChatConfig } from "@/actions/gbxconnector/chat";
+import { updateServerChatConfig } from "@/actions/database/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { getErrorMessage } from "@/lib/utils";
+import { Servers } from "@/lib/prisma/generated";
+import {
+  formatMessage as formatChatMessage,
+  getErrorMessage,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -12,22 +16,35 @@ import { toast } from "sonner";
 import { ChatConfigSchema, ChatConfigSchemaType } from "./chatconfig-schema";
 
 export default function ChatConfigForm({
-  serverUuid,
+  serverId,
   chatConfig,
 }: {
-  serverUuid: string;
-  chatConfig: ChatConfigSchemaType;
+  serverId: string;
+  chatConfig: Pick<
+    Servers,
+    "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
+  >;
 }) {
   const session = useSession();
 
   const form = useForm<ChatConfigSchemaType>({
     resolver: zodResolver(ChatConfigSchema),
-    defaultValues: chatConfig,
+    defaultValues: {
+      manualRouting: chatConfig.manualRouting,
+      messageFormat: chatConfig.messageFormat ?? "",
+      connectMessage: chatConfig.connectMessage ?? "",
+      disconnectMessage: chatConfig.disconnectMessage ?? "",
+    },
   });
 
   async function onSubmit(values: ChatConfigSchemaType) {
     try {
-      const { error } = await updateChatConfig(serverUuid, values);
+      const { error } = await updateServerChatConfig(serverId, {
+        manualRouting: values.manualRouting,
+        messageFormat: values.messageFormat ?? null,
+        connectMessage: values.connectMessage ?? null,
+        disconnectMessage: values.disconnectMessage ?? null,
+      });
       if (error) {
         throw new Error(error);
       }
@@ -55,14 +72,12 @@ export default function ChatConfigForm({
   );
 
   function formatMessage(format: string): string {
-    const msg = format
-      .replaceAll(
-        "{login}",
-        session.data?.user.login ?? "v8vgGbx_TuKkBabAyn7nsQ",
-      )
-      .replaceAll("{nickName}", session.data?.user.displayName ?? "Marijntje04")
-      .replaceAll("{message}", "Nice time!");
-    return msg.trim();
+    return formatChatMessage(
+      format,
+      session.data?.user?.login || "v8vgGbx_TuKkBabAyn7nsQ",
+      session.data?.user?.displayName || "Marijntje04",
+      "Nice Time! Well done.",
+    );
   }
 
   return (

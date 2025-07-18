@@ -43,7 +43,7 @@ export const createColumns = (
     ),
   },
   {
-    accessorKey: "_count.users",
+    accessorKey: "_count.hetznerProjectUsers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Users" />
     ),

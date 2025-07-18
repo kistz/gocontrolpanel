@@ -9,10 +9,10 @@ import { ServerError, ServerResponse } from "@/types/responses";
 import path from "path";
 
 export async function getServerSettings(
-  serverUuid: string,
+  serverId: string,
 ): Promise<ServerResponse<ServerSettingsSchemaType>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(serverId);
     const settings = await client.multicall([
       ["GetServerOptions"],
       ["GetHideServer"],
@@ -69,11 +69,11 @@ export async function getServerSettings(
 }
 
 export async function saveServerSettings(
-  serverUuid: string,
+  serverId: string,
   serverSettings: ServerSettingsSchemaType,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(serverId);
 
     serverSettings.defaultOptions.NextCallVoteTimeOut *= 1000; // Convert to milliseconds
     serverSettings.defaultOptions.CallVoteRatio /= 100; // Convert to 0-1 range
@@ -115,12 +115,12 @@ export async function saveServerSettings(
 }
 
 export async function getLocalMaps(
-  serverUuid: string,
+  serverId: string,
 ): Promise<ServerResponse<LocalMapInfo[]>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+    const client = await getGbxClient(serverId);
 
-    const fileManager = await getFileManager(serverUuid);
+    const fileManager = await getFileManager(serverId);
     if (!fileManager?.health) {
       throw new ServerError("Could not connect to file manager");
     }

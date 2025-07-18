@@ -8,8 +8,8 @@ const UserWithRoleSchema = z.object({
 export const EditGroupSchema = z.object({
   name: z.string().min(1, "Group name is required"),
   description: z.string().optional(),
-  serverUuids: z.array(z.string()).optional(),
-  users: z
+  groupServers: z.array(z.string()).optional(),
+  groupMembers: z
     .array(UserWithRoleSchema)
     .optional()
     .describe("List of users in the group with their roles"),

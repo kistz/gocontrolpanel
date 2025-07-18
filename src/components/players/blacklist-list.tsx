@@ -1,7 +1,7 @@
 "use client";
 
 import { cleanBlacklist, getBlacklist } from "@/actions/gbx/player";
-import { createColumns } from "@/app/(gocontroller)/server/[uuid]/players/blacklist-columns";
+import { createColumns } from "@/app/(gocontroller)/server/[id]/players/blacklist-columns";
 import BlacklistForm from "@/forms/server/players/blacklist-form";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
@@ -12,21 +12,21 @@ import { DataTable } from "../table/data-table";
 import { Button } from "../ui/button";
 
 interface BlacklistListProps {
-  serverUuid: string;
+  serverId: string;
 }
 
-export default function BlacklistList({ serverUuid }: BlacklistListProps) {
+export default function BlacklistList({ serverId }: BlacklistListProps) {
   const [blacklist, setBlacklist] = useState<PlayerInfo[]>([]);
 
   const [confirmClearBlacklist, setConfirmClearBlacklist] = useState(false);
 
   useEffect(() => {
     refetch();
-  }, [serverUuid]);
+  }, [serverId]);
 
   const refetch = async () => {
     try {
-      const { data, error } = await getBlacklist(serverUuid);
+      const { data, error } = await getBlacklist(serverId);
       if (error) {
         throw new Error(error);
       }
@@ -39,11 +39,11 @@ export default function BlacklistList({ serverUuid }: BlacklistListProps) {
     }
   };
 
-  const columns = createColumns(serverUuid, refetch);
+  const columns = createColumns(serverId, refetch);
 
   const handleClearBlacklist = async () => {
     try {
-      const { error } = await cleanBlacklist(serverUuid);
+      const { error } = await cleanBlacklist(serverId);
       if (error) {
         throw new Error(error);
       }
@@ -60,7 +60,7 @@ export default function BlacklistList({ serverUuid }: BlacklistListProps) {
   return (
     <>
       <div className="flex flex-row max-[800px]:flex-col justify-between gap-2">
-        <BlacklistForm serverUuid={serverUuid} />
+        <BlacklistForm serverId={serverId} />
         <div>
           <Button
             variant="destructive"

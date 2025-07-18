@@ -7,8 +7,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatTime(time: number): string {
-  if (time <= 0) {
+export function formatTime(time?: number): string {
+  if (!time || time <= 0) {
     return "--:--.---";
   }
 
@@ -84,7 +84,7 @@ function pathToRegex(path: string) {
 }
 
 // Use in a React client component
-export function useCurrentServerUuid(pathname: string): string | null {
+export function useCurrentid(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);
@@ -186,12 +186,8 @@ export function removePrefix(str: string, prefix: string): string {
 
 export function initGbxWebsocketClient(
   path: string,
-  token: string,
   params?: Record<string, string | string[]>,
 ): WebSocket {
-  const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-  const baseUri = envUrl && envUrl !== "" ? envUrl : "/gbx";
-
   const searchParams = new URLSearchParams();
 
   if (params) {
@@ -205,10 +201,7 @@ export function initGbxWebsocketClient(
     }
   }
 
-  // Append the token param first, so token is always included
-  searchParams.append("token", token);
-
-  return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
+  return new WebSocket(`${path}?${searchParams.toString()}`);
 }
 
 export function capitalize(str: string): string {
@@ -239,4 +232,37 @@ export function generateRandomString(length = 16): string {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
+}
+
+export function isFinalist(matchPoints: number, pointsLimit?: number): boolean {
+  if (pointsLimit === undefined) {
+    return false;
+  }
+
+  return matchPoints == pointsLimit;
+}
+
+export function isWinner(matchPoints: number, pointsLimit?: number): boolean {
+  if (pointsLimit === undefined) {
+    return false;
+  }
+
+  return matchPoints > pointsLimit;
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function formatMessage(
+  format: string,
+  login: string,
+  nickName: string,
+  message: string,
+): string {
+  const msg = format
+    .replaceAll("{login}", login)
+    .replaceAll("{nickName}", nickName)
+    .replaceAll("{message}", message);
+  return msg.trim();
 }

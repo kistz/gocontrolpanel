@@ -3,82 +3,65 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
-import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const editGroups = Prisma.validator<Prisma.GroupsInclude>()({
-  users: {
+const editGroup = Prisma.validator<Prisma.GroupsInclude>()({
+  groupMembers: {
     select: {
       userId: true,
       role: true,
     },
   },
+  groupServers: {
+    select: {
+      serverId: true,
+    },
+  },
 });
 
 export type EditGroups = Prisma.GroupsGetPayload<{
-  include: typeof editGroups;
+  include: typeof editGroup;
 }>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const usersGroups = Prisma.validator<Prisma.GroupsInclude>()({
-  users: {
+const groupUsersServersSchema = Prisma.validator<Prisma.GroupsInclude>()({
+  groupMembers: {
+    where: {
+      user: {
+        deletedAt: null,
+      },
+    },
     include: {
       user: true,
     },
   },
+  groupServers: {
+    where: {
+      server: {
+        deletedAt: null,
+      },
+    },
+    include: {
+      server: true,
+    },
+  },
   _count: {
     select: {
-      users: true,
+      groupMembers: true,
     },
   },
 });
 
-export type GroupsWithUsers = Prisma.GroupsGetPayload<{
-  include: typeof usersGroups;
+export type GroupsWithUsersWithServers = Prisma.GroupsGetPayload<{
+  include: typeof groupUsersServersSchema;
 }>;
-
-export async function getAllGroups(): Promise<
-  ServerResponse<GroupsWithUsers[]>
-> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-    const groups = await db.groups.findMany({
-      where: {
-        deletedAt: null,
-      },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          select: {
-            userId: true,
-            groupId: true,
-            role: true,
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
-    });
-
-    return groups;
-  });
-}
 
 export async function getGroupsPaginated(
   pagination: PaginationState,
-  sorting: { field: string; order: 'asc' | 'desc' },
+  sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
-): Promise<ServerResponse<PaginationResponse<GroupsWithUsers>>> {
+): Promise<ServerResponse<PaginationResponse<GroupsWithUsersWithServers>>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
@@ -109,23 +92,7 @@ export async function getGroupsPaginated(
       orderBy: {
         [sorting.field]: sorting.order.toLowerCase(),
       },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: groupUsersServersSchema,
     });
 
     return {
@@ -137,28 +104,12 @@ export async function getGroupsPaginated(
 
 export async function getGroup(
   groupId: string,
-): Promise<ServerResponse<GroupsWithUsers | null>> {
+): Promise<ServerResponse<GroupsWithUsersWithServers | null>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
     const group = await db.groups.findUnique({
       where: { id: groupId },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: groupUsersServersSchema,
     });
 
     return group;
@@ -167,39 +118,27 @@ export async function getGroup(
 
 export async function createGroup(
   group: Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<ServerResponse<GroupsWithUsers>> {
+): Promise<ServerResponse<GroupsWithUsersWithServers>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
-    const { users, serverUuids, ...groupData } = group;
+    const { groupMembers, groupServers, ...groupData } = group;
     const newGroup = await db.groups.create({
       data: {
         ...groupData,
-        serverUuids: serverUuids ?? [],
-        users: {
-          create: users.map((member) => ({
-            role: member.role,
-            userId: member.userId,
+        groupServers: {
+          create: groupServers.map((gs) => ({
+            serverId: gs.serverId,
+          })),
+        },
+        groupMembers: {
+          create: groupMembers.map((gm) => ({
+            role: gm.role,
+            userId: gm.userId,
           })),
         },
       },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: groupUsersServersSchema,
     });
 
     return newGroup;
@@ -211,94 +150,31 @@ export async function updateGroup(
   group: Partial<
     Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
-): Promise<ServerResponse<GroupsWithUsers>> {
+): Promise<ServerResponse<GroupsWithUsersWithServers>> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
-    const { users, serverUuids, ...scalarFields } = group;
-
-    const currentMembers = await db.groupMember.findMany({
-      where: { groupId },
-      select: { userId: true, role: true },
-    });
-
-    if (!users) {
-      const updatedGroup = await db.groups.update({
-        where: { id: groupId },
-        data: {
-          ...scalarFields,
-          serverUuids: serverUuids ?? [],
-        },
-        include: {
-          users: {
-            where: {
-              user: {
-                deletedAt: null,
-              },
-            },
-            include: { user: true },
-          },
-          _count: {
-            select: {
-              users: true,
-            },
-          },
-        },
-      });
-      return updatedGroup;
-    }
-
-    const usersMap = new Map(users.map((u) => [u.userId, u.role]));
-    const currentMap = new Map(currentMembers.map((m) => [m.userId, m.role]));
-
-    const toAdd = users.filter((u) => !currentMap.has(u.userId));
-
-    const toRemove = currentMembers.filter((m) => !usersMap.has(m.userId));
-
-    const toUpdate = users.filter((u) => {
-      const currentRole = currentMap.get(u.userId);
-      return currentRole && currentRole !== u.role;
-    });
-
-    const updateData: any = {
-      ...scalarFields,
-      serverUuids: serverUuids ?? [],
-      users: {
-        deleteMany: toRemove.map((m) => ({
-          userId: m.userId,
-          groupId: groupId,
-        })),
-        create: toAdd.map((m) => ({ userId: m.userId, role: m.role })),
-        updateMany: toUpdate.map((m) => ({
-          where: {
-            userId: m.userId,
-            groupId: groupId,
-          },
-          data: { role: m.role },
-        })),
-      },
-    };
+    const { groupMembers, groupServers, ...scalarFields } = group;
 
     const updatedGroup = await db.groups.update({
       where: { id: groupId },
-      data: updateData,
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
+      data: {
+        ...scalarFields,
+        groupServers: {
+          deleteMany: {},
+          create: groupServers?.map((gs) => ({
+            serverId: gs.serverId,
+          })),
         },
-        _count: {
-          select: {
-            users: true,
-          },
+        groupMembers: {
+          deleteMany: {},
+          create: groupMembers?.map((gm) => ({
+            role: gm.role,
+            userId: gm.userId,
+          })),
         },
       },
+      include: groupUsersServersSchema,
     });
 
     return updatedGroup;
@@ -317,33 +193,17 @@ export async function deleteGroup(groupId: string): Promise<ServerResponse> {
   });
 }
 
-export async function removeServerUuidFromGroups(
-  serverUuid: string,
+export async function removeServerFromGroups(
+  serverId: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth([], async () => {
     const db = getClient();
-    
-    const groups = await db.groups.findMany({
+
+    // First, find all group-server relations with the given serverId
+    await db.groupServers.deleteMany({
       where: {
-        serverUuids: {
-          array_contains: [serverUuid],
-        },
+        serverId,
       },
     });
-
-    if (groups.length === 0) return;
-
-    await Promise.all(
-      groups.map((group) =>
-        db.groups.update({
-          where: { id: group.id },
-          data: {
-            serverUuids: getList(group.serverUuids).filter(
-              (uuid) => uuid !== serverUuid,
-            ),
-          },
-        }),
-      ),
-    );
   });
 }

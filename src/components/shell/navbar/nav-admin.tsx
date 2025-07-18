@@ -1,4 +1,3 @@
-import { getHealthStatus } from "@/actions/gbxconnector/servers";
 import {
   Collapsible,
   CollapsibleContent,
@@ -16,14 +15,17 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
-import { IconCloud, IconServerCog, IconUserCog, IconUsersGroup } from "@tabler/icons-react";
+import {
+  IconCloud,
+  IconServerCog,
+  IconUserCog,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NavGroup } from ".";
 
 export default async function NavAdmin() {
-  const healthStatus = await getHealthStatus();
-
   const group: NavGroup = {
     name: "Admin",
     items: [
@@ -41,7 +43,6 @@ export default async function NavAdmin() {
         name: "Servers",
         url: routes.admin.servers,
         icon: IconServerCog,
-        healthStatus: !healthStatus ? "Connector offline" : undefined,
       },
       {
         name: "Hetzner",
@@ -113,15 +114,6 @@ export default async function NavAdmin() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-            ) : item.healthStatus ? (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
-                    {item.icon && <item.icon />}
-                    <span>{item.healthStatus}</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             ) : (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild>

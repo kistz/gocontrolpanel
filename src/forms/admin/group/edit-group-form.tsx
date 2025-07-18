@@ -1,11 +1,13 @@
 "use client";
-import { GroupsWithUsers, updateGroup } from "@/actions/database/groups";
+import {
+  GroupsWithUsersWithServers,
+  updateGroup,
+} from "@/actions/database/groups";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Users } from "@/lib/prisma/generated";
-import { getErrorMessage, getList } from "@/lib/utils";
-import { Server } from "@/types/server";
+import { GroupRole, Servers, Users } from "@/lib/prisma/generated";
+import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
@@ -18,8 +20,8 @@ export default function EditGroupForm({
   users,
   callback,
 }: {
-  group: GroupsWithUsers;
-  servers: Server[];
+  group: GroupsWithUsersWithServers;
+  servers: Servers[];
   users: Users[];
   callback?: () => void;
 }) {
@@ -27,8 +29,8 @@ export default function EditGroupForm({
     resolver: zodResolver(EditGroupSchema),
     defaultValues: {
       ...group,
-      serverUuids: getList(group.serverUuids) || [],
-      users: group.users.map((user) => ({
+      groupServers: group.groupServers.map((server) => server.serverId),
+      groupMembers: group.groupMembers.map((user) => ({
         userId: user.userId,
         role: user.role,
       })),
@@ -39,8 +41,11 @@ export default function EditGroupForm({
     try {
       const { error } = await updateGroup(group.id, {
         ...values,
-        serverUuids: getList(values.serverUuids),
-        users: values.users?.map((user) => ({
+        groupServers:
+          values.groupServers?.map((id) => ({
+            serverId: id,
+          })) || [],
+        groupMembers: values.groupMembers?.map((user) => ({
           userId: user.userId,
           role: user.role as GroupRole,
         })),
@@ -79,12 +84,12 @@ export default function EditGroupForm({
         />
 
         <FormElement
-          name="serverUuids"
+          name="groupServers"
           label="Servers"
           placeholder="Select servers"
           options={servers.map((server) => ({
             label: server.name,
-            value: server.uuid,
+            value: server.id,
           }))}
           type="multi-select"
         />
@@ -92,11 +97,11 @@ export default function EditGroupForm({
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Members</FormLabel>
-          {form.watch("users")?.map((_, index) => (
+          {form.watch("groupMembers")?.map((_, index) => (
             <div key={index} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
-                  name={`users.${index}.userId`}
+                  name={`groupMembers.${index}.userId`}
                   className="w-full"
                   placeholder="Select user"
                   options={users.map((u) => ({
@@ -107,7 +112,7 @@ export default function EditGroupForm({
                 />
               </div>
               <FormElement
-                name={`users.${index}.role`}
+                name={`groupMembers.${index}.role`}
                 className="w-30"
                 placeholder="Select role"
                 options={Object.values(GroupRole).map((role) => ({
@@ -121,9 +126,9 @@ export default function EditGroupForm({
                 variant="destructive"
                 size="icon"
                 onClick={() => {
-                  const currentUsers = form.getValues("users");
+                  const currentUsers = form.getValues("groupMembers");
                   form.setValue(
-                    "users",
+                    "groupMembers",
                     currentUsers?.filter((_, i) => i !== index),
                   );
                 }}
@@ -138,8 +143,8 @@ export default function EditGroupForm({
           type="button"
           variant="outline"
           onClick={() => {
-            const currentUsers = form.getValues("users") || [];
-            form.setValue("users", [
+            const currentUsers = form.getValues("groupMembers") || [];
+            form.setValue("groupMembers", [
               ...currentUsers,
               { userId: "", role: GroupRole.Member },
             ]);

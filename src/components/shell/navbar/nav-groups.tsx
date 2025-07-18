@@ -15,14 +15,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { disconnectGbxClient } from "@/lib/gbxclient";
-import {
-  generatePath,
-  initGbxWebsocketClient,
-  useCurrentServerUuid,
-} from "@/lib/utils";
+import { generatePath, useCurrentid } from "@/lib/utils";
 import { routes } from "@/routes";
-import { Server } from "@/types/server";
+import { ServerInfo } from "@/types/server";
 import {
   IconActivity,
   IconAdjustmentsAlt,
@@ -37,13 +32,13 @@ import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface ServerNavGroup {
   name: string;
   servers: {
-    uuid: string;
+    id: string;
     name: string;
     isConnected: boolean;
     isActive: boolean;
@@ -58,27 +53,21 @@ interface ServerNavGroup {
 
 export default function NavGroups() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const [servers, setServers] = useState<Server[]>([]);
+  const [servers, setServers] = useState<ServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [healthStatus, setHealthStatus] = useState(false);
-  const [serverUuid, setServerUuid] = useState<string | null>(null);
+  const [serverId, setServerId] = useState<string | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const uuid = useCurrentServerUuid(pathname);
-    setServerUuid(uuid);
+    const uuid = useCurrentid(pathname);
+    setServerId(uuid);
   }, [pathname]);
 
   useEffect(() => {
     for (const server of servers) {
-      if (!servers.find((s) => s.uuid === server.uuid)?.isConnected) {
-        (async () => await disconnectGbxClient(server.uuid))();
-      }
-    }
-
-    for (const server of servers) {
-      if (server.uuid === serverUuid && !server.isConnected) {
+      if (server.id === serverId && !server.isConnected) {
         toast.error(`Server ${server.name} is offline`);
         router.push("/");
       }
@@ -86,104 +75,119 @@ export default function NavGroups() {
   }, [servers]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!session) {
-        return;
-      }
+    if (!status) {
+      return;
+    }
 
-      if (!session.jwt) {
-        setTimeout(() => toast.error("Can't connect to the server"));
-        setLoading(false);
-        return;
-      }
+    try {
+      const ws = new WebSocket("/api/ws/servers");
+      wsRef.current = ws;
 
-      try {
-        const socket = initGbxWebsocketClient(
-          "/ws/servers",
-          session.jwt as string,
-          {
-            serverUuid: session?.user.groups
-              .map((group) => group.serverUuids)
-              .flat(),
-          },
-        );
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
 
-        socket.onmessage = async (event) => {
-          const data: Server[] = JSON.parse(event.data);
-          
-          setHealthStatus(true);
-          setServers(data);
+        switch (data.type) {
+          case "servers":
+            const serversInfo: ServerInfo[] = data.data;
+            setServers(serversInfo);
+            setLoading(false);
+            break;
+          case "connect":
+            const { serverId } = data.data;
+            setServers((prev) =>
+              prev.map((server) =>
+                server.id === serverId
+                  ? { ...server, isConnected: true }
+                  : server,
+              ),
+            );
+            break;
+          case "disconnect":
+            const { serverId: disconnectedServerId } = data.data;
+            setServers((prev) =>
+              prev.map((server) =>
+                server.id === disconnectedServerId
+                  ? { ...server, isConnected: false }
+                  : server,
+              ),
+            );
+            break;
+        }
+      };
 
-          setLoading(false);
-        };
+      ws.onclose = () => {
+        wsRef.current = null;
+      };
 
-        return () => {
-          socket.close();
-        };
-      } catch {
-        setLoading(false);
+      ws.onerror = (err) => {
+        console.error("WebSocket error", err);
+        ws.close();
+      };
+    } catch {
+      setLoading(false);
+    }
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
       }
     };
-
-    fetchData();
-  }, [session]);
+  }, [status]);
 
   const groupsSidebarGroup: ServerNavGroup[] =
     session?.user.groups.map((group) => ({
       name: group.name,
-      servers: group.serverUuids
-        .map((s) => {
-          const server = servers.find((server) => server.uuid === s);
-          if (!server) return undefined;
-
+      servers: servers
+        .map((server) => {
           return {
-            uuid: server.uuid,
+            id: server.id,
             name: server.name,
             isConnected: server.isConnected,
             icon: IconServer,
-            isActive: serverUuid === server.uuid,
+            isActive: serverId === server.id,
             items: [
               {
                 name: "Settings",
                 url: generatePath(routes.servers.settings, {
-                  uuid: server.uuid,
+                  id: server.id,
                 }),
                 icon: IconAdjustmentsAlt,
               },
               {
                 name: "Game",
                 url: generatePath(routes.servers.game, {
-                  uuid: server.uuid,
+                  id: server.id,
                 }),
                 icon: IconDeviceGamepad,
               },
               {
                 name: "Maps",
                 url: generatePath(routes.servers.maps, {
-                  uuid: server.uuid,
+                  id: server.id,
                 }),
                 icon: IconMap,
               },
               {
                 name: "Players",
                 url: generatePath(routes.servers.players, {
-                  uuid: server.uuid,
+                  id: server.id,
                 }),
                 icon: IconUsers,
               },
               {
                 name: "Live",
                 url: generatePath(routes.servers.live, {
-                  uuid: server.uuid,
+                  id: server.id,
                 }),
                 icon: IconActivity,
               },
-              ...(session?.user.admin && server.fmUrl
+              ...(session?.user.admin && server.filemanagerUrl
                 ? [
                     {
                       name: "Files",
                       url: generatePath(routes.servers.files, {
-                        uuid: server.uuid,
+                        id: server.id,
                       }),
                       icon: IconFileDescription,
                     },
@@ -192,7 +196,7 @@ export default function NavGroups() {
               {
                 name: "Interface",
                 url: generatePath(routes.servers.interface, {
-                  uuid: server.uuid,
+                  id: server.id,
                 }),
                 icon: IconDeviceDesktop,
               },
@@ -217,7 +221,7 @@ export default function NavGroups() {
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {loading ? (
+          {loading && (
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <div className="flex items-center gap-2">
@@ -226,31 +230,11 @@ export default function NavGroups() {
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ) : healthStatus ? (
-            group.servers.length === 0 && (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
-                    <IconServer />
-                    <span>No servers selected</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )
-          ) : (
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
-                  <IconServer />
-                  <span>Connector offline</span>
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           )}
           {group.servers.map((server) =>
             server.items && server.items.length > 0 ? (
               <Collapsible
-                key={server.uuid}
+                key={server.id}
                 asChild
                 defaultOpen={server.isActive}
                 className="group/collapsible"

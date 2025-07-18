@@ -3,7 +3,7 @@ import { z } from "zod";
 export const AddProjectSchema = z.object({
   name: z.string().min(1, "Project name is required"),
   apiTokens: z.array(z.string().min(1, "API token is required")).optional().describe("List of API tokens for the project"),
-  users: z
+  hetznerProjectUsers: z
     .array(
       z.object({
         userId: z.string().min(1, "User is required"),

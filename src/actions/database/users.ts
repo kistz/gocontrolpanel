@@ -71,7 +71,7 @@ export async function getUsersPaginated(
 }
 
 export async function updateUser(
-  id: string,
+  userId: string,
   data: Omit<
     Users,
     | "id"
@@ -89,7 +89,7 @@ export async function updateUser(
 
     const existingUser = await db.users.findUniqueOrThrow({
       where: {
-        id,
+        id: userId,
       },
     });
 
@@ -100,7 +100,7 @@ export async function updateUser(
     }
 
     await db.users.update({
-      where: { id },
+      where: { id: userId },
       data: {
         ...data,
         admin: data.admin,
@@ -111,15 +111,15 @@ export async function updateUser(
   });
 }
 
-export async function deleteUserById(id: string): Promise<ServerResponse> {
+export async function deleteUserById(userId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["admin"], async (session) => {
-    if (id === session.user.id) {
+    if (userId === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }
 
     const db = getClient();
     await db.users.update({
-      where: { id },
+      where: { id: userId },
       data: {
         deletedAt: new Date(),
         updatedAt: new Date(),

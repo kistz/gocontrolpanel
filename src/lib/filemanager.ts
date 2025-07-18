@@ -1,53 +1,47 @@
-import { syncServers } from "@/actions/gbxconnector/servers";
 import { FileManager } from "@/types/filemanager";
+import "server-only";
+import { getClient } from "./dbclient";
+import { appGlobals } from "./global";
 
-const cachedFileManagers: {
-  [key: string]: FileManager;
-} = {};
+export async function getFileManager(serverId: string): Promise<FileManager> {
+  if (!appGlobals.fileManagers?.[serverId]) {
+    const db = getClient();
+    const server = await db.servers.findUnique({
+      where: { id: serverId },
+    });
 
-export async function syncFileManager(
-  serverUuid: string,
-): Promise<FileManager> {
-  const servers = await syncServers();
+    if (!server) {
+      throw new Error(`Server with id ${serverId} not found`);
+    }
 
-  const server = servers.find((server) => server.uuid == serverUuid);
-  if (!server) {
-    throw new Error(`Server ${serverUuid} not found`);
-  }
+    if (!server.filemanagerUrl) {
+      return {
+        url: server.filemanagerUrl || undefined,
+        health: false,
+      };
+    }
 
-  if (!server.fmUrl) {
-    return {
-      url: server.fmUrl,
-      health: false,
+    const res = await fetch(`${server.filemanagerUrl}/health`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const fileManager = {
+      url: server.filemanagerUrl,
+      health: res.status === 200,
     };
+
+    appGlobals.fileManagers = appGlobals.fileManagers || {};
+    appGlobals.fileManagers[serverId] = fileManager;
+
+    return fileManager;
   }
 
-  const res = await fetch(`${server.fmUrl}/health`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const fileManager = {
-    url: server.fmUrl,
-    health: res.status === 200,
-  };
-
-  cachedFileManagers[serverUuid] = fileManager;
-  return fileManager;
-}
-
-export async function getFileManager(
-  serverUuid: string,
-): Promise<FileManager | null> {
-  if (cachedFileManagers[serverUuid]) {
-    return cachedFileManagers[serverUuid];
+  if (!appGlobals.fileManagers[serverId]) {
+    throw new Error(`FileManager with id ${serverId} not found`);
   }
 
-  try {
-    return await syncFileManager(serverUuid);
-  } catch {
-    return null;
-  }
+  return appGlobals.fileManagers[serverId];
 }

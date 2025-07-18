@@ -9,8 +9,8 @@ import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const editHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
-  users: {
+const editHetznerProject = Prisma.validator<Prisma.HetznerProjectsInclude>()({
+  hetznerProjectUsers: {
     select: {
       userId: true,
       role: true,
@@ -19,25 +19,30 @@ const editHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
 });
 
 export type EditHetznerProjects = Prisma.HetznerProjectsGetPayload<{
-  include: typeof editHetznerProjects;
+  include: typeof editHetznerProject;
 }>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const usersHetznerProjects = Prisma.validator<Prisma.HetznerProjectsInclude>()({
-  users: {
-    include: {
-      user: true,
+const hetznerProjectUsersSchema =
+  Prisma.validator<Prisma.HetznerProjectsInclude>()({
+    hetznerProjectUsers: {
+      where: {
+        user: {
+          deletedAt: null,
+        },
+      },
+      include: {
+        user: true,
+      },
     },
-  },
-  _count: {
-    select: {
-      users: true,
+    _count: {
+      select: {
+        hetznerProjectUsers: true,
+      },
     },
-  },
-});
+  });
 
 export type HetznerProjectsWithUsers = Prisma.HetznerProjectsGetPayload<{
-  include: typeof usersHetznerProjects;
+  include: typeof hetznerProjectUsersSchema;
 }>;
 
 export async function getAllHetznerProjects(): Promise<
@@ -50,23 +55,7 @@ export async function getAllHetznerProjects(): Promise<
       where: {
         deletedAt: null,
       },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: hetznerProjectUsersSchema,
     });
 
     return hetznerProjects.map((project) => ({
@@ -99,23 +88,7 @@ export async function getHetznerProjectsPaginated(
           OR: [{ name: { contains: filter } }],
         }),
       },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: hetznerProjectUsersSchema,
       orderBy: { [sorting.field]: sorting.order },
       skip: pagination.pageIndex * pagination.pageSize,
       take: pagination.pageSize,
@@ -146,23 +119,7 @@ export async function getHetznerProject(
           users: { some: { userId } },
         }),
       },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: hetznerProjectUsersSchema,
     });
 
     if (!hetznerProject) {
@@ -187,37 +144,21 @@ export async function createHetznerProject(
   return doServerActionWithAuth([], async () => {
     const db = getClient();
 
-    const { users, apiTokens, ...projectData } = hetznerProject;
+    const { hetznerProjectUsers, apiTokens, ...projectData } = hetznerProject;
     const newProject = await db.hetznerProjects.create({
       data: {
         ...projectData,
         apiTokens: getList(apiTokens).map((token) =>
           encryptHetznerToken(token),
         ),
-        users: {
-          create: users.map((user) => ({
-            role: user.role,
-            userId: user.userId,
+        hetznerProjectUsers: {
+          create: hetznerProjectUsers.map((hpu) => ({
+            role: hpu.role,
+            userId: hpu.userId,
           })),
         },
       },
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
-        },
-      },
+      include: hetznerProjectUsersSchema,
     });
 
     return {
@@ -230,7 +171,7 @@ export async function createHetznerProject(
 }
 
 export async function updateHetznerProject(
-  projectId: string,
+  hetznerProjectId: string,
   hetznerProject: Partial<
     Omit<EditHetznerProjects, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
@@ -239,113 +180,29 @@ export async function updateHetznerProject(
     const db = getClient();
 
     const userId = session?.user?.id;
-    const { users, apiTokens, ...projectData } = hetznerProject;
-
-    const currentUsers = await db.hetznerProjectUser.findMany({
-      where: { projectId },
-      select: { userId: true, role: true },
-    });
-
-    if (!users) {
-      const updatedHetznerProject = await db.hetznerProjects.update({
-        where: {
-          id: projectId,
-          ...(!session?.user?.admin && {
-            users: { some: { userId } },
-          }),
-        },
-        data: {
-          ...projectData,
-          apiTokens: getList(apiTokens).map((token) =>
-            encryptHetznerToken(token),
-          ),
-        },
-        include: {
-          users: {
-            where: {
-              user: {
-                deletedAt: null,
-              },
-            },
-            include: {
-              user: true,
-            },
-          },
-          _count: {
-            select: {
-              users: true,
-            },
-          },
-        },
-      });
-
-      return {
-        ...updatedHetznerProject,
-        apiTokens: getList(updatedHetznerProject.apiTokens).map((token) =>
-          decryptHetznerToken(token),
-        ),
-      };
-    }
-
-    const usersMap = new Map(users.map((u) => [u.userId, u.role]));
-    const currentMap = new Map(currentUsers.map((u) => [u.userId, u.role]));
-
-    const toAdd = users.filter((user) => !currentMap.has(user.userId));
-
-    const toRemove = currentUsers.filter((u) => !usersMap.has(u.userId));
-
-    const toUpdate = users.filter((u) => {
-      const currentRole = currentMap.get(u.userId);
-      return currentRole && currentRole !== u.role;
-    });
-
-    const updateData: any = {
-      ...projectData,
-      apiTokens: getList(apiTokens).map((token) => encryptHetznerToken(token)),
-      users: {
-        deleteMany: toRemove.map((u) => ({
-          userId: u.userId,
-          projectId,
-        })),
-        create: toAdd.map((user) => ({
-          userId: user.userId,
-          role: user.role,
-        })),
-        updateMany: toUpdate.map((user) => ({
-          where: {
-            userId: user.userId,
-            projectId,
-          },
-          data: { role: user.role },
-        })),
-      },
-    };
+    const { hetznerProjectUsers, apiTokens, ...projectData } = hetznerProject;
 
     const updatedHetznerProject = await db.hetznerProjects.update({
       where: {
-        id: projectId,
+        id: hetznerProjectId,
         ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
       },
-      data: updateData,
-      include: {
-        users: {
-          where: {
-            user: {
-              deletedAt: null,
-            },
-          },
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            users: true,
-          },
+      data: {
+        ...projectData,
+        apiTokens: getList(apiTokens).map((token) =>
+          encryptHetznerToken(token),
+        ),
+        hetznerProjectUsers: {
+          deleteMany: {},
+          create: hetznerProjectUsers?.map((hpu) => ({
+            role: hpu.role,
+            userId: hpu.userId,
+          })),
         },
       },
+      include: hetznerProjectUsersSchema,
     });
 
     return {
@@ -358,7 +215,7 @@ export async function updateHetznerProject(
 }
 
 export async function deleteHetznerProject(
-  projectId: string,
+  hetznerProjectId: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth([], async (session) => {
     const db = getClient();
@@ -366,7 +223,7 @@ export async function deleteHetznerProject(
     const userId = session?.user?.id;
     await db.hetznerProjects.update({
       where: {
-        id: projectId,
+        id: hetznerProjectId,
         ...(!session?.user?.admin && {
           users: { some: { userId } },
         }),
