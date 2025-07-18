@@ -253,3 +253,16 @@ export function isWinner(matchPoints: number, pointsLimit?: number): boolean {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export function formatMessage(
+  format: string,
+  login: string,
+  nickName: string,
+  message: string,
+): string {
+  const msg = format
+    .replaceAll("{login}", login)
+    .replaceAll("{nickName}", nickName)
+    .replaceAll("{message}", message);
+  return msg.trim();
+}

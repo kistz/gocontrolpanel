@@ -1,4 +1,3 @@
-
 export interface SPlayerInfo {
   Login: string;
   NickName: string;
@@ -7,4 +6,12 @@ export interface SPlayerInfo {
   TeamId: number;
   LadderRanking: number;
   Flags: number;
+}
+
+export interface PlayerChat {
+  PlayerUid: number;
+  Login: string;
+  Text: string;
+  IsRegistredCmd: boolean;
+  Options: number;
 }

@@ -2,7 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { getGbxClient } from "@/lib/gbxclient";
+import { getGbxClient, getGbxClientManager } from "@/lib/gbxclient";
 import { Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
@@ -132,8 +132,8 @@ export async function updateServerChatConfig(
   >,
 ): Promise<ServerResponse<Servers>> {
   return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const canManualRoute = await client.call(
+    const manager = await getGbxClientManager(serverId);
+    const canManualRoute = await manager.client.call(
       "ChatEnableManualRouting",
       chatConfig.manualRouting,
     );
@@ -146,6 +146,8 @@ export async function updateServerChatConfig(
       where: { id: serverId },
       data: { ...chatConfig },
     });
+
+    manager.info.chat = chatConfig;
 
     if (!canManualRoute) {
       throw new Error("Failed to update manual routing setting.");

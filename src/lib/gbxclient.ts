@@ -3,7 +3,7 @@ import { onPodiumStart, syncMap } from "@/actions/gbx/map";
 import { getPlayerInfo, syncPlayerList } from "@/actions/gbx/server-only";
 import { EndMap, SMapInfo, StartMap } from "@/types/gbx/map";
 import { PauseStatus } from "@/types/gbx/pause";
-import { SPlayerInfo } from "@/types/gbx/player";
+import { PlayerChat, SPlayerInfo } from "@/types/gbx/player";
 import { Elmination, Scores } from "@/types/gbx/scores";
 import { WarmUp, WarmUpStatus } from "@/types/gbx/warmup";
 import { GiveUp, Waypoint } from "@/types/gbx/waypoint";
@@ -15,7 +15,13 @@ import EventEmitter from "events";
 import "server-only";
 import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
-import { isFinalist, isWinner, sleep, withTimeout } from "./utils";
+import {
+  formatMessage,
+  isFinalist,
+  isWinner,
+  sleep,
+  withTimeout,
+} from "./utils";
 
 export class GbxClientManager extends EventEmitter {
   client: GbxClient;
@@ -112,12 +118,12 @@ export class GbxClientManager extends EventEmitter {
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
 
-    await this.client.call("ChatEnableManualRouting", false);
+    await this.client.call("ChatEnableManualRouting", server.manualRouting);
     this.info.chat = {
-      manualRouting: false,
-      messageFormat: "",
-      connectMessage: "",
-      disconnectMessage: "",
+      manualRouting: server.manualRouting,
+      messageFormat: server.messageFormat,
+      connectMessage: server.connectMessage,
+      disconnectMessage: server.disconnectMessage,
     };
 
     await setupListeners(this, server.id);
@@ -231,7 +237,7 @@ async function setupListeners(
         await onPlayerConnect(manager, data[0]);
         break;
       case "ManiaPlanet.PlayerDisconnect":
-        onPlayerDisconnect(manager, data[0]);
+        await onPlayerDisconnect(manager, data[0]);
         break;
       case "ManiaPlanet.PlayerInfoChanged":
         onPlayerInfoChanged(manager, data[0]);
@@ -250,6 +256,16 @@ async function setupListeners(
           Internal: data[0],
           Public: data[1],
         });
+        break;
+      case "ManiaPlanet.PlayerChat":
+        const chat: PlayerChat = {
+          PlayerUid: data[0],
+          Login: data[1],
+          Text: data[2],
+          IsRegistredCmd: data[3],
+          Options: data[4],
+        };
+        await onPlayerChat(manager, chat);
         break;
 
       case "ManiaPlanet.ModeScriptCallbackArray":
@@ -339,9 +355,36 @@ async function onPlayerConnect(manager: GbxClientManager, login: string) {
   }
 
   manager.emit("playerConnectInfo", manager.info.liveInfo);
+
+  if (!manager.info.chat?.connectMessage) return;
+
+  const message = formatMessage(
+    manager.info.chat.connectMessage,
+    playerInfo.login,
+    playerInfo.nickName,
+    ""
+  )
+
+  manager.client.call("ChatSendServerMessage", message);
 }
 
-function onPlayerDisconnect(manager: GbxClientManager, login: string) {
+async function onPlayerDisconnect(manager: GbxClientManager, login: string) {
+  if (manager.info.chat?.disconnectMessage) {
+    let player = manager.info.activePlayers.find((p) => p.login === login);
+    if (!player) {
+      player = await getPlayerInfo(manager.client, login);
+    }
+
+    const message = formatMessage(
+      manager.info.chat.disconnectMessage,
+      player.login,
+      player.nickName,
+      ""
+    );
+
+    manager.client.call("ChatSendServerMessage", message);
+  }
+
   manager.removeActivePlayer(login);
   manager.emit("playerDisconnect", login);
 
@@ -869,4 +912,30 @@ async function onElimination(
   });
 
   manager.emit("elimination", manager.info.liveInfo);
+}
+
+async function onPlayerChat(manager: GbxClientManager, chat: PlayerChat) {
+  if (!manager.info.chat?.manualRouting) return;
+  if (!chat.Login) return;
+  if (chat.Text.startsWith("/")) return; // ignore commands
+
+  if (!manager.info.chat?.messageFormat) {
+    manager.client.call("ChatForwardToLogin", chat.Text, chat.Login, "");
+    return;
+  }
+
+  let player = manager.info.activePlayers.find((p) => p.login === chat.Login);
+
+  if (!player) {
+    player = await getPlayerInfo(manager.client, chat.Login);
+  }
+
+  const message = formatMessage(
+    manager.info.chat?.messageFormat,
+    player.login,
+    player.nickName,
+    chat.Text,
+  );
+
+  manager.client.call("ChatSendServerMessage", message);
 }

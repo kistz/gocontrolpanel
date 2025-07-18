@@ -5,7 +5,10 @@ import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Servers } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import {
+  formatMessage as formatChatMessage,
+  getErrorMessage,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -69,14 +72,12 @@ export default function ChatConfigForm({
   );
 
   function formatMessage(format: string): string {
-    const msg = format
-      .replaceAll(
-        "{login}",
-        session.data?.user.login ?? "v8vgGbx_TuKkBabAyn7nsQ",
-      )
-      .replaceAll("{nickName}", session.data?.user.displayName ?? "Marijntje04")
-      .replaceAll("{message}", "Nice time!");
-    return msg.trim();
+    return formatChatMessage(
+      format,
+      session.data?.user?.login || "v8vgGbx_TuKkBabAyn7nsQ",
+      session.data?.user?.displayName || "Marijntje04",
+      "Nice Time! Well done.",
+    );
   }
 
   return (

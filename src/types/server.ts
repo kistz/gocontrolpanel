@@ -10,9 +10,9 @@ export interface ServerInfo {
 
 export interface ChatConfig {
   manualRouting: boolean;
-  messageFormat: string;
-  connectMessage: string;
-  disconnectMessage: string;
+  messageFormat: string | null;
+  connectMessage: string | null;
+  disconnectMessage: string | null;
 }
 
 export interface ServerClientInfo {
