@@ -62,11 +62,12 @@ export async function getGroupsPaginated(
   sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<GroupsWithUsersWithServers>>> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
+  return doServerActionWithAuth(
+    ["groups:view", "groups::moderator", "groups::admin"],
+    async (session) => {
+      const db = getClient();
 
-    const totalCount = await db.groups.count({
-      where: {
+      const where: Prisma.GroupsWhereInput = {
         deletedAt: null,
         ...(filter && {
           OR: [
@@ -74,52 +75,47 @@ export async function getGroupsPaginated(
             { description: { contains: filter } },
           ],
         }),
-      },
-    });
+      };
 
-    const groups = await db.groups.findMany({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { name: { contains: filter } },
-            { description: { contains: filter } },
-          ],
-        }),
-      },
-      skip: pagination.pageIndex * pagination.pageSize,
-      take: pagination.pageSize,
-      orderBy: {
-        [sorting.field]: sorting.order.toLowerCase(),
-      },
-      include: groupUsersServersSchema,
-    });
+      if (!session.user.permissions.includes("groups:view")) {
+        const userGroupIds = session.user.groups.map((g) => g.id);
 
-    return {
-      data: groups,
-      totalCount,
-    };
-  });
-}
+        if (userGroupIds.length === 0) {
+          return {
+            data: [],
+            totalCount: 0,
+          };
+        }
 
-export async function getGroup(
-  groupId: string,
-): Promise<ServerResponse<GroupsWithUsersWithServers | null>> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-    const group = await db.groups.findUnique({
-      where: { id: groupId },
-      include: groupUsersServersSchema,
-    });
+        where.id = { in: userGroupIds };
+      }
 
-    return group;
-  });
+      const totalCount = await db.groups.count({
+        where,
+      });
+
+      const groups = await db.groups.findMany({
+        where,
+        skip: pagination.pageIndex * pagination.pageSize,
+        take: pagination.pageSize,
+        orderBy: {
+          [sorting.field]: sorting.order.toLowerCase(),
+        },
+        include: groupUsersServersSchema,
+      });
+
+      return {
+        data: groups,
+        totalCount,
+      };
+    },
+  );
 }
 
 export async function createGroup(
   group: Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<ServerResponse<GroupsWithUsersWithServers>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["groups:create"], async () => {
     const db = getClient();
 
     const { groupMembers, groupServers, ...groupData } = group;
@@ -151,7 +147,7 @@ export async function updateGroup(
     Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
 ): Promise<ServerResponse<GroupsWithUsersWithServers>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["groups:edit", `groups:${groupId}:admin`], async () => {
     const db = getClient();
 
     const { groupMembers, groupServers, ...scalarFields } = group;
@@ -182,27 +178,12 @@ export async function updateGroup(
 }
 
 export async function deleteGroup(groupId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["groups:delete", `groups:${groupId}:admin`], async () => {
     const db = getClient();
     await db.groups.update({
       where: { id: groupId },
       data: {
         deletedAt: new Date(),
-      },
-    });
-  });
-}
-
-export async function removeServerFromGroups(
-  serverId: string,
-): Promise<ServerResponse> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-
-    // First, find all group-server relations with the given serverId
-    await db.groupServers.deleteMany({
-      where: {
-        serverId,
       },
     });
   });

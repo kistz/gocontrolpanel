@@ -8,6 +8,7 @@ import { GroupRole, Servers } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddGroupSchema, AddGroupSchemaType } from "./add-group-schema";
@@ -21,8 +22,13 @@ export default function AddGroupForm({
   users: UserMinimal[];
   callback?: () => void;
 }) {
+  const { data: session } = useSession();
+
   const form = useForm<AddGroupSchemaType>({
     resolver: zodResolver(AddGroupSchema),
+    defaultValues: {
+      groupMembers: [{ userId: session?.user.id, role: GroupRole.Admin }],
+    },
   });
 
   async function onSubmit(values: AddGroupSchemaType) {

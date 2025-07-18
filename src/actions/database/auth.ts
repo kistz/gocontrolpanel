@@ -1,5 +1,6 @@
 import { getClient } from "@/lib/dbclient";
 import { Prisma, Users } from "@/lib/prisma/generated";
+import { getList } from "@/lib/utils";
 import { ServerError } from "@/types/responses";
 import "server-only";
 
@@ -119,7 +120,10 @@ export async function createUserAuth(
   };
 
   const result = await db.users.create({
-    data: newUser,
+    data: {
+      ...newUser,
+      permissions: getList(newUser.permissions),
+    },
     include: includeGroupsWithServers,
   });
 

@@ -189,14 +189,19 @@ export async function withAuth(roles?: string[], id = ""): Promise<Session> {
   let userRoles = session.user.permissions;
   
   session.user.groups.forEach((group) => {
-    userRoles.push(`group:${group.id}:${group.role.toLowerCase()}`);
+    const role = group.role.toLowerCase();
+    userRoles.push(`groups::${role}`);
+    userRoles.push(`groups:${group.id}:${role}`);
     group.servers.forEach((server) => {
-      userRoles.push(`server:${server.id}:${group.role.toLowerCase()}`);
+      userRoles.push(`servers::${role}`);
+      userRoles.push(`servers:${server.id}:${role}`);
     });
   });
 
   session.user.projects.forEach((project) => {
-    userRoles.push(`project:${project.id}:${project.role.toLowerCase()}`);
+    const role = project.role.toLowerCase();
+    userRoles.push(`projects::${role}`);
+    userRoles.push(`projects:${project.id}:${role}`);
   });
 
   roles = roles.map((role) => role.replace(":id", `:${id}`));
