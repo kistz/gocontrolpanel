@@ -57,6 +57,7 @@ services:
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: 
       DEFAULT_ADMINS: 
+      DEFAULT_PERMISSIONS: 
       NADEO_CLIENT_ID: 
       NADEO_CLIENT_SECRET: 
       NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo

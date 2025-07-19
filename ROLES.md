@@ -1,9 +1,22 @@
-- Application
-  - Users
-    - View
-      - Admin
-    - Edit
-      - Admin
-    - Delete
-      - Admin
-  - Groups
+- users:view
+- users:edit
+- users:delete
+- groups:view
+- groups:create
+- groups:edit
+- groups:delete
+- roles:view
+- roles:create
+- roles:edit
+- roles:delete
+- servers:view
+- servers:create
+- servers:edit
+- servers:delete
+- hetzner:view
+- hetzner:create
+- hetzner:edit
+- hetzner:delete
+- hetzner:servers:view
+- hetzner:servers:create
+- hetzner:servers:delete

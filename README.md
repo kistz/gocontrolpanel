@@ -22,6 +22,7 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
   - [Getting Started](#getting-started)
     - [New Stack Setup](#new-stack-setup)
     - [PyPlanet/EvoSC Stack Setup](#pyplanetevosc-stack-setup)
+  - [Permissions](#permissions)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
   - [License](#license)
@@ -141,6 +142,7 @@ Make sure to update the environment variables for the services in your `docker-c
 
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins. Probably your own login, e.g., `v8vgGbx_TuKkBabAyn7nsQ`.
+  - `DEFAULT_PERMISSIONS`: Comma-separated list of default permissions for new users. You can find a list of available permissions in the [Permissions](#permissions) section.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
   - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
@@ -225,6 +227,7 @@ gocontrolpanel:
     NEXTAUTH_URL: http://localhost:3000
     NEXTAUTH_SECRET:
     DEFAULT_ADMINS:
+    DEFAULT_PERMISSIONS:
     NADEO_CLIENT_ID:
     NADEO_CLIENT_SECRET:
     NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
@@ -269,6 +272,7 @@ Make sure to update the environment variables for the added services in your `do
 
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
+  - `DEFAULT_PERMISSIONS`: Comma-separated list of default permissions for new users. You can find a list of available permissions in the [Permissions](#permissions) section.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
   - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
 
@@ -285,6 +289,35 @@ docker compose up -d --build
 ### 7. Access the GoControlPanel
 
 That's it! You can now access your **GoControlPanel** at `http://localhost:3000` or your own configured url.
+
+---
+
+## Permissions
+
+The **GoControlPanel** supports a permission system that allows you to manage user access to various features. You can set default permissions for new users using the `DEFAULT_PERMISSIONS` environment variable in your `docker-compose.yml` file. Here is a list of available permissions:
+
+- users:view
+- users:edit
+- users:delete
+- groups:view
+- groups:create
+- groups:edit
+- groups:delete
+- roles:view
+- roles:create
+- roles:edit
+- roles:delete
+- servers:view
+- servers:create
+- servers:edit
+- servers:delete
+- hetzner:view
+- hetzner:create
+- hetzner:edit
+- hetzner:delete
+- hetzner:servers:view
+- hetzner:servers:create
+- hetzner:servers:delete
 
 ---
 
