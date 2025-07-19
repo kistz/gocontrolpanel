@@ -28,21 +28,23 @@ export default async function AdminGroupsPage() {
             Manage the groups and their members.
           </h4>
         </div>
-
-        {canCreate && (
-          <Modal>
-            <AddGroupModal />
-            <Button>
-              <IconPlus /> Add Group
-            </Button>
-          </Modal>
-        )}
       </div>
 
       <PaginationTable
         key={key}
         createColumns={createColumns}
         fetchData={getGroupsPaginated}
+        actions={
+          canCreate && (
+            <Modal>
+              <AddGroupModal />
+              <Button>
+                <IconPlus /> Add Group
+              </Button>
+            </Modal>
+          )
+        }
+        filter
       />
     </div>
   );

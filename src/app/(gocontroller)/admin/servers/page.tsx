@@ -27,20 +27,21 @@ export default async function AdminServersPage() {
             server details.
           </h4>
         </div>
-
-        {canCreate && (
-          <Modal>
-            <AddServerModal />
-            <Button>
-              <IconPlus /> Add Server
-            </Button>
-          </Modal>
-        )}
       </div>
 
       <PaginationTable
         createColumns={createColumns}
         fetchData={getServersPaginated}
+        actions={
+          canCreate && (
+            <Modal>
+              <AddServerModal />
+              <Button>
+                <IconPlus /> Add Server
+              </Button>
+            </Modal>
+          )
+        }
         filter
       />
     </div>

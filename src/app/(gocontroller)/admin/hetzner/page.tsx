@@ -26,8 +26,12 @@ export default async function AdminHetznerPage() {
             Manage your Hetzner projects and cloud servers.
           </h4>
         </div>
+      </div>
 
-        {canCreate && (
+      <PaginationTable
+        fetchData={getHetznerProjectsPaginated}
+        createColumns={createColumns}
+        actions={canCreate && (
           <Modal>
             <AddProjectModal />
             <Button>
@@ -35,12 +39,7 @@ export default async function AdminHetznerPage() {
             </Button>
           </Modal>
         )}
-      </div>
-
-      <PaginationTable
-        fetchData={getHetznerProjectsPaginated}
-        createColumns={createColumns}
-        filter={true}
+        filter
       />
     </div>
   );

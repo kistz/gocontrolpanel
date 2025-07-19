@@ -26,8 +26,13 @@ export default async function AdminRolesPage() {
             Manage the roles and their permissions.
           </h4>
         </div>
+      </div>
 
-        {canCreate && (
+      <PaginationTable
+        createColumns={createColumns}
+        fetchData={getRolesPaginated}
+        actions={
+          canCreate && (
           <Modal>
             <AddRoleModal />
             <Button>
@@ -35,12 +40,7 @@ export default async function AdminRolesPage() {
             </Button>
           </Modal>
         )}
-      </div>
-
-      <PaginationTable
-        createColumns={createColumns}
-        fetchData={getRolesPaginated}
-        filter={true}
+        filter
       />
     </div>
   );
