@@ -25,15 +25,24 @@ export default async function Navbar() {
 
   const canViewUsers = await hasPermission(routePermissions.admin.users.view);
   const canViewGroups = await hasPermission(routePermissions.admin.groups.view);
-  const canViewServers = await hasPermission(routePermissions.admin.servers.view);
+  const canViewServers = await hasPermission(
+    routePermissions.admin.servers.view,
+  );
+  const canViewRoles = await hasPermission(routePermissions.admin.roles.view);
 
-  const canViewAdmin = canViewUsers || canViewGroups || canViewServers;
+  const canViewAdmin =
+    canViewUsers || canViewGroups || canViewServers || canViewRoles;
 
   return (
     <>
       {session && <NavGroups />}
       {session && canViewAdmin && (
-        <NavAdmin canViewUsers={canViewUsers} canViewAdmin={canViewAdmin} canViewServers={canViewServers} />
+        <NavAdmin
+          canViewUsers={canViewUsers}
+          canViewAdmin={canViewAdmin}
+          canViewServers={canViewServers}
+          canViewRoles={canViewRoles}
+        />
       )}
       <NavFooter />
     </>

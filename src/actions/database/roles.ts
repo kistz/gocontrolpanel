@@ -2,14 +2,16 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { Roles } from "@/lib/prisma/generated";
+import { Prisma, Roles } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
 export type RoleMinimal = Pick<Roles, "id" | "name" | "permissions">;
 
-export async function getRolesMinimal(): Promise<ServerResponse<RoleMinimal[]>> {
+export async function getRolesMinimal(): Promise<
+  ServerResponse<RoleMinimal[]>
+> {
   return doServerActionWithAuth(["users:edit"], async () => {
     const db = getClient();
     const roles = await db.roles.findMany({
@@ -29,31 +31,25 @@ export async function getRolesPaginated(
   sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Roles>>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["roles:view"], async () => {
     const db = getClient();
 
+    const where: Prisma.RolesWhereInput = {
+      deletedAt: null,
+      ...(filter && {
+        OR: [
+          { name: { contains: filter } },
+          { permissions: { array_contains: [filter] } },
+        ],
+      }),
+    };
+
     const totalCount = await db.roles.count({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { name: { contains: filter } },
-            { permissions: { array_contains: filter } },
-          ],
-        }),
-      },
+      where,
     });
 
     const roles = await db.roles.findMany({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { name: { contains: filter } },
-            { permissions: { array_contains: [filter] } },
-          ],
-        }),
-      },
+      where,
       skip: pagination.pageIndex * pagination.pageSize,
       take: pagination.pageSize,
       orderBy: {
@@ -71,7 +67,7 @@ export async function getRolesPaginated(
 export async function createRole(
   role: Omit<Roles, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<ServerResponse<Roles>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["roles:create"], async () => {
     const db = getClient();
 
     const newRole = await db.roles.create({
@@ -89,7 +85,7 @@ export async function updateRole(
   roleId: string,
   role: Omit<Roles, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<ServerResponse<Roles>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["roles:edit"], async () => {
     const db = getClient();
 
     const updatedRole = await db.roles.update({
@@ -105,7 +101,7 @@ export async function updateRole(
 }
 
 export async function deleteRole(roleId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["roles:delete"], async () => {
     const db = getClient();
 
     await db.roles.update({

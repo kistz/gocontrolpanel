@@ -13,9 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Roles } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -56,11 +58,26 @@ export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
     id: "actions",
     cell: ({ row }) => {
       const role = row.original;
+      const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
 
+      const canEdit = hasPermissionSync(
+        session,
+        routePermissions.admin.roles.edit,
+      );
+      const canDelete = hasPermissionSync(
+        session,
+        routePermissions.admin.roles.delete,
+      );
+
       const handleDelete = () => {
+        if (!canDelete) {
+          toast.error("You do not have permission to delete roles.");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteRole(role.id);
@@ -77,6 +94,10 @@ export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
         });
       };
 
+      if (!canEdit && !canDelete) {
+        return null;
+      }
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -87,35 +108,43 @@ export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit role
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpen(true)}
-              >
-                Delete role
-              </DropdownMenuItem>
+              {canEdit && (
+                <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                  Edit role
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Delete role
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onConfirm={handleDelete}
-            title="Delete role"
-            description={`Are you sure you want to delete ${role.name}?`}
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
+          {canDelete && (
+            <ConfirmModal
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete role"
+              description={`Are you sure you want to delete ${role.name}?`}
+              confirmText="Delete"
+              cancelText="Cancel"
+            />
+          )}
 
-          <Modal
-            isOpen={isEditOpen}
-            setIsOpen={setIsEditOpen}
-            onClose={() => refetch()}
-          >
-            <EditRoleModal data={role} />
-          </Modal>
+          {canEdit && (
+            <Modal
+              isOpen={isEditOpen}
+              setIsOpen={setIsEditOpen}
+              onClose={() => refetch()}
+            >
+              <EditRoleModal data={role} />
+            </Modal>
+          )}
         </div>
       );
     },

@@ -3,18 +3,19 @@ import AddRoleModal from "@/components/modals/add-role";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
-import { withAuth } from "@/lib/auth";
-import { routes } from "@/routes";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { createColumns } from "./columns";
 
 export default async function AdminRolesPage() {
-  try {
-    await withAuth(["app:admin"]);
-  } catch {
+  const canView = await hasPermission(routePermissions.admin.roles.view);
+  if (!canView) {
     redirect(routes.dashboard);
   }
+
+  const canCreate = await hasPermission(routePermissions.admin.roles.create);
 
   return (
     <div className="flex flex-col gap-6">
@@ -26,12 +27,14 @@ export default async function AdminRolesPage() {
           </h4>
         </div>
 
-        <Modal>
-          <AddRoleModal />
-          <Button>
-            <IconPlus /> Add Role
-          </Button>
-        </Modal>
+        {canCreate && (
+          <Modal>
+            <AddRoleModal />
+            <Button>
+              <IconPlus /> Add Role
+            </Button>
+          </Modal>
+        )}
       </div>
 
       <PaginationTable

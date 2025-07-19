@@ -31,10 +31,12 @@ export default async function NavAdmin({
   canViewUsers,
   canViewAdmin,
   canViewServers,
+  canViewRoles,
 }: {
   canViewUsers: boolean;
   canViewAdmin: boolean;
   canViewServers: boolean;
+  canViewRoles: boolean;
 }) {
   const group: NavGroup = {
     name: "Admin",
@@ -55,6 +57,7 @@ export default async function NavAdmin({
         name: "Roles",
         url: routes.admin.roles,
         icon: IconClipboardText,
+        auth: canViewRoles,
       },
       {
         name: "Servers",
