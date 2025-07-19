@@ -30,9 +30,11 @@ import { NavGroup } from ".";
 export default async function NavAdmin({
   canViewUsers,
   canViewAdmin,
+  canViewServers,
 }: {
   canViewUsers: boolean;
   canViewAdmin: boolean;
+  canViewServers: boolean;
 }) {
   const group: NavGroup = {
     name: "Admin",
@@ -58,6 +60,7 @@ export default async function NavAdmin({
         name: "Servers",
         url: routes.admin.servers,
         icon: IconServerCog,
+        auth: canViewServers,
       },
       {
         name: "Hetzner",

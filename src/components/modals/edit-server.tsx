@@ -1,14 +1,14 @@
 "use client";
+import { ServersWithUsers } from "@/actions/database/servers";
 import EditServerForm from "@/forms/admin/server/edit-server-form";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
-import { Servers } from "@/lib/prisma/generated";
 
 export default function EditServerModal({
   closeModal,
   data,
-}: DefaultModalProps<Servers>) {
+}: DefaultModalProps<ServersWithUsers>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {

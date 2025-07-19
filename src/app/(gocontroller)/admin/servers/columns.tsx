@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteServer } from "@/actions/database/servers";
+import { deleteServer, ServersWithUsers } from "@/actions/database/servers";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditServerModal from "@/components/modals/edit-server";
 import Modal from "@/components/modals/modal";
@@ -13,13 +13,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Servers } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const createColumns = (refetch: () => void): ColumnDef<Servers>[] => [
+export const createColumns = (refetch: () => void): ColumnDef<ServersWithUsers>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -54,11 +56,28 @@ export const createColumns = (refetch: () => void): ColumnDef<Servers>[] => [
     id: "actions",
     cell: ({ row }) => {
       const server = row.original;
+      const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [editIsOpen, setEditIsOpen] = useState(false);
 
+      const canEdit = hasPermissionSync(
+        session,
+        routePermissions.admin.servers.edit,
+        server.id,
+      );
+      const canDelete = hasPermissionSync(
+        session,
+        routePermissions.admin.servers.delete,
+        server.id,
+      );
+
       const handleDelete = () => {
+        if (!canDelete) {
+          toast.error("You do not have permission to delete this server.");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteServer(server.id);
@@ -75,6 +94,10 @@ export const createColumns = (refetch: () => void): ColumnDef<Servers>[] => [
         });
       };
 
+      if (!canEdit && !canDelete) {
+        return null;
+      }
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -85,35 +108,43 @@ export const createColumns = (refetch: () => void): ColumnDef<Servers>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setEditIsOpen(true)}>
-                Edit server
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpen(true)}
-              >
-                Delete server
-              </DropdownMenuItem>
+              {canEdit && (
+                <DropdownMenuItem onClick={() => setEditIsOpen(true)}>
+                  Edit server
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Delete server
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onConfirm={handleDelete}
-            title="Delete server"
-            description="Are you sure you want to delete this server?"
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
+          {canDelete && (
+            <ConfirmModal
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete server"
+              description="Are you sure you want to delete this server?"
+              confirmText="Delete"
+              cancelText="Cancel"
+            />
+          )}
 
-          <Modal
-            isOpen={editIsOpen}
-            setIsOpen={setEditIsOpen}
-            onClose={() => refetch()}
-          >
-            <EditServerModal data={server} />
-          </Modal>
+          {canEdit && (
+            <Modal
+              isOpen={editIsOpen}
+              setIsOpen={setEditIsOpen}
+              onClose={() => refetch()}
+            >
+              <EditServerModal data={server} />
+            </Modal>
+          )}
         </div>
       );
     },

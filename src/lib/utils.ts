@@ -300,7 +300,6 @@ export function hasPermissionSync(session: Session | null, permissions?: string[
 
   if (!permissions || permissions.length === 0) return false;
 
-  
   const userPermissions = session.user.permissions;
   
   session.user.groups.forEach((group) => {

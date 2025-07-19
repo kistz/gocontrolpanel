@@ -9,6 +9,15 @@ export const EditServerSchema = z.object({
     .min(1, { message: "Port must be greater than 0" }),
   user: z.string().min(1, { message: "User is required" }),
   password: z.string().min(1, { message: "Password is required" }),
+    userServers: z
+      .array(
+        z.object({
+          userId: z.string().min(1, "User is required"),
+          role: z.string().min(1, "Role is required"),
+        }),
+      )
+      .optional()
+      .describe("List of users with their roles on the server"),
   filemanagerUrl: z.string().optional(),
 });
 

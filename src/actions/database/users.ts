@@ -16,7 +16,7 @@ export async function getUsersMinimal(): Promise<
   ServerResponse<UserMinimal[]>
 > {
   return doServerActionWithAuth(
-    ["groups:create", "groups:edit", "groups::admin"],
+    ["groups:create", "groups:edit", "groups::admin", "servers:create", "servers:edit", "servers::admin"],
     async () => {
       const db = getClient();
       const users = await db.users.findMany({

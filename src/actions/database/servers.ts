@@ -7,13 +7,44 @@ import { Prisma, Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const editServer = Prisma.validator<Prisma.ServersInclude>()({
+  userServers: {
+    select: {
+      userId: true,
+      role: true,
+    },
+  },
+});
+
+export type EditServers = Prisma.ServersGetPayload<{
+  include: typeof editServer;
+}>;
+
+const serversUsersSchema = Prisma.validator<Prisma.ServersInclude>()({
+  userServers: {
+    where: {
+      user: {
+        deletedAt: null,
+      },
+    },
+    include: {
+      user: true,
+    },
+  },
+});
+
+export type ServersWithUsers = Prisma.ServersGetPayload<{
+  include: typeof serversUsersSchema;
+}>;
+
 export type ServerMinimal = Pick<Servers, "id" | "name">;
 
 export async function getServersMinimal(): Promise<
   ServerResponse<ServerMinimal[]>
 > {
   return doServerActionWithAuth(
-    ["groups:create", "groups:edit", "groups::admin"],
+    ["groups:create", "groups:edit", "groups::admin", "servers:view"],
     async (session) => {
       const db = getClient();
 
@@ -21,7 +52,10 @@ export async function getServersMinimal(): Promise<
         deletedAt: null,
       };
 
-      if (!session.user.admin) {
+      if (
+        !session.user.admin &&
+        !session.user.permissions.includes("servers:view")
+      ) {
         const userServers = session.user.servers.map((s) => s.id);
         session.user.groups.forEach((group) => {
           group.servers.forEach((server) => {
@@ -49,36 +83,58 @@ export async function getServersPaginated(
   pagination: PaginationState,
   sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
-): Promise<ServerResponse<PaginationResponse<Servers>>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const db = getClient();
-    const servers = await db.servers.findMany({
-      skip: pagination.pageIndex * pagination.pageSize,
-      take: pagination.pageSize,
-      orderBy: { [sorting.field]: sorting.order },
-      where: {
-        deletedAt: null,
-        ...(filter ? { name: { contains: filter } } : {}),
-      },
-    });
+): Promise<ServerResponse<PaginationResponse<ServersWithUsers>>> {
+  return doServerActionWithAuth(
+    ["servers:view", "servers::moderator", "servers::admin"],
+    async (session) => {
+      const db = getClient();
 
-    const totalCount = await db.servers.count({
-      where: {
+      const where: Prisma.ServersWhereInput = {
         deletedAt: null,
-        ...(filter ? { name: { contains: filter } } : {}),
-      },
-    });
+        ...(filter && {
+          name: { contains: filter },
+        }),
+      };
 
-    return {
-      data: servers,
-      totalCount,
-    };
-  });
+      if (
+        !session.user.admin &&
+        !session.user.permissions.includes("servers:view")
+      ) {
+        const userServerIds = session.user.servers.map((s) => s.id);
+
+        if (userServerIds.length === 0) {
+          return {
+            data: [],
+            totalCount: 0,
+          };
+        }
+
+        where.id = { in: userServerIds };
+      }
+
+      const totalCount = await db.servers.count({
+        where,
+      });
+
+      const servers = await db.servers.findMany({
+        skip: pagination.pageIndex * pagination.pageSize,
+        take: pagination.pageSize,
+        orderBy: { [sorting.field]: sorting.order },
+        where,
+        include: serversUsersSchema,
+      });
+
+      return {
+        data: servers,
+        totalCount,
+      };
+    },
+  );
 }
 
 export async function createServer(
   server: Omit<
-    Servers,
+    EditServers,
     | "id"
     | "manualRouting"
     | "messageFormat"
@@ -88,11 +144,22 @@ export async function createServer(
     | "updatedAt"
     | "deletedAt"
   >,
-): Promise<ServerResponse<Servers>> {
-  return doServerActionWithAuth(["admin"], async () => {
+): Promise<ServerResponse<ServersWithUsers>> {
+  return doServerActionWithAuth(["servers:create"], async () => {
     const db = getClient();
+
+    const { userServers, ...serverData } = server;
     const newServer = await db.servers.create({
-      data: server,
+      data: {
+        ...serverData,
+        userServers: {
+          create: userServers.map((us) => ({
+            userId: us.userId,
+            role: us.role,
+          })),
+        },
+      },
+      include: serversUsersSchema,
     });
     return newServer;
   });
@@ -102,7 +169,7 @@ export async function updateServer(
   serverId: string,
   server: Partial<
     Omit<
-      Servers,
+      EditServers,
       | "id"
       | "manualRouting"
       | "messageFormat"
@@ -112,15 +179,30 @@ export async function updateServer(
       | "updatedAt"
     >
   >,
-): Promise<ServerResponse<Servers>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const db = getClient();
-    const updatedServer = await db.servers.update({
-      where: { id: serverId },
-      data: server,
-    });
-    return updatedServer;
-  });
+): Promise<ServerResponse<ServersWithUsers>> {
+  return doServerActionWithAuth(
+    ["servers:edit", `servers:${serverId}:admin`],
+    async () => {
+      const db = getClient();
+
+      const { userServers, ...scalarFields } = server;
+      const updatedServer = await db.servers.update({
+        where: { id: serverId },
+        data: {
+          ...scalarFields,
+          userServers: {
+            deleteMany: {},
+            create: userServers?.map((us) => ({
+              userId: us.userId,
+              role: us.role,
+            })),
+          },
+        },
+        include: serversUsersSchema,
+      });
+      return updatedServer;
+    },
+  );
 }
 
 export async function getServerChatConfig(
@@ -133,7 +215,7 @@ export async function getServerChatConfig(
     >
   >
 > {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:moderator`, `servers:${serverId}:admin`], async () => {
     const db = getClient();
     const server = await db.servers.findUnique({
       where: { id: serverId },
@@ -158,7 +240,7 @@ export async function updateServerChatConfig(
     "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
   >,
 ): Promise<ServerResponse<Servers>> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const manager = await getGbxClientManager(serverId);
     let err;
     try {
@@ -188,7 +270,7 @@ export async function updateServerChatConfig(
 }
 
 export async function deleteServer(serverId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth(["servers:delete", `servers:${serverId}:admin`], async () => {
     const db = getClient();
     await db.servers.update({
       where: { id: serverId },
