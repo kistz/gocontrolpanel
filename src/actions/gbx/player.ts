@@ -8,37 +8,47 @@ import { ServerResponse } from "@/types/responses";
 export async function getPlayerList(
   serverId: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const playerList = await client.call("GetPlayerList", 1000, 0);
+  return doServerActionWithAuth(
+    [
+      `servers:${serverId}:member`,
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:member`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async () => {
+      const client = await getGbxClient(serverId);
+      const playerList = await client.call("GetPlayerList", 1000, 0);
 
-    if (!playerList || !Array.isArray(playerList)) {
-      return [];
-    }
-
-    const players: PlayerInfo[] = [];
-    for (const player of playerList) {
-      try {
-        players.push({
-          nickName: player.NickName,
-          login: player.Login,
-          playerId: player.PlayerId,
-          spectatorStatus: player.SpectatorStatus,
-          teamId: player.TeamId,
-        });
-      } catch {
-        players.push({
-          nickName: "-",
-          login: player.Login,
-          playerId: 0,
-          spectatorStatus: 0,
-          teamId: 0,
-        });
+      if (!playerList || !Array.isArray(playerList)) {
+        return [];
       }
-    }
 
-    return players;
-  });
+      const players: PlayerInfo[] = [];
+      for (const player of playerList) {
+        try {
+          players.push({
+            nickName: player.NickName,
+            login: player.Login,
+            playerId: player.PlayerId,
+            spectatorStatus: player.SpectatorStatus,
+            teamId: player.TeamId,
+          });
+        } catch {
+          players.push({
+            nickName: "-",
+            login: player.Login,
+            playerId: 0,
+            spectatorStatus: 0,
+            teamId: 0,
+          });
+        }
+      }
+
+      return players;
+    },
+  );
 }
 
 export async function banPlayer(

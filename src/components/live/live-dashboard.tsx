@@ -1,6 +1,6 @@
 "use client";
 import { getPlayerList } from "@/actions/gbx/player";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { LiveInfo } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
@@ -15,9 +15,10 @@ import Rankings from "./rankings";
 import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
+import { routePermissions } from "@/routes";
 
 export default function LiveDashboard({ serverId }: { serverId: string }) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
   const [liveInfo, setLiveInfo] = useState<LiveInfo | null>(null);
@@ -27,6 +28,12 @@ export default function LiveDashboard({ serverId }: { serverId: string }) {
   } | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
+
+  const canActions = hasPermissionSync(
+    session,
+    routePermissions.servers.live.actions,
+    serverId,
+  );
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -264,6 +271,7 @@ export default function LiveDashboard({ serverId }: { serverId: string }) {
           pauseAvailable={liveInfo.pauseAvailable}
           isPaused={liveInfo.isPaused}
           isWarmUp={liveInfo.isWarmUp}
+          canActions={canActions}
         />
         <Rankings
           players={liveInfo.players}

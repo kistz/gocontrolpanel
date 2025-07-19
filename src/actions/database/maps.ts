@@ -17,20 +17,30 @@ import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
 export async function getMapByUid(
   uid: string,
 ): Promise<ServerResponse<Maps | null>> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-    const map = await db.maps.findFirst({
-      where: { uid, deletedAt: null },
-    });
+  return doServerActionWithAuth(
+    [
+      "servers::member",
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::member",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
+    async () => {
+      const db = getClient();
+      const map = await db.maps.findFirst({
+        where: { uid, deletedAt: null },
+      });
 
-    if (!map) {
-      return null;
-    }
+      if (!map) {
+        return null;
+      }
 
-    const [updatedMap] = await checkAndUpdateMapsInfoIfNeeded([map]);
+      const [updatedMap] = await checkAndUpdateMapsInfoIfNeeded([map]);
 
-    return updatedMap;
-  });
+      return updatedMap;
+    },
+  );
 }
 
 export async function getMapsPaginated(

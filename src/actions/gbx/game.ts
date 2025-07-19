@@ -197,8 +197,11 @@ export async function triggerModeScriptEventArray(
   method: string,
   params: string[],
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("TriggerModeScriptEventArray", method, params);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("TriggerModeScriptEventArray", method, params);
+    },
+  );
 }

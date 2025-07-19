@@ -9,13 +9,11 @@ import {
   IconStopwatch,
   IconUser,
 } from "@tabler/icons-react";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 import { Card } from "../ui/card";
-import { Separator } from "../ui/separator";
 import LiveActions from "./live-actions";
 
 interface MapInfoProps {
@@ -25,6 +23,7 @@ interface MapInfoProps {
   pauseAvailable: boolean;
   isPaused: boolean;
   isWarmUp: boolean;
+  canActions: boolean;
 }
 
 export default function MapInfo({
@@ -34,8 +33,8 @@ export default function MapInfo({
   pauseAvailable,
   isPaused,
   isWarmUp,
+  canActions,
 }: MapInfoProps) {
-  const session = useSession();
   const [mapInfo, setMapInfo] = useState<Maps | null>(null);
 
   useEffect(() => {
@@ -116,9 +115,8 @@ export default function MapInfo({
           <span className="text-sm">{formatTime(mapInfo.authorTime)}</span>
         </div>
 
-        {session.data?.user?.admin && (
+        {canActions && (
           <>
-            <Separator />
             <LiveActions
               serverId={serverId}
               pauseAvailable={pauseAvailable}

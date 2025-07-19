@@ -3,6 +3,7 @@ import { triggerModeScriptEventArray } from "@/actions/gbx/game";
 import { getErrorMessage } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 
 interface LiveActionsProps {
   serverId: string;
@@ -74,25 +75,32 @@ export default function LiveActions({
     }
   };
 
+  if (!pauseAvailable && !isWarmUp) {
+    return null;
+  }
+
   return (
-    <div className="flex gap-2 flex-wrap">
-      {pauseAvailable && (
-        <Button variant={"outline"} onClick={handlePause}>
-          {isPaused ? "Resume" : "Pause"}
-        </Button>
-      )}
+    <>
+      <Separator />
+      <div className="flex gap-2 flex-wrap">
+        {pauseAvailable && (
+          <Button variant={"outline"} onClick={handlePause}>
+            {isPaused ? "Resume" : "Pause"}
+          </Button>
+        )}
 
-      {isWarmUp && (
-        <Button variant={"outline"} onClick={handleEndWarmUpRound}>
-          End Warmup Round
-        </Button>
-      )}
+        {isWarmUp && (
+          <Button variant={"outline"} onClick={handleEndWarmUpRound}>
+            End Warmup Round
+          </Button>
+        )}
 
-      {isWarmUp && (
-        <Button variant={"outline"} onClick={handleEndWarmUp}>
-          End Warmup
-        </Button>
-      )}
-    </div>
+        {isWarmUp && (
+          <Button variant={"outline"} onClick={handleEndWarmUp}>
+            End Warmup
+          </Button>
+        )}
+      </div>
+    </>
   );
 }
