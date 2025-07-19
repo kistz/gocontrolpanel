@@ -233,7 +233,16 @@ export default function NavGroups() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}
-          {group.servers.map((server) =>
+          {group.servers.length === 0 ? (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <IconServer />
+                  <span>No servers in this group</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ) : group.servers.map((server) =>
             server.items && server.items.length > 0 ? (
               <Collapsible
                 key={server.id}
