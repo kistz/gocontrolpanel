@@ -1,5 +1,6 @@
-import { withAuth } from "@/lib/auth";
+import { hasPermission } from "@/lib/auth";
 import { getFileManager } from "@/lib/filemanager";
+import { routePermissions, routes } from "@/routes";
 import { redirect } from "next/navigation";
 
 export default async function FilesLayout({
@@ -9,13 +10,13 @@ export default async function FilesLayout({
   children: React.ReactNode;
   params: Promise<{ id: string }>;
 }) {
-  try {
-    await withAuth(["admin"]);
-  } catch {
-    redirect("/");
-  }
-
   const { id } = await params;
+
+  const canView = await hasPermission(routePermissions.servers.files, id);
+
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
 
   try {
     const fileManager = await getFileManager(id);
