@@ -28,16 +28,19 @@ export async function SOCKET(
     return;
   }
 
-  const serverId = token.groups
-    ?.flatMap((group) => group.servers)
-    .find((server) => server.id === id)?.id;
+  const canView =
+    token.admin ||
+    token.servers.some((server) => server.id === id) ||
+    token.groups.some((group) =>
+      group.servers.some((server) => server.id === id),
+    );
 
-  if (!serverId) {
+  if (!canView) {
     client.close();
     return;
   }
 
-  const manager = await getGbxClientManager(serverId);
+  const manager = await getGbxClientManager(id);
 
   client.send(
     JSON.stringify({
@@ -67,7 +70,7 @@ export async function SOCKET(
   const cleanup = () => {
     manager.off("endMap", onEndMap);
     manager.off("startMap", onStartMap);
-  }
+  };
 
   return () => {
     cleanup();

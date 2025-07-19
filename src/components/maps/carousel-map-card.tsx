@@ -1,7 +1,8 @@
 import { nextMap, restartMap } from "@/actions/gbx/game";
 import { jumpToMap } from "@/actions/gbx/map";
 import { Maps } from "@/lib/prisma/generated";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { cn, getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import {
   IconBounceRight,
   IconPhoto,
@@ -10,6 +11,8 @@ import {
   IconRotateClockwise,
   IconUser,
 } from "@tabler/icons-react";
+import clsx from "clsx";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { parseTmTags, stripTmTags } from "tmtags";
@@ -24,6 +27,7 @@ interface CarouselMapCardProps {
   isSwitching?: boolean;
   total: number;
   serverId: string;
+  canMapActions: boolean;
   className?: string;
 }
 
@@ -34,9 +38,15 @@ export default function CarouselMapCard({
   isSwitching = false,
   total,
   serverId,
+  canMapActions,
   className,
 }: CarouselMapCardProps) {
   const onPreviousMap = async () => {
+    if (!canMapActions) {
+      toast.error("You do not have permission to perform this action.");
+      return;
+    }
+
     try {
       const previousIndex = index - 1 < 0 ? total - 1 : index - 1;
       const { error } = await jumpToMap(serverId, previousIndex);
@@ -52,6 +62,11 @@ export default function CarouselMapCard({
   };
 
   const onRestartMap = async () => {
+    if (!canMapActions) {
+      toast.error("You do not have permission to perform this action.");
+      return;
+    }
+
     try {
       const { error } = await restartMap(serverId);
       if (error) {
@@ -68,6 +83,11 @@ export default function CarouselMapCard({
   };
 
   const onNextMap = async () => {
+    if (!canMapActions) {
+      toast.error("You do not have permission to perform this action.");
+      return;
+    }
+
     try {
       const { error } = await nextMap(serverId);
       if (error) {
@@ -82,8 +102,16 @@ export default function CarouselMapCard({
   };
 
   const onJumpToMap = async () => {
+    if (!canMapActions) {
+      toast.error("You do not have permission to perform this action.");
+      return;
+    }
+
     try {
-      await jumpToMap(serverId, index);
+      const { error } = await jumpToMap(serverId, index);
+      if (error) {
+        throw new Error(error);
+      }
       toast.success("Jumped to map", {
         description: `Jumped to ${stripTmTags(map.name)} by ${map.authorNickname}`,
       });
@@ -109,7 +137,12 @@ export default function CarouselMapCard({
             <IconPhoto className="text-gray-500" size={48} />
           </div>
         )}
-        <div className="flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40">
+        <div
+          className={clsx(
+            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40",
+            !canMapActions && "rounded-b-lg",
+          )}
+        >
           <h3
             className="truncate text-lg font-semibold text-white"
             dangerouslySetInnerHTML={{ __html: parseTmTags(map.name) }}
@@ -126,51 +159,53 @@ export default function CarouselMapCard({
           </div>
         </div>
       </div>
-      <div className="p-3 flex gap-2 justify-between">
-        {isCurrent ? (
-          <>
-            <Button
-              variant={"outline"}
-              size="sm"
-              className="flex items-center gap-2"
-              onClick={onPreviousMap}
-            >
-              <IconPlayerTrackPrev className="mt-[2px]" />
-              <span className="hidden min-[450px]:block">Previous</span>
-            </Button>
+      {canMapActions && (
+        <div className="p-3 flex gap-2 justify-between">
+          {isCurrent ? (
+            <>
+              <Button
+                variant={"outline"}
+                size="sm"
+                className="flex items-center gap-2"
+                onClick={onPreviousMap}
+              >
+                <IconPlayerTrackPrev className="mt-[2px]" />
+                <span className="hidden min-[450px]:block">Previous</span>
+              </Button>
 
-            <Button
-              variant={"outline"}
-              size="sm"
-              className="flex items-center gap-2"
-              onClick={onRestartMap}
-            >
-              <IconRotateClockwise className="mt-[2px] rotate-180" />
-              <span className="hidden min-[450px]:block">Restart</span>
-            </Button>
+              <Button
+                variant={"outline"}
+                size="sm"
+                className="flex items-center gap-2"
+                onClick={onRestartMap}
+              >
+                <IconRotateClockwise className="mt-[2px] rotate-180" />
+                <span className="hidden min-[450px]:block">Restart</span>
+              </Button>
 
+              <Button
+                variant={"outline"}
+                size="sm"
+                className="flex items-center gap-2"
+                onClick={onNextMap}
+              >
+                <IconPlayerTrackNext className="mt-[2px]" />
+                <span className="hidden min-[450px]:block">Next</span>
+              </Button>
+            </>
+          ) : (
             <Button
               variant={"outline"}
               size="sm"
               className="flex items-center gap-2"
-              onClick={onNextMap}
+              onClick={onJumpToMap}
             >
-              <IconPlayerTrackNext className="mt-[2px]" />
-              <span className="hidden min-[450px]:block">Next</span>
+              <IconBounceRight className="mt-[2px]" />
+              Jump to Map
             </Button>
-          </>
-        ) : (
-          <Button
-            variant={"outline"}
-            size="sm"
-            className="flex items-center gap-2"
-            onClick={onJumpToMap}
-          >
-            <IconBounceRight className="mt-[2px]" />
-            Jump to Map
-          </Button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {isCurrent && (
         <Badge

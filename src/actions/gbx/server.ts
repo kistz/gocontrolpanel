@@ -11,7 +11,7 @@ import path from "path";
 export async function getServerSettings(
   serverId: string,
 ): Promise<ServerResponse<ServerSettingsSchemaType>> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const client = await getGbxClient(serverId);
     const settings = await client.multicall([
       ["GetServerOptions"],
@@ -72,7 +72,7 @@ export async function saveServerSettings(
   serverId: string,
   serverSettings: ServerSettingsSchemaType,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const client = await getGbxClient(serverId);
 
     serverSettings.defaultOptions.NextCallVoteTimeOut *= 1000; // Convert to milliseconds

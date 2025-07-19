@@ -1,7 +1,8 @@
 "use client";
 
 import { Maps } from "@/lib/prisma/generated";
-import { cn } from "@/lib/utils";
+import { cn, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import {
   IconArrowForwardUp,
   IconLock,
@@ -35,11 +36,17 @@ export default function MapCarousel({
   startIndex = 0,
   className,
 }: MapCarouselProps) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const [api, setApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState<number>(startIndex);
   const [follow, setFollow] = useState<boolean>(true);
   const [isSwitching, setIsSwitching] = useState<boolean>(false);
+
+  const canMapActions = hasPermissionSync(
+    session,
+    routePermissions.servers.game.mapActions,
+    serverId,
+  );
 
   const wsRef = useRef<WebSocket | null>(null);
   const followRef = useRef(follow);
@@ -124,6 +131,7 @@ export default function MapCarousel({
             >
               <CarouselMapCard
                 serverId={serverId}
+                canMapActions={canMapActions}
                 map={map}
                 index={index}
                 isCurrent={index === currentIndex}

@@ -15,6 +15,9 @@ import ModeScriptSettingsForm from "@/forms/server/game/mode-script-settings-for
 import PlaylistForm from "@/forms/server/game/playlist-form";
 import ScriptNameForm from "@/forms/server/game/script-name-form";
 import ShowOpponentsForm from "@/forms/server/game/show-opponents-form";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions } from "@/routes";
+import { ModeScriptInfo } from "@/types/gbx";
 import { parseTmTags } from "tmtags";
 
 export default async function ServerGamePage({
@@ -24,15 +27,56 @@ export default async function ServerGamePage({
 }) {
   const { id } = await params;
 
+  const canGameSettings = await hasPermission(
+    routePermissions.servers.game.gameSettings,
+    id,
+  );
+  const canScriptSettings = await hasPermission(
+    routePermissions.servers.game.scriptSettings,
+    id,
+  );
+
   const { data: mapList } = await getMapList(id);
   const { data: currentIndex } = await getCurrentMapIndex(id);
 
-  const { data: scripts } = await getScripts(id);
+  let showOpponents = 0;
+  let scriptName = "";
+  let scripts: string[] = [];
 
-  const { data: showOpponents } = await getShowOpponents(id);
-  const { data: scriptName } = await getScriptName(id);
-  const { data: modeScriptInfo } = await getModeScriptInfo(id);
-  const { data: modeScriptSettings } = await getModeScriptSettings(id);
+  if (canGameSettings) {
+    const [showOpponentsRes, scriptNameRes, scriptsRes] = await Promise.all([
+      getShowOpponents(id),
+      getScriptName(id),
+      getScripts(id),
+    ]);
+
+    showOpponents = showOpponentsRes.data.NextValue || 0;
+    scriptName = scriptNameRes.data.NextValue || "";
+    scripts = scriptsRes.data || [];
+  }
+
+  let modeScriptInfo: ModeScriptInfo = {
+    Name: "",
+    CompatibleTypes: "",
+    Description: "",
+    Version: "",
+    ParamDescs: [],
+    CommandDescs: [],
+  };
+
+  let modeScriptSettings: {
+    [key: string]: string | number | boolean;
+  } = {};
+
+  if (canScriptSettings) {
+    const [modeScriptInfoRes, modeScriptSettingsRes] = await Promise.all([
+      getModeScriptInfo(id),
+      getModeScriptSettings(id),
+    ]);
+
+    modeScriptInfo = modeScriptInfoRes.data;
+    modeScriptSettings = modeScriptSettingsRes.data;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,7 +91,9 @@ export default async function ServerGamePage({
       <Tabs defaultValue="map" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="map">Map Rotation</TabsTrigger>
-          <TabsTrigger value="script">Script Settings</TabsTrigger>
+          {canScriptSettings && (
+            <TabsTrigger value="script">Script Settings</TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="map" className="flex flex-col gap-6">
@@ -59,52 +105,56 @@ export default async function ServerGamePage({
             className="w-full"
           />
 
-          <Card className="p-6">
-            <div className="flex gap-6 flex-col min-[960px]:flex-row">
-              <div className="flex flex-col gap-4 flex-1">
-                <ShowOpponentsForm
-                  serverId={id}
-                  showOpponents={showOpponents.NextValue}
-                />
-                <ScriptNameForm
-                  serverId={id}
-                  scriptName={scriptName.NextValue}
-                  scripts={scripts}
-                />
-              </div>
-              <div className="flex flex-col gap-4 flex-1">
-                <MatchSettingsForm serverId={id} />
-                <PlaylistForm serverId={id} />
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-        <TabsContent value="script">
-          <Card className="p-6">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2 min-[960px]:w-1/2">
-                <div className="flex flex-col">
-                  <h2 className="text-lg font-bold">Mode Script Settings </h2>
-                  <p className="text-base text-muted-foreground font-medium truncate">
-                    ({modeScriptInfo.Name})
-                  </p>
+          {canGameSettings && (
+            <Card className="p-6">
+              <div className="flex gap-6 flex-col min-[960px]:flex-row">
+                <div className="flex flex-col gap-4 flex-1">
+                  <ShowOpponentsForm
+                    serverId={id}
+                    showOpponents={showOpponents}
+                  />
+                  <ScriptNameForm
+                    serverId={id}
+                    scriptName={scriptName}
+                    scripts={scripts}
+                  />
                 </div>
-                <p
-                  className="text-base"
-                  dangerouslySetInnerHTML={{
-                    __html: parseTmTags(modeScriptInfo.Description),
-                  }}
+                <div className="flex flex-col gap-4 flex-1">
+                  <MatchSettingsForm serverId={id} />
+                  <PlaylistForm serverId={id} />
+                </div>
+              </div>
+            </Card>
+          )}
+        </TabsContent>
+        {canScriptSettings && (
+          <TabsContent value="script">
+            <Card className="p-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2 min-[960px]:w-1/2">
+                  <div className="flex flex-col">
+                    <h2 className="text-lg font-bold">Mode Script Settings </h2>
+                    <p className="text-base text-muted-foreground font-medium truncate">
+                      ({modeScriptInfo.Name})
+                    </p>
+                  </div>
+                  <p
+                    className="text-base"
+                    dangerouslySetInnerHTML={{
+                      __html: parseTmTags(modeScriptInfo.Description),
+                    }}
+                  />
+                </div>
+
+                <ModeScriptSettingsForm
+                  serverId={id}
+                  modeScriptSettings={modeScriptSettings}
+                  modeScriptInfo={modeScriptInfo}
                 />
               </div>
-
-              <ModeScriptSettingsForm
-                serverId={id}
-                modeScriptSettings={modeScriptSettings}
-                modeScriptInfo={modeScriptInfo}
-              />
-            </div>
-          </Card>
-        </TabsContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

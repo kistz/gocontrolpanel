@@ -99,26 +99,39 @@ export async function getCurrentMapInfo(
 export async function getCurrentMapIndex(
   serverId: string,
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const mapIndex = await client.call("GetCurrentMapIndex");
+  return doServerActionWithAuth(
+    [
+      `servers:${serverId}:member`,
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:member`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async () => {
+      const client = await getGbxClient(serverId);
+      const mapIndex = await client.call("GetCurrentMapIndex");
 
-    if (typeof mapIndex !== "number") {
-      throw new ServerError("Failed to get current map index");
-    }
+      if (typeof mapIndex !== "number") {
+        throw new ServerError("Failed to get current map index");
+      }
 
-    return mapIndex;
-  });
+      return mapIndex;
+    },
+  );
 }
 
 export async function jumpToMap(
   serverId: string,
   index: number,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("JumpToMapIndex", index);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("JumpToMapIndex", index);
+    },
+  );
 }
 
 export async function setNextMap(

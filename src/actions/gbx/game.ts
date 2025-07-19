@@ -5,17 +5,23 @@ import { ModeScriptInfo } from "@/types/gbx";
 import { ServerResponse } from "@/types/responses";
 
 export async function restartMap(serverId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("RestartMap");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("RestartMap");
+    },
+  );
 }
 
 export async function nextMap(serverId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("NextMap");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("NextMap");
+    },
+  );
 }
 
 export async function balanceTeams(serverId: string): Promise<ServerResponse> {
@@ -29,10 +35,13 @@ export async function setShowOpponents(
   serverId: string,
   count: number,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("SetForceShowAllOpponents", count);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("SetForceShowAllOpponents", count);
+    },
+  );
 }
 
 export async function getShowOpponents(serverId: string): Promise<
@@ -41,20 +50,26 @@ export async function getShowOpponents(serverId: string): Promise<
     NextValue: number;
   }>
 > {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("GetForceShowAllOpponents");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("GetForceShowAllOpponents");
+    },
+  );
 }
 
 export async function setScriptName(
   serverId: string,
   script: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("SetScriptName", script);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("SetScriptName", script);
+    },
+  );
 }
 
 export async function getScriptName(serverId: string): Promise<
@@ -63,59 +78,77 @@ export async function getScriptName(serverId: string): Promise<
     NextValue: string;
   }>
 > {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("GetScriptName");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("GetScriptName");
+    },
+  );
 }
 
 export async function loadMatchSettings(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("LoadMatchSettings", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("LoadMatchSettings", filename);
+    },
+  );
 }
 
 export async function appendPlaylist(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("AppendPlaylistFromMatchSettings", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("AppendPlaylistFromMatchSettings", filename);
+    },
+  );
 }
 
 export async function saveMatchSettings(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("SaveMatchSettings", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("SaveMatchSettings", filename);
+    },
+  );
 }
 
 export async function insertPlaylist(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("InsertPlaylistFromMatchSettings", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("InsertPlaylistFromMatchSettings", filename);
+    },
+  );
 }
 
 export async function getModeScriptInfo(
   serverId: string,
 ): Promise<ServerResponse<ModeScriptInfo>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("GetModeScriptInfo");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("GetModeScriptInfo");
+    },
+  );
 }
 
 export async function getModeScriptSettings(serverId: string): Promise<
@@ -123,10 +156,13 @@ export async function getModeScriptSettings(serverId: string): Promise<
     [key: string]: string | number | boolean;
   }>
 > {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    return await client.call("GetModeScriptSettings");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      return await client.call("GetModeScriptSettings");
+    },
+  );
 }
 
 export async function setModeScriptSettings(
@@ -135,11 +171,14 @@ export async function setModeScriptSettings(
     [key: string]: string | number | boolean;
   },
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("SetModeScriptSettings", settings);
-    client.call("Echo", "", "UpdatedSettings");
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("SetModeScriptSettings", settings);
+      client.call("Echo", "", "UpdatedSettings");
+    },
+  );
 }
 
 export async function triggerModeScriptEvent(

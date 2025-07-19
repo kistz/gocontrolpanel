@@ -141,7 +141,7 @@ export default function NavGroups() {
       servers: servers
         .filter((server) => group.servers.some((s) => s.id === server.id))
         .map((server) => {
-          return {
+          const serverGroup = {
             id: server.id,
             name: server.name,
             isConnected: server.isConnected,
@@ -198,22 +198,6 @@ export default function NavGroups() {
                 }),
                 icon: IconActivity,
               },
-              ...(session?.user.admin && server.filemanagerUrl
-                ? [
-                    {
-                      name: "Files",
-                      url: generatePath(routes.servers.files, {
-                        id: server.id,
-                      }),
-                      icon: IconFileDescription,
-                      auth: hasPermissionSync(
-                        session,
-                        routePermissions.servers.files,
-                        server.id,
-                      ),
-                    },
-                  ]
-                : []),
               {
                 name: "Interface",
                 url: generatePath(routes.servers.interface, {
@@ -235,6 +219,23 @@ export default function NavGroups() {
               // }
             ],
           };
+
+          if (server.filemanagerUrl) {
+            serverGroup.items.push({
+              name: "Files",
+              url: generatePath(routes.servers.files, {
+                id: server.id,
+              }),
+              icon: IconFileDescription,
+              auth: hasPermissionSync(
+                session,
+                routePermissions.servers.files,
+                server.id,
+              ),
+            });
+          }
+
+          return serverGroup;
         })
         .filter((server): server is NonNullable<typeof server> => !!server),
     })) || [];
