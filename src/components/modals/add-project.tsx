@@ -9,15 +9,10 @@ import { DefaultModalProps } from "./default-props";
 
 export default function AddProjectModal({
   closeModal,
-  data,
-}: DefaultModalProps<{
-  users: UserMinimal[];
-}>) {
+}: DefaultModalProps) {
   const router = useRouter();
   const { update } = useSession();
-
-  if (!data) return null;
-
+  
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -40,7 +35,7 @@ export default function AddProjectModal({
           onClick={closeModal}
         />
       </div>
-      <AddProjectForm users={data.users} callback={handleCallback} />
+      <AddProjectForm callback={handleCallback} />
     </Card>
   );
 }

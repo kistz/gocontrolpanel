@@ -1,5 +1,8 @@
 "use client";
 
+import { getHetznerImages } from "@/actions/hetzner/images";
+import { getHetznerLocations } from "@/actions/hetzner/locations";
+import { getServerTypes } from "@/actions/hetzner/server-types";
 import { createHetznerServer } from "@/actions/hetzner/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
@@ -8,6 +11,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Flag from "react-world-flags";
 import { toast } from "sonner";
@@ -18,17 +22,65 @@ import {
 
 export default function AddHetznerServerForm({
   projectId,
-  serverTypes,
-  images,
-  locations,
   callback,
 }: {
   projectId: string;
-  serverTypes: HetznerServerType[];
-  images: HetznerImage[];
-  locations: HetznerLocation[];
   callback?: () => void;
 }) {
+  const [locations, setLocations] = useState<HetznerLocation[]>([]);
+  const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
+  const [images, setImages] = useState<HetznerImage[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const { data, error } = await getHetznerLocations(projectId);
+        if (error) {
+          throw new Error(error);
+        }
+        setLocations(data);
+      } catch (err) {
+        setError("Failed to get locations: " + getErrorMessage(error));
+        toast.error("Failed to fetch locations", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      try {
+        const { data, error } = await getServerTypes(projectId);
+        if (error) {
+          throw new Error(error);
+        }
+        setServerTypes(data);
+      } catch (err) {
+        setError("Failed to get server types: " + getErrorMessage(error));
+        toast.error("Failed to fetch server types", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      try {
+        const { data, error } = await getHetznerImages(projectId);
+        if (error) {
+          throw new Error(error);
+        }
+        setImages(data);
+      } catch (err) {
+        setError("Failed to get images: " + getErrorMessage(error));
+        toast.error("Failed to fetch images", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const form = useForm<AddHetznerServerSchemaType>({
     resolver: zodResolver(AddHetznerServerSchema),
     defaultValues: {
@@ -66,6 +118,14 @@ export default function AddHetznerServerForm({
         description: getErrorMessage(error),
       });
     }
+  }
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   const selectedServerType = serverTypes.find(

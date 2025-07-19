@@ -10,7 +10,7 @@ import { axiosHetzner } from "@/lib/axios/hetzner";
 export async function getHetznerLocations(
   projectId: string,
 ): Promise<ServerResponse<HetznerLocation[]>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["hetzner:servers:create", `hetzner:${projectId}:admin`], async () => {
     const redis = await getRedisClient();
     const key = getKeyHetznerLocations();
 

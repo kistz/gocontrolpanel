@@ -1,6 +1,6 @@
 "use client";
 import { createHetznerProject } from "@/actions/database/hetzner-projects";
-import { UserMinimal } from "@/actions/database/users";
+import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
@@ -11,14 +11,39 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddProjectSchema, AddProjectSchemaType } from "./add-project-schema";
+import { useEffect, useState } from "react";
 
 export default function AddProjectForm({
-  users,
   callback,
 }: {
-  users: UserMinimal[];
   callback?: () => void;
 }) {
+  const [users, setUsers] = useState<UserMinimal[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const { data, error } = await getUsersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setUsers(data);
+      } catch (err) {
+        setError("Failed to get users: " + getErrorMessage(error));
+        toast.error("Failed to fetch users", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetchUsers();
+  }, []);
+
   const form = useForm<AddProjectSchemaType>({
     resolver: zodResolver(AddProjectSchema),
   });
@@ -46,6 +71,14 @@ export default function AddProjectForm({
         description: getErrorMessage(error),
       });
     }
+  }
+  
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (

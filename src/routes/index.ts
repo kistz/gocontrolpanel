@@ -54,6 +54,11 @@ export const routePermissions = {
       create: ["hetzner:create"],
       edit: ["hetzner:edit", "hetzner:id:admin"],
       delete: ["hetzner:delete", "hetzner:id:admin"],
+      servers: {
+        view: ["hetzner:servers:view", "hetzner:id:moderator", "hetzner:id:admin"],
+        create: ["hetzner:servers:create", "hetzner:id:admin"],
+        delete: ["hetzner:servers:delete", "hetzner:id:admin"],
+      }
     },
   }
 }

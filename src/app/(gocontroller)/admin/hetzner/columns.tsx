@@ -53,6 +53,11 @@ export const createColumns = (
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
 
+      const canView = hasPermissionSync(
+        session,
+        routePermissions.admin.hetzner.servers.view,
+        project.id,
+      );
       const canEdit = hasPermissionSync(
         session,
         routePermissions.admin.hetzner.edit,
@@ -86,7 +91,7 @@ export const createColumns = (
         });
       };
 
-      if (!canEdit && !canDelete) {
+      if (!canView && !canEdit && !canDelete) {
         return null;
       }
 
@@ -100,12 +105,14 @@ export const createColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => router.push(`/admin/hetzner/${project.id}`)}
-              >
-                View Project
-              </DropdownMenuItem>
-              {(canEdit || canDelete) && <Separator />}
+              {canView && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/admin/hetzner/${project.id}`)}
+                >
+                  View Project
+                </DropdownMenuItem>
+              )}
+              {canView && (canEdit || canDelete) && <Separator />}
               {canEdit && (
                 <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
                   Edit Project

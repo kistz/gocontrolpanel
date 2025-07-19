@@ -1,6 +1,3 @@
-import { getHetznerImages } from "@/actions/hetzner/images";
-import { getHetznerLocations } from "@/actions/hetzner/locations";
-import { getServerTypes } from "@/actions/hetzner/server-types";
 import {
   getHetznerServersPaginated,
   getRateLimit,
@@ -10,8 +7,11 @@ import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createColumns } from "./columns";
 
 export default async function ProjectPage({
@@ -21,10 +21,20 @@ export default async function ProjectPage({
 }) {
   const { id } = await params;
 
+  const canView = await hasPermission(
+    routePermissions.admin.hetzner.servers.view,
+    id,
+  );
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
+
+  const canCreate = await hasPermission(
+    routePermissions.admin.hetzner.servers.create,
+    id,
+  );
+
   const { data: rateLimit } = await getRateLimit(id);
-  const { data: serverTypes } = await getServerTypes(id);
-  const { data: images } = await getHetznerImages(id);
-  const { data: locations } = await getHetznerLocations(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,19 +71,14 @@ export default async function ProjectPage({
         fetchArgs={{ projectId: id }}
         filter
         actions={
-          <Modal>
-            <AddHetznerServerModal
-              data={{
-                projectId: id,
-                serverTypes: serverTypes || [],
-                images: images || [],
-                locations: locations || [],
-              }}
-            />
-            <Button>
-              <IconPlus /> Add Server
-            </Button>
-          </Modal>
+          canCreate && (
+            <Modal>
+              <AddHetznerServerModal data={id} />
+              <Button>
+                <IconPlus /> Add Server
+              </Button>
+            </Modal>
+          )
         }
       />
 

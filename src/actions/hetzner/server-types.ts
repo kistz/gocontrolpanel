@@ -12,7 +12,7 @@ import { getApiToken } from "./util";
 export async function getServerTypes(
   projectId: string,
 ): Promise<ServerResponse<HetznerServerType[]>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["hetzner:servers:create", `hetzner:${projectId}:admin`], async () => {
     const redis = await getRedisClient();
     const key = getKeyHetznerServerTypes();
 
