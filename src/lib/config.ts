@@ -10,6 +10,9 @@ const config: Config = {
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
     : [],
+  DEFAULT_PERMISSIONS: process.env.DEFAULT_PERMISSIONS
+    ? process.env.DEFAULT_PERMISSIONS.split(",")
+    : [],
   NADEO: {
     CLIENT_ID: process.env.NADEO_CLIENT_ID || "",
     CLIENT_SECRET: process.env.NADEO_CLIENT_SECRET || "",

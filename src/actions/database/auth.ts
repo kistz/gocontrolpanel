@@ -85,7 +85,6 @@ export async function getUserById(
   const user = await db.users.findUniqueOrThrow({
     where: {
       id: userId,
-      deletedAt: null,
     },
     include: includeGroupsWithServers,
   });
@@ -100,7 +99,6 @@ export async function getUserByLogin(
   const user = await db.users.findUniqueOrThrow({
     where: {
       login,
-      deletedAt: null,
     },
     include: includeGroupsWithServers,
   });
@@ -132,7 +130,6 @@ export async function createUserAuth(
     admin: user.admin,
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: null,
   };
 
   const result = await db.users.create({

@@ -25,11 +25,6 @@ export type EditHetznerProjects = Prisma.HetznerProjectsGetPayload<{
 const hetznerProjectUsersSchema =
   Prisma.validator<Prisma.HetznerProjectsInclude>()({
     hetznerProjectUsers: {
-      where: {
-        user: {
-          deletedAt: null,
-        },
-      },
       include: {
         user: {
           select: {

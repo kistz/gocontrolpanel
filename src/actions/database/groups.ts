@@ -27,11 +27,6 @@ export type EditGroups = Prisma.GroupsGetPayload<{
 
 const groupUsersServersSchema = Prisma.validator<Prisma.GroupsInclude>()({
   groupMembers: {
-    where: {
-      user: {
-        deletedAt: null,
-      },
-    },
     include: {
       user: true,
     },

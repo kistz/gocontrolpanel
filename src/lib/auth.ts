@@ -131,7 +131,7 @@ export const authOptions: NextAuthOptions = {
             admin: config.DEFAULT_ADMINS.includes(token.login),
             path: "",
             ubiUid,
-            permissions: [],
+            permissions: config.DEFAULT_PERMISSIONS,
           });
         }
       }

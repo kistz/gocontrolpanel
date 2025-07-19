@@ -23,11 +23,6 @@ export type EditServers = Prisma.ServersGetPayload<{
 
 const serversUsersSchema = Prisma.validator<Prisma.ServersInclude>()({
   userServers: {
-    where: {
-      user: {
-        deletedAt: null,
-      },
-    },
     include: {
       user: true,
     },

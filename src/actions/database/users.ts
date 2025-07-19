@@ -30,9 +30,6 @@ export async function getUsersMinimal(): Promise<
     async () => {
       const db = getClient();
       const users = await db.users.findMany({
-        where: {
-          deletedAt: null,
-        },
         select: {
           id: true,
           login: true,
@@ -54,7 +51,6 @@ export async function getUsersPaginated(
     const db = getClient();
 
     const where: Prisma.UsersWhereInput = {
-      deletedAt: null,
       ...(filter && {
         OR: [
           { login: { contains: filter } },
@@ -119,11 +115,8 @@ export async function deleteUserById(userId: string): Promise<ServerResponse> {
     }
 
     const db = getClient();
-    await db.users.update({
+    await db.users.delete({
       where: { id: userId },
-      data: {
-        deletedAt: new Date(),
-      },
     });
   });
 }
