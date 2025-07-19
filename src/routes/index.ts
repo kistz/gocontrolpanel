@@ -47,13 +47,23 @@ export const routePermissions = {
       delete: ["users:delete"],
     },
     groups: {
-      view: ["groups:view", "groups::moderator", "groups::admin"],
+      view: [
+        "groups:view",
+        "groups:create",
+        "groups::moderator",
+        "groups::admin",
+      ],
       create: ["groups:create"],
       edit: ["groups:edit", "groups:id:admin"],
       delete: ["groups:delete", "groups:id:admin"],
     },
     servers: {
-      view: ["servers:view", "servers::moderator", "servers::admin"],
+      view: [
+        "servers:view",
+        "servers:create",
+        "servers::moderator",
+        "servers::admin",
+      ],
       create: ["servers:create"],
       edit: ["servers:edit", "servers:id:admin"],
       delete: ["servers:delete", "servers:id:admin"],
@@ -65,7 +75,12 @@ export const routePermissions = {
       delete: ["roles:delete"],
     },
     hetzner: {
-      view: ["hetzner:view", "hetzner::moderator", "hetzner::admin"],
+      view: [
+        "hetzner:view",
+        "hetzner:create",
+        "hetzner::moderator",
+        "hetzner::admin",
+      ],
       create: ["hetzner:create"],
       edit: ["hetzner:edit", "hetzner:id:admin"],
       delete: ["hetzner:delete", "hetzner:id:admin"],

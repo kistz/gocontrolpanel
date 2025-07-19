@@ -85,7 +85,7 @@ export async function getServersPaginated(
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<ServersWithUsers>>> {
   return doServerActionWithAuth(
-    ["servers:view", "servers::moderator", "servers::admin"],
+    ["servers:view", "servers:create", "servers::moderator", "servers::admin"],
     async (session) => {
       const db = getClient();
 

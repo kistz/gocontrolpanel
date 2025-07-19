@@ -63,7 +63,7 @@ export async function getGroupsPaginated(
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<GroupsWithUsersWithServers>>> {
   return doServerActionWithAuth(
-    ["groups:view", "groups::moderator", "groups::admin"],
+    ["groups:view", "groups:create", "groups::moderator", "groups::admin"],
     async (session) => {
       const db = getClient();
 

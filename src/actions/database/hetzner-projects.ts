@@ -57,7 +57,7 @@ export async function getHetznerProjectsPaginated(
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<HetznerProjectsWithUsers>>> {
   return doServerActionWithAuth(
-    ["hetzner:view", "hetzner::moderator", "hetzner::admin"],
+    ["hetzner:view", "hetzner:create", "hetzner::moderator", "hetzner::admin"],
     async (session) => {
       const db = getClient();
 
