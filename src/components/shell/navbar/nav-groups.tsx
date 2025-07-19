@@ -139,9 +139,7 @@ export default function NavGroups() {
     session?.user.groups.map((group) => ({
       name: group.name,
       servers: servers
-        .filter((server) =>
-          group.servers.some((s) => s.id === server.id),
-        )
+        .filter((server) => group.servers.some((s) => s.id === server.id))
         .map((server) => {
           return {
             id: server.id,
@@ -156,7 +154,11 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconAdjustmentsAlt,
-                auth: hasPermissionSync(session, routePermissions.servers.settings, server.id),
+                auth: hasPermissionSync(
+                  session,
+                  routePermissions.servers.settings,
+                  server.id,
+                ),
               },
               {
                 name: "Game",
@@ -171,7 +173,11 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconMap,
-                auth: hasPermissionSync(session, routePermissions.servers.maps, server.id),
+                auth: hasPermissionSync(
+                  session,
+                  routePermissions.servers.maps,
+                  server.id,
+                ),
               },
               {
                 name: "Players",
@@ -179,7 +185,11 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconUsers,
-                auth: hasPermissionSync(session, routePermissions.servers.players, server.id),
+                auth: hasPermissionSync(
+                  session,
+                  routePermissions.servers.players,
+                  server.id,
+                ),
               },
               {
                 name: "Live",
@@ -196,7 +206,11 @@ export default function NavGroups() {
                         id: server.id,
                       }),
                       icon: IconFileDescription,
-                      auth: hasPermissionSync(session, routePermissions.servers.files, server.id),
+                      auth: hasPermissionSync(
+                        session,
+                        routePermissions.servers.files,
+                        server.id,
+                      ),
                     },
                   ]
                 : []),
@@ -206,7 +220,11 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconDeviceDesktop,
-                auth: hasPermissionSync(session, routePermissions.servers.interface, server.id),
+                auth: hasPermissionSync(
+                  session,
+                  routePermissions.servers.interface,
+                  server.id,
+                ),
               },
               // {
               //   name: "Dev",
@@ -221,6 +239,25 @@ export default function NavGroups() {
         .filter((server): server is NonNullable<typeof server> => !!server),
     })) || [];
 
+  if (loading) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+        <SidebarGroupContent className="flex flex-col gap-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <IconServer />
+                  <span>Loading...</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
   return groupsSidebarGroup.map((group) => (
     <SidebarGroup
       className="group-data-[collapsible=icon]:hidden select-none"
@@ -229,16 +266,6 @@ export default function NavGroups() {
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {loading && (
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <div className="flex items-center gap-2">
-                  <IconServer />
-                  <span>Loading...</span>
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
           {group.servers.length === 0 ? (
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
@@ -248,73 +275,77 @@ export default function NavGroups() {
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ) : group.servers.map((server) =>
-            server.items && server.items.length > 0 ? (
-              <Collapsible
-                key={server.id}
-                asChild
-                defaultOpen={server.isActive}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  {server.isConnected ? (
-                    <>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={server.name} asChild>
-                          <div className="select-none cursor-pointer">
-                            {server.icon && <server.icon />}
-                            <span className="overflow-hidden text-ellipsis text-nowrap">
-                              {server.name}
-                            </span>
-                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                          </div>
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {server.items.filter(i => i.auth || i.auth === undefined).map((item) => (
-                            <SidebarMenuSubItem key={item.name}>
-                              <SidebarMenuSubButton asChild>
-                                {item.url ? (
-                                  <Link href={item.url}>
-                                    {item.icon && <item.icon />}
-                                    <span>{item.name}</span>
-                                  </Link>
-                                ) : (
-                                  <div>
-                                    {item.icon && <item.icon />}
-                                    <span>{item.name}</span>
-                                  </div>
-                                )}
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </>
-                  ) : (
-                    <SidebarMenuButton
-                      asChild
-                      className="text-foreground/50 pointer-events-none"
-                    >
-                      <div>
-                        {server.icon && <server.icon />}
-                        <span>{server.name}</span>
-                      </div>
-                    </SidebarMenuButton>
-                  )}
+          ) : (
+            group.servers.map((server) =>
+              server.items && server.items.length > 0 ? (
+                <Collapsible
+                  key={server.id}
+                  asChild
+                  defaultOpen={server.isActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    {server.isConnected ? (
+                      <>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton tooltip={server.name} asChild>
+                            <div className="select-none cursor-pointer">
+                              {server.icon && <server.icon />}
+                              <span className="overflow-hidden text-ellipsis text-nowrap">
+                                {server.name}
+                              </span>
+                              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            </div>
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {server.items
+                              .filter((i) => i.auth || i.auth === undefined)
+                              .map((item) => (
+                                <SidebarMenuSubItem key={item.name}>
+                                  <SidebarMenuSubButton asChild>
+                                    {item.url ? (
+                                      <Link href={item.url}>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.name}</span>
+                                      </Link>
+                                    ) : (
+                                      <div>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.name}</span>
+                                      </div>
+                                    )}
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </>
+                    ) : (
+                      <SidebarMenuButton
+                        asChild
+                        className="text-foreground/50 pointer-events-none"
+                      >
+                        <div>
+                          {server.icon && <server.icon />}
+                          <span>{server.name}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                </Collapsible>
+              ) : (
+                <SidebarMenuItem key={server.name}>
+                  <SidebarMenuButton asChild>
+                    <div>
+                      {server.icon && <server.icon />}
+                      <span>{server.name}</span>
+                    </div>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-              </Collapsible>
-            ) : (
-              <SidebarMenuItem key={server.name}>
-                <SidebarMenuButton asChild>
-                  <div>
-                    {server.icon && <server.icon />}
-                    <span>{server.name}</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ),
+              ),
+            )
           )}
         </SidebarMenu>
       </SidebarGroupContent>

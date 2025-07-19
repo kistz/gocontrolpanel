@@ -22,10 +22,6 @@ export async function SOCKET(
 
   const servers = token?.groups?.flatMap((group) => group.servers) || [];
 
-  if (servers.length === 0) {
-    return new Response("No servers found", { status: 404 });
-  }
-
   const serverManagers: {
     manager: GbxClientManager;
     server: ServerInfo;
