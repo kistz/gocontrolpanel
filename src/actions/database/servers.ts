@@ -215,7 +215,7 @@ export async function getServerChatConfig(
     >
   >
 > {
-  return doServerActionWithAuth([`servers:${serverId}:moderator`, `servers:${serverId}:admin`], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const db = getClient();
     const server = await db.servers.findUnique({
       where: { id: serverId },
@@ -270,11 +270,14 @@ export async function updateServerChatConfig(
 }
 
 export async function deleteServer(serverId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["servers:delete", `servers:${serverId}:admin`], async () => {
-    const db = getClient();
-    await db.servers.update({
-      where: { id: serverId },
-      data: { deletedAt: new Date() },
-    });
-  });
+  return doServerActionWithAuth(
+    ["servers:delete", `servers:${serverId}:admin`],
+    async () => {
+      const db = getClient();
+      await db.servers.update({
+        where: { id: serverId },
+        data: { deletedAt: new Date() },
+      });
+    },
+  );
 }

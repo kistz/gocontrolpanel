@@ -4,6 +4,9 @@ import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
+import { redirect } from "next/navigation";
 
 export default async function ServerInterfacePage({
   params,
@@ -11,6 +14,12 @@ export default async function ServerInterfacePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  const canView = await hasPermission(routePermissions.servers.interface, id);
+
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
 
   const { data } = await getServerChatConfig(id);
 

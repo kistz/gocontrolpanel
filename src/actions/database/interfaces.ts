@@ -8,7 +8,7 @@ import { ServerError, ServerResponse } from "@/types/responses";
 export async function getInterfaces(
   serverId: string,
 ): Promise<ServerResponse<Interfaces[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const db = getClient();
     const interfaces = await db.interfaces.findMany({
       where: {
@@ -28,7 +28,7 @@ export async function createInterface(
   name: string,
   interfaceString: string,
 ): Promise<ServerResponse<Interfaces>> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const db = getClient();
     const result = await db.interfaces.create({
       data: {
@@ -51,7 +51,7 @@ export async function saveInterface(
   interfaceId: string,
   interfaceString: string,
 ): Promise<ServerResponse<Interfaces>> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const db = getClient();
     const result = await db.interfaces.update({
       where: {
