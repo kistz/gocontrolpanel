@@ -179,6 +179,7 @@ export default function RenderInput<TControl extends FieldValues>({
           onValueChange={field.onChange}
           placeholder={placeholder}
           animation={2}
+          maxCount={max || 3}
         />
       );
     default:

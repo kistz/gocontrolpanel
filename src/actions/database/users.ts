@@ -1,7 +1,7 @@
 "use server";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { Users } from "@/lib/prisma/generated";
+import { Prisma, Users } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
 import {
   PaginationResponse,
@@ -40,35 +40,27 @@ export async function getUsersPaginated(
   sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
-  return doServerActionWithAuth(["app:admin"], async () => {
+  return doServerActionWithAuth(["users:view"], async () => {
     const db = getClient();
 
+    const where: Prisma.UsersWhereInput = {
+      deletedAt: null,
+      ...(filter && {
+        OR: [
+          { login: { contains: filter } },
+          { nickName: { contains: filter } },
+          { ubiUid: { contains: filter } },
+          { path: { contains: filter } },
+        ],
+      }),
+    };
+
     const totalCount = await db.users.count({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { login: { contains: filter } },
-            { nickName: { contains: filter } },
-            { ubiUid: { contains: filter } },
-            { path: { contains: filter } },
-          ],
-        }),
-      },
+      where,
     });
 
     const users = await db.users.findMany({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { login: { contains: filter } },
-            { nickName: { contains: filter } },
-            { ubiUid: { contains: filter } },
-            { path: { contains: filter } },
-          ],
-        }),
-      },
+      where,
       skip: pagination.pageIndex * pagination.pageSize,
       take: pagination.pageSize,
       orderBy: {
@@ -97,7 +89,7 @@ export async function updateUser(
     | "deletedAt"
   >,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["app:admin"], async () => {
+  return doServerActionWithAuth(["users:edit"], async () => {
     const db = getClient();
 
     const existingUser = await db.users.findUniqueOrThrow({
@@ -123,7 +115,7 @@ export async function updateUser(
 }
 
 export async function deleteUserById(userId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["app:admin"], async (session) => {
+  return doServerActionWithAuth(["users:delete"], async (session) => {
     if (userId === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }
@@ -133,7 +125,6 @@ export async function deleteUserById(userId: string): Promise<ServerResponse> {
       where: { id: userId },
       data: {
         deletedAt: new Date(),
-        updatedAt: new Date(),
       },
     });
   });

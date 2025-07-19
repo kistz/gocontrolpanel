@@ -7,11 +7,18 @@ import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
-export async function getRoles(): Promise<ServerResponse<Roles[]>> {
-  return doServerActionWithAuth([], async () => {
+export type RoleMinimal = Pick<Roles, "id" | "name" | "permissions">;
+
+export async function getRolesMinimal(): Promise<ServerResponse<RoleMinimal[]>> {
+  return doServerActionWithAuth(["users:edit"], async () => {
     const db = getClient();
     const roles = await db.roles.findMany({
       where: { deletedAt: null },
+      select: {
+        id: true,
+        name: true,
+        permissions: true,
+      },
     });
     return roles;
   });

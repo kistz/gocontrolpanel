@@ -8,10 +8,7 @@ import { DefaultModalProps } from "./default-props";
 export default function EditUserModal({
   closeModal,
   data,
-}: DefaultModalProps<{
-  user: Users;
-  roles: Roles[];
-}>) {
+}: DefaultModalProps<Users>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -24,13 +21,13 @@ export default function EditUserModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Edit {data.user.nickName}</h1>
+        <h1 className="text-xl font-bold">Edit {data.nickName}</h1>
         <IconX
           className="h-6 w-6 cursor-pointer text-muted-foreground"
           onClick={closeModal}
         />
       </div>
-      <EditUserForm user={data.user} roles={data.roles} callback={closeModal} />
+      <EditUserForm user={data} callback={closeModal} />
     </Card>
   );
 }

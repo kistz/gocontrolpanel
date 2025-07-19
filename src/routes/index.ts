@@ -26,6 +26,11 @@ export const routes = {
 
 export const routePermissions = {
   admin: {
+    users: {
+      view: ["users:view"],
+      edit: ["users:edit"],
+      delete: ["users:delete"],
+    },
     groups: {
       view: ["groups:view", "groups::moderator", "groups::admin"],
       create: ["groups:create"],

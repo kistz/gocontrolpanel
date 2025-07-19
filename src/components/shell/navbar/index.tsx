@@ -23,14 +23,17 @@ export interface NavGroup {
 export default async function Navbar() {
   const session = await auth();
 
+  const canViewUsers = await hasPermission(routePermissions.admin.users.view);
   const canViewGroups = await hasPermission(routePermissions.admin.groups.view);
 
-  const canViewAdmin = canViewGroups;
+  const canViewAdmin = canViewUsers || canViewGroups;
 
   return (
     <>
       {session && <NavGroups />}
-      {session && canViewAdmin && <NavAdmin canViewAdmin={canViewAdmin} />}
+      {session && canViewAdmin && (
+        <NavAdmin canViewUsers={canViewUsers} canViewAdmin={canViewAdmin} />
+      )}
       <NavFooter />
     </>
   );

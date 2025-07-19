@@ -1,24 +1,50 @@
 "use client";
+import { getRolesMinimal, RoleMinimal } from "@/actions/database/roles";
 import { updateUser } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Roles, Users } from "@/lib/prisma/generated";
+import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditUserSchema, EditUserSchemaType } from "./edit-user-schema";
 
 export default function EditUserForm({
   user,
-  roles,
   callback,
 }: {
   user: Users;
-  roles: Roles[];
   callback?: () => void;
 }) {
+  const [roles, setRoles] = useState<RoleMinimal[]>([]);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchRoles() {
+      try {
+        const { data, error } = await getRolesMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setRoles(data);
+      } catch (error) {
+        setError("Failed to get roles: " + getErrorMessage(error));
+        toast.error("Failed to fetch roles", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetchRoles();
+  }, []);
+
   const form = useForm<EditUserSchemaType>({
     resolver: zodResolver(EditUserSchema),
     defaultValues: {
@@ -49,6 +75,14 @@ export default function EditUserForm({
 
   const selectedRole = roles.find((role) => role.id === form.watch("role"));
 
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
+  }
+
   return (
     <Form {...form}>
       <form
@@ -69,6 +103,7 @@ export default function EditUserForm({
           description="Select the permissions to assign to the user."
           className="w-full min-w-64"
           type="multi-select"
+          max={2}
           options={permissions.map((perm) => ({
             label: perm,
             value: perm,

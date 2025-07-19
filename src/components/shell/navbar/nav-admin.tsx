@@ -28,8 +28,10 @@ import Link from "next/link";
 import { NavGroup } from ".";
 
 export default async function NavAdmin({
+  canViewUsers,
   canViewAdmin,
 }: {
+  canViewUsers: boolean;
   canViewAdmin: boolean;
 }) {
   const group: NavGroup = {
@@ -39,6 +41,7 @@ export default async function NavAdmin({
         name: "Users",
         url: routes.admin.users,
         icon: IconUserCog,
+        auth: canViewUsers,
       },
       {
         name: "Groups",
