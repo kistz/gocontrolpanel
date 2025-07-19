@@ -1,24 +1,14 @@
 "use client";
-import { UserMinimal } from "@/actions/database/users";
 import AddGroupForm from "@/forms/admin/group/add-group-form";
-import { Servers } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddGroupModal({
-  closeModal,
-  data,
-}: DefaultModalProps<{
-  servers: Servers[];
-  users: UserMinimal[];
-}>) {
+export default function AddGroupModal({ closeModal }: DefaultModalProps) {
   const router = useRouter();
   const { update } = useSession();
-
-  if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -42,11 +32,7 @@ export default function AddGroupModal({
           onClick={closeModal}
         />
       </div>
-      <AddGroupForm
-        servers={data.servers}
-        users={data.users}
-        callback={handleCallback}
-      />
+      <AddGroupForm callback={handleCallback} />
     </Card>
   );
 }

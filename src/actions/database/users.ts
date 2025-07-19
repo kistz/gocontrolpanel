@@ -10,32 +10,34 @@ import {
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
-export type UserMinimal = Pick<
-  Users,
-  "id" | "login" | "nickName"
->;
+export type UserMinimal = Pick<Users, "id" | "login" | "nickName">;
 
-export async function getAllUsers(): Promise<ServerResponse<UserMinimal[]>> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-    const users = await db.users.findMany({
-      where: {
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        login: true,
-        nickName: true,
-      },
-    });
+export async function getUsersMinimal(): Promise<
+  ServerResponse<UserMinimal[]>
+> {
+  return doServerActionWithAuth(
+    ["groups:create", "groups:edit", "groups::admin"],
+    async () => {
+      const db = getClient();
+      const users = await db.users.findMany({
+        where: {
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          login: true,
+          nickName: true,
+        },
+      });
 
-    return users;
-  });
+      return users;
+    },
+  );
 }
 
 export async function getUsersPaginated(
   pagination: PaginationState,
-  sorting: { field: string; order: 'asc' | 'desc' },
+  sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
   return doServerActionWithAuth(["app:admin"], async () => {

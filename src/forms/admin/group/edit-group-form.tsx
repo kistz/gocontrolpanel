@@ -3,29 +3,67 @@ import {
   GroupsWithUsersWithServers,
   updateGroup,
 } from "@/actions/database/groups";
-import { UserMinimal } from "@/actions/database/users";
+import { getServersMinimal, ServerMinimal } from "@/actions/database/servers";
+import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Servers } from "@/lib/prisma/generated";
+import { GroupRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconTrash } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditGroupSchema, EditGroupSchemaType } from "./edit-group-schema";
 
 export default function EditGroupForm({
   group,
-  servers,
-  users,
   callback,
 }: {
   group: GroupsWithUsersWithServers;
-  servers: Servers[];
-  users: UserMinimal[];
   callback?: () => void;
 }) {
+  const [servers, setServers] = useState<ServerMinimal[]>([]);
+  const [users, setUsers] = useState<UserMinimal[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const { data, error } = await getServersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setServers(data);
+      } catch (error) {
+        setError("Failed to get servers: " + getErrorMessage(error));
+        toast.error("Failed to fetch servers", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      try {
+        const { data, error } = await getUsersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setUsers(data);
+      } catch (error) {
+        setError("Failed to get users: " + getErrorMessage(error));
+        toast.error("Failed to fetch users", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const form = useForm<EditGroupSchemaType>({
     resolver: zodResolver(EditGroupSchema),
     defaultValues: {
@@ -63,6 +101,14 @@ export default function EditGroupForm({
         description: getErrorMessage(error),
       });
     }
+  }
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (

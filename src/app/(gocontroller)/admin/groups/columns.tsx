@@ -3,7 +3,6 @@ import {
   deleteGroup,
   GroupsWithUsersWithServers,
 } from "@/actions/database/groups";
-import { UserMinimal } from "@/actions/database/users";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditGroupModal from "@/components/modals/edit-group";
 import Modal from "@/components/modals/modal";
@@ -15,8 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Servers } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -25,10 +24,6 @@ import { toast } from "sonner";
 
 export const createColumns = (
   refetch: () => void,
-  data: {
-    servers: Servers[];
-    users: UserMinimal[];
-  },
 ): ColumnDef<GroupsWithUsersWithServers>[] => [
   {
     accessorKey: "name",
@@ -52,12 +47,28 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const group = row.original;
-      const { update } = useSession();
+      const { data: session, update } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
 
+      const canEdit = hasPermissionSync(
+        session,
+        routePermissions.admin.groups.edit,
+        group.id,
+      );
+      const canDelete = hasPermissionSync(
+        session,
+        routePermissions.admin.groups.delete,
+        group.id,
+      );
+
       const handleDelete = () => {
+        if (!canDelete) {
+          toast.error("You do not have permission to delete this group.");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteGroup(group.id);
@@ -75,6 +86,10 @@ export const createColumns = (
         });
       };
 
+      if (!canEdit && !canDelete) {
+        return null;
+      }
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -85,41 +100,43 @@ export const createColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit group
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpen(true)}
-              >
-                Delete group
-              </DropdownMenuItem>
+              {canEdit && (
+                <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                  Edit group
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Delete group
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onConfirm={handleDelete}
-            title="Delete group"
-            description={`Are you sure you want to delete ${group.name}?`}
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
-
-          <Modal
-            isOpen={isEditOpen}
-            setIsOpen={setIsEditOpen}
-            onClose={() => refetch()}
-          >
-            <EditGroupModal
-              data={{
-                group,
-                servers: data.servers,
-                users: data.users,
-              }}
+          {canDelete && (
+            <ConfirmModal
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete group"
+              description={`Are you sure you want to delete ${group.name}?`}
+              confirmText="Delete"
+              cancelText="Cancel"
             />
-          </Modal>
+          )}
+
+          {canEdit && (
+            <Modal
+              isOpen={isEditOpen}
+              setIsOpen={setIsEditOpen}
+              onClose={() => refetch()}
+            >
+              <EditGroupModal data={group} />
+            </Modal>
+          )}
         </div>
       );
     },

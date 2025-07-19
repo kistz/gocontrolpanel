@@ -7,12 +7,19 @@ import { Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
-export async function getServers(): Promise<ServerResponse<Servers[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
+export type ServerMinimal = Pick<Servers, "id" | "name">;
+
+export async function getServersMinimal(): Promise<ServerResponse<ServerMinimal[]>> {
+  return doServerActionWithAuth(["groups:create", "groups:edit", "groups::admin"], async () => {
     const db = getClient();
+
     return await db.servers.findMany({
       where: {
         deletedAt: null,
+      },
+      select: {
+        id: true,
+        name: true,
       },
     });
   });

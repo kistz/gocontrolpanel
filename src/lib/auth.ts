@@ -17,7 +17,7 @@ import { IncomingMessage } from "node:http";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
-import { getList } from "./utils";
+import { getList, hasPermissionSync } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -174,39 +174,17 @@ export function auth(
   return getServerSession(...args, authOptions);
 }
 
-export async function withAuth(roles?: string[], id = ""): Promise<Session> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Not authenticated");
-  }
-
-  if (session.user.admin) return session;
-
-  if (!roles || roles.length === 0) {
+export async function withAuth(
+  permissions?: string[],
+  id = "",
+): Promise<Session> {
+  const perm = await hasPermission(permissions, id);
+  if (!perm) {
     throw new Error("Unauthorized");
   }
 
-  let userRoles = session.user.permissions;
-  
-  session.user.groups.forEach((group) => {
-    const role = group.role.toLowerCase();
-    userRoles.push(`groups::${role}`);
-    userRoles.push(`groups:${group.id}:${role}`);
-    group.servers.forEach((server) => {
-      userRoles.push(`servers::${role}`);
-      userRoles.push(`servers:${server.id}:${role}`);
-    });
-  });
-
-  session.user.projects.forEach((project) => {
-    const role = project.role.toLowerCase();
-    userRoles.push(`projects::${role}`);
-    userRoles.push(`projects:${project.id}:${role}`);
-  });
-
-  roles = roles.map((role) => role.replace(":id", `:${id}`));
-
-  if (!roles.some((role) => userRoles.includes(role))) {
+  const session = await auth();
+  if (!session) {
     throw new Error("Unauthorized");
   }
 
@@ -221,4 +199,16 @@ export async function parseTokenFromRequest(req: IncomingMessage) {
     req: req as any,
     secret: process.env.NEXTAUTH_SECRET!,
   });
+}
+
+export async function hasPermission(
+  permissions?: string[],
+  id = "",
+): Promise<boolean> {
+  const session = await auth();
+  if (!session) {
+    return false;
+  }
+
+  return hasPermissionSync(session, permissions, id);
 }

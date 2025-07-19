@@ -1,6 +1,7 @@
 import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { routes } from "@/routes";
 import { clsx, type ClassValue } from "clsx";
+import { Session } from "next-auth";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -291,3 +292,33 @@ export const permissions: string[] = [
   "projects:servers:create",
   "projects:servers:delete",
 ] as const;
+
+export function hasPermissionSync(session: Session | null, permissions?: string[], id = ""): boolean {
+  if (!session) return false;
+  
+  if (session.user.admin) return true;
+
+  if (!permissions || permissions.length === 0) return false;
+
+  
+  const userPermissions = session.user.permissions;
+  
+  session.user.groups.forEach((group) => {
+    const role = group.role.toLowerCase();
+    userPermissions.push(`groups::${role}`);
+    userPermissions.push(`groups:${group.id}:${role}`);
+    group.servers.forEach((server) => {
+      userPermissions.push(`servers::${role}`);
+      userPermissions.push(`servers:${server.id}:${role}`);
+    });
+  });
+  
+  session.user.projects.forEach((project) => {
+    const role = project.role.toLowerCase();
+    userPermissions.push(`projects::${role}`);
+    userPermissions.push(`projects:${project.id}:${role}`);
+  });
+  
+  permissions = permissions.map((permission) => permission.replace(":id", `:${id}`));
+  return permissions.some((permission) => userPermissions.includes(permission));
+}

@@ -24,6 +24,17 @@ export const routes = {
   login: "/login",
 };
 
+export const routePermissions = {
+  admin: {
+    groups: {
+      view: ["groups:view", "groups::moderator", "groups::admin"],
+      create: ["groups:create"],
+      edit: ["groups:edit", "groups:id:admin"],
+      delete: ["groups:delete", "groups:id:admin"],
+    },
+  }
+}
+
 export const breadCrumbs: {
   path: string;
   breadCrumbs: TBreadcrumb[];

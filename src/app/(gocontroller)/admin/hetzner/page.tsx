@@ -1,5 +1,5 @@
 import { getHetznerProjectsPaginated } from "@/actions/database/hetzner-projects";
-import { getAllUsers } from "@/actions/database/users";
+import { getUsersMinimal } from "@/actions/database/users";
 import AddProjectModal from "@/components/modals/add-project";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
@@ -8,7 +8,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { createColumns } from "./columns";
 
 export default async function AdminHetznerPage() {
-  const { data: users } = await getAllUsers();
+  const { data: users } = await getUsersMinimal();
 
   return (
     <div className="flex flex-col gap-6">
