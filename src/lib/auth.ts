@@ -89,6 +89,7 @@ export const authOptions: NextAuthOptions = {
         permissions: token.permissions,
         groups: token.groups,
         projects: token.projects,
+        servers: token.servers,
       };
 
       return session;
@@ -153,6 +154,11 @@ export const authOptions: NextAuthOptions = {
         id: p.project.id,
         name: p.project.name,
         role: p.role,
+      }));
+      token.servers = dbUser.userServers.map((s) => ({
+        id: s.server.id,
+        name: s.server.name,
+        role: s.role,
       }));
 
       return token;

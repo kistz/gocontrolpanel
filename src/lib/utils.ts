@@ -308,8 +308,8 @@ export function hasPermissionSync(session: Session | null, permissions?: string[
     userPermissions.push(`groups::${role}`);
     userPermissions.push(`groups:${group.id}:${role}`);
     group.servers.forEach((server) => {
-      userPermissions.push(`servers::${role}`);
-      userPermissions.push(`servers:${server.id}:${role}`);
+      userPermissions.push(`group:servers::${role}`);
+      userPermissions.push(`group:servers:${server.id}:${role}`);
     });
   });
   
@@ -317,6 +317,12 @@ export function hasPermissionSync(session: Session | null, permissions?: string[
     const role = project.role.toLowerCase();
     userPermissions.push(`projects::${role}`);
     userPermissions.push(`projects:${project.id}:${role}`);
+  });
+
+  session.user.servers.forEach((server) => {
+    const role = server.role.toLowerCase();
+    userPermissions.push(`servers::${role}`);
+    userPermissions.push(`servers:${server.id}:${role}`);
   });
   
   permissions = permissions.map((permission) => permission.replace(":id", `:${id}`));

@@ -3,26 +3,46 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClientManager } from "@/lib/gbxclient";
-import { Servers } from "@/lib/prisma/generated";
+import { Prisma, Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
 export type ServerMinimal = Pick<Servers, "id" | "name">;
 
-export async function getServersMinimal(): Promise<ServerResponse<ServerMinimal[]>> {
-  return doServerActionWithAuth(["groups:create", "groups:edit", "groups::admin"], async () => {
-    const db = getClient();
+export async function getServersMinimal(): Promise<
+  ServerResponse<ServerMinimal[]>
+> {
+  return doServerActionWithAuth(
+    ["groups:create", "groups:edit", "groups::admin"],
+    async (session) => {
+      const db = getClient();
 
-    return await db.servers.findMany({
-      where: {
+      const where: Prisma.ServersWhereInput = {
         deletedAt: null,
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-  });
+      };
+
+      if (!session.user.admin) {
+        const userServers = session.user.servers.map((s) => s.id);
+        session.user.groups.forEach((group) => {
+          group.servers.forEach((server) => {
+            if (!userServers.includes(server.id)) {
+              userServers.push(server.id);
+            }
+          });
+        });
+
+        where.id = { in: userServers };
+      }
+
+      return await db.servers.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+    },
+  );
 }
 
 export async function getServersPaginated(

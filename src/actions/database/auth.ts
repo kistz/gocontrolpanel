@@ -56,6 +56,22 @@ const includeGroupsWithServers = Prisma.validator<Prisma.UsersInclude>()({
       },
     },
   },
+  userServers: {
+    where: {
+      server: {
+        deletedAt: null,
+      },
+    },
+    select: {
+      role: true,
+      server: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
 });
 
 export type UsersWithGroupsWithServers = Prisma.UsersGetPayload<{
