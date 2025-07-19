@@ -160,7 +160,10 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
       )}
 
       <div className="flex justify-between items-center w-full">
-        <FilesBreadcrumbs crumbs={pathToBreadcrumbs(path).slice(1)} serverId={serverId} />
+        <FilesBreadcrumbs
+          crumbs={pathToBreadcrumbs(path).slice(1)}
+          serverId={serverId}
+        />
 
         <Actions
           selectedItems={selectedItems}

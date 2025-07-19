@@ -294,9 +294,13 @@ export const permissions: string[] = [
   "hetzner:servers:delete",
 ] as const;
 
-export function hasPermissionSync(session: Session | null, permissions?: string[], id = ""): boolean {
+export function hasPermissionSync(
+  session: Session | null,
+  permissions?: string[],
+  id = "",
+): boolean {
   if (!session) return false;
-  
+
   return hasPermissionsJWTSync(session.user, permissions, id);
 }
 
@@ -310,7 +314,7 @@ export function hasPermissionsJWTSync(
   if (!permissions || permissions.length === 0) return false;
 
   const userPermissions = jwt.permissions;
-  
+
   jwt.groups.forEach((group) => {
     const role = group.role.toLowerCase();
     userPermissions.push(`groups::${role}`);
@@ -320,7 +324,7 @@ export function hasPermissionsJWTSync(
       userPermissions.push(`group:servers:${server.id}:${role}`);
     });
   });
-  
+
   jwt.projects.forEach((project) => {
     const role = project.role.toLowerCase();
     userPermissions.push(`hetzner::${role}`);
@@ -332,7 +336,9 @@ export function hasPermissionsJWTSync(
     userPermissions.push(`servers::${role}`);
     userPermissions.push(`servers:${server.id}:${role}`);
   });
-  
-  permissions = permissions.map((permission) => permission.replace(":id", `:${id}`));
+
+  permissions = permissions.map((permission) =>
+    permission.replace(":id", `:${id}`),
+  );
   return permissions.some((permission) => userPermissions.includes(permission));
 }

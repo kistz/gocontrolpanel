@@ -1,9 +1,13 @@
-import "server-only";
 import { saveRecord } from "@/actions/database/records";
 import { Maps } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import "server-only";
 
-export async function onPlayerFinish(serverId: string, login: string, time: number) {
+export async function onPlayerFinish(
+  serverId: string,
+  login: string,
+  time: number,
+) {
   const redis = await getRedisClient();
   const key = getKeyActiveMap(serverId);
 

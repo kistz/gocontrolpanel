@@ -70,13 +70,17 @@ export const routePermissions = {
       edit: ["hetzner:edit", "hetzner:id:admin"],
       delete: ["hetzner:delete", "hetzner:id:admin"],
       servers: {
-        view: ["hetzner:servers:view", "hetzner:id:moderator", "hetzner:id:admin"],
+        view: [
+          "hetzner:servers:view",
+          "hetzner:id:moderator",
+          "hetzner:id:admin",
+        ],
         create: ["hetzner:servers:create", "hetzner:id:admin"],
         delete: ["hetzner:servers:delete", "hetzner:id:admin"],
-      }
+      },
     },
-  }
-}
+  },
+};
 
 export const breadCrumbs: {
   path: string;
@@ -222,7 +226,7 @@ export const breadCrumbs: {
       },
       {
         label: "Roles",
-      }
+      },
     ],
   },
   {

@@ -8,10 +8,10 @@ import { HetznerProjectRole } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddProjectSchema, AddProjectSchemaType } from "./add-project-schema";
-import { useEffect, useState } from "react";
 
 export default function AddProjectForm({
   callback,
@@ -72,7 +72,7 @@ export default function AddProjectForm({
       });
     }
   }
-  
+
   if (loading) {
     return <span className="text-muted-foreground">Loading...</span>;
   }

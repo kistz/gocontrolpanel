@@ -77,7 +77,10 @@ export async function getGroupsPaginated(
         }),
       };
 
-      if (!session.user.admin && !session.user.permissions.includes("groups:view")) {
+      if (
+        !session.user.admin &&
+        !session.user.permissions.includes("groups:view")
+      ) {
         const userGroupIds = session.user.groups.map((g) => g.id);
 
         if (userGroupIds.length === 0) {
@@ -147,44 +150,50 @@ export async function updateGroup(
     Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
 ): Promise<ServerResponse<GroupsWithUsersWithServers>> {
-  return doServerActionWithAuth(["groups:edit", `groups:${groupId}:admin`], async () => {
-    const db = getClient();
+  return doServerActionWithAuth(
+    ["groups:edit", `groups:${groupId}:admin`],
+    async () => {
+      const db = getClient();
 
-    const { groupMembers, groupServers, ...scalarFields } = group;
+      const { groupMembers, groupServers, ...scalarFields } = group;
 
-    const updatedGroup = await db.groups.update({
-      where: { id: groupId },
-      data: {
-        ...scalarFields,
-        groupServers: {
-          deleteMany: {},
-          create: groupServers?.map((gs) => ({
-            serverId: gs.serverId,
-          })),
+      const updatedGroup = await db.groups.update({
+        where: { id: groupId },
+        data: {
+          ...scalarFields,
+          groupServers: {
+            deleteMany: {},
+            create: groupServers?.map((gs) => ({
+              serverId: gs.serverId,
+            })),
+          },
+          groupMembers: {
+            deleteMany: {},
+            create: groupMembers?.map((gm) => ({
+              role: gm.role,
+              userId: gm.userId,
+            })),
+          },
         },
-        groupMembers: {
-          deleteMany: {},
-          create: groupMembers?.map((gm) => ({
-            role: gm.role,
-            userId: gm.userId,
-          })),
-        },
-      },
-      include: groupUsersServersSchema,
-    });
+        include: groupUsersServersSchema,
+      });
 
-    return updatedGroup;
-  });
+      return updatedGroup;
+    },
+  );
 }
 
 export async function deleteGroup(groupId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["groups:delete", `groups:${groupId}:admin`], async () => {
-    const db = getClient();
-    await db.groups.update({
-      where: { id: groupId },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-  });
+  return doServerActionWithAuth(
+    ["groups:delete", `groups:${groupId}:admin`],
+    async () => {
+      const db = getClient();
+      await db.groups.update({
+        where: { id: groupId },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+    },
+  );
 }

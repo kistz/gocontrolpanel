@@ -57,7 +57,11 @@ export default async function EditorPage({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <TextEditor defaultText={data.value as string} path={path} serverId={id} />
+      <TextEditor
+        defaultText={data.value as string}
+        path={path}
+        serverId={id}
+      />
     </div>
   );
 }

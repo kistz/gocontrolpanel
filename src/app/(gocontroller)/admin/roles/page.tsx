@@ -33,13 +33,14 @@ export default async function AdminRolesPage() {
         fetchData={getRolesPaginated}
         actions={
           canCreate && (
-          <Modal>
-            <AddRoleModal />
-            <Button>
-              <IconPlus /> Add Role
-            </Button>
-          </Modal>
-        )}
+            <Modal>
+              <AddRoleModal />
+              <Button>
+                <IconPlus /> Add Role
+              </Button>
+            </Modal>
+          )
+        }
         filter
       />
     </div>

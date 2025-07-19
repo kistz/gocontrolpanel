@@ -31,7 +31,11 @@ export async function SOCKET(
     return;
   }
 
-  const canView = hasPermissionsJWTSync(token, routePermissions.servers.players, id);
+  const canView = hasPermissionsJWTSync(
+    token,
+    routePermissions.servers.players,
+    id,
+  );
   if (!canView) {
     client.close();
     return;

@@ -10,26 +10,10 @@ export const FONTS = [
   "Nadeo/Trackmania/BebasNeueRegular",
 ];
 
-export const H_ALIGN = [
-  "left",
-  "center",
-  "right",
-];
+export const H_ALIGN = ["left", "center", "right"];
 
-export const V_ALIGN = [
-  "top",
-  "center",
-  "center2",
-  "bottom",
-];
+export const V_ALIGN = ["top", "center", "center2", "bottom"];
 
-export const BLENDS = [
-  "default",
-  "add",
-];
+export const BLENDS = ["default", "add"];
 
-export const KEEP_RATIO = [
-  "Inactive",
-  "Fit",
-  "Clip",
-];
+export const KEEP_RATIO = ["Inactive", "Fit", "Clip"];

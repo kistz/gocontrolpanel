@@ -31,14 +31,16 @@ export default async function AdminHetznerPage() {
       <PaginationTable
         fetchData={getHetznerProjectsPaginated}
         createColumns={createColumns}
-        actions={canCreate && (
-          <Modal>
-            <AddProjectModal />
-            <Button>
-              <IconPlus /> Add Project
-            </Button>
-          </Modal>
-        )}
+        actions={
+          canCreate && (
+            <Modal>
+              <AddProjectModal />
+              <Button>
+                <IconPlus /> Add Project
+              </Button>
+            </Modal>
+          )
+        }
         filter
       />
     </div>

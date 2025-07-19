@@ -1,8 +1,7 @@
 import { nextMap, restartMap } from "@/actions/gbx/game";
 import { jumpToMap } from "@/actions/gbx/map";
 import { Maps } from "@/lib/prisma/generated";
-import { cn, getErrorMessage, hasPermissionSync } from "@/lib/utils";
-import { routePermissions } from "@/routes";
+import { cn, getErrorMessage } from "@/lib/utils";
 import {
   IconBounceRight,
   IconPhoto,
@@ -12,7 +11,6 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import clsx from "clsx";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { parseTmTags, stripTmTags } from "tmtags";

@@ -63,7 +63,6 @@ export async function getPlayerInfo(
   };
 }
 
-
 export async function onPodiumStart(serverId: string) {
   const redis = await getRedisClient();
   const key = getKeyJukebox(serverId);
@@ -79,7 +78,6 @@ export async function onPodiumStart(serverId: string) {
 
   await redis.lpop(key);
 }
-
 
 export async function syncMap(
   manager: GbxClientManager,

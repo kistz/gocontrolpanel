@@ -101,7 +101,7 @@ export async function updateUser(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["users:edit"], async () => {
     const db = getClient();
-    
+
     await db.users.update({
       where: { id: userId },
       data: {

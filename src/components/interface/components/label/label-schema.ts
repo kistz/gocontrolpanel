@@ -1,12 +1,14 @@
+import { FONTS, H_ALIGN, V_ALIGN } from "@/lib/manialink/attributes";
 import { z } from "zod";
 import { DefaultAttributesSchema } from "../default-attributes-schema";
-import { FONTS, H_ALIGN, V_ALIGN } from "@/lib/manialink/attributes";
 
 export const LabelSchema = DefaultAttributesSchema.extend({
-  size: z.object({
-    width: z.number(),
-    height: z.number(),
-  }).partial(),
+  size: z
+    .object({
+      width: z.number(),
+      height: z.number(),
+    })
+    .partial(),
   hAlign: z.enum([...H_ALIGN] as [string, ...string[]]),
   vAlign: z.enum([...V_ALIGN] as [string, ...string[]]),
   scriptEvents: z.boolean(),
@@ -34,4 +36,3 @@ export const LabelSchema = DefaultAttributesSchema.extend({
 }).partial();
 
 export type LabelSchemaType = z.infer<typeof LabelSchema>;
-  

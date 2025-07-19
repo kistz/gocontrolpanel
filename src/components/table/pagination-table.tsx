@@ -109,7 +109,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
               className="min-w-64 w-1/3"
             />
           ) : (
-            <div/>
+            <div />
           )}
 
           {actions}

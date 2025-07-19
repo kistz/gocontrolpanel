@@ -1,6 +1,6 @@
+import "server-only";
 import { appGlobals } from "./global";
 import { PrismaClient } from "./prisma/generated";
-import "server-only";
 
 export function getClient(): PrismaClient {
   if (!appGlobals.prisma) {

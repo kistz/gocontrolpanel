@@ -3,7 +3,7 @@ export interface Config {
   HETZNER: {
     URL: string;
     KEY: string;
-  }
+  };
   DEFAULT_ADMINS: string[];
   NADEO: {
     CLIENT_ID: string;

@@ -1,6 +1,7 @@
 "use client";
 import { getPlayerList } from "@/actions/gbx/player";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { LiveInfo } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
@@ -15,7 +16,6 @@ import Rankings from "./rankings";
 import RoundScores from "./round-scores";
 import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
-import { routePermissions } from "@/routes";
 
 export default function LiveDashboard({ serverId }: { serverId: string }) {
   const { data: session, status } = useSession();

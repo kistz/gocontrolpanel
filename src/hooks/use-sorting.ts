@@ -5,7 +5,7 @@ interface SortingHook {
   sorting: SortingState;
   setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
   field: string;
-  order: 'asc' | 'desc';
+  order: "asc" | "desc";
 }
 
 export const useSorting = (

@@ -120,7 +120,11 @@ export const createColumns = (
   {
     id: "actions",
     cell: ({ data, serverId }) => (
-      <MapActionsCell data={data} serverId={serverId} onRemoveMap={onRemoveMap} />
+      <MapActionsCell
+        data={data}
+        serverId={serverId}
+        onRemoveMap={onRemoveMap}
+      />
     ),
   },
 ];

@@ -1,5 +1,10 @@
 import { onPlayerFinish } from "@/actions/gbx/listeners/records";
-import { getPlayerInfo, onPodiumStart, syncMap, syncPlayerList } from "@/actions/gbx/server-only";
+import {
+  getPlayerInfo,
+  onPodiumStart,
+  syncMap,
+  syncPlayerList,
+} from "@/actions/gbx/server-only";
 import { EndMap, SMapInfo, StartMap } from "@/types/gbx/map";
 import { PauseStatus } from "@/types/gbx/pause";
 import { PlayerChat, SPlayerInfo } from "@/types/gbx/player";
@@ -361,8 +366,8 @@ async function onPlayerConnect(manager: GbxClientManager, login: string) {
     manager.info.chat.connectMessage,
     playerInfo.login,
     playerInfo.nickName,
-    ""
-  )
+    "",
+  );
 
   manager.client.call("ChatSendServerMessage", message);
 }
@@ -378,7 +383,7 @@ async function onPlayerDisconnect(manager: GbxClientManager, login: string) {
       manager.info.chat.disconnectMessage,
       player.login,
       player.nickName,
-      ""
+      "",
     );
 
     manager.client.call("ChatSendServerMessage", message);

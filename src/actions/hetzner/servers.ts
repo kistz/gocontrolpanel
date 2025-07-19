@@ -73,17 +73,20 @@ export async function deleteHetznerServer(
   projectId: string,
   serverId: number,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["hetzner:servers:delete", `hetzner:${projectId}:admin`], async () => {
-    const token = await getApiToken(projectId);
+  return doServerActionWithAuth(
+    ["hetzner:servers:delete", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
 
-    const res = await axiosHetzner.delete(`/servers/${serverId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await axiosHetzner.delete(`/servers/${serverId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    await setRateLimit(projectId, res);
-  });
+      await setRateLimit(projectId, res);
+    },
+  );
 }
 
 export async function getRateLimit(
@@ -130,47 +133,51 @@ export async function createHetznerServer(
   projectId: string,
   data: AddHetznerServerSchemaType,
 ): Promise<ServerResponse<HetznerServer>> {
-  return doServerActionWithAuth(["hetzner:servers:create", `hetzner:${projectId}:admin`], async () => {
-    const token = await getApiToken(projectId);
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
 
-    const dediData = {
-      dedi_login: data.dediLogin,
-      dedi_password: data.dediPassword,
-      room_password: data.roomPassword,
-      superadmin_password: data.superAdminPassword || generateRandomString(16),
-      admin_password: data.adminPassword || generateRandomString(16),
-      user_password: data.userPassword || generateRandomString(16),
-    };
+      const dediData = {
+        dedi_login: data.dediLogin,
+        dedi_password: data.dediPassword,
+        room_password: data.roomPassword,
+        superadmin_password:
+          data.superAdminPassword || generateRandomString(16),
+        admin_password: data.adminPassword || generateRandomString(16),
+        user_password: data.userPassword || generateRandomString(16),
+      };
 
-    const userData = template(dediData);
+      const userData = template(dediData);
 
-    const body = {
-      name: data.name,
-      server_type: parseInt(data.serverType),
-      image: parseInt(data.image),
-      location: data.location,
-      user_data: userData,
-      labels: {
-        "authorization.superadmin.password": dediData.superadmin_password,
-        "authorization.admin.password": dediData.admin_password,
-        "authorization.user.password": dediData.user_password,
-      },
-      public_net: {
-        enable_ipv4: true,
-        enable_ipv6: false,
-      },
-    };
+      const body = {
+        name: data.name,
+        server_type: parseInt(data.serverType),
+        image: parseInt(data.image),
+        location: data.location,
+        user_data: userData,
+        labels: {
+          "authorization.superadmin.password": dediData.superadmin_password,
+          "authorization.admin.password": dediData.admin_password,
+          "authorization.user.password": dediData.user_password,
+        },
+        public_net: {
+          enable_ipv4: true,
+          enable_ipv6: false,
+        },
+      };
 
-    const res = await axiosHetzner.post<{
-      server: HetznerServer;
-    }>("/servers", body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await axiosHetzner.post<{
+        server: HetznerServer;
+      }>("/servers", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    await setRateLimit(projectId, res);
+      await setRateLimit(projectId, res);
 
-    return res.data.server;
-  });
+      return res.data.server;
+    },
+  );
 }

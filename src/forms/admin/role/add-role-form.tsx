@@ -37,7 +37,10 @@ export default function AddRoleForm({ callback }: { callback?: () => void }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         <FormElement
           name={"name"}
           label="Name"
