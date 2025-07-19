@@ -29,9 +29,16 @@ export default async function Navbar() {
     routePermissions.admin.servers.view,
   );
   const canViewRoles = await hasPermission(routePermissions.admin.roles.view);
+  const canViewHetzner = await hasPermission(
+    routePermissions.admin.hetzner.view,
+  );
 
   const canViewAdmin =
-    canViewUsers || canViewGroups || canViewServers || canViewRoles;
+    canViewUsers ||
+    canViewGroups ||
+    canViewServers ||
+    canViewRoles ||
+    canViewHetzner;
 
   return (
     <>
@@ -42,6 +49,7 @@ export default async function Navbar() {
           canViewAdmin={canViewAdmin}
           canViewServers={canViewServers}
           canViewRoles={canViewRoles}
+          canViewHetzner={canViewHetzner}
         />
       )}
       <NavFooter />

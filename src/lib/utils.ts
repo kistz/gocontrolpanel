@@ -284,13 +284,13 @@ export const permissions: string[] = [
   "servers:create",
   "servers:edit",
   "servers:delete",
-  "projects:view",
-  "projects:create",
-  "projects:edit",
-  "projects:delete",
-  "projects:servers:view",
-  "projects:servers:create",
-  "projects:servers:delete",
+  "hetzner:view",
+  "hetzner:create",
+  "hetzner:edit",
+  "hetzner:delete",
+  "hetzner:servers:view",
+  "hetzner:servers:create",
+  "hetzner:servers:delete",
 ] as const;
 
 export function hasPermissionSync(session: Session | null, permissions?: string[], id = ""): boolean {
@@ -314,8 +314,8 @@ export function hasPermissionSync(session: Session | null, permissions?: string[
   
   session.user.projects.forEach((project) => {
     const role = project.role.toLowerCase();
-    userPermissions.push(`projects::${role}`);
-    userPermissions.push(`projects:${project.id}:${role}`);
+    userPermissions.push(`hetzner::${role}`);
+    userPermissions.push(`hetzner:${project.id}:${role}`);
   });
 
   session.user.servers.forEach((server) => {

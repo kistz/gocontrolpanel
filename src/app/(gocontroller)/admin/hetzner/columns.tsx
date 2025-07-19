@@ -3,7 +3,6 @@ import {
   deleteHetznerProject,
   HetznerProjectsWithUsers,
 } from "@/actions/database/hetzner-projects";
-import { UserMinimal } from "@/actions/database/users";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditProjectModal from "@/components/modals/edit-project";
 import Modal from "@/components/modals/modal";
@@ -16,18 +15,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const createColumns = (
   refetch: () => void,
-  data: {
-    users: UserMinimal[];
-  },
 ): ColumnDef<HetznerProjectsWithUsers>[] => [
   {
     accessorKey: "name",
@@ -49,12 +47,29 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const project = row.original;
+      const { data: session } = useSession();
       const router = useRouter();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
 
+      const canEdit = hasPermissionSync(
+        session,
+        routePermissions.admin.hetzner.edit,
+        project.id,
+      );
+      const canDelete = hasPermissionSync(
+        session,
+        routePermissions.admin.hetzner.delete,
+        project.id,
+      );
+
       const handleDelete = () => {
+        if (!canDelete) {
+          toast.error("You do not have permission to delete this project.");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteHetznerProject(project.id);
@@ -71,6 +86,10 @@ export const createColumns = (
         });
       };
 
+      if (!canEdit && !canDelete) {
+        return null;
+      }
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -86,41 +105,44 @@ export const createColumns = (
               >
                 View Project
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit project
-              </DropdownMenuItem>
-              <Separator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpen(true)}
-              >
-                Delete project
-              </DropdownMenuItem>
+              {(canEdit || canDelete) && <Separator />}
+              {canEdit && (
+                <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                  Edit Project
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Delete Project
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onConfirm={handleDelete}
-            title="Delete project"
-            description={`Are you sure you want to delete ${project.name}? Deleting a project does not delete the servers in it. You can manage those servers again when you create a new project with the same API Token.`}
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
-
-          <Modal
-            isOpen={isEditOpen}
-            setIsOpen={setIsEditOpen}
-            onClose={() => refetch()}
-          >
-            <EditProjectModal
-              data={{
-                project,
-                users: data.users,
-              }}
+          {canDelete && (
+            <ConfirmModal
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete project"
+              description={`Are you sure you want to delete ${project.name}? Deleting a project does not delete the servers in it. You can manage those servers again when you create a new project with the same API Token.`}
+              confirmText="Delete"
+              cancelText="Cancel"
             />
-          </Modal>
+          )}
+
+          {canEdit && (
+            <Modal
+              isOpen={isEditOpen}
+              setIsOpen={setIsEditOpen}
+              onClose={() => refetch()}
+            >
+              <EditProjectModal data={project} />
+            </Modal>
+          )}
         </div>
       );
     },

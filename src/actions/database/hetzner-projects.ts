@@ -4,7 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { decryptHetznerToken, encryptHetznerToken } from "@/lib/hetzner";
 import { Prisma } from "@/lib/prisma/generated";
-import { getList } from "@/lib/utils";
+import { getList, hasPermissionSync } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
@@ -57,7 +57,7 @@ export async function getHetznerProjectsPaginated(
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<HetznerProjectsWithUsers>>> {
   return doServerActionWithAuth(
-    ["projects:view", "projects::moderator", "projects::admin"],
+    ["hetzner:view", "hetzner::moderator", "hetzner::admin"],
     async (session) => {
       const db = getClient();
 
@@ -70,7 +70,7 @@ export async function getHetznerProjectsPaginated(
 
       if (
         !session.user.admin &&
-        !session.user.permissions.includes("projects:view")
+        !session.user.permissions.includes("hetzner:view")
       ) {
         const userProjects = session.user.projects.map((p) => p.id);
 
@@ -96,21 +96,11 @@ export async function getHetznerProjectsPaginated(
         take: pagination.pageSize,
       });
 
-      const canViewApiTokens = (projectId: string) => {
-        return (
-          session.user.admin ||
-          session.user.permissions.includes("projects:edit") ||
-          session.user.projects.some(
-            (p) => p.id === projectId && p.role === "Admin",
-          )
-        );
-      };
-
       return {
         totalCount,
         data: projects.map((project) => ({
           ...project,
-          apiTokens: canViewApiTokens(project.id)
+          apiTokens: hasPermissionSync(session, ["hetzner:edit", "hetzner:id:admin"], project.id)
             ? getList(project.apiTokens).map((token) =>
                 decryptHetznerToken(token),
               )
@@ -128,7 +118,7 @@ export async function createHetznerProject(
     "id" | "createdAt" | "updatedAt" | "deletedAt"
   >,
 ): Promise<ServerResponse<HetznerProjectsWithUsers>> {
-  return doServerActionWithAuth(["projects:create"], async () => {
+  return doServerActionWithAuth(["hetzner:create"], async () => {
     const db = getClient();
 
     const { hetznerProjectUsers, apiTokens, ...projectData } = hetznerProject;
@@ -163,7 +153,7 @@ export async function updateHetznerProject(
     Omit<EditHetznerProjects, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >,
 ): Promise<ServerResponse<HetznerProjectsWithUsers>> {
-  return doServerActionWithAuth(["projects:edit", `projects:${hetznerProjectId}:admin`], async () => {
+  return doServerActionWithAuth(["hetzner:edit", `hetzner:${hetznerProjectId}:admin`], async () => {
     const db = getClient();
 
     const { hetznerProjectUsers, apiTokens, ...projectData } = hetznerProject;
@@ -200,7 +190,7 @@ export async function updateHetznerProject(
 export async function deleteHetznerProject(
   hetznerProjectId: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["projects:delete", `projects:${hetznerProjectId}:admin`], async () => {
+  return doServerActionWithAuth(["hetzner:delete", `hetzner:${hetznerProjectId}:admin`], async () => {
     const db = getClient();
 
     await db.hetznerProjects.update({

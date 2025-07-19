@@ -21,8 +21,6 @@ export default function EditServerForm({
   server: ServersWithUsers;
   callback?: () => void;
 }) {
-  const { data: session } = useSession();
-
   const [users, setUsers] = useState<UserMinimal[]>([]);
 
   const [loading, setLoading] = useState(true);
