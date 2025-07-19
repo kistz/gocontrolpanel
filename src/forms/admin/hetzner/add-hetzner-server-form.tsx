@@ -43,9 +43,9 @@ export default function AddHetznerServerForm({
         }
         setLocations(data);
       } catch (err) {
-        setError("Failed to get locations: " + getErrorMessage(error));
+        setError("Failed to get locations: " + getErrorMessage(err));
         toast.error("Failed to fetch locations", {
-          description: getErrorMessage(error),
+          description: getErrorMessage(err),
         });
       }
 
@@ -56,9 +56,9 @@ export default function AddHetznerServerForm({
         }
         setServerTypes(data);
       } catch (err) {
-        setError("Failed to get server types: " + getErrorMessage(error));
+        setError("Failed to get server types: " + getErrorMessage(err));
         toast.error("Failed to fetch server types", {
-          description: getErrorMessage(error),
+          description: getErrorMessage(err),
         });
       }
 
@@ -69,9 +69,9 @@ export default function AddHetznerServerForm({
         }
         setImages(data);
       } catch (err) {
-        setError("Failed to get images: " + getErrorMessage(error));
+        setError("Failed to get images: " + getErrorMessage(err));
         toast.error("Failed to fetch images", {
-          description: getErrorMessage(error),
+          description: getErrorMessage(err),
         });
       }
 

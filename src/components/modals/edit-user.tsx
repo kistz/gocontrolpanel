@@ -1,6 +1,6 @@
 "use client";
 import EditUserForm from "@/forms/admin/user/edit-user-form";
-import { Roles, Users } from "@/lib/prisma/generated";
+import { Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";

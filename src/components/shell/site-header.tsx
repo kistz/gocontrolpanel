@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { generatePath } from "@/lib/utils";
 import { breadCrumbs } from "@/routes";
-import { IconBrandGithub } from "@tabler/icons-react";
+import { IconBrandGithub, IconBrandX, IconCoffee } from "@tabler/icons-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -64,9 +64,15 @@ export function SiteHeader() {
           className="mx-2 data-[orientation=vertical]:h-4"
         />
 
-        <Breadcrumbs crumbs={activeBreadCrumbs} />
+        <Breadcrumbs crumbs={activeBreadCrumbs} className="min-w-0 flex-1" />
 
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex gap-2 lg:gap-4">
+          <Link href="https://x.com/MarijnRegtersc2" target="_blank">
+            <IconBrandX />
+          </Link>
+          <Link href="https://ko-fi.com/marijnregterschot" target="_blank">
+            <IconCoffee />
+          </Link>
           <Link
             href="https://github.com/MRegterschot/gocontrolpanel"
             target="_blank"

@@ -12,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Servers } from "@/lib/prisma/generated";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
@@ -21,7 +20,9 @@ import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const createColumns = (refetch: () => void): ColumnDef<ServersWithUsers>[] => [
+export const createColumns = (
+  refetch: () => void,
+): ColumnDef<ServersWithUsers>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (

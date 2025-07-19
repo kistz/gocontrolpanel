@@ -32,9 +32,9 @@ export default function AddProjectForm({
         }
         setUsers(data);
       } catch (err) {
-        setError("Failed to get users: " + getErrorMessage(error));
+        setError("Failed to get users: " + getErrorMessage(err));
         toast.error("Failed to fetch users", {
-          description: getErrorMessage(error),
+          description: getErrorMessage(err),
         });
       }
 

@@ -1,5 +1,5 @@
 "use server";
-import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
+import { doServerActionWithAuth } from "@/lib/actions";
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClient } from "@/lib/gbxclient";

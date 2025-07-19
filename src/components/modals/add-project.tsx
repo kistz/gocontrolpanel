@@ -1,5 +1,4 @@
 "use client";
-import { UserMinimal } from "@/actions/database/users";
 import AddProjectForm from "@/forms/admin/hetzner/add-project-form";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
@@ -7,12 +6,10 @@ import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddProjectModal({
-  closeModal,
-}: DefaultModalProps) {
+export default function AddProjectModal({ closeModal }: DefaultModalProps) {
   const router = useRouter();
   const { update } = useSession();
-  
+
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };

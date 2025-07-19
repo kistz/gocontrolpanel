@@ -1,12 +1,11 @@
 "use server";
-import { doServerAction, doServerActionWithAuth } from "@/lib/actions";
-import { GbxClientManager, getGbxClient } from "@/lib/gbxclient";
+import { doServerActionWithAuth } from "@/lib/actions";
+import { getGbxClient } from "@/lib/gbxclient";
 import { Maps } from "@/lib/prisma/generated";
-import { getKeyActiveMap, getKeyJukebox, getRedisClient } from "@/lib/redis";
+import { getKeyJukebox, getRedisClient } from "@/lib/redis";
 import { SMapInfo } from "@/types/gbx/map";
 import { JukeboxMap } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
-import { createMap, getMapByUid } from "../database/gbx";
 
 export async function getJukebox(
   serverId: string,

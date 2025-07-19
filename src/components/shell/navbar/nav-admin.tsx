@@ -14,8 +14,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { hasPermission } from "@/lib/auth";
-import { routePermissions, routes } from "@/routes";
+import { routes } from "@/routes";
 import {
   IconClipboardText,
   IconCloud,
