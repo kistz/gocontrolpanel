@@ -4,7 +4,10 @@ import Jukebox from "@/components/maps/jukebox";
 import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { hasPermission } from "@/lib/auth";
 import { getFileManager } from "@/lib/filemanager";
+import { routePermissions, routes } from "@/routes";
+import { redirect } from "next/navigation";
 
 export default async function ServerMapsPage({
   params,
@@ -12,6 +15,11 @@ export default async function ServerMapsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  const canView = await hasPermission(routePermissions.servers.maps, id);
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
 
   const { data: maps } = await getMapList(id);
   const { data: jukebox } = await getJukebox(id);

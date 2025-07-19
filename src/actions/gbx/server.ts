@@ -117,49 +117,52 @@ export async function saveServerSettings(
 export async function getLocalMaps(
   serverId: string,
 ): Promise<ServerResponse<LocalMapInfo[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
 
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
-
-    const res = await fetch(`${fileManager.url}/maps`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (res.status !== 200) {
-      throw new ServerError("Failed to get maps");
-    }
-
-    const maps = await res.json();
-    if (!maps) {
-      throw new ServerError("Failed to get maps");
-    }
-
-    const mapInfoList: LocalMapInfo[] = [];
-
-    for (const map of maps) {
-      try {
-        const mapInfo = await client.call("GetMapInfo", map);
-
-        if (!mapInfo) {
-          throw new ServerError(`Failed to get map info for ${map}`);
-        }
-
-        mapInfoList.push({
-          ...mapInfo,
-          Path: path.dirname(map),
-        } as LocalMapInfo);
-      } catch (error) {
-        console.error(`Error getting map info for ${map}:`, error);
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
       }
-    }
 
-    return mapInfoList;
-  });
+      const res = await fetch(`${fileManager.url}/maps`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status !== 200) {
+        throw new ServerError("Failed to get maps");
+      }
+
+      const maps = await res.json();
+      if (!maps) {
+        throw new ServerError("Failed to get maps");
+      }
+
+      const mapInfoList: LocalMapInfo[] = [];
+
+      for (const map of maps) {
+        try {
+          const mapInfo = await client.call("GetMapInfo", map);
+
+          if (!mapInfo) {
+            throw new ServerError(`Failed to get map info for ${map}`);
+          }
+
+          mapInfoList.push({
+            ...mapInfo,
+            Path: path.dirname(map),
+          } as LocalMapInfo);
+        } catch (error) {
+          console.error(`Error getting map info for ${map}:`, error);
+        }
+      }
+
+      return mapInfoList;
+    },
+  );
 }

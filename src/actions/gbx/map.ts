@@ -10,75 +10,90 @@ import { ServerError, ServerResponse } from "@/types/responses";
 export async function getJukebox(
   serverId: string,
 ): Promise<ServerResponse<JukeboxMap[]>> {
-  return doServerActionWithAuth([], async () => {
-    const redis = await getRedisClient();
-    const key = getKeyJukebox(serverId);
-    const items = await redis.lrange(key, 0, -1);
-    return items.map((item) => JSON.parse(item));
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const redis = await getRedisClient();
+      const key = getKeyJukebox(serverId);
+      const items = await redis.lrange(key, 0, -1);
+      return items.map((item) => JSON.parse(item));
+    },
+  );
 }
 
 export async function setJukebox(
   serverId: string,
   jukebox: JukeboxMap[],
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth([], async () => {
-    const redis = await getRedisClient();
-    const key = getKeyJukebox(serverId);
-    await redis.del(key);
-    if (jukebox.length > 0) {
-      await redis.rpush(key, ...jukebox.map((map) => JSON.stringify(map)));
-    }
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const redis = await getRedisClient();
+      const key = getKeyJukebox(serverId);
+      await redis.del(key);
+      if (jukebox.length > 0) {
+        await redis.rpush(key, ...jukebox.map((map) => JSON.stringify(map)));
+      }
+    },
+  );
 }
 
 export async function clearJukebox(serverId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth([], async () => {
-    const redis = await getRedisClient();
-    const key = getKeyJukebox(serverId);
-    await redis.del(key);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const redis = await getRedisClient();
+      const key = getKeyJukebox(serverId);
+      await redis.del(key);
+    },
+  );
 }
 
 export async function addMapToJukebox(
   serverId: string,
   map: Maps,
 ): Promise<ServerResponse<JukeboxMap>> {
-  return doServerActionWithAuth(["admin"], async (session) => {
-    const redis = await getRedisClient();
-    const newMap: JukeboxMap = {
-      ...map,
-      QueuedAt: new Date(),
-      QueuedBy: session.user.login,
-      QueuedByDisplayName: session.user.displayName,
-    };
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async (session) => {
+      const redis = await getRedisClient();
+      const newMap: JukeboxMap = {
+        ...map,
+        QueuedAt: new Date(),
+        QueuedBy: session.user.login,
+        QueuedByDisplayName: session.user.displayName,
+      };
 
-    const key = getKeyJukebox(serverId);
-    await redis.rpush(key, JSON.stringify(newMap));
+      const key = getKeyJukebox(serverId);
+      await redis.rpush(key, JSON.stringify(newMap));
 
-    return newMap;
-  });
+      return newMap;
+    },
+  );
 }
 
 export async function removeMapFromJukebox(
   serverId: string,
   mapId: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth([], async () => {
-    const redis = await getRedisClient();
-    const key = getKeyJukebox(serverId);
-    const items = await redis.lrange(key, 0, -1);
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const redis = await getRedisClient();
+      const key = getKeyJukebox(serverId);
+      const items = await redis.lrange(key, 0, -1);
 
-    const filtered = items.filter((item) => {
-      const parsed = JSON.parse(item);
-      return parsed.id !== mapId;
-    });
+      const filtered = items.filter((item) => {
+        const parsed = JSON.parse(item);
+        return parsed.id !== mapId;
+      });
 
-    await redis.del(key);
-    if (filtered.length > 0) {
-      await redis.rpush(key, ...filtered);
-    }
-  });
+      await redis.del(key);
+      if (filtered.length > 0) {
+        await redis.rpush(key, ...filtered);
+      }
+    },
+  );
 }
 
 export async function getCurrentMapInfo(
@@ -149,56 +164,68 @@ export async function addMap(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("AddMap", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("AddMap", filename);
+    },
+  );
 }
 
 export async function addMapList(
   serverId: string,
   filenames: string[],
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const res = await client.call("AddMapList", filenames);
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      const res = await client.call("AddMapList", filenames);
 
-    if (typeof res !== "number") {
-      throw new ServerError("Failed to add map list");
-    }
+      if (typeof res !== "number") {
+        throw new ServerError("Failed to add map list");
+      }
 
-    return res;
-  });
+      return res;
+    },
+  );
 }
 
 export async function removeMap(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const mapList = await client.call("GetMapList", 2, 0);
-    if (mapList.length < 2) {
-      throw new ServerError("Cannot remove the last map from the server");
-    }
-    await client.call("RemoveMap", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      const mapList = await client.call("GetMapList", 2, 0);
+      if (mapList.length < 2) {
+        throw new ServerError("Cannot remove the last map from the server");
+      }
+      await client.call("RemoveMap", filename);
+    },
+  );
 }
 
 export async function removeMapList(
   serverId: string,
   filenames: string[],
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const res = await client.call("RemoveMapList", filenames);
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      const res = await client.call("RemoveMapList", filenames);
 
-    if (typeof res !== "number") {
-      throw new ServerError("Failed to remove map list");
-    }
+      if (typeof res !== "number") {
+        throw new ServerError("Failed to remove map list");
+      }
 
-    return res;
-  });
+      return res;
+    },
+  );
 }
 
 export async function insertMap(
