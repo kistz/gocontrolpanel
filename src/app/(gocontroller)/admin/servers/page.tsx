@@ -1,12 +1,21 @@
-import { getServers } from "@/actions/gbxconnector/servers";
+import { getServersPaginated } from "@/actions/database/servers";
 import AddServerModal from "@/components/modals/add-server";
 import Modal from "@/components/modals/modal";
-import ServerOrder from "@/components/servers/server-order";
+import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
+import { redirect } from "next/navigation";
+import { createColumns } from "./columns";
 
 export default async function AdminServersPage() {
-  const { data: servers } = await getServers();
+  const canView = await hasPermission(routePermissions.admin.servers.view);
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
+
+  const canCreate = await hasPermission(routePermissions.admin.servers.create);
 
   return (
     <div className="flex flex-col gap-6">
@@ -14,25 +23,27 @@ export default async function AdminServersPage() {
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">Manage Servers</h1>
           <h4 className="text-muted-foreground">
-            Manage the servers and their order.
+            Here you can manage your servers, add new ones, and edit existing
+            server details.
           </h4>
         </div>
-
-        <Modal>
-          <AddServerModal />
-          <Button>
-            <IconPlus /> Add Server
-          </Button>
-        </Modal>
       </div>
 
-      {servers.length === 0 ? (
-        <div className="text-muted-foreground">No servers found.</div>
-      ) : (
-        <ServerOrder servers={servers} />
-      )}
+      <PaginationTable
+        createColumns={createColumns}
+        fetchData={getServersPaginated}
+        actions={
+          canCreate && (
+            <Modal>
+              <AddServerModal />
+              <Button>
+                <IconPlus /> Add Server
+              </Button>
+            </Modal>
+          )
+        }
+        filter
+      />
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";

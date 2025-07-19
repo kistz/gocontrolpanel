@@ -9,10 +9,10 @@ import { ServerError, ServerResponse } from "@/types/responses";
 import path from "path";
 
 export async function getServerSettings(
-  serverUuid: string,
+  serverId: string,
 ): Promise<ServerResponse<ServerSettingsSchemaType>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
+    const client = await getGbxClient(serverId);
     const settings = await client.multicall([
       ["GetServerOptions"],
       ["GetHideServer"],
@@ -69,11 +69,11 @@ export async function getServerSettings(
 }
 
 export async function saveServerSettings(
-  serverUuid: string,
+  serverId: string,
   serverSettings: ServerSettingsSchemaType,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
+    const client = await getGbxClient(serverId);
 
     serverSettings.defaultOptions.NextCallVoteTimeOut *= 1000; // Convert to milliseconds
     serverSettings.defaultOptions.CallVoteRatio /= 100; // Convert to 0-1 range
@@ -115,51 +115,54 @@ export async function saveServerSettings(
 }
 
 export async function getLocalMaps(
-  serverUuid: string,
+  serverId: string,
 ): Promise<ServerResponse<LocalMapInfo[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverUuid);
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
 
-    const fileManager = await getFileManager(serverUuid);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
-
-    const res = await fetch(`${fileManager.url}/maps`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (res.status !== 200) {
-      throw new ServerError("Failed to get maps");
-    }
-
-    const maps = await res.json();
-    if (!maps) {
-      throw new ServerError("Failed to get maps");
-    }
-
-    const mapInfoList: LocalMapInfo[] = [];
-
-    for (const map of maps) {
-      try {
-        const mapInfo = await client.call("GetMapInfo", map);
-
-        if (!mapInfo) {
-          throw new ServerError(`Failed to get map info for ${map}`);
-        }
-
-        mapInfoList.push({
-          ...mapInfo,
-          Path: path.dirname(map),
-        } as LocalMapInfo);
-      } catch (error) {
-        console.error(`Error getting map info for ${map}:`, error);
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
       }
-    }
 
-    return mapInfoList;
-  });
+      const res = await fetch(`${fileManager.url}/maps`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status !== 200) {
+        throw new ServerError("Failed to get maps");
+      }
+
+      const maps = await res.json();
+      if (!maps) {
+        throw new ServerError("Failed to get maps");
+      }
+
+      const mapInfoList: LocalMapInfo[] = [];
+
+      for (const map of maps) {
+        try {
+          const mapInfo = await client.call("GetMapInfo", map);
+
+          if (!mapInfo) {
+            throw new ServerError(`Failed to get map info for ${map}`);
+          }
+
+          mapInfoList.push({
+            ...mapInfo,
+            Path: path.dirname(map),
+          } as LocalMapInfo);
+        } catch (error) {
+          console.error(`Error getting map info for ${map}:`, error);
+        }
+      }
+
+      return mapInfoList;
+    },
+  );
 }

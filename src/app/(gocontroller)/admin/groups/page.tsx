@@ -1,16 +1,22 @@
 import { getGroupsPaginated } from "@/actions/database/groups";
-import { getAllUsers } from "@/actions/database/users";
-import { getServers } from "@/actions/gbxconnector/servers";
 import AddGroupModal from "@/components/modals/add-group";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
+import { redirect } from "next/navigation";
 import { createColumns } from "./columns";
 
 export default async function AdminGroupsPage() {
-  const { data: servers } = await getServers();
-  const { data: users } = await getAllUsers();
+  const canView = await hasPermission(routePermissions.admin.groups.view);
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
+
+  const canCreate = await hasPermission(routePermissions.admin.groups.create);
+
   const key = crypto.randomUUID();
 
   return (
@@ -22,28 +28,23 @@ export default async function AdminGroupsPage() {
             Manage the groups and their members.
           </h4>
         </div>
-
-        <Modal>
-          <AddGroupModal
-            data={{
-              servers,
-              users,
-            }}
-          />
-          <Button>
-            <IconPlus /> Add Group
-          </Button>
-        </Modal>
       </div>
 
       <PaginationTable
         key={key}
         createColumns={createColumns}
-        args={{
-          servers,
-          users,
-        }}
         fetchData={getGroupsPaginated}
+        actions={
+          canCreate && (
+            <Modal>
+              <AddGroupModal />
+              <Button>
+                <IconPlus /> Add Group
+              </Button>
+            </Modal>
+          )
+        }
+        filter
       />
     </div>
   );

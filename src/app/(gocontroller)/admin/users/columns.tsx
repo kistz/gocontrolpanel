@@ -14,10 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Users } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
@@ -56,6 +58,25 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     ),
   },
   {
+    accessorKey: "permissions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Permissions"} />
+    ),
+    cell: ({ row }) => {
+      const permissions = row.getValue("permissions") as string[];
+      return (
+        <span className="truncate">
+          {permissions.map((perm: string, index: number) => (
+            <span key={index} className="mr-1">
+              {perm}
+              {index < permissions.length - 1 ? ", " : ""}
+            </span>
+          ))}
+        </span>
+      );
+    },
+  },
+  {
     accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Joined"} />
@@ -75,11 +96,26 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+      const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isEditOpen, setIsEditOpen] = useState(false);
 
+      const canEdit = hasPermissionSync(
+        session,
+        routePermissions.admin.users.edit,
+      );
+      const canDelete = hasPermissionSync(
+        session,
+        routePermissions.admin.users.delete,
+      );
+
       const handleDelete = () => {
+        if (!canDelete) {
+          toast.error("You do not have permission to delete this user.");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteUserById(user.id);
@@ -96,6 +132,10 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
         });
       };
 
+      if (!canEdit && !canDelete) {
+        return null;
+      }
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -106,35 +146,43 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                Edit user
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpen(true)}
-              >
-                Delete user
-              </DropdownMenuItem>
+              {canEdit && (
+                <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                  Edit user
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Delete user
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onConfirm={handleDelete}
-            title="Delete user"
-            description={`Are you sure you want to delete ${user.nickName}?`}
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
+          {canDelete && (
+            <ConfirmModal
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete user"
+              description={`Are you sure you want to delete ${user.nickName}?`}
+              confirmText="Delete"
+              cancelText="Cancel"
+            />
+          )}
 
-          <Modal
-            isOpen={isEditOpen}
-            setIsOpen={setIsEditOpen}
-            onClose={() => refetch()}
-          >
-            <EditUserModal data={user} />
-          </Modal>
+          {canEdit && (
+            <Modal
+              isOpen={isEditOpen}
+              setIsOpen={setIsEditOpen}
+              onClose={() => refetch()}
+            >
+              <EditUserModal data={user} />
+            </Modal>
+          )}
         </div>
       );
     },

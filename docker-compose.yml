@@ -5,14 +5,16 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - CONNECTOR_URL=http://nginx/gbx
         - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
         - DB_TYPE=mysql
+    ports:
+      - 3000:3000
     restart: unless-stopped
     environment:
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: 
       DEFAULT_ADMINS: 
+      DEFAULT_PERMISSIONS: 
       NADEO_CLIENT_ID: 
       NADEO_CLIENT_SECRET: 
       NADEO_REDIRECT_URI: http://localhost:3000/api/auth/callback/nadeo
@@ -24,29 +26,6 @@ services:
     depends_on:
       - db
       - redis
-
-  gbxconnector:
-    image: marijnregterschot/gbxconnector:latest
-    restart: unless-stopped
-    environment:
-      PORT: 6980
-      SERVER_RECONNECT_INTERVAL: 15
-      JWT_SECRET: 
-      DOCKER_NETWORK_RANGE: 172.16.0.0/16
-      LOG_LEVEL: DEBUG
-    volumes:
-      - ./servers.json:/app/servers.json
-
-  nginx:
-    image: nginx:latest
-    restart: unless-stopped
-    ports:
-      - 3000:80
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - gocontrolpanel
-      - gbxconnector
 
   dedicated:
     image: evoesports/trackmania:latest

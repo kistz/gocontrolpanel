@@ -1,28 +1,68 @@
 "use client";
 import { createGroup } from "@/actions/database/groups";
+import { getServersMinimal, ServerMinimal } from "@/actions/database/servers";
+import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { GroupRole, Users } from "@/lib/prisma/generated";
-import { getErrorMessage, getList } from "@/lib/utils";
-import { Server } from "@/types/server";
+import { GroupRole } from "@/lib/prisma/generated";
+import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddGroupSchema, AddGroupSchemaType } from "./add-group-schema";
 
-export default function AddGroupForm({
-  servers,
-  users,
-  callback,
-}: {
-  servers: Server[];
-  users: Users[];
-  callback?: () => void;
-}) {
+export default function AddGroupForm({ callback }: { callback?: () => void }) {
+  const { data: session } = useSession();
+
+  const [servers, setServers] = useState<ServerMinimal[]>([]);
+  const [users, setUsers] = useState<UserMinimal[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const { data, error } = await getServersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setServers(data);
+      } catch (error) {
+        setError("Failed to get servers: " + getErrorMessage(error));
+        toast.error("Failed to fetch servers", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      try {
+        const { data, error } = await getUsersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setUsers(data);
+      } catch (error) {
+        setError("Failed to get users: " + getErrorMessage(error));
+        toast.error("Failed to fetch users", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const form = useForm<AddGroupSchemaType>({
     resolver: zodResolver(AddGroupSchema),
+    defaultValues: {
+      groupMembers: [{ userId: session?.user.id, role: GroupRole.Admin }],
+    },
   });
 
   async function onSubmit(values: AddGroupSchemaType) {
@@ -30,9 +70,12 @@ export default function AddGroupForm({
       const { error } = await createGroup({
         ...values,
         description: values.description || "",
-        serverUuids: getList(values.serverUuids),
-        users:
-          values.users?.map((user) => ({
+        groupServers:
+          values.groupServers?.map((id) => ({
+            serverId: id,
+          })) || [],
+        groupMembers:
+          values.groupMembers?.map((user) => ({
             userId: user.userId,
             role: user.role as GroupRole,
           })) || [],
@@ -49,6 +92,14 @@ export default function AddGroupForm({
         description: getErrorMessage(error),
       });
     }
+  }
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (
@@ -71,12 +122,12 @@ export default function AddGroupForm({
         />
 
         <FormElement
-          name="serverUuids"
+          name="groupServers"
           label="Servers"
           placeholder="Select servers"
           options={servers.map((server) => ({
             label: server.name,
-            value: server.uuid,
+            value: server.id,
           }))}
           type="multi-select"
         />
@@ -84,11 +135,11 @@ export default function AddGroupForm({
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Members</FormLabel>
-          {form.watch("users")?.map((_, index) => (
+          {form.watch("groupMembers")?.map((_, index) => (
             <div key={index} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
-                  name={`users.${index}.userId`}
+                  name={`groupMembers.${index}.userId`}
                   className="w-full"
                   placeholder="Select user"
                   options={users.map((u) => ({
@@ -99,7 +150,7 @@ export default function AddGroupForm({
                 />
               </div>
               <FormElement
-                name={`users.${index}.role`}
+                name={`groupMembers.${index}.role`}
                 className="w-30"
                 placeholder="Select role"
                 options={Object.values(GroupRole).map((role) => ({
@@ -113,9 +164,9 @@ export default function AddGroupForm({
                 variant="destructive"
                 size={"icon"}
                 onClick={() => {
-                  const currentUsers = form.getValues("users");
+                  const currentUsers = form.getValues("groupMembers");
                   form.setValue(
-                    "users",
+                    "groupMembers",
                     currentUsers?.filter((_, i) => i !== index),
                   );
                 }}
@@ -130,8 +181,8 @@ export default function AddGroupForm({
             type="button"
             variant="outline"
             onClick={() => {
-              const currentUsers = form.getValues("users") || [];
-              form.setValue("users", [
+              const currentUsers = form.getValues("groupMembers") || [];
+              form.setValue("groupMembers", [
                 ...currentUsers,
                 { userId: "", role: GroupRole.Member },
               ]);

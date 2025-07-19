@@ -1,22 +1,14 @@
 "use client";
 import AddProjectForm from "@/forms/admin/hetzner/add-project-form";
-import { Users } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddProjectModal({
-  closeModal,
-  data,
-}: DefaultModalProps<{
-  users: Users[];
-}>) {
+export default function AddProjectModal({ closeModal }: DefaultModalProps) {
   const router = useRouter();
   const { update } = useSession();
-
-  if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -40,7 +32,7 @@ export default function AddProjectModal({
           onClick={closeModal}
         />
       </div>
-      <AddProjectForm users={data.users} callback={handleCallback} />
+      <AddProjectForm callback={handleCallback} />
     </Card>
   );
 }

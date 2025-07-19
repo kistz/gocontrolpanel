@@ -3,13 +3,15 @@ import "dotenv/config";
 
 const config: Config = {
   NODE_ENV: process.env.NODE_ENV || "development",
-  CONNECTOR_URL: process.env.CONNECTOR_URL || "http://localhost:6980",
   HETZNER: {
     URL: "https://api.hetzner.cloud/v1",
     KEY: process.env.HETZNER_KEY || "",
   },
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
+    : [],
+  DEFAULT_PERMISSIONS: process.env.DEFAULT_PERMISSIONS
+    ? process.env.DEFAULT_PERMISSIONS.split(",")
     : [],
   NADEO: {
     CLIENT_ID: process.env.NADEO_CLIENT_ID || "",

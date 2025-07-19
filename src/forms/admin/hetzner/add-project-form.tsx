@@ -1,23 +1,49 @@
 "use client";
 import { createHetznerProject } from "@/actions/database/hetzner-projects";
+import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { HetznerProjectRole, Users } from "@/lib/prisma/generated";
+import { HetznerProjectRole } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddProjectSchema, AddProjectSchemaType } from "./add-project-schema";
 
 export default function AddProjectForm({
-  users,
   callback,
 }: {
-  users: Users[];
   callback?: () => void;
 }) {
+  const [users, setUsers] = useState<UserMinimal[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const { data, error } = await getUsersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setUsers(data);
+      } catch (err) {
+        setError("Failed to get users: " + getErrorMessage(err));
+        toast.error("Failed to fetch users", {
+          description: getErrorMessage(err),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetchUsers();
+  }, []);
+
   const form = useForm<AddProjectSchemaType>({
     resolver: zodResolver(AddProjectSchema),
   });
@@ -27,8 +53,8 @@ export default function AddProjectForm({
       const { error } = await createHetznerProject({
         ...values,
         apiTokens: getList(values.apiTokens),
-        users:
-          values.users?.map((user) => ({
+        hetznerProjectUsers:
+          values.hetznerProjectUsers?.map((user) => ({
             userId: user.userId,
             role: user.role as HetznerProjectRole,
           })) || [],
@@ -45,6 +71,14 @@ export default function AddProjectForm({
         description: getErrorMessage(error),
       });
     }
+  }
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (
@@ -106,11 +140,11 @@ export default function AddProjectForm({
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Users</FormLabel>
-          {form.watch("users")?.map((_, index) => (
+          {form.watch("hetznerProjectUsers")?.map((_, index) => (
             <div key={index} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
-                  name={`users.${index}.userId`}
+                  name={`hetznerProjectUsers.${index}.userId`}
                   className="w-full"
                   placeholder="Select user"
                   options={users.map((u) => ({
@@ -121,7 +155,7 @@ export default function AddProjectForm({
                 />
               </div>
               <FormElement
-                name={`users.${index}.role`}
+                name={`hetznerProjectUsers.${index}.role`}
                 className="w-30"
                 placeholder="Select role"
                 options={Object.values(HetznerProjectRole).map((role) => ({
@@ -135,9 +169,9 @@ export default function AddProjectForm({
                 variant="destructive"
                 size={"icon"}
                 onClick={() => {
-                  const currentUsers = form.getValues("users");
+                  const currentUsers = form.getValues("hetznerProjectUsers");
                   form.setValue(
-                    "users",
+                    "hetznerProjectUsers",
                     currentUsers?.filter((_, i) => i !== index),
                   );
                 }}
@@ -152,8 +186,8 @@ export default function AddProjectForm({
             type="button"
             variant="outline"
             onClick={() => {
-              const currentUsers = form.getValues("users") || [];
-              form.setValue("users", [
+              const currentUsers = form.getValues("hetznerProjectUsers") || [];
+              form.setValue("hetznerProjectUsers", [
                 ...currentUsers,
                 { userId: "", role: HetznerProjectRole.Moderator },
               ]);

@@ -19,8 +19,7 @@ export function LoginForm({
           <div className="flex size-8 items-center justify-center rounded-md">
             <IconDeviceGamepad2 className="size-6" />
           </div>
-          <span className="sr-only">GoController Panel</span>
-          <h1 className="text-xl font-bold">Welcome to GoController Panel</h1>
+          <h1 className="text-xl font-bold">Welcome to GoControlPanel</h1>
         </div>
 
         <Button className="w-full" onClick={handleLogin}>

@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Maps {
-  id             String   @id @default(uuid())
+  id             String @id @default(uuid())
   name           String
   uid            String @unique
   fileName       String
@@ -20,50 +20,51 @@ model Maps {
   silverTime     Int
   bronzeTime     Int
 
-  submitter      String?
-  timestamp      DateTime? 
-  fileUrl        String? @unique
-  thumbnailUrl   String? @unique
+  submitter    String?
+  timestamp    DateTime?
+  fileUrl      String?   @unique
+  thumbnailUrl String?   @unique
+  uploadCheck  DateTime?
 
-  records        Records[]
+  records Records[]
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  deletedAt      DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([deletedAt])
   @@map("maps")
 }
 
 model Users {
-  id        String   @id @default(uuid())
-  login     String
-  nickName  String
-  path      String
-  admin    Boolean @default(false)
-  ubiUid    String
-  groups GroupMember[]
-  hetznerProjects HetznerProjectUser[]
+  id          String   @id @default(uuid())
+  login       String
+  nickName    String
+  path        String
+  admin       Boolean  @default(false)
+  ubiUid      String
+  permissions String[] @default([])
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  deletedAt      DateTime?
+  groupMembers        GroupMember[]
+  hetznerProjectUsers HetznerProjectUser[]
+  userServers         UserServers[]
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  @@index([deletedAt])
   @@map("users")
 }
 
 model Records {
-  id        String   @id @default(uuid())
-  mapId    String
-  map Maps @relation(fields: [mapId], references: [id])
-  login    String
-  mapUid  String
+  id     String @id @default(uuid())
+  mapId  String
+  map    Maps   @relation(fields: [mapId], references: [id])
+  login  String
+  mapUid String
   time   Int
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   @@index([deletedAt])
@@ -72,13 +73,15 @@ model Records {
 }
 
 model Interfaces {
-  id       String   @id @default(uuid())
-  name    String
-  serverUuid String
+  id              String @id @default(uuid())
+  name            String
   interfaceString String @db.Text
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  serverId String
+  server   Servers @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   @@index([deletedAt])
@@ -86,27 +89,28 @@ model Interfaces {
 }
 
 model Groups {
-  id           String        @id @default(uuid())
-  name         String
-  description  String
-  serverUuids  String[]
-  users        GroupMember[]
+  id          String @id @default(uuid())
+  name        String
+  description String
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  deletedAt    DateTime?
+  groupServers GroupServers[]
+  groupMembers GroupMember[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([deletedAt])
   @@map("groups")
 }
 
 model GroupMember {
-  userId   String
-  groupId  String
-  role     GroupRole
+  userId  String
+  groupId String
+  role    GroupRole
 
-  user     Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group    Groups  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Groups @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@id([userId, groupId])
   @@map("group_members")
@@ -119,26 +123,26 @@ enum GroupRole {
 }
 
 model HetznerProjects {
-  id          String   @id @default(uuid())
-  name       String
-  apiTokens String[]
-  users HetznerProjectUser[]
+  id                  String               @id @default(uuid())
+  name                String
+  apiTokens           String[]
+  hetznerProjectUsers HetznerProjectUser[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([deletedAt])
   @@map("hetzner_projects")
 }
 
 model HetznerProjectUser {
-  userId     String
-  projectId  String
+  userId    String
+  projectId String
   role      HetznerProjectRole
 
-  user       Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project    HetznerProjects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    Users           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project HetznerProjects @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@id([userId, projectId])
   @@map("hetzner_project_users")
@@ -147,4 +151,74 @@ model HetznerProjectUser {
 enum HetznerProjectRole {
   Admin
   Moderator
+}
+
+model Servers {
+  id             String  @id @default(uuid())
+  name           String
+  description    String
+  host           String
+  port           Int
+  user           String
+  password       String
+  filemanagerUrl String?
+
+  manualRouting     Boolean @default(false)
+  messageFormat     String?
+  connectMessage    String?
+  disconnectMessage String?
+
+  interfaces   Interfaces[]
+  groupServers GroupServers[]
+  userServers  UserServers[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("servers")
+}
+
+model UserServers {
+  userId   String
+  serverId String
+  role     UserServerRole
+
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server Servers @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@id([userId, serverId])
+  @@map("user_servers")
+}
+
+enum UserServerRole {
+  Admin
+  Moderator
+  Member
+}
+
+model GroupServers {
+  groupId  String
+  serverId String
+
+  group  Groups  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  server Servers @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, serverId])
+  @@map("group_servers")
+}
+
+model Roles {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  permissions String[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("roles")
 }

@@ -3,24 +3,98 @@ import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 export const routes = {
   dashboard: "/",
   servers: {
-    settings: "/server/:uuid/settings",
-    game: "/server/:uuid/game",
-    maps: "/server/:uuid/maps",
-    players: "/server/:uuid/players",
-    live: "/server/:uuid/live",
-    files: "/server/:uuid/files",
-    editor: "/server/:uuid/files/editor",
-    dev: "/server/:uuid/dev",
-    interface: "/server/:uuid/interface",
+    settings: "/server/:id/settings",
+    game: "/server/:id/game",
+    maps: "/server/:id/maps",
+    players: "/server/:id/players",
+    live: "/server/:id/live",
+    files: "/server/:id/files",
+    editor: "/server/:id/files/editor",
+    dev: "/server/:id/dev",
+    interface: "/server/:id/interface",
   },
   admin: {
     users: "/admin/users",
     servers: "/admin/servers",
     groups: "/admin/groups",
+    roles: "/admin/roles",
     hetzner: "/admin/hetzner",
-    hetznerProject: "/admin/hetzner/:id",
+    hetznerServers: "/admin/hetzner/:id",
   },
   login: "/login",
+};
+
+export const routePermissions = {
+  servers: {
+    settings: ["servers:id:admin"],
+    game: {
+      mapActions: ["servers:id:moderator", "servers:id:admin"],
+      gameSettings: ["servers:id:moderator", "servers:id:admin"],
+      scriptSettings: ["servers:id:moderator", "servers:id:admin"],
+    },
+    maps: ["servers:id:moderator", "servers:id:admin"],
+    players: ["servers:id:moderator", "servers:id:admin"],
+    live: {
+      actions: ["servers:id:moderator", "servers:id:admin"],
+    },
+    files: ["servers:id:admin"],
+    interface: ["servers:id:admin"],
+  },
+  admin: {
+    users: {
+      view: ["users:view"],
+      edit: ["users:edit"],
+      delete: ["users:delete"],
+    },
+    groups: {
+      view: [
+        "groups:view",
+        "groups:create",
+        "groups::moderator",
+        "groups::admin",
+      ],
+      create: ["groups:create"],
+      edit: ["groups:edit", "groups:id:admin"],
+      delete: ["groups:delete", "groups:id:admin"],
+    },
+    servers: {
+      view: [
+        "servers:view",
+        "servers:create",
+        "servers::moderator",
+        "servers::admin",
+      ],
+      create: ["servers:create"],
+      edit: ["servers:edit", "servers:id:admin"],
+      delete: ["servers:delete", "servers:id:admin"],
+    },
+    roles: {
+      view: ["roles:view"],
+      create: ["roles:create"],
+      edit: ["roles:edit"],
+      delete: ["roles:delete"],
+    },
+    hetzner: {
+      view: [
+        "hetzner:view",
+        "hetzner:create",
+        "hetzner::moderator",
+        "hetzner::admin",
+      ],
+      create: ["hetzner:create"],
+      edit: ["hetzner:edit", "hetzner:id:admin"],
+      delete: ["hetzner:delete", "hetzner:id:admin"],
+      servers: {
+        view: [
+          "hetzner:servers:view",
+          "hetzner:id:moderator",
+          "hetzner:id:admin",
+        ],
+        create: ["hetzner:servers:create", "hetzner:id:admin"],
+        delete: ["hetzner:servers:delete", "hetzner:id:admin"],
+      },
+    },
+  },
 };
 
 export const breadCrumbs: {
@@ -160,6 +234,17 @@ export const breadCrumbs: {
     ],
   },
   {
+    path: routes.admin.roles,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "Roles",
+      },
+    ],
+  },
+  {
     path: routes.admin.servers,
     breadCrumbs: [
       {
@@ -182,7 +267,7 @@ export const breadCrumbs: {
     ],
   },
   {
-    path: routes.admin.hetznerProject,
+    path: routes.admin.hetznerServers,
     breadCrumbs: [
       {
         label: "Admin",

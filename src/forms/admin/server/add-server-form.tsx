@@ -1,29 +1,68 @@
 "use client";
-import { addServer } from "@/actions/gbxconnector/servers";
+import { createServer } from "@/actions/database/servers";
+import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Form, FormLabel } from "@/components/ui/form";
+import { UserServerRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddServerSchema, AddServerSchemaType } from "./add-server-schema";
 
 export default function AddServerForm({ callback }: { callback?: () => void }) {
+  const { data: session } = useSession();
+
+  const [users, setUsers] = useState<UserMinimal[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const { data, error } = await getUsersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setUsers(data);
+      } catch (error) {
+        setError("Failed to get users: " + getErrorMessage(error));
+        toast.error("Failed to fetch users", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const form = useForm<AddServerSchemaType>({
     resolver: zodResolver(AddServerSchema),
     defaultValues: {
-      name: "",
-      host: "",
-      xmlrpcPort: 0,
-      user: "",
-      pass: "",
+      port: 5000,
+      userServers: [{ userId: session?.user.id, role: UserServerRole.Admin }],
     },
   });
 
   async function onSubmit(values: AddServerSchemaType) {
     try {
-      const { error } = await addServer(values);
+      const { error } = await createServer({
+        ...values,
+        description: values.description || "",
+        userServers:
+          values.userServers?.map((user) => ({
+            userId: user.userId,
+            role: user.role as UserServerRole,
+          })) || [],
+        filemanagerUrl: values.filemanagerUrl || "",
+      });
       if (error) {
         throw new Error(error);
       }
@@ -36,6 +75,14 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
         description: getErrorMessage(error),
       });
     }
+  }
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (
@@ -68,8 +115,8 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
         />
 
         <FormElement
-          name={"xmlrpcPort"}
-          label="XMLRPC Port"
+          name={"port"}
+          label="Port"
           description="The XMLRPC port of the server."
           placeholder="Enter server XMLRPC port"
           type="number"
@@ -85,15 +132,76 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
         />
 
         <FormElement
-          name={"pass"}
+          name={"password"}
           label="Password"
           description="The XMLRPC password."
           placeholder="Enter password"
           isRequired
         />
 
+        {/* Users with roles */}
+        <div className="flex flex-col gap-2">
+          <FormLabel className="text-sm">Users</FormLabel>
+          {form.watch("userServers")?.map((_, index) => (
+            <div key={index} className="flex items-end gap-2">
+              <div className="flex-1">
+                <FormElement
+                  name={`userServers.${index}.userId`}
+                  className="w-full"
+                  placeholder="Select user"
+                  options={users.map((u) => ({
+                    label: u.nickName,
+                    value: u.id,
+                  }))}
+                  type="select"
+                />
+              </div>
+              <FormElement
+                name={`userServers.${index}.role`}
+                className="w-30"
+                placeholder="Select role"
+                options={Object.values(UserServerRole).map((role) => ({
+                  label: role,
+                  value: role,
+                }))}
+                type="select"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size={"icon"}
+                onClick={() => {
+                  const currentUsers = form.getValues("userServers");
+                  form.setValue(
+                    "userServers",
+                    currentUsers?.filter((_, i) => i !== index),
+                  );
+                }}
+              >
+                <IconTrash />
+                <span className="sr-only">Remove User</span>
+              </Button>
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              const currentUsers = form.getValues("userServers") || [];
+              form.setValue("userServers", [
+                ...currentUsers,
+                { userId: "", role: UserServerRole.Member },
+              ]);
+            }}
+          >
+            <IconPlus />
+            Add User
+          </Button>
+        </div>
+
         <FormElement
-          name={"fmUrl"}
+          name={"filemanagerUrl"}
           label="Filemanager url"
           description="The url of the filemanager."
           placeholder="Enter filemanager url"

@@ -1,14 +1,21 @@
 import { getHetznerProjectsPaginated } from "@/actions/database/hetzner-projects";
-import { getAllUsers } from "@/actions/database/users";
 import AddProjectModal from "@/components/modals/add-project";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
+import { redirect } from "next/navigation";
 import { createColumns } from "./columns";
 
 export default async function AdminHetznerPage() {
-  const { data: users } = await getAllUsers();
+  const canView = await hasPermission(routePermissions.admin.hetzner.view);
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
+
+  const canCreate = await hasPermission(routePermissions.admin.hetzner.create);
 
   return (
     <div className="flex flex-col gap-6">
@@ -19,21 +26,22 @@ export default async function AdminHetznerPage() {
             Manage your Hetzner projects and cloud servers.
           </h4>
         </div>
-
-        <Modal>
-          <AddProjectModal data={{ users }} />
-          <Button>
-            <IconPlus /> Add Project
-          </Button>
-        </Modal>
       </div>
 
       <PaginationTable
         fetchData={getHetznerProjectsPaginated}
         createColumns={createColumns}
-        args={{
-          users,
-        }}
+        actions={
+          canCreate && (
+            <Modal>
+              <AddProjectModal />
+              <Button>
+                <IconPlus /> Add Project
+              </Button>
+            </Modal>
+          )
+        }
+        filter
       />
     </div>
   );

@@ -1,7 +1,5 @@
 "use client";
 import AddHetznerServerForm from "@/forms/admin/hetzner/add-hetzner-server-form";
-import { HetznerLocation } from "@/types/api/hetzner/locations";
-import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
@@ -10,12 +8,7 @@ import { DefaultModalProps } from "./default-props";
 export default function AddHetznerServerModal({
   closeModal,
   data,
-}: DefaultModalProps<{
-  projectId: string;
-  serverTypes: HetznerServerType[];
-  images: HetznerImage[];
-  locations: HetznerLocation[];
-}>) {
+}: DefaultModalProps<string>) {
   const router = useRouter();
 
   if (!data) return null;
@@ -42,13 +35,7 @@ export default function AddHetznerServerModal({
         />
       </div>
 
-      <AddHetznerServerForm
-        projectId={data.projectId}
-        serverTypes={data.serverTypes}
-        images={data.images}
-        locations={data.locations}
-        callback={handleSubmit}
-      />
+      <AddHetznerServerForm projectId={data} callback={handleSubmit} />
     </Card>
   );
 }

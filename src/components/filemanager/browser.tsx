@@ -12,11 +12,11 @@ import FolderCard from "./folder-card";
 
 interface BrowserProps {
   data: FileEntry[];
-  serverUuid: string;
+  serverId: string;
   path: string;
 }
 
-export default function Browser({ data, serverUuid, path }: BrowserProps) {
+export default function Browser({ data, serverId, path }: BrowserProps) {
   const [folders, setFolders] = useState<FileEntry[]>(
     data.filter((fileEntry: FileEntry) => fileEntry.isDir),
   );
@@ -47,7 +47,7 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
       }
 
       try {
-        const { data, error } = await uploadFiles(serverUuid, formData);
+        const { data, error } = await uploadFiles(serverId, formData);
         if (error) {
           throw new Error(error);
         }
@@ -79,7 +79,7 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
         });
       }
     },
-    [serverUuid, path],
+    [serverId, path],
   );
 
   const handleSelect = (
@@ -162,7 +162,7 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
       <div className="flex justify-between items-center w-full">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
-          serverUuid={serverUuid}
+          serverId={serverId}
         />
 
         <Actions
@@ -170,7 +170,7 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
           setSelectedItems={setSelectedItems}
           setFolders={setFolders}
           setFiles={setFiles}
-          serverUuid={serverUuid}
+          serverId={serverId}
           path={path}
           uploadFilesCallback={uploadFilesCallback}
         />
@@ -193,7 +193,7 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
                 <FolderCard
                   key={fileEntry.path}
                   fileEntry={fileEntry}
-                  serverUuid={serverUuid}
+                  serverId={serverId}
                   active={selectedItems.some(
                     (item) => item.path === fileEntry.path,
                   )}
@@ -216,7 +216,7 @@ export default function Browser({ data, serverUuid, path }: BrowserProps) {
                   <FileCard
                     key={fileEntry.path}
                     fileEntry={fileEntry}
-                    serverUuid={serverUuid}
+                    serverId={serverId}
                     active={selectedItems.some(
                       (item) => item.path === fileEntry.path,
                     )}

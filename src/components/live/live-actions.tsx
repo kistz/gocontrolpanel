@@ -3,16 +3,17 @@ import { triggerModeScriptEventArray } from "@/actions/gbx/game";
 import { getErrorMessage } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 
 interface LiveActionsProps {
-  serverUuid: string;
+  serverId: string;
   pauseAvailable: boolean;
   isPaused: boolean;
   isWarmUp: boolean;
 }
 
 export default function LiveActions({
-  serverUuid,
+  serverId,
   pauseAvailable,
   isPaused,
   isWarmUp,
@@ -20,7 +21,7 @@ export default function LiveActions({
   const handlePause = async () => {
     try {
       const { error } = await triggerModeScriptEventArray(
-        serverUuid,
+        serverId,
         "Maniaplanet.Pause.SetActive",
         [isPaused ? "false" : "true"],
       );
@@ -39,7 +40,7 @@ export default function LiveActions({
   const handleEndWarmUpRound = async () => {
     try {
       const { error } = await triggerModeScriptEventArray(
-        serverUuid,
+        serverId,
         "Trackmania.WarmUp.ForceStopRound",
         [],
       );
@@ -58,7 +59,7 @@ export default function LiveActions({
   const handleEndWarmUp = async () => {
     try {
       const { error } = await triggerModeScriptEventArray(
-        serverUuid,
+        serverId,
         "Trackmania.WarmUp.ForceStop",
         [],
       );
@@ -74,25 +75,32 @@ export default function LiveActions({
     }
   };
 
+  if (!pauseAvailable && !isWarmUp) {
+    return null;
+  }
+
   return (
-    <div className="flex gap-2 flex-wrap">
-      {pauseAvailable && (
-        <Button variant={"outline"} onClick={handlePause}>
-          {isPaused ? "Resume" : "Pause"}
-        </Button>
-      )}
+    <>
+      <Separator />
+      <div className="flex gap-2 flex-wrap">
+        {pauseAvailable && (
+          <Button variant={"outline"} onClick={handlePause}>
+            {isPaused ? "Resume" : "Pause"}
+          </Button>
+        )}
 
-      {isWarmUp && (
-        <Button variant={"outline"} onClick={handleEndWarmUpRound}>
-          End Warmup Round
-        </Button>
-      )}
+        {isWarmUp && (
+          <Button variant={"outline"} onClick={handleEndWarmUpRound}>
+            End Warmup Round
+          </Button>
+        )}
 
-      {isWarmUp && (
-        <Button variant={"outline"} onClick={handleEndWarmUp}>
-          End Warmup
-        </Button>
-      )}
-    </div>
+        {isWarmUp && (
+          <Button variant={"outline"} onClick={handleEndWarmUp}>
+            End Warmup
+          </Button>
+        )}
+      </div>
+    </>
   );
 }

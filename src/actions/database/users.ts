@@ -1,7 +1,8 @@
 "use server";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
-import { Users } from "@/lib/prisma/generated";
+import { Prisma, Users } from "@/lib/prisma/generated";
+import { getList } from "@/lib/utils";
 import {
   PaginationResponse,
   ServerError,
@@ -9,53 +10,63 @@ import {
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 
-export async function getAllUsers(): Promise<ServerResponse<Users[]>> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-    const users = await db.users.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
+export type UserMinimal = Pick<Users, "id" | "login" | "nickName">;
 
-    return users;
-  });
+export async function getUsersMinimal(): Promise<
+  ServerResponse<UserMinimal[]>
+> {
+  return doServerActionWithAuth(
+    [
+      "groups:create",
+      "groups:edit",
+      "groups::admin",
+      "servers:create",
+      "servers:edit",
+      "servers::admin",
+      "hetzner:create",
+      "hetzner:edit",
+      "hetzner::admin",
+    ],
+    async () => {
+      const db = getClient();
+      const users = await db.users.findMany({
+        select: {
+          id: true,
+          login: true,
+          nickName: true,
+        },
+      });
+
+      return users;
+    },
+  );
 }
 
 export async function getUsersPaginated(
   pagination: PaginationState,
-  sorting: { field: string; order: 'asc' | 'desc' },
+  sorting: { field: string; order: "asc" | "desc" },
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Users>>> {
-  return doServerActionWithAuth([], async () => {
+  return doServerActionWithAuth(["users:view"], async () => {
     const db = getClient();
 
+    const where: Prisma.UsersWhereInput = {
+      ...(filter && {
+        OR: [
+          { login: { contains: filter } },
+          { nickName: { contains: filter } },
+          { ubiUid: { contains: filter } },
+          { path: { contains: filter } },
+        ],
+      }),
+    };
+
     const totalCount = await db.users.count({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { login: { contains: filter } },
-            { nickName: { contains: filter } },
-            { ubiUid: { contains: filter } },
-            { path: { contains: filter } },
-          ],
-        }),
-      },
+      where,
     });
 
     const users = await db.users.findMany({
-      where: {
-        deletedAt: null,
-        ...(filter && {
-          OR: [
-            { login: { contains: filter } },
-            { nickName: { contains: filter } },
-            { ubiUid: { contains: filter } },
-            { path: { contains: filter } },
-          ],
-        }),
-      },
+      where,
       skip: pagination.pageIndex * pagination.pageSize,
       take: pagination.pageSize,
       orderBy: {
@@ -71,7 +82,7 @@ export async function getUsersPaginated(
 }
 
 export async function updateUser(
-  id: string,
+  userId: string,
   data: Omit<
     Users,
     | "id"
@@ -84,46 +95,28 @@ export async function updateUser(
     | "deletedAt"
   >,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth(["users:edit"], async () => {
     const db = getClient();
 
-    const existingUser = await db.users.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    });
-
-    const isRemovingAdmin = existingUser.admin && !data.admin;
-
-    if (isRemovingAdmin) {
-      throw new ServerError("Cannot remove admin role");
-    }
-
     await db.users.update({
-      where: { id },
+      where: { id: userId },
       data: {
         ...data,
-        admin: data.admin,
-        updatedAt: new Date(),
-        deletedAt: null,
+        permissions: getList(data.permissions),
       },
     });
   });
 }
 
-export async function deleteUserById(id: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async (session) => {
-    if (id === session.user.id) {
+export async function deleteUserById(userId: string): Promise<ServerResponse> {
+  return doServerActionWithAuth(["users:delete"], async (session) => {
+    if (userId === session.user.id) {
       throw new ServerError("Cannot delete your own account");
     }
 
     const db = getClient();
-    await db.users.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      },
+    await db.users.delete({
+      where: { id: userId },
     });
   });
 }

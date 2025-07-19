@@ -2,6 +2,7 @@ import { LabelSchemaType } from "@/components/interface/components/label/label-s
 import { Handlebars } from "@/lib/handlebars";
 import fs from "fs/promises";
 import path from "path";
+import "server-only";
 
 export async function renderLabelComponent(
   attributes: LabelSchemaType,

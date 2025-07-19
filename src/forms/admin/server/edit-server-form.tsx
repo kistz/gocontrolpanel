@@ -1,11 +1,14 @@
 "use client";
-import { editServer } from "@/actions/gbxconnector/servers";
+import { ServersWithUsers, updateServer } from "@/actions/database/servers";
+import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Form, FormLabel } from "@/components/ui/form";
+import { UserServerRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
-import { Server } from "@/types/server";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
@@ -14,25 +17,61 @@ export default function EditServerForm({
   server,
   callback,
 }: {
-  server: Server;
+  server: ServersWithUsers;
   callback?: () => void;
 }) {
+  const [users, setUsers] = useState<UserMinimal[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const { data, error } = await getUsersMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setUsers(data);
+      } catch (error) {
+        setError("Failed to get users: " + getErrorMessage(error));
+        toast.error("Failed to fetch users", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const form = useForm<EditServerSchemaType>({
     resolver: zodResolver(EditServerSchema),
     defaultValues: {
       name: server.name,
-      description: server.description,
+      description: server.description || undefined,
       host: server.host,
-      xmlrpcPort: server.xmlrpcPort,
+      port: server.port,
       user: server.user,
-      pass: server.pass,
-      fmUrl: server.fmUrl,
+      password: server.password,
+      userServers: server.userServers.map((userServer) => ({
+        userId: userServer.userId,
+        role: userServer.role,
+      })),
+      filemanagerUrl: server.filemanagerUrl || undefined,
     },
   });
 
   async function onSubmit(values: EditServerSchemaType) {
     try {
-      const { error } = await editServer(server.uuid, values);
+      const { error } = await updateServer(server.id, {
+        ...values,
+        userServers: values.userServers?.map((user) => ({
+          userId: user.userId,
+          role: user.role as UserServerRole,
+        })),
+      });
       if (error) {
         throw new Error(error);
       }
@@ -45,6 +84,14 @@ export default function EditServerForm({
         description: getErrorMessage(error),
       });
     }
+  }
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (
@@ -77,8 +124,8 @@ export default function EditServerForm({
         />
 
         <FormElement
-          name={"xmlrpcPort"}
-          label="XMLRPC Port"
+          name={"port"}
+          label="Port"
           description="The XMLRPC port of the server."
           placeholder="Enter server XMLRPC port"
           type="number"
@@ -94,15 +141,76 @@ export default function EditServerForm({
         />
 
         <FormElement
-          name={"pass"}
+          name={"password"}
           label="Password"
           description="The XMLRPC password."
           placeholder="Enter password"
           isRequired
         />
 
+        {/* Users with roles */}
+        <div className="flex flex-col gap-2">
+          <FormLabel className="text-sm">Users</FormLabel>
+          {form.watch("userServers")?.map((_, index) => (
+            <div key={index} className="flex items-end gap-2">
+              <div className="flex-1">
+                <FormElement
+                  name={`userServers.${index}.userId`}
+                  className="w-full"
+                  placeholder="Select user"
+                  options={users.map((u) => ({
+                    label: u.nickName,
+                    value: u.id,
+                  }))}
+                  type="select"
+                />
+              </div>
+              <FormElement
+                name={`userServers.${index}.role`}
+                className="w-30"
+                placeholder="Select role"
+                options={Object.values(UserServerRole).map((role) => ({
+                  label: role,
+                  value: role,
+                }))}
+                type="select"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size={"icon"}
+                onClick={() => {
+                  const currentUsers = form.getValues("userServers");
+                  form.setValue(
+                    "userServers",
+                    currentUsers?.filter((_, i) => i !== index),
+                  );
+                }}
+              >
+                <IconTrash />
+                <span className="sr-only">Remove User</span>
+              </Button>
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              const currentUsers = form.getValues("userServers") || [];
+              form.setValue("userServers", [
+                ...currentUsers,
+                { userId: "", role: UserServerRole.Member },
+              ]);
+            }}
+          >
+            <IconPlus />
+            Add User
+          </Button>
+        </div>
+
         <FormElement
-          name={"fmUrl"}
+          name={"filemanagerUrl"}
           label="Filemanager url"
           description="The url of the filemanager."
           placeholder="Enter filemanager url"

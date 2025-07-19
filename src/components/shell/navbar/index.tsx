@@ -1,4 +1,5 @@
-import { auth } from "@/lib/auth";
+import { auth, hasPermission } from "@/lib/auth";
+import { routePermissions } from "@/routes";
 import { Icon } from "@tabler/icons-react";
 import NavAdmin from "./nav-admin";
 import NavFooter from "./nav-footer";
@@ -11,7 +12,7 @@ export interface NavItem {
   icon: Icon;
   items?: NavItem[];
   isActive?: boolean;
-  healthStatus?: string;
+  auth?: boolean;
 }
 
 export interface NavGroup {
@@ -22,10 +23,35 @@ export interface NavGroup {
 export default async function Navbar() {
   const session = await auth();
 
+  const canViewUsers = await hasPermission(routePermissions.admin.users.view);
+  const canViewGroups = await hasPermission(routePermissions.admin.groups.view);
+  const canViewServers = await hasPermission(
+    routePermissions.admin.servers.view,
+  );
+  const canViewRoles = await hasPermission(routePermissions.admin.roles.view);
+  const canViewHetzner = await hasPermission(
+    routePermissions.admin.hetzner.view,
+  );
+
+  const canViewAdmin =
+    canViewUsers ||
+    canViewGroups ||
+    canViewServers ||
+    canViewRoles ||
+    canViewHetzner;
+
   return (
     <>
       {session && <NavGroups />}
-      {session && session.user.admin && <NavAdmin />}
+      {session && canViewAdmin && (
+        <NavAdmin
+          canViewUsers={canViewUsers}
+          canViewAdmin={canViewAdmin}
+          canViewServers={canViewServers}
+          canViewRoles={canViewRoles}
+          canViewHetzner={canViewHetzner}
+        />
+      )}
       <NavFooter />
     </>
   );

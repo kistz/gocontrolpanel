@@ -1,11 +1,13 @@
 "use client";
+import { getRolesMinimal, RoleMinimal } from "@/actions/database/roles";
 import { updateUser } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Users } from "@/lib/prisma/generated";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditUserSchema, EditUserSchemaType } from "./edit-user-schema";
@@ -17,10 +19,37 @@ export default function EditUserForm({
   user: Users;
   callback?: () => void;
 }) {
+  const [roles, setRoles] = useState<RoleMinimal[]>([]);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchRoles() {
+      try {
+        const { data, error } = await getRolesMinimal();
+        if (error) {
+          throw new Error(error);
+        }
+        setRoles(data);
+      } catch (error) {
+        setError("Failed to get roles: " + getErrorMessage(error));
+        toast.error("Failed to fetch roles", {
+          description: getErrorMessage(error),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetchRoles();
+  }, []);
+
   const form = useForm<EditUserSchemaType>({
     resolver: zodResolver(EditUserSchema),
     defaultValues: {
       admin: user.admin,
+      permissions: getList(user.permissions),
     },
   });
 
@@ -28,6 +57,7 @@ export default function EditUserForm({
     try {
       const { error } = await updateUser(user.id, {
         admin: values.admin,
+        permissions: getList(values.permissions),
       });
       if (error) {
         throw new Error(error);
@@ -43,9 +73,22 @@ export default function EditUserForm({
     }
   }
 
+  const selectedRole = roles.find((role) => role.id === form.watch("role"));
+
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         <FormElement
           name={"admin"}
           label="Admin"
@@ -53,6 +96,44 @@ export default function EditUserForm({
           className="w-full min-w-64"
           type="checkbox"
         />
+
+        <FormElement
+          name={"permissions"}
+          label="Permissions"
+          description="Select the permissions to assign to the user."
+          className="w-full min-w-64"
+          type="multi-select"
+          max={2}
+          options={permissions.map((perm) => ({
+            label: perm,
+            value: perm,
+          }))}
+        />
+
+        <div className="flex flex-col gap-2">
+          <FormElement
+            name={"role"}
+            label="Role preset"
+            description="Select a role preset to assign multiple permissions at once."
+            className="w-full min-w-64"
+            type="select"
+            options={roles.map((role) => ({
+              label: role.name,
+              value: role.id,
+            }))}
+          />
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              form.setValue("permissions", getList(selectedRole?.permissions));
+            }}
+          >
+            Apply Role Preset
+          </Button>
+        </div>
 
         <Button
           type="submit"

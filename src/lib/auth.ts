@@ -2,21 +2,22 @@ import {
   createUserAuth,
   getUserById,
   getUserByLogin,
-  UsersWithGroups,
+  UsersWithGroupsWithServers,
 } from "@/actions/database/auth";
+import { parse } from "cookie";
 import {
   GetServerSidePropsContext,
   NextApiRequest,
   NextApiResponse,
 } from "next";
 import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import { OAuthConfig } from "next-auth/providers/oauth";
+import { IncomingMessage } from "node:http";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
-import { axiosAuth } from "./axios/connector";
 import config from "./config";
-import { Users } from "./prisma/generated";
-import { getList } from "./utils";
+import { getList, hasPermissionSync } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
   id: "nadeo",
@@ -85,75 +86,86 @@ export const authOptions: NextAuthOptions = {
         displayName: token.displayName,
         admin: token.admin,
         ubiId: token.ubiId,
+        permissions: token.permissions,
         groups: token.groups,
+        projects: token.projects,
+        servers: token.servers,
       };
-
-      session.jwt = token.jwt;
 
       return session;
     },
     async jwt({ token, user }) {
-      let dbUser: UsersWithGroups | null;
-      if (user) {
-        const login = slugid.encode(user.accountId);
-        ({ data: dbUser } = await getUserByLogin(login));
+      let dbUser: UsersWithGroupsWithServers | null = null;
+      try {
+        if (user) {
+          const login = slugid.encode(user.accountId);
 
-        token.accountId = user.accountId;
-        token.login = login;
-        token.displayName = user.displayName;
-      } else {
-        ({ data: dbUser } = await getUserById(token.id));
-      }
+          token.accountId = user.accountId;
+          token.login = login;
+          token.displayName = user.displayName;
 
-      if (!dbUser) {
-        let ubiUid = "";
-        try {
-          const { data: webidentities, error } = await getWebIdentities([
-            token.accountId,
-          ]);
-          if (error) {
-            throw new Error(error);
-          }
-          if (webidentities && webidentities.length > 0) {
-            ubiUid = webidentities[0].uid;
-          }
-        } catch (error) {
-          console.error("Failed to fetch web identities", error);
+          dbUser = await getUserByLogin(login);
+        } else {
+          dbUser = await getUserById(token.id);
         }
+      } catch {
+        if (!dbUser) {
+          let ubiUid = "";
+          try {
+            const { data: webidentities, error } = await getWebIdentities([
+              token.accountId,
+            ]);
+            if (error) {
+              throw new Error(error);
+            }
+            if (webidentities && webidentities.length > 0) {
+              ubiUid = webidentities[0].uid;
+            }
+          } catch (error) {
+            console.error("Failed to fetch web identities", error);
+          }
 
-        ({ data: dbUser } = await createUserAuth({
-          login: token.login,
-          nickName: token.displayName,
-          admin: config.DEFAULT_ADMINS.includes(token.login),
-          path: "",
-          ubiUid,
-        }));
+          dbUser = await createUserAuth({
+            login: token.login,
+            nickName: token.displayName,
+            admin: config.DEFAULT_ADMINS.includes(token.login),
+            path: "",
+            ubiUid,
+            permissions: config.DEFAULT_PERMISSIONS,
+          });
+        }
       }
 
       if (!dbUser) {
         throw new Error("Failed to fetch user from database");
       }
 
-      try {
-        token.jwt = await getConnectorToken(dbUser);
-      } catch (error) {
-        console.error("Failed to fetch connector token", error);
-      }
-
       token.id = dbUser.id;
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid;
-      token.groups = dbUser.groups.map((group) => ({
-        id: group.group.id,
-        name: group.group.name,
-        serverUuids: getList(group.group.serverUuids),
-        role: group.role,
+      token.permissions = getList(dbUser.permissions);
+      token.groups = dbUser.groupMembers.map((g) => ({
+        id: g.group.id,
+        name: g.group.name,
+        servers: g.group.groupServers.map((s) => s.server),
+        role: g.role,
+      }));
+      token.projects = dbUser.hetznerProjectUsers.map((p) => ({
+        id: p.project.id,
+        name: p.project.name,
+        role: p.role,
+      }));
+      token.servers = dbUser.userServers.map((s) => ({
+        id: s.server.id,
+        name: s.server.name,
+        role: s.role,
       }));
 
       return token;
     },
   },
   session: {
+    strategy: "jwt",
     maxAge: 1 * 86400, // 1 day,
     updateAge: 6 * 3600, // 6 hours
   },
@@ -168,29 +180,41 @@ export function auth(
   return getServerSession(...args, authOptions);
 }
 
-export async function withAuth(roles?: string[]): Promise<Session> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Not authenticated");
+export async function withAuth(
+  permissions?: string[],
+  id = "",
+): Promise<Session> {
+  const perm = await hasPermission(permissions, id);
+  if (!perm) {
+    throw new Error("Unauthorized");
   }
 
-  if (roles && !session.user.admin) {
-    throw new Error("Not authorized");
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
   }
+
   return session;
 }
 
-async function getConnectorToken(user: Users): Promise<string> {
-  const res = await axiosAuth.post("/auth", user);
+export async function parseTokenFromRequest(req: IncomingMessage) {
+  const cookies = parse(req.headers.cookie || "");
+  (req as any).cookies = cookies;
 
-  if (res.status !== 200) {
-    throw new Error("Failed to fetch connector token");
+  return getToken({
+    req: req as any,
+    secret: process.env.NEXTAUTH_SECRET!,
+  });
+}
+
+export async function hasPermission(
+  permissions?: string[],
+  id = "",
+): Promise<boolean> {
+  const session = await auth();
+  if (!session) {
+    return false;
   }
 
-  const data = res.data;
-  if (!data.token) {
-    throw new Error("Failed to fetch connector token");
-  }
-
-  return data.token;
+  return hasPermissionSync(session, permissions, id);
 }

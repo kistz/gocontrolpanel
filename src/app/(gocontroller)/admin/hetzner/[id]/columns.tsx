@@ -13,10 +13,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { HetznerServer } from "@/types/api/hetzner/servers";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -37,20 +39,52 @@ export const createColumns = (
     header: () => <span>Status</span>,
   },
   {
+    accessorKey: "public_net.ipv4.ip",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"IP Address"} />
+    ),
+  },
+  {
+    accessorKey: "server_type.name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Server Type"} />
+    ),
+  },
+  {
     accessorKey: "created",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Created At"} />
     ),
+    cell: ({ row }) => {
+      const date = new Date(row.original.created);
+      return (
+        <span>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </span>
+      );
+    },
   },
   {
     id: "actions",
     cell: ({ row }) => {
       const server = row.original;
+      const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
       const [isViewOpen, setIsViewOpen] = useState(false);
 
+      const canDelete = hasPermissionSync(
+        session,
+        routePermissions.admin.hetzner.servers.delete,
+        data.projectId,
+      );
+
       const handleDelete = () => {
+        if (!canDelete) {
+          toast.error("You do not have permission to delete this server.");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteHetznerServer(
@@ -83,25 +117,31 @@ export const createColumns = (
               <DropdownMenuItem onClick={() => setIsViewOpen(true)}>
                 View Details
               </DropdownMenuItem>
-              <Separator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsDeleteOpen(true)}
-              >
-                Delete Server
-              </DropdownMenuItem>
+              {canDelete && (
+                <>
+                  <Separator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setIsDeleteOpen(true)}
+                  >
+                    Delete Server
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isDeleteOpen}
-            onClose={() => setIsDeleteOpen(false)}
-            onConfirm={handleDelete}
-            title="Delete server"
-            description={`Are you sure you want to delete ${server.name}?`}
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
+          {canDelete && (
+            <ConfirmModal
+              isOpen={isDeleteOpen}
+              onClose={() => setIsDeleteOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete server"
+              description={`Are you sure you want to delete ${server.name}?`}
+              confirmText="Delete"
+              cancelText="Cancel"
+            />
+          )}
 
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
             <HetznerServerDetailsModal

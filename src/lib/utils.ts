@@ -1,14 +1,16 @@
 import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { routes } from "@/routes";
 import { clsx, type ClassValue } from "clsx";
+import { Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatTime(time: number): string {
-  if (time <= 0) {
+export function formatTime(time?: number): string {
+  if (!time || time <= 0) {
     return "--:--.---";
   }
 
@@ -84,7 +86,7 @@ function pathToRegex(path: string) {
 }
 
 // Use in a React client component
-export function useCurrentServerUuid(pathname: string): string | null {
+export function useCurrentid(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);
@@ -186,12 +188,8 @@ export function removePrefix(str: string, prefix: string): string {
 
 export function initGbxWebsocketClient(
   path: string,
-  token: string,
   params?: Record<string, string | string[]>,
 ): WebSocket {
-  const envUrl = process.env.NEXT_PUBLIC_CONNECTOR_URL;
-  const baseUri = envUrl && envUrl !== "" ? envUrl : "/gbx";
-
   const searchParams = new URLSearchParams();
 
   if (params) {
@@ -205,10 +203,7 @@ export function initGbxWebsocketClient(
     }
   }
 
-  // Append the token param first, so token is always included
-  searchParams.append("token", token);
-
-  return new WebSocket(`${baseUri}${path}?${searchParams.toString()}`);
+  return new WebSocket(`${path}?${searchParams.toString()}`);
 }
 
 export function capitalize(str: string): string {
@@ -239,4 +234,111 @@ export function generateRandomString(length = 16): string {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
+}
+
+export function isFinalist(matchPoints: number, pointsLimit?: number): boolean {
+  if (pointsLimit === undefined) {
+    return false;
+  }
+
+  return matchPoints == pointsLimit;
+}
+
+export function isWinner(matchPoints: number, pointsLimit?: number): boolean {
+  if (pointsLimit === undefined) {
+    return false;
+  }
+
+  return matchPoints > pointsLimit;
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function formatMessage(
+  format: string,
+  login: string,
+  nickName: string,
+  message: string,
+): string {
+  const msg = format
+    .replaceAll("{login}", login)
+    .replaceAll("{nickName}", nickName)
+    .replaceAll("{message}", message);
+  return msg.trim();
+}
+
+export const permissions: string[] = [
+  "users:view",
+  "users:edit",
+  "users:delete",
+  "groups:view",
+  "groups:create",
+  "groups:edit",
+  "groups:delete",
+  "roles:view",
+  "roles:create",
+  "roles:edit",
+  "roles:delete",
+  "servers:view",
+  "servers:create",
+  "servers:edit",
+  "servers:delete",
+  "hetzner:view",
+  "hetzner:create",
+  "hetzner:edit",
+  "hetzner:delete",
+  "hetzner:servers:view",
+  "hetzner:servers:create",
+  "hetzner:servers:delete",
+] as const;
+
+export function hasPermissionSync(
+  session: Session | null,
+  permissions?: string[],
+  id = "",
+): boolean {
+  if (!session) return false;
+
+  return hasPermissionsJWTSync(session.user, permissions, id);
+}
+
+export function hasPermissionsJWTSync(
+  jwt: JWT,
+  permissions?: string[],
+  id = "",
+): boolean {
+  if (jwt.admin) return true;
+
+  if (!permissions || permissions.length === 0) return false;
+
+  const userPermissions = jwt.permissions;
+
+  jwt.groups.forEach((group) => {
+    const role = group.role.toLowerCase();
+    userPermissions.push(`groups::${role}`);
+    userPermissions.push(`groups:${group.id}:${role}`);
+    group.servers.forEach((server) => {
+      userPermissions.push(`group:servers::${role}`);
+      userPermissions.push(`group:servers:${server.id}:${role}`);
+    });
+  });
+
+  jwt.projects.forEach((project) => {
+    const role = project.role.toLowerCase();
+    userPermissions.push(`hetzner::${role}`);
+    userPermissions.push(`hetzner:${project.id}:${role}`);
+  });
+
+  jwt.servers.forEach((server) => {
+    const role = server.role.toLowerCase();
+    userPermissions.push(`servers::${role}`);
+    userPermissions.push(`servers:${server.id}:${role}`);
+  });
+
+  permissions = permissions.map((permission) =>
+    permission.replace(":id", `:${id}`),
+  );
+  return permissions.some((permission) => userPermissions.includes(permission));
 }

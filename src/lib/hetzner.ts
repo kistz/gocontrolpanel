@@ -1,6 +1,18 @@
 import crypto from "crypto";
 import "server-only";
 import config from "./config";
+import { getClient } from "./dbclient";
+import { Prisma } from "./prisma/generated";
+import { getList } from "./utils";
+
+const hetznerProjectUsersSchema =
+  Prisma.validator<Prisma.HetznerProjectsInclude>()({
+    hetznerProjectUsers: true,
+  });
+
+type HetznerProjectsWithUsers = Prisma.HetznerProjectsGetPayload<{
+  include: typeof hetznerProjectUsersSchema;
+}>;
 
 const algorithm = "aes-256-gcm";
 const ivLength = 12;
@@ -38,4 +50,27 @@ export function decryptHetznerToken(encryptedBase64: string): string {
     console.error("Decryption failed:", error);
     return encryptedBase64; // Return the original string if decryption fails
   }
+}
+
+export async function getHetznerProject(
+  hetznerProjectId: string,
+): Promise<HetznerProjectsWithUsers | null> {
+  const db = getClient();
+  const hetznerProject = await db.hetznerProjects.findUnique({
+    where: {
+      id: hetznerProjectId,
+    },
+    include: hetznerProjectUsersSchema,
+  });
+
+  if (!hetznerProject) {
+    return null;
+  }
+
+  return {
+    ...hetznerProject,
+    apiTokens: getList(hetznerProject.apiTokens).map((token) =>
+      decryptHetznerToken(token),
+    ),
+  };
 }

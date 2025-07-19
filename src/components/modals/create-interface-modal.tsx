@@ -1,18 +1,18 @@
 "use client";
 
 import CreateInterfaceForm from "@/forms/server/interface/create-interface-form";
+import { Interfaces } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
-import { Interfaces } from "@/lib/prisma/generated";
 
 export default function CreateInterfaceModal({
-  serverUuid,
+  serverId,
   closeModal,
   onSubmit,
 }: DefaultModalProps<void, Interfaces>) {
-  if (!serverUuid) {
-    throw new Error("serverUuid is required for CreateInterfaceModal");
+  if (!serverId) {
+    throw new Error("serverId is required for CreateInterfaceModal");
   }
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -39,7 +39,7 @@ export default function CreateInterfaceModal({
         />
       </div>
 
-      <CreateInterfaceForm serverUuid={serverUuid} callback={handleSubmit} />
+      <CreateInterfaceForm serverId={serverId} callback={handleSubmit} />
     </Card>
   );
 }

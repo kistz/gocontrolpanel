@@ -5,13 +5,13 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 
 interface DevDashboardProps {
-  serverUuid: string;
+  serverId: string;
 }
 
-export default function DevDashboard({ serverUuid }: DevDashboardProps) {
+export default function DevDashboard({ serverId }: DevDashboardProps) {
   const handleAddPlayer = async () => {
     try {
-      const { error } = await connectFakePlayer(serverUuid);
+      const { error } = await connectFakePlayer(serverId);
       if (error) {
         throw new Error(error);
       }

@@ -1,4 +1,3 @@
-import { getHealthStatus } from "@/actions/gbxconnector/servers";
 import {
   Collapsible,
   CollapsibleContent,
@@ -16,14 +15,30 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { routes } from "@/routes";
-import { IconCloud, IconServerCog, IconUserCog, IconUsersGroup } from "@tabler/icons-react";
+import {
+  IconClipboardText,
+  IconCloud,
+  IconServerCog,
+  IconUserCog,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NavGroup } from ".";
 
-export default async function NavAdmin() {
-  const healthStatus = await getHealthStatus();
-
+export default async function NavAdmin({
+  canViewUsers,
+  canViewAdmin,
+  canViewServers,
+  canViewRoles,
+  canViewHetzner,
+}: {
+  canViewUsers: boolean;
+  canViewAdmin: boolean;
+  canViewServers: boolean;
+  canViewRoles: boolean;
+  canViewHetzner: boolean;
+}) {
   const group: NavGroup = {
     name: "Admin",
     items: [
@@ -31,22 +46,31 @@ export default async function NavAdmin() {
         name: "Users",
         url: routes.admin.users,
         icon: IconUserCog,
+        auth: canViewUsers,
       },
       {
         name: "Groups",
         url: routes.admin.groups,
         icon: IconUsersGroup,
+        auth: canViewAdmin,
+      },
+      {
+        name: "Roles",
+        url: routes.admin.roles,
+        icon: IconClipboardText,
+        auth: canViewRoles,
       },
       {
         name: "Servers",
         url: routes.admin.servers,
         icon: IconServerCog,
-        healthStatus: !healthStatus ? "Connector offline" : undefined,
+        auth: canViewServers,
       },
       {
         name: "Hetzner",
         url: routes.admin.hetzner,
         icon: IconCloud,
+        auth: canViewHetzner,
       },
     ],
   };
@@ -59,87 +83,80 @@ export default async function NavAdmin() {
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {group.items.map((item) =>
-            item.items && item.items.length > 0 ? (
-              <Collapsible
-                key={item.id || item.name}
-                asChild
-                defaultOpen={item.isActive}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.name} asChild>
-                      {item.url ? (
-                        <Link href={item.url}>
-                          {item.icon && <item.icon />}
-                          <span className="overflow-hidden text-ellipsis text-nowrap">
-                            {item.name}
-                          </span>
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        </Link>
-                      ) : (
-                        <div>
-                          {item.icon && <item.icon />}
-                          <span className="overflow-hidden text-ellipsis text-nowrap">
-                            {item.name}
-                          </span>
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        </div>
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
+          {group.items
+            .filter((i) => i.auth)
+            .map((item) =>
+              item.items && item.items.length > 0 ? (
+                <Collapsible
+                  key={item.id || item.name}
+                  asChild
+                  defaultOpen={item.isActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.name} asChild>
+                        {item.url ? (
+                          <Link href={item.url}>
+                            {item.icon && <item.icon />}
+                            <span className="overflow-hidden text-ellipsis text-nowrap">
+                              {item.name}
+                            </span>
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          </Link>
+                        ) : (
+                          <div>
+                            {item.icon && <item.icon />}
+                            <span className="overflow-hidden text-ellipsis text-nowrap">
+                              {item.name}
+                            </span>
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          </div>
+                        )}
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
 
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.name}>
-                          <SidebarMenuSubButton asChild>
-                            {subItem.url ? (
-                              <Link href={subItem.url}>
-                                {subItem.icon && <subItem.icon />}
-                                <span>{subItem.name}</span>
-                              </Link>
-                            ) : (
-                              <div>
-                                {subItem.icon && <subItem.icon />}
-                                <span>{subItem.name}</span>
-                              </div>
-                            )}
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.name}>
+                            <SidebarMenuSubButton asChild>
+                              {subItem.url ? (
+                                <Link href={subItem.url}>
+                                  {subItem.icon && <subItem.icon />}
+                                  <span>{subItem.name}</span>
+                                </Link>
+                              ) : (
+                                <div>
+                                  {subItem.icon && <subItem.icon />}
+                                  <span>{subItem.name}</span>
+                                </div>
+                              )}
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              ) : (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    {item.url ? (
+                      <Link href={item.url}>
+                        {item.icon && <item.icon />}
+                        <span>{item.name}</span>
+                      </Link>
+                    ) : (
+                      <div>
+                        {item.icon && <item.icon />}
+                        <span>{item.name}</span>
+                      </div>
+                    )}
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-              </Collapsible>
-            ) : item.healthStatus ? (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <div className="flex items-center gap-2 text-foreground/50 pointer-events-none">
-                    {item.icon && <item.icon />}
-                    <span>{item.healthStatus}</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ) : (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  {item.url ? (
-                    <Link href={item.url}>
-                      {item.icon && <item.icon />}
-                      <span>{item.name}</span>
-                    </Link>
-                  ) : (
-                    <div>
-                      {item.icon && <item.icon />}
-                      <span>{item.name}</span>
-                    </div>
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ),
-          )}
+              ),
+            )}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
