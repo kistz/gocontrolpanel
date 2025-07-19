@@ -1,5 +1,5 @@
-import { getHetznerProject } from "@/actions/database/hetzner-projects";
 import { withAuth } from "@/lib/auth";
+import { getHetznerProject } from "@/lib/hetzner";
 import { routes } from "@/routes";
 import { redirect } from "next/navigation";
 
@@ -17,12 +17,16 @@ export default async function AdminHetznerProjectLayout({
     redirect(routes.login);
   }
 
-  const { data } = await getHetznerProject(id);
+  const data = await getHetznerProject(id);
   if (!data) {
     redirect(routes.admin.hetzner);
   }
 
-  if (!session.user.admin && !data.hetznerProjectUsers.some((hpu) => hpu.userId === session.user.id)) {
+  if (
+    !data.hetznerProjectUsers.some(
+      (user) => user.userId === session.user.id && user.role === "Admin",
+    )
+  ) {
     redirect(routes.admin.hetzner);
   }
 

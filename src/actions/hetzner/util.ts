@@ -1,11 +1,11 @@
+import { getHetznerProject } from "@/lib/hetzner";
 import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import { getList } from "@/lib/utils";
 import { AxiosResponse } from "axios";
 import "server-only";
-import { getHetznerProject } from "../database/hetzner-projects";
 
 export async function getApiToken(projectId: string): Promise<string> {
-  const { data: project } = await getHetznerProject(projectId);
+  const project = await getHetznerProject(projectId);
   const apiTokens = getList(project?.apiTokens);
 
   if (apiTokens.length === 0) {

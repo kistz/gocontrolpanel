@@ -36,11 +36,8 @@ export const createColumns = (
     ),
   },
   {
-    accessorKey: "apiTokens",
+    accessorKey: "apiTokensCount",
     header: "API Tokens",
-    cell: ({ row }) => (
-      <span>{(row.getValue("apiTokens") as string[])?.length}</span>
-    ),
   },
   {
     accessorKey: "_count.hetznerProjectUsers",

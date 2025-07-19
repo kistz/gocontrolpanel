@@ -77,7 +77,7 @@ export async function getGroupsPaginated(
         }),
       };
 
-      if (!session.user.permissions.includes("groups:view")) {
+      if (!session.user.admin && !session.user.permissions.includes("groups:view")) {
         const userGroupIds = session.user.groups.map((g) => g.id);
 
         if (userGroupIds.length === 0) {
