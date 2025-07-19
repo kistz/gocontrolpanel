@@ -1,5 +1,7 @@
 import { parseTokenFromRequest } from "@/lib/auth";
 import { getGbxClientManager } from "@/lib/gbxclient";
+import { hasPermissionsJWTSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { PlayerInfo } from "@/types/player";
 import { parse } from "node:url";
 
@@ -29,16 +31,13 @@ export async function SOCKET(
     return;
   }
 
-  const serverId = token.groups
-    ?.flatMap((group) => group.servers)
-    .find((server) => server.id === id)?.id;
-
-  if (!serverId) {
+  const canView = hasPermissionsJWTSync(token, routePermissions.servers.players, id);
+  if (!canView) {
     client.close();
     return;
   }
 
-  const manager = await getGbxClientManager(serverId);
+  const manager = await getGbxClientManager(id);
 
   client.send(
     JSON.stringify({

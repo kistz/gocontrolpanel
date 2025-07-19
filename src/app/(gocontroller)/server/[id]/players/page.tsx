@@ -3,7 +3,10 @@ import BlacklistList from "@/components/players/blacklist-list";
 import GuestlistList from "@/components/players/guestlist-list";
 import PlayerList from "@/components/players/player-list";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
 import { TabsContent } from "@radix-ui/react-tabs";
+import { redirect } from "next/navigation";
 
 export default async function ServerPlayersPage({
   params,
@@ -11,6 +14,11 @@ export default async function ServerPlayersPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  const canView = await hasPermission(routePermissions.servers.players, id);
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
 
   return (
     <div className="flex flex-col gap-6">

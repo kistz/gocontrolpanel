@@ -2,6 +2,7 @@ import { TBreadcrumb } from "@/components/shell/breadcrumbs";
 import { routes } from "@/routes";
 import { clsx, type ClassValue } from "clsx";
 import { Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -296,13 +297,21 @@ export const permissions: string[] = [
 export function hasPermissionSync(session: Session | null, permissions?: string[], id = ""): boolean {
   if (!session) return false;
   
-  if (session.user.admin) return true;
+  return hasPermissionsJWTSync(session.user, permissions, id);
+}
+
+export function hasPermissionsJWTSync(
+  jwt: JWT,
+  permissions?: string[],
+  id = "",
+): boolean {
+  if (jwt.admin) return true;
 
   if (!permissions || permissions.length === 0) return false;
 
-  const userPermissions = session.user.permissions;
+  const userPermissions = jwt.permissions;
   
-  session.user.groups.forEach((group) => {
+  jwt.groups.forEach((group) => {
     const role = group.role.toLowerCase();
     userPermissions.push(`groups::${role}`);
     userPermissions.push(`groups:${group.id}:${role}`);
@@ -312,13 +321,13 @@ export function hasPermissionSync(session: Session | null, permissions?: string[
     });
   });
   
-  session.user.projects.forEach((project) => {
+  jwt.projects.forEach((project) => {
     const role = project.role.toLowerCase();
     userPermissions.push(`hetzner::${role}`);
     userPermissions.push(`hetzner:${project.id}:${role}`);
   });
 
-  session.user.servers.forEach((server) => {
+  jwt.servers.forEach((server) => {
     const role = server.role.toLowerCase();
     userPermissions.push(`servers::${role}`);
     userPermissions.push(`servers:${server.id}:${role}`);
