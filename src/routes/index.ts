@@ -25,6 +25,21 @@ export const routes = {
 };
 
 export const routePermissions = {
+  servers: {
+    settings: ["servers:id:admin"],
+    game: {
+      mapActions: ["servers:id:moderator", "servers:id:admin"],
+      gameSettings: ["servers:id:moderator", "servers:id:admin"],
+      scriptSettings: ["servers:id:moderator", "servers:id:admin"],
+    },
+    maps: ["servers:id:moderator", "servers:id:admin"],
+    players: ["servers:id:moderator", "servers:id:admin"],
+    live: {
+      actions: ["servers:id:moderator", "servers:id:admin"],
+    },
+    files: ["servers:id:admin"],
+    interface: ["servers:id:admin"],
+  },
   admin: {
     users: {
       view: ["users:view"],

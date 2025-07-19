@@ -101,19 +101,7 @@ export async function updateUser(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(["users:edit"], async () => {
     const db = getClient();
-
-    const existingUser = await db.users.findUniqueOrThrow({
-      where: {
-        id: userId,
-      },
-    });
-
-    const isRemovingAdmin = existingUser.admin && !data.admin;
-
-    if (isRemovingAdmin) {
-      throw new ServerError("Cannot remove admin role");
-    }
-
+    
     await db.users.update({
       where: { id: userId },
       data: {

@@ -15,8 +15,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { generatePath, useCurrentid } from "@/lib/utils";
-import { routes } from "@/routes";
+import { generatePath, hasPermissionSync, useCurrentid } from "@/lib/utils";
+import { routePermissions, routes } from "@/routes";
 import { ServerInfo } from "@/types/server";
 import {
   IconActivity,
@@ -47,6 +47,7 @@ interface ServerNavGroup {
       name: string;
       url: string;
       icon?: React.ElementType;
+      auth?: boolean;
     }[];
   }[];
 }
@@ -155,6 +156,7 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconAdjustmentsAlt,
+                auth: hasPermissionSync(session, routePermissions.servers.settings, server.id),
               },
               {
                 name: "Game",
@@ -169,6 +171,7 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconMap,
+                auth: hasPermissionSync(session, routePermissions.servers.maps, server.id),
               },
               {
                 name: "Players",
@@ -176,6 +179,7 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconUsers,
+                auth: hasPermissionSync(session, routePermissions.servers.players, server.id),
               },
               {
                 name: "Live",
@@ -192,6 +196,7 @@ export default function NavGroups() {
                         id: server.id,
                       }),
                       icon: IconFileDescription,
+                      auth: hasPermissionSync(session, routePermissions.servers.files, server.id),
                     },
                   ]
                 : []),
@@ -201,6 +206,7 @@ export default function NavGroups() {
                   id: server.id,
                 }),
                 icon: IconDeviceDesktop,
+                auth: hasPermissionSync(session, routePermissions.servers.interface, server.id),
               },
               // {
               //   name: "Dev",
@@ -266,7 +272,7 @@ export default function NavGroups() {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {server.items.map((item) => (
+                          {server.items.filter(i => i.auth || i.auth === undefined).map((item) => (
                             <SidebarMenuSubItem key={item.name}>
                               <SidebarMenuSubButton asChild>
                                 {item.url ? (
