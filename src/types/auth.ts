@@ -1,4 +1,4 @@
-import { GroupRole, HetznerProjectRole, Servers } from "@/lib/prisma/generated";
+import { GroupRole, HetznerProjectRole, Servers, UserServerRole } from "@/lib/prisma/generated";
 
 export interface UserGroup {
   id: string;
@@ -11,4 +11,10 @@ export interface UserProject {
   id: string;
   name: string;
   role: HetznerProjectRole;
+}
+
+export interface UserServer {
+  id: string;
+  name: string;
+  role: UserServerRole;
 }

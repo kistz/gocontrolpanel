@@ -43,10 +43,11 @@ model Users {
   path        String
   admin       Boolean @default(false)
   ubiUid      String  @unique
-  permissions Json @default("[]")
+  permissions Json    @default("[]")
 
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]
+  userServers         UserServers[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -171,6 +172,7 @@ model Servers {
 
   interfaces   Interfaces[]
   groupServers GroupServers[]
+  userServers  UserServers[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -178,6 +180,24 @@ model Servers {
 
   @@index([deletedAt])
   @@map("servers")
+}
+
+model UserServers {
+  userId   String
+  serverId String
+  role     UserServerRole
+
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server Servers @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@id([userId, serverId])
+  @@map("user_servers")
+}
+
+enum UserServerRole {
+  Admin
+  Moderator
+  Member
 }
 
 model GroupServers {
