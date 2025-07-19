@@ -143,7 +143,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="table table-fixed w-full"
+                  className="table table-fixed w-full min-h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

@@ -53,8 +53,7 @@ export default function PlayerList({ serverId }: PlayerListProps) {
       wsRef.current = null;
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
+    ws.onerror = () => {
       ws.close();
     };
 

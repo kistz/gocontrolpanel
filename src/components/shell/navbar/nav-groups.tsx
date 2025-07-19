@@ -119,8 +119,7 @@ export default function NavGroups() {
         wsRef.current = null;
       };
 
-      ws.onerror = (err) => {
-        console.error("WebSocket error", err);
+      ws.onerror = () => {
         ws.close();
       };
     } catch {
@@ -139,6 +138,9 @@ export default function NavGroups() {
     session?.user.groups.map((group) => ({
       name: group.name,
       servers: servers
+        .filter((server) =>
+          group.servers.some((s) => s.id === server.id),
+        )
         .map((server) => {
           return {
             id: server.id,

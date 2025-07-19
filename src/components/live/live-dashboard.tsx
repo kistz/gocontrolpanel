@@ -179,12 +179,10 @@ export default function LiveDashboard({ serverId }: { serverId: string }) {
     };
 
     ws.onclose = () => {
-      console.log("WebSocket connection closed");
       wsRef.current = null;
     };
 
-    ws.onerror = (err) => {
-      console.error("WebSocket error", err);
+    ws.onerror = () => {
       ws.close();
     };
 
