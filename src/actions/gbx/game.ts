@@ -24,13 +24,6 @@ export async function nextMap(serverId: string): Promise<ServerResponse> {
   );
 }
 
-export async function balanceTeams(serverId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("AutoTeamBalance");
-  });
-}
-
 export async function setShowOpponents(
   serverId: string,
   count: number,
@@ -179,17 +172,6 @@ export async function setModeScriptSettings(
       client.call("Echo", "", "UpdatedSettings");
     },
   );
-}
-
-export async function triggerModeScriptEvent(
-  serverId: string,
-  method: string,
-  param: string,
-): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("TriggerModeScriptEvent", method, param);
-  });
 }
 
 export async function triggerModeScriptEventArray(

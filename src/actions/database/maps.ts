@@ -6,12 +6,7 @@ import { getGbxClient } from "@/lib/gbxclient";
 import { Maps } from "@/lib/prisma/generated";
 import { SMapInfo } from "@/types/gbx/map";
 import { MapInfoMinimal } from "@/types/map";
-import {
-  PaginationResponse,
-  ServerError,
-  ServerResponse,
-} from "@/types/responses";
-import { PaginationState } from "@tanstack/react-table";
+import { ServerError, ServerResponse } from "@/types/responses";
 import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
 
 export async function getMapByUid(
@@ -41,44 +36,6 @@ export async function getMapByUid(
       return updatedMap;
     },
   );
-}
-
-export async function getMapsPaginated(
-  pagination: PaginationState,
-  sorting: { field: string; order: "asc" | "desc" },
-): Promise<ServerResponse<PaginationResponse<Maps>>> {
-  return doServerActionWithAuth([], async () => {
-    const db = getClient();
-    const totalCount = await db.maps.count({
-      where: { deletedAt: null },
-    });
-
-    const maps = await db.maps.findMany({
-      where: {
-        deletedAt: null,
-      },
-      skip: pagination.pageSize * pagination.pageIndex,
-      take: pagination.pageSize,
-      orderBy: {
-        [sorting.field]: sorting.order.toLowerCase(),
-      },
-    });
-
-    return {
-      data: maps,
-      totalCount,
-    };
-  });
-}
-
-export async function deleteMapById(mapId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const db = getClient();
-    await db.maps.update({
-      where: { id: mapId },
-      data: { deletedAt: new Date() },
-    });
-  });
 }
 
 export async function getMapList(

@@ -96,21 +96,6 @@ export async function removeMapFromJukebox(
   );
 }
 
-export async function getCurrentMapInfo(
-  serverId: string,
-): Promise<ServerResponse<SMapInfo>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const mapInfo = await client.call("GetCurrentMapInfo");
-
-    if (!mapInfo) {
-      throw new ServerError("Failed to get current map info");
-    }
-
-    return mapInfo;
-  });
-}
-
 export async function getCurrentMapIndex(
   serverId: string,
 ): Promise<ServerResponse<number>> {
@@ -147,17 +132,6 @@ export async function jumpToMap(
       await client.call("JumpToMapIndex", index);
     },
   );
-}
-
-export async function setNextMap(
-  serverId: string,
-  index: number,
-): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-
-    await client.call("SetNextMapIndex", index);
-  });
 }
 
 export async function addMap(
@@ -226,30 +200,4 @@ export async function removeMapList(
       return res;
     },
   );
-}
-
-export async function insertMap(
-  serverId: string,
-  filename: string,
-): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("InsertMap", filename);
-  });
-}
-
-export async function insertMapList(
-  serverId: string,
-  filenames: string[],
-): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    const res = await client.call("InsertMapList", filenames);
-
-    if (typeof res !== "number") {
-      throw new ServerError("Failed to insert map list");
-    }
-
-    return res;
-  });
 }

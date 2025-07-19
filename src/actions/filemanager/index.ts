@@ -6,40 +6,6 @@ import { getFileManager } from "@/lib/filemanager";
 import { ContentType, File, FileEntry } from "@/types/filemanager";
 import { ServerError, ServerResponse } from "@/types/responses";
 
-export async function getUserData(
-  serverId: string,
-): Promise<ServerResponse<FileEntry[]>> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
-
-    const res = await fetch(`${fileManager.url}/UserData`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (res.status !== 200) {
-      throw new ServerError("Failed to get files");
-    }
-
-    const data = await res.json();
-    if (!data) {
-      throw new ServerError("Failed to get files");
-    }
-
-    const parsedData = data.map((entry: any) => ({
-      ...entry,
-      lastModified: new Date(entry.lastModified),
-    }));
-
-    return parsedData;
-  });
-}
-
 export async function getRoute(
   serverId: string,
   path: string,

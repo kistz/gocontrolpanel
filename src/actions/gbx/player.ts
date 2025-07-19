@@ -190,20 +190,26 @@ export async function loadBlacklist(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("LoadBlackList", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("LoadBlackList", filename);
+    },
+  );
 }
 
 export async function saveBlacklist(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("SaveBlackList", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("SaveBlackList", filename);
+    },
+  );
 }
 
 export async function cleanBlacklist(
@@ -284,20 +290,26 @@ export async function loadGuestlist(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("LoadGuestList", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("LoadGuestList", filename);
+    },
+  );
 }
 
 export async function saveGuestlist(
   serverId: string,
   filename: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("SaveGuestList", filename);
-  });
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const client = await getGbxClient(serverId);
+      await client.call("SaveGuestList", filename);
+    },
+  );
 }
 
 export async function cleanGuestlist(
@@ -344,7 +356,7 @@ export async function forceSpectator(
 export async function connectFakePlayer(
   serverId: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["admin"], async () => {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const client = await getGbxClient(serverId);
     await client.call("ConnectFakePlayer");
   });
