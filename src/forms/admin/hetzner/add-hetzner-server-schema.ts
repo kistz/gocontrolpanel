@@ -22,6 +22,7 @@ export const AddHetznerServerSchema = z.object({
   superAdminPassword: z.string().optional(),
   adminPassword: z.string().optional(),
   userPassword: z.string().optional(),
+  filemanagerPassword: z.string().optional(),
 });
 
 export type AddHetznerServerSchemaType = z.infer<typeof AddHetznerServerSchema>;

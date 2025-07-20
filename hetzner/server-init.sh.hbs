@@ -8,9 +8,9 @@ apt install -y docker.io docker-compose-v2 curl unzip
 
 # Fetch Docker Compose setup
 cd /root
-curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/master.zip
+curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/dev.zip
 unzip gcp.zip
-cd gocontrolpanel-master/hetzner
+cd gocontrolpanel-dev/hetzner
 
 # Set environment variables
 export TM_MASTERSERVER_LOGIN='{{{dedi_login}}}'
@@ -20,6 +20,7 @@ export TM_SYSTEM_FORCE_IP_ADDRESS=$(curl -s https://ipinfo.io/ip)
 export TM_AUTHORIZATION_SUPERADMIN_PASSWORD='{{{superadmin_password}}}'
 export TM_AUTHORIZATION_ADMIN_PASSWORD='{{{admin_password}}}'
 export TM_AUTHORIZATION_USER_PASSWORD='{{{user_password}}}'
+export FM_PASSWORD='{{{filemanager_password}}}'
 
 # Start server
 docker compose up --build -d

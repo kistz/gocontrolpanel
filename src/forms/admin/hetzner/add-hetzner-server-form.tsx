@@ -355,6 +355,14 @@ export default function AddHetznerServerForm({
             type="password"
           />
 
+          <FormElement
+            name={"filemanagerPassword"}
+            label="File Manager Password"
+            placeholder="Enter file manager password"
+            type="password"
+            description="This password will be used to access the file manager."
+          />
+
           <Button
             type="submit"
             className="w-full"
