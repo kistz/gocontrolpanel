@@ -60,6 +60,7 @@ export default function EditServerForm({
         role: userServer.role,
       })),
       filemanagerUrl: server.filemanagerUrl || undefined,
+      filemanagerPassword: server.filemanagerPassword || undefined,
     },
   });
 
@@ -214,6 +215,13 @@ export default function EditServerForm({
           label="Filemanager url"
           description="The url of the filemanager."
           placeholder="Enter filemanager url"
+        />
+
+        <FormElement
+          name={"filemanagerPassword"}
+          label="Filemanager password"
+          description="The password for the filemanager."
+          placeholder="Enter filemanager password"
         />
 
         <Button

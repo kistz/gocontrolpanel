@@ -2,6 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
+import { updateFileManager } from "@/lib/filemanager";
 import { getGbxClientManager } from "@/lib/gbxclient";
 import { Prisma, Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
@@ -180,6 +181,15 @@ export async function updateServer(
     async () => {
       const db = getClient();
 
+      // Get the original server data before the update
+      const originalServer = await db.servers.findUnique({
+        where: { id: serverId },
+        select: {
+          filemanagerUrl: true,
+          filemanagerPassword: true,
+        },
+      });
+
       const { userServers, ...scalarFields } = server;
       const updatedServer = await db.servers.update({
         where: { id: serverId },
@@ -195,6 +205,22 @@ export async function updateServer(
         },
         include: serversUsersSchema,
       });
+
+      const filemanagerUrlChanged =
+        scalarFields.filemanagerUrl !== originalServer?.filemanagerUrl;
+
+      const filemanagerPasswordChanged =
+        scalarFields.filemanagerPassword !==
+        originalServer?.filemanagerPassword;
+
+      if (filemanagerUrlChanged || filemanagerPasswordChanged) {
+        await updateFileManager(
+          serverId,
+          scalarFields.filemanagerUrl,
+          scalarFields.filemanagerPassword,
+        );
+      }
+
       return updatedServer;
     },
   );

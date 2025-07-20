@@ -49,8 +49,8 @@ model Users {
   hetznerProjectUsers HetznerProjectUser[]
   userServers         UserServers[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
 }
@@ -154,14 +154,15 @@ enum HetznerProjectRole {
 }
 
 model Servers {
-  id             String  @id @default(uuid())
-  name           String
-  description    String
-  host           String
-  port           Int
-  user           String
-  password       String
-  filemanagerUrl String?
+  id                  String  @id @default(uuid())
+  name                String
+  description         String
+  host                String
+  port                Int
+  user                String
+  password            String
+  filemanagerUrl      String?
+  filemanagerPassword String?
 
   manualRouting     Boolean @default(false)
   messageFormat     String?

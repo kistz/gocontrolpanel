@@ -146,6 +146,7 @@ export async function createHetznerServer(
           data.superAdminPassword || generateRandomString(16),
         admin_password: data.adminPassword || generateRandomString(16),
         user_password: data.userPassword || generateRandomString(16),
+        filemanager_password: data.filemanagerPassword || generateRandomString(16),
       };
 
       const userData = template(dediData);
@@ -160,6 +161,7 @@ export async function createHetznerServer(
           "authorization.superadmin.password": dediData.superadmin_password,
           "authorization.admin.password": dediData.admin_password,
           "authorization.user.password": dediData.user_password,
+          "filemanager.password": dediData.filemanager_password,
         },
         public_net: {
           enable_ipv4: true,

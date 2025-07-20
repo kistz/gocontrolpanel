@@ -24,6 +24,7 @@ export default function HetznerServerDetailsModal({
     superAdmin: data.server.labels["authorization.superadmin.password"],
     admin: data.server.labels["authorization.admin.password"],
     user: data.server.labels["authorization.user.password"],
+    filemanager: data.server.labels["filemanager.password"],
   };
 
   return (
@@ -136,6 +137,12 @@ export default function HetznerServerDetailsModal({
               <div className="flex flex-col">
                 <span className="font-semibold">User</span>
                 <span className="truncate">{passwords.user || "-"}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">File Manager</span>
+                <span className="truncate">
+                  {passwords.filemanager || "-"}
+                </span>
               </div>
             </div>
           </div>
