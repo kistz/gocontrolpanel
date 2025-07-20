@@ -1,5 +1,6 @@
 export interface FileManager {
   url?: string;
+  password?: string;
   health: boolean;
 }
 

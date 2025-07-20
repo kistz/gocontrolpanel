@@ -17,6 +17,7 @@ export const AddServerSchema = z.object({
     .optional()
     .describe("List of users with their roles on the server"),
   filemanagerUrl: z.string().optional(),
+  filemanagerPassword: z.string().optional(),
 });
 
 export type AddServerSchemaType = z.infer<typeof AddServerSchema>;

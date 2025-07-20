@@ -62,6 +62,7 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
             role: user.role as UserServerRole,
           })) || [],
         filemanagerUrl: values.filemanagerUrl || "",
+        filemanagerPassword: values.filemanagerPassword || "",
       });
       if (error) {
         throw new Error(error);
@@ -205,6 +206,13 @@ export default function AddServerForm({ callback }: { callback?: () => void }) {
           label="Filemanager url"
           description="The url of the filemanager."
           placeholder="Enter filemanager url"
+        />
+
+        <FormElement
+          name={"filemanagerPassword"}
+          label="Filemanager password"
+          description="The password for the filemanager."
+          placeholder="Enter filemanager password"
         />
 
         <Button

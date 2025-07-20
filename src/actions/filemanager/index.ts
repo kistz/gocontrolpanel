@@ -20,6 +20,7 @@ export async function getRoute(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${fileManager.password}`,
       },
     });
 
@@ -62,6 +63,7 @@ export async function getFile(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${fileManager.password}`,
       },
     });
 
@@ -101,6 +103,7 @@ export async function saveFileText(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${fileManager.password}`,
       },
       body: JSON.stringify(text),
     });
@@ -125,6 +128,7 @@ export async function deleteEntry(
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${fileManager.password}`,
       },
       body: JSON.stringify(paths),
     });
@@ -147,6 +151,9 @@ export async function uploadFiles(
 
     const res = await fetch(fileManager.url + "/upload", {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${fileManager.password}`,
+      },
       body: formData,
     });
 
@@ -199,6 +206,7 @@ export async function getScripts(
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${fileManager.password}`,
           },
         });
 
@@ -235,6 +243,7 @@ export async function createFileEntry(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${fileManager.password}`,
       },
       body: JSON.stringify(request),
     });

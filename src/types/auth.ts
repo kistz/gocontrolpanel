@@ -17,6 +17,7 @@ export interface UserGroup {
     | "messageFormat"
     | "connectMessage"
     | "disconnectMessage"
+    | "filemanagerPassword"
     | "createdAt"
     | "updatedAt"
     | "deletedAt"
