@@ -15,9 +15,9 @@ import { Form, FormLabel } from "@/components/ui/form";
 import { GroupRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconTrash } from "@tabler/icons-react";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditGroupSchema, EditGroupSchemaType } from "./edit-group-schema";
 
@@ -80,6 +80,16 @@ export default function EditGroupForm({
         role: user.role,
       })),
     },
+  });
+
+  const { control } = form;
+  const {
+    fields: memberFields,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "groupMembers",
   });
 
   async function onSubmit(values: EditGroupSchemaType) {
@@ -174,8 +184,8 @@ export default function EditGroupForm({
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Members</FormLabel>
-          {form.watch("groupMembers")?.map((_, index) => (
-            <div key={index} className="flex items-end gap-2">
+          {memberFields.map((field, index) => (
+            <div key={field.id} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`groupMembers.${index}.userId`}
@@ -203,34 +213,24 @@ export default function EditGroupForm({
               <Button
                 type="button"
                 variant="destructive"
-                size="icon"
-                onClick={() => {
-                  const currentUsers = form.getValues("groupMembers");
-                  form.setValue(
-                    "groupMembers",
-                    currentUsers?.filter((_, i) => i !== index),
-                  );
-                }}
+                size={"icon"}
+                onClick={() => remove(index)}
               >
                 <IconTrash />
                 <span className="sr-only">Remove Member</span>
               </Button>
             </div>
           ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => append({ userId: "", role: GroupRole.Member })}
+          >
+            <IconPlus />
+            Add Member
+          </Button>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            const currentUsers = form.getValues("groupMembers") || [];
-            form.setValue("groupMembers", [
-              ...currentUsers,
-              { userId: "", role: GroupRole.Member },
-            ]);
-          }}
-        >
-          Add Member
-        </Button>
 
         <Button
           type="submit"
