@@ -1,5 +1,6 @@
 "use server";
 import { doServerActionWithAuth } from "@/lib/actions";
+import { searchAccountNames } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { Prisma, Users } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
@@ -9,6 +10,7 @@ import {
   ServerResponse,
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import slugid from "slugid";
 
 export type UserMinimal = Pick<Users, "id" | "login" | "nickName">;
 
@@ -30,9 +32,6 @@ export async function getUsersMinimal(): Promise<
     async () => {
       const db = getClient();
       const users = await db.users.findMany({
-        where: {
-          authenticated: true,
-        },
         select: {
           id: true,
           login: true,
@@ -123,4 +122,58 @@ export async function deleteUserById(userId: string): Promise<ServerResponse> {
       where: { id: userId },
     });
   });
+}
+
+export async function searchUsers(
+  search: string,
+): Promise<ServerResponse<UserMinimal[]>> {
+  return doServerActionWithAuth(
+    [
+      "groups:create",
+      "groups:edit",
+      "groups::admin",
+      "servers:create",
+      "servers:edit",
+      "servers::admin",
+      "hetzner:create",
+      "hetzner:edit",
+      "hetzner::admin",
+    ],
+    async () => {
+      const db = getClient();
+
+      if (search.length > 3 ) {
+        const { data: accountNames } = await searchAccountNames([search]);
+  
+        if (Object.keys(accountNames).length > 0) {
+          await db.users.createMany({
+            data: Object.entries(accountNames).map(
+              ([accountName, accountId]) => ({
+                login: slugid.encode(accountId),
+                nickName: accountName,
+                path: "",
+              }),
+            ),
+            skipDuplicates: true,
+          });
+        }
+      }
+
+      const users = await db.users.findMany({
+        where: {
+          OR: [
+            { login: { contains: search } },
+            { nickName: { contains: search } },
+          ],
+        },
+        select: {
+          id: true,
+          login: true,
+          nickName: true,
+        },
+      });
+
+      return users;
+    },
+  );
 }

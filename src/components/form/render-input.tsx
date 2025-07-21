@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { SearchInput } from "../ui/search-input";
 
 interface RenderInputProps<TControl extends FieldValues> {
   field: ControllerRenderProps<TControl>;
@@ -38,6 +39,7 @@ interface RenderInputProps<TControl extends FieldValues> {
   min?: number;
   max?: number;
   error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
+  onSearch?: (query?: string) => void;
   className?: string;
 }
 
@@ -56,6 +58,7 @@ export default function RenderInput<TControl extends FieldValues>({
   min,
   max,
   error,
+  onSearch,
   className,
 }: RenderInputProps<TControl & FieldValues>) {
   const [showPassword, setShowPassword] = useState(false);
@@ -180,6 +183,18 @@ export default function RenderInput<TControl extends FieldValues>({
           placeholder={placeholder}
           animation={2}
           maxCount={max || 3}
+        />
+      );
+    case "search":
+      return (
+        <SearchInput
+          onSearch={onSearch}
+          value={field.value}
+          onValueChange={field.onChange}
+          searchResults={options || []}
+          loading={isLoading}
+          className={className}
+          placeholder={placeholder}
         />
       );
     default:

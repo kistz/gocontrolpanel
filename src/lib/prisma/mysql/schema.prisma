@@ -42,7 +42,7 @@ model Users {
   nickName      String
   path          String
   admin         Boolean @default(false)
-  ubiUid        String  @unique
+  ubiUid        String?
   permissions   Json    @default("[]")
   authenticated Boolean @default(false)
 

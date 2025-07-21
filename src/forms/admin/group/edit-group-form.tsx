@@ -4,7 +4,11 @@ import {
   updateGroup,
 } from "@/actions/database/groups";
 import { getServersMinimal, ServerMinimal } from "@/actions/database/servers";
-import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
+import {
+  getUsersMinimal,
+  searchUsers,
+  UserMinimal,
+} from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
@@ -25,10 +29,12 @@ export default function EditGroupForm({
   callback?: () => void;
 }) {
   const [servers, setServers] = useState<ServerMinimal[]>([]);
-  const [users, setUsers] = useState<UserMinimal[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchResults, setSearchResults] = useState<UserMinimal[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     async function fetch() {
@@ -50,10 +56,10 @@ export default function EditGroupForm({
         if (error) {
           throw new Error(error);
         }
-        setUsers(data);
+        setSearchResults(data);
       } catch (error) {
-        setError("Failed to get users: " + getErrorMessage(error));
-        toast.error("Failed to fetch users", {
+        setError("Failed to search users: " + getErrorMessage(error));
+        toast.error("Failed to search users", {
           description: getErrorMessage(error),
         });
       }
@@ -103,6 +109,30 @@ export default function EditGroupForm({
     }
   }
 
+  const handleSearch = async (query?: string) => {
+    if (!query?.trim()) {
+      return;
+    }
+    setSearching(true);
+    try {
+      const { data, error } = await searchUsers(query);
+      if (error) {
+        throw new Error(error);
+      }
+      setSearchResults((prev) => {
+        const existingIds = new Set(prev.map((u) => u.id));
+        return [...prev, ...data.filter((u) => !existingIds.has(u.id))];
+      });
+    } catch (error) {
+      setError("Failed to search users: " + getErrorMessage(error));
+      toast.error("Failed to search users", {
+        description: getErrorMessage(error),
+      });
+    } finally {
+      setSearching(false);
+    }
+  };
+
   if (loading) {
     return <span className="text-muted-foreground">Loading...</span>;
   }
@@ -150,12 +180,14 @@ export default function EditGroupForm({
                 <FormElement
                   name={`groupMembers.${index}.userId`}
                   className="w-full"
-                  placeholder="Select user"
-                  options={users.map((u) => ({
+                  placeholder="Search user..."
+                  onSearch={handleSearch}
+                  options={searchResults.map((u) => ({
                     label: u.nickName,
                     value: u.id,
                   }))}
-                  type="select"
+                  isLoading={searching}
+                  type="search"
                 />
               </div>
               <FormElement

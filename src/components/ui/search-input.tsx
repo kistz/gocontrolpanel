@@ -1,97 +1,114 @@
 import clsx from "clsx";
 import { Search } from "lucide-react";
 import React from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./dropdown-menu";
+import { Input } from "./input";
+import { Popover, PopoverAnchor, PopoverContent } from "./popover"; // Don't use PopoverTrigger
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  onSearch: (query: string) => void;
-  onValueChange?: (value: string) => void;
+  value?: string;
+  defaultValue?: string;
+  onSearch?: (query?: string) => void;
+  onValueChange: (value: string) => void;
   searchResults: { label: string; value: string }[];
   loading?: boolean;
-  noResults?: boolean;
   className?: string;
 }
 
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
   (
     {
+      value,
+      defaultValue = "",
       onSearch,
       onValueChange,
       searchResults,
       loading = false,
-      noResults = false,
       className,
       placeholder,
       ...props
     },
     ref,
   ) => {
-    const [inputValue, setInputValue] = React.useState("");
-    const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+    const isControlled = value !== undefined;
+    const [rawInput, setRawInput] = React.useState(defaultValue);
+    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+
+    const selectedLabel = React.useMemo(() => {
+      if (!isControlled) return undefined;
+      const match = searchResults.find((r) => r.value === value);
+      return match?.label ?? value;
+    }, [value, searchResults]);
+
+    const displayValue = isControlled ? selectedLabel : rawInput;
 
     const handleEnterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        onSearch(inputValue.trim());
-        setIsDropdownOpen(true);
+        handleSearch();
       }
     };
 
-    return (
-      <div className="relative w-full">
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-          <DropdownMenuTrigger asChild>
-            <div className={"relative w-full"}>
-              <input
-                ref={ref}
-                type="text"
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                }}
-                onKeyDown={handleEnterKey}
-                placeholder={placeholder || "Search..."}
-                className={clsx("w-full pr-10", className)}
-                {...props}
-              />
-              <Search
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                size={18}
-              />
-            </div>
-          </DropdownMenuTrigger>
+    const handleSearch = () => {
+      onSearch?.(isControlled ? value : rawInput);
+      setIsPopoverOpen(true);
+    };
 
-          <DropdownMenuContent
-            className="w-full p-0 z-[9999] bg-white shadow-md rounded-md"
-            align="start"
-          >
-            {loading ? (
-              <div className="p-2 text-sm text-gray-500">Searching...</div>
-            ) : searchResults.length === 0 ? (
-              <div className="p-2 text-sm text-gray-500">No results found</div>
-            ) : (
-              searchResults.map((result) => (
-                <DropdownMenuItem
+    const handleSelect = (item: { label: string; value: string }) => {
+      setIsPopoverOpen(false);
+      if (!isControlled) {
+        setRawInput(item.label);
+      }
+      onValueChange?.(item.value);
+    };
+
+    return (
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverAnchor asChild>
+          <div className="relative w-full">
+            <Input
+              ref={ref}
+              value={displayValue}
+              onChange={(e) => {
+                if (!isControlled) {
+                  setRawInput(e.target.value);
+                }
+                onValueChange(e.target.value);
+              }}
+              type="text"
+              onKeyDown={handleEnterKey}
+              placeholder={placeholder || "Search..."}
+              className={clsx("w-full pr-10", className)}
+              {...props}
+            />
+            <Search
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+              onClick={handleSearch}
+              role="button"
+            />
+          </div>
+        </PopoverAnchor>
+
+        <PopoverContent align="start" className="w-auto p-0 z-[9999]">
+          {loading ? (
+            <div className="p-2 text-sm">Searching...</div>
+          ) : searchResults.length === 0 ? (
+            <div className="p-2 text-sm">No results found</div>
+          ) : (
+            searchResults
+              .filter((r) => r.label.toLowerCase().includes((isControlled ? value : rawInput).toLowerCase()))
+              .map((result) => (
+                <div
                   key={result.value}
-                  onSelect={() => {
-                    setInputValue(result.label);
-                    setIsDropdownOpen(false);
-                    onValueChange?.(result.value);
-                  }}
-                  className="cursor-pointer"
+                  onClick={() => handleSelect(result)}
+                  className="cursor-pointer px-3 py-2 text-sm hover:bg-accent"
                 >
                   {result.label}
-                </DropdownMenuItem>
+                </div>
               ))
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          )}
+        </PopoverContent>
+      </Popover>
     );
   },
 );

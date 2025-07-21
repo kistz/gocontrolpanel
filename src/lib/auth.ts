@@ -85,7 +85,7 @@ export const authOptions: NextAuthOptions = {
         login: token.login,
         displayName: token.displayName,
         admin: token.admin,
-        ubiId: token.ubiId,
+        ubiId: token.ubiId || undefined,
         permissions: token.permissions,
         groups: token.groups,
         projects: token.projects,
@@ -143,7 +143,7 @@ export const authOptions: NextAuthOptions = {
 
       token.id = dbUser.id;
       token.admin = dbUser.admin;
-      token.ubiId = dbUser.ubiUid;
+      token.ubiId = dbUser.ubiUid || undefined;
       token.permissions = getList(dbUser.permissions);
       token.groups = dbUser.groupMembers.map((g) => ({
         id: g.group.id,
