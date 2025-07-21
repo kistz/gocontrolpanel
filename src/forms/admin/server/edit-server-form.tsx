@@ -1,6 +1,10 @@
 "use client";
 import { ServersWithUsers, updateServer } from "@/actions/database/servers";
-import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
+import {
+  getUsersMinimal,
+  searchUsers,
+  UserMinimal,
+} from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
@@ -9,7 +13,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
 
@@ -20,10 +24,11 @@ export default function EditServerForm({
   server: ServersWithUsers;
   callback?: () => void;
 }) {
-  const [users, setUsers] = useState<UserMinimal[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchResults, setSearchResults] = useState<UserMinimal[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     async function fetch() {
@@ -32,7 +37,7 @@ export default function EditServerForm({
         if (error) {
           throw new Error(error);
         }
-        setUsers(data);
+        setSearchResults(data);
       } catch (error) {
         setError("Failed to get users: " + getErrorMessage(error));
         toast.error("Failed to fetch users", {
@@ -64,6 +69,16 @@ export default function EditServerForm({
     },
   });
 
+  const { control } = form;
+  const {
+    fields: userFields,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "userServers",
+  });
+
   async function onSubmit(values: EditServerSchemaType) {
     try {
       const { error } = await updateServer(server.id, {
@@ -86,6 +101,30 @@ export default function EditServerForm({
       });
     }
   }
+
+  const handleSearch = async (query?: string) => {
+    if (!query?.trim()) {
+      return;
+    }
+    setSearching(true);
+    try {
+      const { data, error } = await searchUsers(query);
+      if (error) {
+        throw new Error(error);
+      }
+      setSearchResults((prev) => {
+        const existingIds = new Set(prev.map((u) => u.id));
+        return [...prev, ...data.filter((u) => !existingIds.has(u.id))];
+      });
+    } catch (error) {
+      setError("Failed to search users: " + getErrorMessage(error));
+      toast.error("Failed to search users", {
+        description: getErrorMessage(error),
+      });
+    } finally {
+      setSearching(false);
+    }
+  };
 
   if (loading) {
     return <span className="text-muted-foreground">Loading...</span>;
@@ -152,18 +191,20 @@ export default function EditServerForm({
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Users</FormLabel>
-          {form.watch("userServers")?.map((_, index) => (
-            <div key={index} className="flex items-end gap-2">
+          {userFields.map((field, index) => (
+            <div key={field.id} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`userServers.${index}.userId`}
                   className="w-full"
-                  placeholder="Select user"
-                  options={users.map((u) => ({
+                  placeholder="Search user..."
+                  onSearch={handleSearch}
+                  options={searchResults.map((u) => ({
                     label: u.nickName,
                     value: u.id,
                   }))}
-                  type="select"
+                  isLoading={searching}
+                  type="search"
                 />
               </div>
               <FormElement
@@ -180,13 +221,7 @@ export default function EditServerForm({
                 type="button"
                 variant="destructive"
                 size={"icon"}
-                onClick={() => {
-                  const currentUsers = form.getValues("userServers");
-                  form.setValue(
-                    "userServers",
-                    currentUsers?.filter((_, i) => i !== index),
-                  );
-                }}
+                onClick={() => remove(index)}
               >
                 <IconTrash />
                 <span className="sr-only">Remove User</span>
@@ -197,13 +232,7 @@ export default function EditServerForm({
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              const currentUsers = form.getValues("userServers") || [];
-              form.setValue("userServers", [
-                ...currentUsers,
-                { userId: "", role: UserServerRole.Member },
-              ]);
-            }}
+            onClick={() => append({ userId: "", role: UserServerRole.Member })}
           >
             <IconPlus />
             Add User
