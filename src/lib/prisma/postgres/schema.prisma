@@ -37,13 +37,14 @@ model Maps {
 }
 
 model Users {
-  id          String   @id @default(uuid())
-  login       String
-  nickName    String
-  path        String
-  admin       Boolean  @default(false)
-  ubiUid      String
-  permissions String[] @default([])
+  id            String   @id @default(uuid())
+  login         String
+  nickName      String
+  path          String
+  admin         Boolean  @default(false)
+  ubiUid        String
+  permissions   String[] @default([])
+  authenticated Boolean  @default(false)
 
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]

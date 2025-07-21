@@ -30,6 +30,9 @@ export async function getUsersMinimal(): Promise<
     async () => {
       const db = getClient();
       const users = await db.users.findMany({
+        where: {
+          authenticated: true,
+        },
         select: {
           id: true,
           login: true,
@@ -51,6 +54,7 @@ export async function getUsersPaginated(
     const db = getClient();
 
     const where: Prisma.UsersWhereInput = {
+      authenticated: true,
       ...(filter && {
         OR: [
           { login: { contains: filter } },

@@ -1,7 +1,7 @@
 import {
-  createUserAuth,
   getUserById,
   getUserByLogin,
+  upsertUserAuth,
   UsersWithGroupsWithServers,
 } from "@/actions/database/auth";
 import { parse } from "cookie";
@@ -125,13 +125,14 @@ export const authOptions: NextAuthOptions = {
             console.error("Failed to fetch web identities", error);
           }
 
-          dbUser = await createUserAuth({
+          dbUser = await upsertUserAuth({
             login: token.login,
             nickName: token.displayName,
             admin: config.DEFAULT_ADMINS.includes(token.login),
             path: "",
             ubiUid,
             permissions: config.DEFAULT_PERMISSIONS,
+            authenticated: true,
           });
         }
       }

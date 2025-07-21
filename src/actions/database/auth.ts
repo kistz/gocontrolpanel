@@ -1,7 +1,6 @@
 import { getClient } from "@/lib/dbclient";
 import { Prisma, Users } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
-import { ServerError } from "@/types/responses";
 import "server-only";
 
 const includeGroupsWithServers = Prisma.validator<Prisma.UsersInclude>()({
@@ -106,43 +105,23 @@ export async function getUserByLogin(
   return user;
 }
 
-export async function createUserAuth(
+export async function upsertUserAuth(
   user: Omit<Users, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<UsersWithGroupsWithServers> {
   const db = getClient();
 
-  const existingUser = await db.users.findFirst({
+  return await db.users.upsert({
     where: {
-      OR: [
-        { login: user.login },
-        { nickName: user.nickName },
-        { ubiUid: user.ubiUid },
-      ],
+      login: user.login,
     },
-  });
-
-  if (existingUser) {
-    throw new ServerError("User with this login or nickname already exists");
-  }
-
-  const newUser = {
-    ...user,
-    admin: user.admin,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  const result = await db.users.create({
-    data: {
-      ...newUser,
-      permissions: getList(newUser.permissions),
+    update: {
+      ...user,
+      permissions: getList(user.permissions),
+    },
+    create: {
+      ...user,
+      permissions: getList(user.permissions),
     },
     include: includeGroupsWithServers,
   });
-
-  if (!result) {
-    throw new ServerError("Failed to create user");
-  }
-
-  return result;
 }
