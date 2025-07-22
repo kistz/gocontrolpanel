@@ -48,8 +48,8 @@ export default function useWebSocket({
 
     return () => {
       if (wsRef.current) {
+        console.log("Cleaning up WebSocket connection");
         wsRef.current.close();
-        wsRef.current = null;
       }
     };
   }, [
