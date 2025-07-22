@@ -259,6 +259,24 @@ export default function NavGroups() {
     );
   }
 
+  if (groupsSidebarGroup.length === 0) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+        <SidebarGroupContent className="flex flex-col gap-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span>No groups found</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
   return groupsSidebarGroup.map((group) => (
     <SidebarGroup
       className="group-data-[collapsible=icon]:hidden select-none"

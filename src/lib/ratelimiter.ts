@@ -66,11 +66,7 @@ export function redisRateLimit(options: RateLimitOptions) {
 export function withRateLimit<T>(
   limiterKey: string,
   fn: () => Promise<T>,
-  options?: {
-    ratePerMinute?: number;
-    burst?: number;
-    tokenCost?: number;
-  },
+  options?: Omit<RateLimitOptions, "key">,
 ): Promise<T> {
   return redisRateLimit({
     key: limiterKey,

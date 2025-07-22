@@ -83,6 +83,7 @@ export async function getUserById(
   const db = getClient();
   const user = await db.users.findUniqueOrThrow({
     where: {
+      authenticated: true,
       id: userId,
     },
     include: includeGroupsWithServers,
@@ -97,6 +98,7 @@ export async function getUserByLogin(
   const db = getClient();
   const user = await db.users.findUniqueOrThrow({
     where: {
+      authenticated: true,
       login,
     },
     include: includeGroupsWithServers,
