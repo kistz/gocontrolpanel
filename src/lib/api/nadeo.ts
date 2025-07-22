@@ -1,8 +1,15 @@
 import config from "@/lib/config";
-import { AccountNames, MapInfo, NadeoTokens, TrackmaniaCredentials, WebIdentity } from "@/types/api/nadeo";
+import {
+  AccountNames,
+  MapInfo,
+  NadeoTokens,
+  TrackmaniaCredentials,
+  WebIdentity,
+} from "@/types/api/nadeo";
 import { ServerError, ServerResponse } from "@/types/responses";
 import "server-only";
 import { doServerAction } from "../actions";
+import { withRateLimit } from "../ratelimiter";
 import { getRedisClient } from "../redis";
 
 const TOKEN_KEY = "nadeo:tokens";
@@ -53,7 +60,9 @@ export async function authenticateCredentials(): Promise<string> {
   const clientSecret = config.NADEO.CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new ServerError("Nadeo client ID and secret are required for authentication.");
+    throw new ServerError(
+      "Nadeo client ID and secret are required for authentication.",
+    );
   }
 
   console.log("Authenticating with Trackmania API...");
@@ -80,7 +89,12 @@ export async function authenticateCredentials(): Promise<string> {
   const redis = await getRedisClient();
 
   const credentials: TrackmaniaCredentials = await response.json();
-  await redis.set(CREDENTIALS_TOKEN_KEY, credentials.access_token, "EX", credentials.expires_in);
+  await redis.set(
+    CREDENTIALS_TOKEN_KEY,
+    credentials.access_token,
+    "EX",
+    credentials.expires_in,
+  );
   return credentials.access_token;
 }
 
@@ -122,67 +136,72 @@ export async function searchAccountNames(
     const params = new URLSearchParams();
     accountNames.forEach((name) => params.append("displayName[]", name));
 
-    return await doCredentialsRequest<AccountNames>(`${url}?${params.toString()}`);
+    return await doCredentialsRequest<AccountNames>(
+      `${url}?${params.toString()}`,
+    );
   });
 }
-
 
 export async function doRequest<T>(
   url: string,
   init: RequestInit = {},
 ): Promise<T> {
-  let tokens = await getTokens();
-  if (!tokens) {
-    tokens = await authenticate();
-  }
+  return withRateLimit("nadeo:doRequest", async () => {
+    let tokens = await getTokens();
+    if (!tokens) {
+      tokens = await authenticate();
+    }
 
-  const headers = new Headers(init.headers);
-  headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
-  headers.set("User-Agent", config.NADEO.CONTACT);
-
-  console.log("Requesting Nadeo API:", url);
-  let res = await fetch(url, { ...init, headers });
-
-  if (res.status === 401) {
-    tokens = await authenticate();
-    console.log("Retrying Nadeo API request with new tokens");
+    const headers = new Headers(init.headers);
     headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
-    res = await fetch(url, { ...init, headers });
-  }
+    headers.set("User-Agent", config.NADEO.CONTACT);
 
-  if (!res.ok) {
-    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
-  }
+    console.log("Requesting Nadeo API:", url);
+    let res = await fetch(url, { ...init, headers });
 
-  return res.json();
+    if (res.status === 401) {
+      tokens = await authenticate();
+      console.log("Retrying Nadeo API request with new tokens");
+      headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
+      res = await fetch(url, { ...init, headers });
+    }
+
+    if (!res.ok) {
+      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+  });
 }
 
 export async function doCredentialsRequest<T>(
   url: string,
   init: RequestInit = {},
 ): Promise<T> {
-  let token = await getCredentialsToken();
-  if (!token) {
-    token = await authenticateCredentials();
-  }
+  return withRateLimit("nadeo:doCredentialsRequest", async () => {
+    let token = await getCredentialsToken();
+    if (!token) {
+      token = await authenticateCredentials();
+    }
 
-  const headers = new Headers(init.headers);
-  headers.set("Authorization", `Bearer ${token}`);
-  headers.set("User-Agent", config.NADEO.CONTACT);
-
-  console.log("Requesting Trackmania API:", url);
-  let res = await fetch(url, { ...init, headers });
-
-  if (res.status === 401) {
-    token = await authenticateCredentials();
-    console.log("Retrying Trackmania API request with new token");
+    const headers = new Headers(init.headers);
     headers.set("Authorization", `Bearer ${token}`);
-    res = await fetch(url, { ...init, headers });
-  }
+    headers.set("User-Agent", config.NADEO.CONTACT);
 
-  if (!res.ok) {
-    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
-  }
+    console.log("Requesting Trackmania API:", url);
+    let res = await fetch(url, { ...init, headers });
 
-  return res.json();
+    if (res.status === 401) {
+      token = await authenticateCredentials();
+      console.log("Retrying Trackmania API request with new token");
+      headers.set("Authorization", `Bearer ${token}`);
+      res = await fetch(url, { ...init, headers });
+    }
+
+    if (!res.ok) {
+      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+  });
 }
