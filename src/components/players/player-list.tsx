@@ -3,8 +3,7 @@
 import { createColumns } from "@/app/(gocontroller)/server/[id]/players/players-columns";
 import useWebSocket from "@/hooks/use-websocket";
 import { PlayerInfo } from "@/types/player";
-import { useSession } from "next-auth/react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { DataTable } from "../table/data-table";
 
 interface PlayerListProps {
@@ -12,10 +11,7 @@ interface PlayerListProps {
 }
 
 export default function PlayerList({ serverId }: PlayerListProps) {
-  const { status } = useSession();
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
-
-  const wsRef = useRef<WebSocket | null>(null);
 
   const handleMessage = useCallback((type: string, data: any) => {
     switch (type) {

@@ -64,12 +64,15 @@ export async function SOCKET(
       }),
     );
 
-  manager.on("endMap", onEndMap);
-  manager.on("startMap", onStartMap);
+  const listenerId = crypto.randomUUID();
+
+  manager.addListeners(listenerId, {
+    endMap: onEndMap,
+    startMap: onStartMap,
+  });
 
   const cleanup = () => {
-    manager.off("endMap", onEndMap);
-    manager.off("startMap", onStartMap);
+    manager.removeListeners(listenerId);
   };
 
   return () => {

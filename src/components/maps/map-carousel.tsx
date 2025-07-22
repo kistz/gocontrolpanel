@@ -37,7 +37,7 @@ export default function MapCarousel({
   startIndex = 0,
   className,
 }: MapCarouselProps) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [api, setApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState<number>(startIndex);
   const [follow, setFollow] = useState<boolean>(true);

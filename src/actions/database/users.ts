@@ -93,6 +93,7 @@ export async function updateUser(
     | "nickName"
     | "path"
     | "ubiUid"
+    | "authenticated"
     | "createdAt"
     | "updatedAt"
     | "deletedAt"

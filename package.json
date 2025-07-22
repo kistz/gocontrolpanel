@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx src/server.ts",
     "build": "next build",
-    "start": "NODE_ENV=production tsx src/server.ts",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint",
     "pretty": "prettier --write \"**/*.{ts,tsx,json,css}\"",
     "generate": "prisma generate --schema ./src/lib/prisma/$DB/schema.prisma",

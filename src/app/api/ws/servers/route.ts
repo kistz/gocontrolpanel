@@ -62,28 +62,13 @@ export async function SOCKET(
     });
   }
 
-  setTimeout(() => {
-    console.log(client)
-    if (
-      client.readyState === client.CLOSED ||
-      client.readyState === client.CLOSING
-    ) {
-      console.log("WebSocket inactive after 5s — cleaning up...");
-      cleanup();
-      client.close();
-    }
-  }, 5000);
-
   const cleanup = () => {
     for (const { manager } of serverManagers) {
       manager.removeListeners(listenerId);
-      console.log(manager.listeners("connect"));
-      console.log(manager.listeners("disconnect"));
     }
   };
 
   return () => {
-    console.log("WebSocket connection closed, cleaning up...");
     cleanup();
     client.close();
   };
