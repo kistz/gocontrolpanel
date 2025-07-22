@@ -22,6 +22,7 @@ import {
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
@@ -98,16 +99,19 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   return (
     <div className="flex flex-col gap-4">
       {(filter || actions) && (
-        <div className="flex justify-between items-center gap-2 max-w-full">
-          {filter ? (
+        <div
+          className={clsx(
+            "flex justify-between items-center gap-2 max-w-full",
+            !filter && "justify-end",
+          )}
+        >
+          {filter && (
             <Input
               placeholder="Search..."
               value={globalFilter || ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
               className="flex-1 sm:max-w-1/3"
             />
-          ) : (
-            <div />
           )}
 
           {actions}

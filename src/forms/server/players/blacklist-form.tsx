@@ -1,16 +1,30 @@
 "use client";
 
-import { loadBlacklist, saveBlacklist } from "@/actions/gbx/player";
+import {
+  cleanBlacklist,
+  loadBlacklist,
+  saveBlacklist,
+} from "@/actions/gbx/player";
 import FormElement from "@/components/form/form-element";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { blacklistSchema, BlacklistSchemaType } from "./blacklist-schema";
 
-export default function BlacklistForm({ serverId }: { serverId: string }) {
+export default function BlacklistForm({
+  serverId,
+  refetch,
+}: {
+  serverId: string;
+  refetch: () => void;
+}) {
+  const [confirmClearBlacklist, setConfirmClearBlacklist] = useState(false);
+
   const form = useForm<BlacklistSchemaType>({
     resolver: zodResolver(blacklistSchema),
     defaultValues: {
@@ -52,16 +66,33 @@ export default function BlacklistForm({ serverId }: { serverId: string }) {
     }
   }
 
+  const handleClearBlacklist = async () => {
+    try {
+      const { error } = await cleanBlacklist(serverId);
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast.success("Blacklist cleared");
+      refetch();
+    } catch (error) {
+      toast.error("Error clearing blacklist", {
+        description: getErrorMessage(error),
+      });
+    }
+  };
+
   return (
     <Form {...form}>
-      <form className="flex flex-col gap-2">
+      <form className="flex flex-col sm:flex-row gap-2 w-full justify-between">
         <FormElement
           name="filename"
           placeholder="blacklist.txt"
-          className="min-w-64"
           isRequired
-        >
-          <div className="gap-2 hidden max-[500px]:hidden max-[800px]:flex min-[890px]:flex">
+        />
+
+        <div className="flex gap-2 justify-between w-full">
+          <div className="flex gap-2">
             <Button className="w-20" type="button" onClick={onLoad}>
               Load
             </Button>
@@ -69,17 +100,24 @@ export default function BlacklistForm({ serverId }: { serverId: string }) {
               Save
             </Button>
           </div>
-        </FormElement>
-
-        <div className="flex gap-2 max-[500px]:flex max-[800px]:hidden min-[890px]:hidden">
-          <Button className="w-20" type="button" onClick={onLoad}>
-            Load
-          </Button>
-          <Button className="w-20" type="button" onClick={onSave}>
-            Save
+          <Button
+            variant="destructive"
+            onClick={() => setConfirmClearBlacklist(true)}
+          >
+            Clear Blacklist
           </Button>
         </div>
       </form>
+
+      <ConfirmModal
+        title="Clear Blacklist"
+        description="Are you sure you want to clear the blacklist?"
+        isOpen={confirmClearBlacklist}
+        onClose={() => setConfirmClearBlacklist(false)}
+        onConfirm={handleClearBlacklist}
+        confirmText="Clear"
+        cancelText="Cancel"
+      />
     </Form>
   );
 }
