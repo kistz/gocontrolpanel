@@ -35,8 +35,9 @@ export default async function AdminHetznerPage() {
           canCreate && (
             <Modal>
               <AddProjectModal />
-              <Button>
-                <IconPlus /> Add Project
+              <Button className="w-9 sm:w-auto">
+                <IconPlus />
+                <span className="hidden sm:inline">Add Project</span>
               </Button>
             </Modal>
           )

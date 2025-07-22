@@ -203,42 +203,30 @@ export async function SOCKET(
     );
   };
 
-  manager.on("finish", onFinish);
-  manager.on("personalBest", onPersonalBest);
-  manager.on("checkpoint", onCheckpoint);
-  manager.on("beginRound", onBeginRound);
-  manager.on("endRound", onEndRound);
-  manager.on("beginMap", onBeginMap);
-  manager.on("endMap", onEndMap);
-  manager.on("beginMatch", onBeginMatch);
-  manager.on("giveUp", onGiveUp);
-  manager.on("warmUpStart", onWarmUpStart);
-  manager.on("warmUpEnd", onWarmUpEnd);
-  manager.on("warmUpStartRound", onWarmUpStartRound);
-  manager.on("playerInfoChanged", onPlayerInfoChanged);
-  manager.on("playerConnectInfo", onPlayerConnect);
-  manager.on("playerDisconnectInfo", onPlayerDisconnect);
-  manager.on("updatedSettings", onUpdatedSettings);
-  manager.on("elimination", onElimination);
+  const listenerId = crypto.randomUUID();
+
+  manager.addListeners(listenerId, {
+    finish: onFinish,
+    personalBest: onPersonalBest,
+    checkpoint: onCheckpoint,
+    beginRound: onBeginRound,
+    endRound: onEndRound,
+    beginMap: onBeginMap,
+    endMap: onEndMap,
+    beginMatch: onBeginMatch,
+    giveUp: onGiveUp,
+    warmUpStart: onWarmUpStart,
+    warmUpEnd: onWarmUpEnd,
+    warmUpStartRound: onWarmUpStartRound,
+    playerInfoChanged: onPlayerInfoChanged,
+    playerConnectInfo: onPlayerConnect,
+    playerDisconnectInfo: onPlayerDisconnect,
+    updatedSettings: onUpdatedSettings,
+    elimination: onElimination,
+  });
 
   const cleanup = () => {
-    manager.removeListener("finish", onFinish);
-    manager.removeListener("personalBest", onPersonalBest);
-    manager.removeListener("checkpoint", onCheckpoint);
-    manager.removeListener("beginRound", onBeginRound);
-    manager.removeListener("endRound", onEndRound);
-    manager.removeListener("beginMap", onBeginMap);
-    manager.removeListener("endMap", onEndMap);
-    manager.removeListener("beginMatch", onBeginMatch);
-    manager.removeListener("giveUp", onGiveUp);
-    manager.removeListener("warmUpStart", onWarmUpStart);
-    manager.removeListener("warmUpEnd", onWarmUpEnd);
-    manager.removeListener("warmUpStartRound", onWarmUpStartRound);
-    manager.removeListener("playerInfoChanged", onPlayerInfoChanged);
-    manager.removeListener("playerConnectInfo", onPlayerConnect);
-    manager.removeListener("playerDisconnectInfo", onPlayerDisconnect);
-    manager.removeListener("updatedSettings", onUpdatedSettings);
-    manager.removeListener("elimination", onElimination);
+    manager.removeListeners(listenerId);
   };
 
   return () => {

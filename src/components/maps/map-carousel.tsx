@@ -1,5 +1,6 @@
 "use client";
 
+import useWebSocket from "@/hooks/use-websocket";
 import { Maps } from "@/lib/prisma/generated";
 import { cn, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
@@ -9,7 +10,7 @@ import {
   IconLockOpen,
 } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Carousel,
@@ -36,7 +37,7 @@ export default function MapCarousel({
   startIndex = 0,
   className,
 }: MapCarouselProps) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [api, setApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState<number>(startIndex);
   const [follow, setFollow] = useState<boolean>(true);
@@ -48,7 +49,6 @@ export default function MapCarousel({
     serverId,
   );
 
-  const wsRef = useRef<WebSocket | null>(null);
   const followRef = useRef(follow);
   const apiRef = useRef(api);
 
@@ -61,56 +61,37 @@ export default function MapCarousel({
     apiRef.current = api;
   }, [api]);
 
-  useEffect(() => {
-    if (status !== "authenticated") return;
-
-    const ws = new WebSocket(`/api/ws/map/${serverId}`);
-    wsRef.current = ws;
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      switch (data.type) {
-        case "activeMap":
-          const activeMap = data.data;
-          const index = maps.findIndex((m) => m.uid === activeMap);
-          if (index !== -1) {
-            setCurrentIndex(index);
-            if (followRef.current && apiRef.current) {
-              apiRef.current.scrollTo(index);
-            }
+  const handleMessage = useCallback((type: string, data: any) => {
+    switch (type) {
+      case "activeMap":
+        const index = maps.findIndex((m) => m.uid === data);
+        if (index !== -1) {
+          setCurrentIndex(index);
+          if (followRef.current && apiRef.current) {
+            apiRef.current.scrollTo(index);
           }
-          break;
-        case "endMap":
-          setIsSwitching(true);
-          break;
-        case "startMap":
-          const { mapUid } = data.data;
-          const newIndex = maps.findIndex((m) => m.uid === mapUid);
-          if (newIndex !== -1) {
-            setCurrentIndex(newIndex);
-            if (followRef.current && apiRef.current) {
-              apiRef.current.scrollTo(newIndex);
-            }
+        }
+        break;
+      case "endMap":
+        setIsSwitching(true);
+        break;
+      case "startMap":
+        const newIndex = maps.findIndex((m) => m.uid === data.mapUid);
+        if (newIndex !== -1) {
+          setCurrentIndex(newIndex);
+          if (followRef.current && apiRef.current) {
+            apiRef.current.scrollTo(newIndex);
           }
-          setIsSwitching(false);
-          break;
-      }
-    };
+        }
+        setIsSwitching(false);
+        break;
+    }
+  }, []);
 
-    ws.onclose = () => {
-      wsRef.current = null;
-    };
-
-    ws.onerror = () => {
-      ws.close();
-    };
-
-    return () => {
-      ws.close();
-      wsRef.current = null;
-    };
-  }, [serverId, maps, status]);
+  useWebSocket({
+    url: `/api/ws/map/${serverId}`,
+    onMessage: handleMessage,
+  });
 
   return (
     <div className="flex flex-col gap-2">

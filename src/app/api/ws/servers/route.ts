@@ -49,30 +49,22 @@ export async function SOCKET(
     }),
   );
 
-  const onConnect = (serverId: string) =>
-    client.send(
-      JSON.stringify({
-        type: "connect",
-        data: { serverId },
-      }),
-    );
-  const onDisconnect = (serverId: string) =>
-    client.send(
-      JSON.stringify({
-        type: "disconnect",
-        data: { serverId },
-      }),
-    );
+  const listenerId = crypto.randomUUID();
 
-  for (const serverManager of serverManagers) {
-    serverManager.manager.on("connect", onConnect);
-    serverManager.manager.on("disconnect", onDisconnect);
+  for (const { manager } of serverManagers) {
+    manager.addListeners(listenerId, {
+      connect: (serverId) => {
+        client.send(JSON.stringify({ type: "connect", data: { serverId } }));
+      },
+      disconnect: (serverId) => {
+        client.send(JSON.stringify({ type: "disconnect", data: { serverId } }));
+      },
+    });
   }
 
   const cleanup = () => {
     for (const { manager } of serverManagers) {
-      manager.off("connect", onConnect);
-      manager.off("disconnect", onDisconnect);
+      manager.removeListeners(listenerId);
     }
   };
 

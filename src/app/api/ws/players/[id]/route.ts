@@ -82,16 +82,17 @@ export async function SOCKET(
       }),
     );
 
-  manager.on("playerConnect", onPlayerConnect);
-  manager.on("playerDisconnect", onPlayerDisconnect);
-  manager.on("playerInfo", onPlayerInfo);
-  manager.on("playerList", onPlayerList);
+  const listenerId = crypto.randomUUID();
+
+  manager.addListeners(listenerId, {
+    playerConnect: onPlayerConnect,
+    playerDisconnect: onPlayerDisconnect,
+    playerInfo: onPlayerInfo,
+    playerList: onPlayerList,
+  });
 
   const cleanup = () => {
-    manager.off("playerConnect", onPlayerConnect);
-    manager.off("playerDisconnect", onPlayerDisconnect);
-    manager.off("playerInfo", onPlayerInfo);
-    manager.off("playerList", onPlayerList);
+    manager.removeListeners(listenerId);
   };
 
   return () => {

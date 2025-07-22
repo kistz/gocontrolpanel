@@ -38,8 +38,9 @@ export default async function AdminGroupsPage() {
           canCreate && (
             <Modal>
               <AddGroupModal />
-              <Button>
-                <IconPlus /> Add Group
+              <Button className="w-9 sm:w-auto">
+                <IconPlus />
+                <span className="hidden sm:inline">Add Group</span>
               </Button>
             </Modal>
           )

@@ -33,6 +33,8 @@ export class GbxClientManager extends EventEmitter {
   info: ServerClientInfo;
   private isConnected = false;
   private reconnectTimeout: NodeJS.Timeout | null = null;
+  private listenerMap: Map<string, Record<string, (...args: any[]) => void>> =
+    new Map();
 
   constructor(serverId: string) {
     super();
@@ -69,6 +71,27 @@ export class GbxClientManager extends EventEmitter {
 
     appGlobals.gbxClients = appGlobals.gbxClients || {};
     appGlobals.gbxClients[serverId] = this;
+  }
+
+  addListeners(
+    listenerId: string,
+    listeners: Record<string, (...args: any[]) => void>,
+  ) {
+    for (const [event, handler] of Object.entries(listeners)) {
+      this.on(event, handler);
+    }
+    this.listenerMap.set(listenerId, listeners);
+  }
+
+  removeListeners(listenerId: string) {
+    const listeners = this.listenerMap.get(listenerId);
+    if (!listeners) return;
+
+    for (const [event, handler] of Object.entries(listeners)) {
+      this.off(event, handler);
+    }
+
+    this.listenerMap.delete(listenerId);
   }
 
   private scheduleReconnect() {
@@ -230,104 +253,115 @@ export async function getGbxClientManager(
   return appGlobals.gbxClients[serverId];
 }
 
+async function callbackListener(
+  manager: GbxClientManager,
+  serverId: string,
+  method: string,
+  data: any,
+) {
+  switch (method) {
+    case "ManiaPlanet.PlayerConnect":
+      await onPlayerConnect(manager, data[0]);
+      break;
+    case "ManiaPlanet.PlayerDisconnect":
+      await onPlayerDisconnect(manager, data[0]);
+      break;
+    case "ManiaPlanet.PlayerInfoChanged":
+      onPlayerInfoChanged(manager, data[0]);
+      break;
+    case "ManiaPlanet.BeginMap":
+      onBeginMap(manager, data[0]);
+      break;
+    case "ManiaPlanet.EndMap":
+      onEndMap(manager, data[0]);
+      break;
+    case "ManiaPlanet.BeginMatch":
+      await onBeginMatch(manager);
+      break;
+    case "ManiaPlanet.Echo":
+      await onEcho(manager, {
+        Internal: data[0],
+        Public: data[1],
+      });
+      break;
+    case "ManiaPlanet.PlayerChat":
+      const chat: PlayerChat = {
+        PlayerUid: data[0],
+        Login: data[1],
+        Text: data[2],
+        IsRegistredCmd: data[3],
+        Options: data[4],
+      };
+      await onPlayerChat(manager, chat);
+      break;
+
+    case "ManiaPlanet.ModeScriptCallbackArray":
+      if (!data || data.length === 0) return;
+
+      const methodName = data[0];
+      const params = JSON.parse(data[1]) ?? data[1];
+
+      switch (methodName) {
+        case "Maniaplanet.Podium_Start":
+          onPodiumStartScript(manager, serverId);
+          break;
+        case "Trackmania.Event.WayPoint":
+          if (params.isendrace) {
+            onPlayerFinishScript(manager, serverId, params);
+          } else {
+            onPlayerCheckpointScript(manager, params);
+          }
+          break;
+        case "Maniaplanet.EndMap_Start":
+          onEndMapStartScript(manager, params);
+          break;
+        case "Maniaplanet.StartMap_Start":
+          onStartMapStartScript(manager, params);
+          break;
+        case "Maniaplanet.StartRound_Start":
+          await onStartRoundStartScript(manager);
+          break;
+        case "Trackmania.Scores":
+          await onScoresScript(manager, params);
+          if (params.section === "EndRound") {
+            await onEndRoundScript(manager, params);
+          }
+          break;
+        case "Trackmania.WarmUp.Status":
+          onWarmUpStatusScript(manager, params);
+          break;
+        case "Maniaplanet.Pause.Status":
+          onPauseStatusScript(manager, params);
+          break;
+        case "Trackmania.Event.GiveUp":
+          onPlayerGiveUpScript(manager, params);
+          break;
+        case "Trackmania.WarmUp.Start":
+          onWarmUpStartScript(manager);
+          break;
+        case "Trackmania.WarmUp.End":
+          onWarmUpEndScript(manager);
+          break;
+        case "Trackmania.WarmUp.StartRound":
+          await onWarmUpStartRoundScript(manager, params);
+          break;
+        case "Trackmania.Knockout.Elimination":
+          await onElimination(manager, params);
+          break;
+      }
+  }
+}
+
 async function setupListeners(
   manager: GbxClientManager,
   serverId: string,
 ): Promise<void> {
-  manager.client.removeAllListeners("callback");
-  manager.client.on("callback", async (method: string, data: any) => {
-    switch (method) {
-      case "ManiaPlanet.PlayerConnect":
-        await onPlayerConnect(manager, data[0]);
-        break;
-      case "ManiaPlanet.PlayerDisconnect":
-        await onPlayerDisconnect(manager, data[0]);
-        break;
-      case "ManiaPlanet.PlayerInfoChanged":
-        onPlayerInfoChanged(manager, data[0]);
-        break;
-      case "ManiaPlanet.BeginMap":
-        onBeginMap(manager, data[0]);
-        break;
-      case "ManiaPlanet.EndMap":
-        onEndMap(manager, data[0]);
-        break;
-      case "ManiaPlanet.BeginMatch":
-        await onBeginMatch(manager);
-        break;
-      case "ManiaPlanet.Echo":
-        await onEcho(manager, {
-          Internal: data[0],
-          Public: data[1],
-        });
-        break;
-      case "ManiaPlanet.PlayerChat":
-        const chat: PlayerChat = {
-          PlayerUid: data[0],
-          Login: data[1],
-          Text: data[2],
-          IsRegistredCmd: data[3],
-          Options: data[4],
-        };
-        await onPlayerChat(manager, chat);
-        break;
-
-      case "ManiaPlanet.ModeScriptCallbackArray":
-        if (!data || data.length === 0) return;
-
-        const methodName = data[0];
-        const params = JSON.parse(data[1]) ?? data[1];
-
-        switch (methodName) {
-          case "Maniaplanet.Podium_Start":
-            onPodiumStartScript(manager, serverId);
-            break;
-          case "Trackmania.Event.WayPoint":
-            if (params.isendrace) {
-              onPlayerFinishScript(manager, serverId, params);
-            } else {
-              onPlayerCheckpointScript(manager, params);
-            }
-            break;
-          case "Maniaplanet.EndMap_Start":
-            onEndMapStartScript(manager, params);
-            break;
-          case "Maniaplanet.StartMap_Start":
-            onStartMapStartScript(manager, params);
-            break;
-          case "Maniaplanet.StartRound_Start":
-            await onStartRoundStartScript(manager);
-            break;
-          case "Trackmania.Scores":
-            await onScoresScript(manager, params);
-            if (params.section === "EndRound") {
-              await onEndRoundScript(manager, params);
-            }
-            break;
-          case "Trackmania.WarmUp.Status":
-            onWarmUpStatusScript(manager, params);
-            break;
-          case "Maniaplanet.Pause.Status":
-            onPauseStatusScript(manager, params);
-            break;
-          case "Trackmania.Event.GiveUp":
-            onPlayerGiveUpScript(manager, params);
-            break;
-          case "Trackmania.WarmUp.Start":
-            onWarmUpStartScript(manager);
-            break;
-          case "Trackmania.WarmUp.End":
-            onWarmUpEndScript(manager);
-            break;
-          case "Trackmania.WarmUp.StartRound":
-            await onWarmUpStartRoundScript(manager, params);
-            break;
-          case "Trackmania.Knockout.Elimination":
-            await onElimination(manager, params);
-            break;
-        }
-    }
-  });
+  manager.client.removeListener("callback", (method: string, data: any) =>
+    callbackListener(manager, serverId, method, data),
+  );
+  manager.client.on("callback", (method: string, data: any) =>
+    callbackListener(manager, serverId, method, data),
+  );
 }
 
 async function onPlayerConnect(manager: GbxClientManager, login: string) {

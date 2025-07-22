@@ -171,7 +171,7 @@ export default function EditProjectForm({
               </div>
               <FormElement
                 name={`hetznerProjectUsers.${index}.role`}
-                className="w-30"
+                className="w-24 sm:w-30"
                 placeholder="Select role"
                 options={Object.values(HetznerProjectRole).map((role) => ({
                   label: role,

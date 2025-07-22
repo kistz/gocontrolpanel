@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx src/server.ts",
     "build": "next build",
-    "start": "NODE_ENV=production tsx src/server.ts",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint",
     "pretty": "prettier --write \"**/*.{ts,tsx,json,css}\"",
     "generate": "prisma generate --schema ./src/lib/prisma/$DB/schema.prisma",
@@ -14,6 +14,9 @@
     "deploy": "bun run generate && prisma migrate deploy --schema ./src/lib/prisma/$DB/schema.prisma",
     "reset": "prisma migrate reset --schema ./src/lib/prisma/$DB/schema.prisma",
     "prepare": "next-ws patch"
+  },
+  "overrides": {
+    "@radix-ui/react-focus-scope": "1.1.7"
   },
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.2",

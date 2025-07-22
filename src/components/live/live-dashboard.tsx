@@ -1,11 +1,12 @@
 "use client";
 import { getPlayerList } from "@/actions/gbx/player";
+import useWebSocket from "@/hooks/use-websocket";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { LiveInfo } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 import KnockoutScores from "./knockout-scores";
@@ -18,7 +19,7 @@ import TeamScores from "./team-scores";
 import TimeAttackScores from "./time-attack-scores";
 
 export default function LiveDashboard({ serverId }: { serverId: string }) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const [playerList, setPlayerList] = useState<PlayerInfo[]>([]);
   const [liveInfo, setLiveInfo] = useState<LiveInfo | null>(null);
@@ -27,177 +28,141 @@ export default function LiveDashboard({ serverId }: { serverId: string }) {
     mode: string;
   } | null>(null);
 
-  const wsRef = useRef<WebSocket | null>(null);
-
   const canActions = hasPermissionSync(
     session,
     routePermissions.servers.live.actions,
     serverId,
   );
 
-  useEffect(() => {
-    if (status !== "authenticated") return;
-
-    const ws = new WebSocket(`/api/ws/live/${serverId}`);
-    wsRef.current = ws;
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      switch (data.type) {
-        case "beginMatch": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          setMapInfo({
-            map: info.currentMap,
-            mode: info.mode,
-          });
-          break;
-        }
-        case "finish": {
-          const { round } = data.data;
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: round,
-            };
-          });
-          break;
-        }
-        case "personalBest": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
-        case "checkpoint": {
-          const { round } = data.data;
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: round,
-            };
-          });
-          break;
-        }
-        case "beginRound": {
-          const { round } = data.data;
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: round,
-            };
-          });
-          break;
-        }
-        case "endRound": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
-        case "beginMap": {
-          const { mapUid } = data.data;
-          setMapInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              map: mapUid,
-            };
-          });
-          break;
-        }
-        case "endMap": {
-          const { mapUid } = data.data;
-          setMapInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              map: mapUid,
-            };
-          });
-          break;
-        }
-        case "giveUp": {
-          const { round } = data.data;
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: round,
-            };
-          });
-          break;
-        }
-        case "warmUpStart": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
-        case "warmUpEnd": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
-        case "warmUpStartRound": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
-        case "playerInfoChanged": {
-          const { round } = data.data;
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: round,
-            };
-          });
-          break;
-        }
-        case "playerConnect": {
-          const { live } = data.data;
-          setLiveInfo(live);
-          break;
-        }
-        case "playerDisconnect": {
-          const { round } = data.data;
-          setLiveInfo((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              activeRound: round,
-            };
-          });
-          break;
-        }
-        case "updatedSettings": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
-        case "elimination": {
-          const { info } = data.data;
-          setLiveInfo(info);
-          break;
-        }
+  const handleMessage = useCallback((type: string, data: any) => {
+    switch (type) {
+      case "beginMatch": {
+        setLiveInfo(data.info);
+        setMapInfo({
+          map: data.info.currentMap,
+          mode: data.info.mode,
+        });
+        break;
       }
-    };
+      case "finish": {
+        setLiveInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            activeRound: data.round,
+          };
+        });
+        break;
+      }
+      case "personalBest": {
+        setLiveInfo(data.info);
+        break;
+      }
+      case "checkpoint": {
+        setLiveInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            activeRound: data.round,
+          };
+        });
+        break;
+      }
+      case "beginRound": {
+        setLiveInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            activeRound: data.round,
+          };
+        });
+        break;
+      }
+      case "endRound": {
+        setLiveInfo(data.info);
+        break;
+      }
+      case "beginMap": {
+        setMapInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            map: data.mapUid,
+          };
+        });
+        break;
+      }
+      case "endMap": {
+        setMapInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            map: data.mapUid,
+          };
+        });
+        break;
+      }
+      case "giveUp": {
+        setLiveInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            activeRound: data.round,
+          };
+        });
+        break;
+      }
+      case "warmUpStart": {
+        setLiveInfo(data.info);
+        break;
+      }
+      case "warmUpEnd": {
+        setLiveInfo(data.info);
+        break;
+      }
+      case "warmUpStartRound": {
+        setLiveInfo(data.info);
+        break;
+      }
+      case "playerInfoChanged": {
+        setLiveInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            activeRound: data.round,
+          };
+        });
+        break;
+      }
+      case "playerConnect": {
+        setLiveInfo(data.live);
+        break;
+      }
+      case "playerDisconnect": {
+        setLiveInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            activeRound: data.round,
+          };
+        });
+        break;
+      }
+      case "updatedSettings": {
+        setLiveInfo(data.info);
+        break;
+      }
+      case "elimination": {
+        setLiveInfo(data.info);
+        break;
+      }
+    }
+  }, []);
 
-    ws.onclose = () => {
-      wsRef.current = null;
-    };
-
-    ws.onerror = () => {
-      ws.close();
-    };
-
-    return () => {
-      ws.close();
-      wsRef.current = null;
-    };
-  }, [serverId, status]);
+  useWebSocket({
+    url: `/api/ws/live/${serverId}`,
+    onMessage: handleMessage,
+  });
 
   useEffect(() => {
     if (!liveInfo?.players) {

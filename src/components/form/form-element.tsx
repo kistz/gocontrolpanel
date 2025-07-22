@@ -25,6 +25,7 @@ interface FormElementProps<TControl> {
   step?: number;
   min?: number;
   max?: number;
+  onSearch?: (query?: string) => void;
   className?: string;
   children?: React.ReactNode;
 }
@@ -45,6 +46,7 @@ export default function FormElement<TControl>({
   step,
   min,
   max,
+  onSearch,
   className,
   children,
 }: FormElementProps<TControl>) {
@@ -111,6 +113,7 @@ export default function FormElement<TControl>({
                 step={step}
                 min={min}
                 max={max}
+                onSearch={onSearch}
                 error={error}
                 autoFocus={autoFocus}
                 className={className}

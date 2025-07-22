@@ -1,7 +1,7 @@
 import {
-  createUserAuth,
   getUserById,
   getUserByLogin,
+  upsertUserAuth,
   UsersWithGroupsWithServers,
 } from "@/actions/database/auth";
 import { parse } from "cookie";
@@ -85,7 +85,7 @@ export const authOptions: NextAuthOptions = {
         login: token.login,
         displayName: token.displayName,
         admin: token.admin,
-        ubiId: token.ubiId,
+        ubiId: token.ubiId || undefined,
         permissions: token.permissions,
         groups: token.groups,
         projects: token.projects,
@@ -125,13 +125,14 @@ export const authOptions: NextAuthOptions = {
             console.error("Failed to fetch web identities", error);
           }
 
-          dbUser = await createUserAuth({
+          dbUser = await upsertUserAuth({
             login: token.login,
             nickName: token.displayName,
             admin: config.DEFAULT_ADMINS.includes(token.login),
             path: "",
             ubiUid,
             permissions: config.DEFAULT_PERMISSIONS,
+            authenticated: true,
           });
         }
       }
@@ -142,7 +143,7 @@ export const authOptions: NextAuthOptions = {
 
       token.id = dbUser.id;
       token.admin = dbUser.admin;
-      token.ubiId = dbUser.ubiUid;
+      token.ubiId = dbUser.ubiUid || undefined;
       token.permissions = getList(dbUser.permissions);
       token.groups = dbUser.groupMembers.map((g) => ({
         id: g.group.id,

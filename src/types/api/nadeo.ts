@@ -3,6 +3,12 @@ export interface NadeoTokens {
   refreshToken: string;
 }
 
+export interface TrackmaniaCredentials {
+  token_type: string;
+  expires_in: number;
+  access_token: string;
+}
+
 export interface MapInfo {
   author: string;
   authorScore: number;
@@ -30,4 +36,8 @@ export interface WebIdentity {
   provider: string;
   uid: string;
   timestamp: Date;
+}
+
+export interface AccountNames {
+  [key: string]: string;
 }

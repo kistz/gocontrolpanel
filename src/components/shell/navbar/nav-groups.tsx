@@ -15,6 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import useWebSocket from "@/hooks/use-websocket";
 import { generatePath, hasPermissionSync, useCurrentid } from "@/lib/utils";
 import { routePermissions, routes } from "@/routes";
 import { ServerInfo } from "@/types/server";
@@ -32,7 +33,7 @@ import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 interface ServerNavGroup {
@@ -54,12 +55,44 @@ interface ServerNavGroup {
 
 export default function NavGroups() {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const [servers, setServers] = useState<ServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [serverId, setServerId] = useState<string | null>(null);
-  const wsRef = useRef<WebSocket | null>(null);
+
+  const handleMessage = useCallback((type: string, data: any) => {
+    switch (type) {
+      case "servers":
+        setServers(data);
+        setLoading(false);
+        break;
+      case "connect":
+        setServers((prev) =>
+          prev.map((server) =>
+            server.id === data.serverId
+              ? { ...server, isConnected: true }
+              : server,
+          ),
+        );
+        break;
+      case "disconnect":
+        setServers((prev) =>
+          prev.map((server) =>
+            server.id === data.serverId
+              ? { ...server, isConnected: false }
+              : server,
+          ),
+        );
+        break;
+    }
+  }, []);
+
+  useWebSocket({
+    url: "/api/ws/servers",
+    onMessage: handleMessage,
+    onError: () => setLoading(false),
+  });
 
   useEffect(() => {
     const uuid = useCurrentid(pathname);
@@ -75,170 +108,113 @@ export default function NavGroups() {
     }
   }, [servers]);
 
-  useEffect(() => {
-    if (!status) {
-      return;
-    }
+  const groupsSidebarGroup: ServerNavGroup[] = useMemo(
+    () =>
+      session?.user.groups.map((group) => ({
+        name: group.name,
+        servers: servers
+          .filter((server) => group.servers.some((s) => s.id === server.id))
+          .map((server) => {
+            const serverGroup = {
+              id: server.id,
+              name: server.name,
+              isConnected: server.isConnected,
+              icon: IconServer,
+              isActive: serverId === server.id,
+              items: [
+                {
+                  name: "Settings",
+                  url: generatePath(routes.servers.settings, {
+                    id: server.id,
+                  }),
+                  icon: IconAdjustmentsAlt,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.settings,
+                    server.id,
+                  ),
+                },
+                {
+                  name: "Game",
+                  url: generatePath(routes.servers.game, {
+                    id: server.id,
+                  }),
+                  icon: IconDeviceGamepad,
+                },
+                {
+                  name: "Maps",
+                  url: generatePath(routes.servers.maps, {
+                    id: server.id,
+                  }),
+                  icon: IconMap,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.maps,
+                    server.id,
+                  ),
+                },
+                {
+                  name: "Players",
+                  url: generatePath(routes.servers.players, {
+                    id: server.id,
+                  }),
+                  icon: IconUsers,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.players,
+                    server.id,
+                  ),
+                },
+                {
+                  name: "Live",
+                  url: generatePath(routes.servers.live, {
+                    id: server.id,
+                  }),
+                  icon: IconActivity,
+                },
+                {
+                  name: "Interface",
+                  url: generatePath(routes.servers.interface, {
+                    id: server.id,
+                  }),
+                  icon: IconDeviceDesktop,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.interface,
+                    server.id,
+                  ),
+                },
+                // {
+                //   name: "Dev",
+                //   url: generatePath(routes.servers.dev, {
+                //     uuid: server.uuid,
+                //   }),
+                //   icon: IconCode,
+                // }
+              ],
+            };
 
-    try {
-      const ws = new WebSocket("/api/ws/servers");
-      wsRef.current = ws;
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        switch (data.type) {
-          case "servers":
-            const serversInfo: ServerInfo[] = data.data;
-            setServers(serversInfo);
-            setLoading(false);
-            break;
-          case "connect":
-            const { serverId } = data.data;
-            setServers((prev) =>
-              prev.map((server) =>
-                server.id === serverId
-                  ? { ...server, isConnected: true }
-                  : server,
-              ),
-            );
-            break;
-          case "disconnect":
-            const { serverId: disconnectedServerId } = data.data;
-            setServers((prev) =>
-              prev.map((server) =>
-                server.id === disconnectedServerId
-                  ? { ...server, isConnected: false }
-                  : server,
-              ),
-            );
-            break;
-        }
-      };
-
-      ws.onclose = () => {
-        wsRef.current = null;
-      };
-
-      ws.onerror = () => {
-        ws.close();
-      };
-    } catch {
-      setLoading(false);
-    }
-
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
-    };
-  }, [status]);
-
-  const groupsSidebarGroup: ServerNavGroup[] =
-    session?.user.groups.map((group) => ({
-      name: group.name,
-      servers: servers
-        .filter((server) => group.servers.some((s) => s.id === server.id))
-        .map((server) => {
-          const serverGroup = {
-            id: server.id,
-            name: server.name,
-            isConnected: server.isConnected,
-            icon: IconServer,
-            isActive: serverId === server.id,
-            items: [
-              {
-                name: "Settings",
-                url: generatePath(routes.servers.settings, {
+            if (server.filemanagerUrl) {
+              serverGroup.items.push({
+                name: "Files",
+                url: generatePath(routes.servers.files, {
                   id: server.id,
                 }),
-                icon: IconAdjustmentsAlt,
+                icon: IconFileDescription,
                 auth: hasPermissionSync(
                   session,
-                  routePermissions.servers.settings,
+                  routePermissions.servers.files,
                   server.id,
                 ),
-              },
-              {
-                name: "Game",
-                url: generatePath(routes.servers.game, {
-                  id: server.id,
-                }),
-                icon: IconDeviceGamepad,
-              },
-              {
-                name: "Maps",
-                url: generatePath(routes.servers.maps, {
-                  id: server.id,
-                }),
-                icon: IconMap,
-                auth: hasPermissionSync(
-                  session,
-                  routePermissions.servers.maps,
-                  server.id,
-                ),
-              },
-              {
-                name: "Players",
-                url: generatePath(routes.servers.players, {
-                  id: server.id,
-                }),
-                icon: IconUsers,
-                auth: hasPermissionSync(
-                  session,
-                  routePermissions.servers.players,
-                  server.id,
-                ),
-              },
-              {
-                name: "Live",
-                url: generatePath(routes.servers.live, {
-                  id: server.id,
-                }),
-                icon: IconActivity,
-              },
-              {
-                name: "Interface",
-                url: generatePath(routes.servers.interface, {
-                  id: server.id,
-                }),
-                icon: IconDeviceDesktop,
-                auth: hasPermissionSync(
-                  session,
-                  routePermissions.servers.interface,
-                  server.id,
-                ),
-              },
-              // {
-              //   name: "Dev",
-              //   url: generatePath(routes.servers.dev, {
-              //     uuid: server.uuid,
-              //   }),
-              //   icon: IconCode,
-              // }
-            ],
-          };
+              });
+            }
 
-          if (server.filemanagerUrl) {
-            serverGroup.items.push({
-              name: "Files",
-              url: generatePath(routes.servers.files, {
-                id: server.id,
-              }),
-              icon: IconFileDescription,
-              auth: hasPermissionSync(
-                session,
-                routePermissions.servers.files,
-                server.id,
-              ),
-            });
-          }
-
-          return serverGroup;
-        })
-        .filter((server): server is NonNullable<typeof server> => !!server),
-    })) || [];
+            return serverGroup;
+          })
+          .filter((server): server is NonNullable<typeof server> => !!server),
+      })) || [],
+    [session, servers, serverId],
+  );
 
   if (loading) {
     return (
@@ -250,6 +226,24 @@ export default function NavGroups() {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <IconServer />
                   <span>Loading...</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
+  if (groupsSidebarGroup.length === 0) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+        <SidebarGroupContent className="flex flex-col gap-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span>No groups found</span>
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>

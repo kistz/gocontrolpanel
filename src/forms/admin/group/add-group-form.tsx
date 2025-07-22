@@ -1,7 +1,11 @@
 "use client";
 import { createGroup } from "@/actions/database/groups";
 import { getServersMinimal, ServerMinimal } from "@/actions/database/servers";
-import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
+import {
+  getUsersMinimal,
+  searchUsers,
+  UserMinimal,
+} from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
@@ -11,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddGroupSchema, AddGroupSchemaType } from "./add-group-schema";
 
@@ -19,10 +23,12 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
   const { data: session } = useSession();
 
   const [servers, setServers] = useState<ServerMinimal[]>([]);
-  const [users, setUsers] = useState<UserMinimal[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchResults, setSearchResults] = useState<UserMinimal[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     async function fetch() {
@@ -44,10 +50,10 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
         if (error) {
           throw new Error(error);
         }
-        setUsers(data);
+        setSearchResults(data);
       } catch (error) {
-        setError("Failed to get users: " + getErrorMessage(error));
-        toast.error("Failed to fetch users", {
+        setError("Failed to search users: " + getErrorMessage(error));
+        toast.error("Failed to search users", {
           description: getErrorMessage(error),
         });
       }
@@ -63,6 +69,16 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
     defaultValues: {
       groupMembers: [{ userId: session?.user.id, role: GroupRole.Admin }],
     },
+  });
+
+  const { control } = form;
+  const {
+    fields: memberFields,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "groupMembers",
   });
 
   async function onSubmit(values: AddGroupSchemaType) {
@@ -93,6 +109,30 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
       });
     }
   }
+
+  const handleSearch = async (query?: string) => {
+    if (!query?.trim()) {
+      return;
+    }
+    setSearching(true);
+    try {
+      const { data, error } = await searchUsers(query);
+      if (error) {
+        throw new Error(error);
+      }
+      setSearchResults((prev) => {
+        const existingIds = new Set(prev.map((u) => u.id));
+        return [...prev, ...data.filter((u) => !existingIds.has(u.id))];
+      });
+    } catch (error) {
+      setError("Failed to search users: " + getErrorMessage(error));
+      toast.error("Failed to search users", {
+        description: getErrorMessage(error),
+      });
+    } finally {
+      setSearching(false);
+    }
+  };
 
   if (loading) {
     return <span className="text-muted-foreground">Loading...</span>;
@@ -135,23 +175,25 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
         {/* Users with roles */}
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Members</FormLabel>
-          {form.watch("groupMembers")?.map((_, index) => (
-            <div key={index} className="flex items-end gap-2">
+          {memberFields.map((field, index) => (
+            <div key={field.id} className="flex items-end gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`groupMembers.${index}.userId`}
                   className="w-full"
-                  placeholder="Select user"
-                  options={users.map((u) => ({
+                  placeholder="Search user..."
+                  onSearch={handleSearch}
+                  options={searchResults.map((u) => ({
                     label: u.nickName,
                     value: u.id,
                   }))}
-                  type="select"
+                  isLoading={searching}
+                  type="search"
                 />
               </div>
               <FormElement
                 name={`groupMembers.${index}.role`}
-                className="w-30"
+                className="w-24 sm:w-30"
                 placeholder="Select role"
                 options={Object.values(GroupRole).map((role) => ({
                   label: role,
@@ -163,13 +205,7 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
                 type="button"
                 variant="destructive"
                 size={"icon"}
-                onClick={() => {
-                  const currentUsers = form.getValues("groupMembers");
-                  form.setValue(
-                    "groupMembers",
-                    currentUsers?.filter((_, i) => i !== index),
-                  );
-                }}
+                onClick={() => remove(index)}
               >
                 <IconTrash />
                 <span className="sr-only">Remove Member</span>
@@ -180,13 +216,7 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              const currentUsers = form.getValues("groupMembers") || [];
-              form.setValue("groupMembers", [
-                ...currentUsers,
-                { userId: "", role: GroupRole.Member },
-              ]);
-            }}
+            onClick={() => append({ userId: "", role: GroupRole.Member })}
           >
             <IconPlus />
             Add Member

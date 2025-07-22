@@ -58,15 +58,19 @@ export default function BanlistList({ serverId }: BanlistListProps) {
 
   return (
     <>
-      <div className="flex items-center flex-row-reverse">
-        <Button
-          variant="destructive"
-          onClick={() => setConfirmClearBanlist(true)}
-        >
-          <span className="text-sm">Clear Banlist</span>
-        </Button>
-      </div>
-      <DataTable columns={columns} data={banlist} pagination />
+      <DataTable
+        columns={columns}
+        data={banlist}
+        actions={
+          <Button
+            variant="destructive"
+            onClick={() => setConfirmClearBanlist(true)}
+          >
+            <span className="text-sm">Clear Banlist</span>
+          </Button>
+        }
+        pagination
+      />
 
       <ConfirmModal
         title="Clear Banlist"
