@@ -10,7 +10,7 @@ const webSocketServer = new WebSocketServer({ noServer: true });
 setWebSocketServer(webSocketServer);
 
 const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev, customServer: true, turbo: true, turbopack: true });
+const app = next({ dev, customServer: true, turbo: true });
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
