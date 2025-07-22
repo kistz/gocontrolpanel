@@ -89,19 +89,27 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           </div>
         </PopoverAnchor>
 
-        <PopoverContent align="start" className="w-auto p-0 z-[9999]">
+        <PopoverContent align="start" className="w-auto p-1 z-[9999]">
           {loading ? (
-            <div className="p-2 text-sm">Searching...</div>
-          ) : searchResults.length === 0 ? (
-            <div className="p-2 text-sm">No results found</div>
+            <div className="p-2 text-sm px-2 py-1 ">Searching...</div>
+          ) : searchResults.filter((r) =>
+              r.label
+                .toLowerCase()
+                .includes((isControlled ? value : rawInput).toLowerCase()),
+            ).length === 0 ? (
+            <div className="p-2 text-sm px-2 py-1 ">No results found</div>
           ) : (
             searchResults
-              .filter((r) => r.label.toLowerCase().includes((isControlled ? value : rawInput).toLowerCase()))
+              .filter((r) =>
+                r.label
+                  .toLowerCase()
+                  .includes((isControlled ? value : rawInput).toLowerCase()),
+              )
               .map((result) => (
                 <div
                   key={result.value}
                   onClick={() => handleSelect(result)}
-                  className="cursor-pointer px-3 py-2 text-sm hover:bg-accent"
+                  className="cursor-pointer px-2 py-1 text-sm hover:bg-accent"
                 >
                   {result.label}
                 </div>
