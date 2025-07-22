@@ -19,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { usePaginationAPI } from "@/hooks/use-pagination-api";
 import { useSorting } from "@/hooks/use-sorting";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
@@ -56,9 +55,6 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   fetchArgs = {} as TFetch,
   actions,
 }: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
-  const { ref: tableBodyRef, hasScrollbar } =
-    useHasScrollbar<HTMLTableSectionElement>();
-
   const [pagination, setPagination] = useState<PaginationState>({
     pageSize,
     pageIndex: 0,
@@ -75,7 +71,6 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
       ...prev,
       pageIndex: 0,
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalFilter]);
 
   const columns = createColumns(refetch, args);
@@ -94,6 +89,9 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
     state: {
       pagination,
       sorting,
+    },
+    defaultColumn: {
+      size: 100,
     },
   });
 
@@ -116,15 +114,17 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
         </div>
       )}
 
-      <div className="rounded-md border flex-1 overflow-hidden">
+      <div className="overflow-x-auto rounded-md border flex-1">
         <Table>
-          <TableHeader
-            className={`table table-fixed ${hasScrollbar ? "w-[calc(100%-0.5em)]" : "w-full"}`}
-          >
+          <TableHeader className="table-fixed">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-4">
+                  <TableHead
+                    key={header.id}
+                    className="px-4 max-w-64"
+                    style={{ minWidth: header.column.getSize() }}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -137,18 +137,19 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
             ))}
           </TableHeader>
 
-          <TableBody ref={tableBodyRef} className="block overflow-auto">
+          <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="table table-fixed w-full min-h-12"
+                  className="table-fixed min-h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-4 overflow-hidden overflow-ellipsis"
+                      className="px-4 overflow-hidden overflow-ellipsis max-w-64"
+                      style={{ minWidth: cell.column.getSize() }}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -159,14 +160,12 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
                 </TableRow>
               ))
             ) : loading ? (
-              <TableRow className="block">
+              <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
                   className="p-8 flex justify-center items-center"
                 >
-                  <div className="flex items-center justify-center w-full h-full">
-                    <p className="text-muted-foreground">Loading...</p>
-                  </div>
+                  <p className="text-muted-foreground">Loading...</p>
                 </TableCell>
               </TableRow>
             ) : (
