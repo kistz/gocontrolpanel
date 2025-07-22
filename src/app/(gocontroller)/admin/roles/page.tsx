@@ -35,8 +35,9 @@ export default async function AdminRolesPage() {
           canCreate && (
             <Modal>
               <AddRoleModal />
-              <Button>
-                <IconPlus /> Add Role
+              <Button className="w-9 sm:w-auto">
+                <IconPlus />
+                <span className="hidden sm:inline">Add Role</span>
               </Button>
             </Modal>
           )

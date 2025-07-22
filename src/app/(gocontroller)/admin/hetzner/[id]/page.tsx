@@ -74,8 +74,9 @@ export default async function ProjectPage({
           canCreate && (
             <Modal>
               <AddHetznerServerModal data={id} />
-              <Button>
-                <IconPlus /> Add Server
+              <Button className="w-9 sm:w-auto">
+                <IconPlus />
+                <span className="hidden sm:inline">Add Server</span>
               </Button>
             </Modal>
           )

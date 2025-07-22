@@ -77,7 +77,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
               type="text"
               onKeyDown={handleEnterKey}
               placeholder={placeholder || "Search..."}
-              className={clsx("w-full pr-10", className)}
+              className={clsx("w-full pr-10 text-sm", className)}
               {...props}
             />
             <Search
