@@ -163,7 +163,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="p-4 flex items-center"
+                  className="h-24"
                 >
                   <p className="text-muted-foreground">Loading...</p>
                 </TableCell>
@@ -172,7 +172,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
+                  className="h-24"
                 >
                   No results.
                 </TableCell>
