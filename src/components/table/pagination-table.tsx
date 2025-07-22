@@ -98,13 +98,13 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   return (
     <div className="flex flex-col gap-4">
       {(filter || actions) && (
-        <div className="flex justify-between items-center gap-2">
+        <div className="flex justify-between items-center gap-2 max-w-full">
           {filter ? (
             <Input
               placeholder="Search..."
               value={globalFilter || ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="min-w-64 w-1/3"
+              className="flex-1 sm:max-w-1/3"
             />
           ) : (
             <div />
@@ -163,7 +163,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="p-8 flex justify-center items-center"
+                  className="p-4 flex items-center"
                 >
                   <p className="text-muted-foreground">Loading...</p>
                 </TableCell>
