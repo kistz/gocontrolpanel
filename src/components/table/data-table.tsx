@@ -19,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useHasScrollbar } from "@/hooks/use-has-scrollbar";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { DataTablePagination } from "./data-table-pagination";
@@ -30,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   isLoading?: boolean;
   filter?: boolean;
   pagination?: boolean;
+  actions?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,11 +38,10 @@ export function DataTable<TData, TValue>({
   isLoading = false,
   filter = false,
   pagination = false,
+  actions,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const { ref: tableBodyRef, hasScrollbar } =
-    useHasScrollbar<HTMLTableSectionElement>();
 
   const table = useReactTable({
     data,
@@ -58,28 +57,41 @@ export function DataTable<TData, TValue>({
       sorting,
       globalFilter,
     },
+    defaultColumn: {
+      size: 100,
+    },
   });
 
   return (
     <div className="flex flex-col gap-4">
-      {filter && (
-        <Input
-          placeholder="Search..."
-          value={globalFilter ?? ""}
-          onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
+      {(filter || actions) && (
+        <div className="flex justify-between items-center gap-2 max-w-full">
+          {filter ? (
+            <Input
+              placeholder="Search..."
+              value={globalFilter || ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="flex-1 sm:max-w-1/3"
+            />
+          ) : (
+            <div />
+          )}
+
+          {actions}
+        </div>
       )}
 
-      <div className="rounded-md border flex-1 overflow-hidden">
+      <div className="overflow-x-auto rounded-md border flex-1">
         <Table>
-          <TableHeader
-            className={`table table-fixed ${hasScrollbar ? "w-[calc(100%-0.5em)]" : "w-full"}`}
-          >
+          <TableHeader className="table-fixed">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-4">
+                  <TableHead
+                    key={header.id}
+                    className="px-4 max-w-64"
+                    style={{ minWidth: header.column.getSize() }}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -92,18 +104,19 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
 
-          <TableBody ref={tableBodyRef} className="block overflow-auto">
+          <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="table table-fixed w-full"
+                  className="table-fixed min-h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-4 overflow-hidden overflow-ellipsis"
+                      className="px-4 overflow-hidden overflow-ellipsis max-w-64"
+                      style={{ minWidth: cell.column.getSize() }}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -114,21 +127,19 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               ))
             ) : isLoading ? (
-              <TableRow className="block">
+              <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="p-8 flex justify-center items-center"
+                  className="h-24"
                 >
-                  <div className="flex items-center justify-center w-full h-full">
-                    <p className="text-muted-foreground">Loading...</p>
-                  </div>
+                  <p className="text-muted-foreground">Loading...</p>
                 </TableCell>
               </TableRow>
             ) : (
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
+                  className="h-24"
                 >
                   No results.
                 </TableCell>
