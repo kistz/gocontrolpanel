@@ -110,7 +110,7 @@ export default function TextEditor({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-row items-center justify-between w-full">
+      <div className="flex justify-between w-full lg:items-center flex-col lg:flex-row gap-2">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
           serverId={serverId}

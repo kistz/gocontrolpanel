@@ -159,10 +159,11 @@ export default function Browser({ data, serverId, path }: BrowserProps) {
         </div>
       )}
 
-      <div className="flex justify-between items-center w-full">
+      <div className="flex justify-between lg:items-center w-full flex-col lg:flex-row gap-4">
         <FilesBreadcrumbs
           crumbs={pathToBreadcrumbs(path).slice(1)}
           serverId={serverId}
+          className="min-w-0 flex-1"
         />
 
         <Actions
