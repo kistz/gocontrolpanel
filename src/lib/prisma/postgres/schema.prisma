@@ -90,9 +90,10 @@ model Interfaces {
 }
 
 model Groups {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   description String
+  public      Boolean @default(false)
 
   groupServers GroupServers[]
   groupMembers GroupMember[]
