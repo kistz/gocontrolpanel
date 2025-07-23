@@ -151,6 +151,7 @@ export async function getPublicGroupsWithServers(): Promise<
   const groups = await db.groups.findMany({
     where: {
       deletedAt: null,
+      public: true,
       groupServers: {
         some: {
           server: {
