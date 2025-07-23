@@ -340,5 +340,6 @@ export function hasPermissionsJWTSync(
   permissions = permissions.map((permission) =>
     permission.replace(":id", `:${id}`),
   );
+
   return permissions.some((permission) => userPermissions.includes(permission));
 }

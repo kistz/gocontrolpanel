@@ -162,6 +162,13 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
         />
 
         <FormElement
+          name="public"
+          label="Public Group"
+          type="checkbox"
+          description="This will allow any user to join as Member."
+        />
+
+        <FormElement
           name="groupServers"
           label="Servers"
           placeholder="Select servers"

@@ -46,7 +46,7 @@ export default async function Navbar() {
       {session && canViewAdmin && (
         <NavAdmin
           canViewUsers={canViewUsers}
-          canViewAdmin={canViewAdmin}
+          canViewGroups={canViewGroups}
           canViewServers={canViewServers}
           canViewRoles={canViewRoles}
           canViewHetzner={canViewHetzner}
