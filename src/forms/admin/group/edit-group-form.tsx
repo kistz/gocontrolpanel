@@ -174,7 +174,7 @@ export default function EditGroupForm({
           name="public"
           label="Public Group"
           type="checkbox"
-          description="This will allow any user to join as Member."
+          description="Makes group visible to all users"
         />
 
         <FormElement
