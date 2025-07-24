@@ -29,7 +29,7 @@ export function SiteUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { data: session } = useSession();
-  const { notifications, unreadCount } = useNotifications();
+  const { unreadCount } = useNotifications();
 
   const signOutHandler = async () => {
     const data = await signOut({
