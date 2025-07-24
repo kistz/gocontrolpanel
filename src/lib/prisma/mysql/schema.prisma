@@ -46,6 +46,8 @@ model Users {
   permissions   Json    @default("[]")
   authenticated Boolean @default(false)
 
+  notifications Notifications[]
+
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]
   userServers         UserServers[]
@@ -171,9 +173,10 @@ model Servers {
   connectMessage    String?
   disconnectMessage String?
 
-  interfaces   Interfaces[]
-  groupServers GroupServers[]
-  userServers  UserServers[]
+  interfaces     Interfaces[]
+  groupServers   GroupServers[]
+  userServers    UserServers[]
+  serverCommands ServerCommands[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -224,4 +227,49 @@ model Roles {
 
   @@index([deletedAt])
   @@map("roles")
+}
+
+model Commands {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  command     String
+
+  serverCommands ServerCommands[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("commands")
+}
+
+model ServerCommands {
+  serverId  String
+  commandId String
+
+  server  Servers  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  command Commands @relation(fields: [commandId], references: [id], onDelete: Cascade)
+
+  @@id([serverId, commandId])
+  @@map("server_commands")
+}
+
+model Notifications {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  timestamp DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("notifications")
 }
