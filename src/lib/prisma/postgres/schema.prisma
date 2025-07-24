@@ -259,12 +259,13 @@ model ServerCommands {
 }
 
 model Notifications {
-  id        String   @id @default(uuid())
-  userId    String
-  type      String
-  message   String
-  read      Boolean  @default(false)
-  timestamp DateTime @default(now())
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  message     String
+  description String?
+  read        Boolean  @default(false)
+  timestamp   DateTime @default(now())
 
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 

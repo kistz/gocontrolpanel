@@ -17,6 +17,7 @@ import { ServerClientInfo } from "@/types/server";
 import { GbxClient } from "@evotm/gbxclient";
 import EventEmitter from "events";
 import "server-only";
+import { handleAdminCommand } from "./commands";
 import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
 import {
@@ -969,11 +970,17 @@ async function handleCommand(manager: GbxClientManager, chat: PlayerChat) {
   const command = chat.Text.split(" ")[0].toLowerCase();
   const params = chat.Text.split(" ").slice(1);
 
-  for (const cmd of manager.info.commands) {
-    if (cmd.command.command.toLowerCase() !== command || !cmd.enabled) return;
+  const cmd = manager.info.commands.find(
+    (c) => c.command.name.toLowerCase() === command,
+  );
 
-    console.log(cmd.command.parameters);
-  }
+  if (!cmd || !cmd.enabled) return;
+
+  switch (cmd.command.name.toLowerCase()) {
+    case "admin":
+      await handleAdminCommand(manager, chat, params);
+      break;
+  } 
 }
 
 async function onPlayerChat(manager: GbxClientManager, chat: PlayerChat) {
