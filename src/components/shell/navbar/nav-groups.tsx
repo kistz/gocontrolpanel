@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import useWebSocket from "@/hooks/use-websocket";
 import { generatePath, hasPermissionSync, useCurrentid } from "@/lib/utils";
+import { useNotifications } from "@/providers/notification-provider";
 import { routePermissions, routes } from "@/routes";
 import { ServerInfo } from "@/types/server";
 import {
@@ -60,6 +61,7 @@ export default function NavGroups() {
   const [servers, setServers] = useState<ServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [serverId, setServerId] = useState<string | null>(null);
+  const { notifications } = useNotifications();
 
   const handleMessage = useCallback((type: string, data: any) => {
     switch (type) {
@@ -286,8 +288,20 @@ export default function NavGroups() {
                           <SidebarMenuButton tooltip={server.name} asChild>
                             <div className="select-none cursor-pointer">
                               {server.icon && <server.icon />}
-                              <span className="overflow-hidden text-ellipsis text-nowrap">
+                              <span className="overflow-hidden text-ellipsis text-nowrap flex items-center">
                                 {server.name}
+                                {notifications.some(
+                                  (n) => n.serverId === server.id && !n.read,
+                                ) && (
+                                  <span className="ml-2 h-3 w-3 text-center rounded-full bg-destructive text-[8px]">
+                                    {
+                                      notifications.filter(
+                                        (n) =>
+                                          n.serverId === server.id && !n.read,
+                                      ).length
+                                    }
+                                  </span>
+                                )}
                               </span>
                               <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                             </div>

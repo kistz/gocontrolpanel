@@ -310,8 +310,8 @@ export function hasPermissionsJWTSync(
   id = "",
 ): boolean {
   if (jwt.admin) return true;
+  if (!permissions || permissions.length === 0) return true;
 
-  if (!permissions || permissions.length === 0) return false;
 
   const userPermissions = jwt.permissions;
 
