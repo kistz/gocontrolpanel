@@ -70,6 +70,8 @@ export const NotificationProvider = ({
     setNotifications((prev) => [...prev, notification]);
     toast.info(notification.message, {
       description: notification.description,
+      duration: 60000,
+      closeButton: true,
     });
   };
 

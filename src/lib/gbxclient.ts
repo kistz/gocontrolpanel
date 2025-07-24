@@ -971,9 +971,9 @@ async function handleCommand(manager: GbxClientManager, chat: PlayerChat) {
   const params = chat.Text.split(" ").slice(1);
 
   const cmd = manager.info.commands.find(
-    (c) => c.command.name.toLowerCase() === command,
+    (c) => c.command.command.toLowerCase() === command,
   );
-
+  
   if (!cmd || !cmd.enabled) return;
 
   switch (cmd.command.name.toLowerCase()) {
