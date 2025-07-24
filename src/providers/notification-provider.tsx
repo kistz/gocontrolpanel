@@ -67,7 +67,7 @@ export const NotificationProvider = ({
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const addNotification = (notification: Notifications) => {
-    setNotifications((prev) => [...prev, notification]);
+    setNotifications((prev) => [notification, ...prev]);
     toast.info(notification.message, {
       description: notification.description,
       duration: 60000,
@@ -76,6 +76,12 @@ export const NotificationProvider = ({
   };
 
   const markAsRead = async (id: string) => {
+    if (notifications.find((n) => n.id === id)?.read) return;
+
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
+
     try {
       const { data, error } = await markNotificationAsRead(id);
       if (error) {
