@@ -7,6 +7,7 @@ import { getGbxClientManager } from "@/lib/gbxclient";
 import { Prisma, Servers } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { ServerCommandsWithCommand } from "./gbx";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editServer = Prisma.validator<Prisma.ServersInclude>()({
@@ -301,4 +302,61 @@ export async function deleteServer(serverId: string): Promise<ServerResponse> {
       });
     },
   );
+}
+
+export async function updateServerCommands(
+  serverId: string,
+  commands: {
+    commandId: string;
+    enabled: boolean;
+  }[],
+): Promise<ServerResponse> {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
+    const db = getClient();
+    const commandUpdates = commands.map((c) =>
+      db.serverCommands.upsert({
+        where: {
+          serverId_commandId: {
+            serverId,
+            commandId: c.commandId,
+          },
+        },
+        create: {
+          serverId,
+          commandId: c.commandId,
+          enabled: c.enabled,
+        },
+        update: {
+          enabled: c.enabled,
+        },
+      }),
+    );
+
+    await db.$transaction(commandUpdates);
+
+    const updatedCommands = await db.serverCommands.findMany({
+      where: { serverId },
+      include: {
+        command: true,
+      },
+    });
+
+    const manager = await getGbxClientManager(serverId);
+
+    manager.info.commands = updatedCommands;
+  });
+}
+
+export async function getServerCommands(
+  serverId: string,
+): Promise<ServerResponse<ServerCommandsWithCommand[]>> {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
+    const db = getClient();
+    const commands = await db.serverCommands.findMany({
+      where: { serverId },
+      include: { command: true },
+    });
+
+    return commands;
+  });
 }

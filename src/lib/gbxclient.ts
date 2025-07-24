@@ -59,6 +59,7 @@ export class GbxClientManager extends EventEmitter {
         pauseAvailable: false,
         isPaused: false,
       },
+      commands: [],
     };
 
     this.client.on("disconnect", () => {
@@ -115,6 +116,13 @@ export class GbxClientManager extends EventEmitter {
     const db = getClient();
     const server = await db.servers.findUnique({
       where: { id: this.serverId },
+      include: {
+        serverCommands: {
+          include: {
+            command: true,
+          }
+        }
+      }
     });
 
     if (!server) throw new Error(`Server ${this.serverId} not found`);
@@ -152,6 +160,8 @@ export class GbxClientManager extends EventEmitter {
       connectMessage: server.connectMessage,
       disconnectMessage: server.disconnectMessage,
     };
+
+    this.info.commands = server.serverCommands;
 
     await setupListeners(this, server.id);
     await syncPlayerList(this);
@@ -952,10 +962,26 @@ async function onElimination(
   manager.emit("elimination", manager.info.liveInfo);
 }
 
+async function handleCommand(manager: GbxClientManager, chat: PlayerChat) {
+  if (manager.info.commands.length === 0) return;
+  if (!manager.info.commands.some((c) => c.enabled)) return;
+
+  const command = chat.Text.split(" ")[0].toLowerCase();
+  const params = chat.Text.split(" ").slice(1);
+
+  for (const cmd of manager.info.commands) {
+    if (cmd.command.command.toLowerCase() !== command || !cmd.enabled) return;
+
+    console.log(cmd.command.parameters);
+  }
+}
+
 async function onPlayerChat(manager: GbxClientManager, chat: PlayerChat) {
-  if (!manager.info.chat?.manualRouting) return;
   if (!chat.Login) return;
-  if (chat.Text.startsWith("/")) return; // ignore commands
+  if (chat.Text.startsWith("/")) {
+    return await handleCommand(manager, chat);
+  }
+  if (!manager.info.chat?.manualRouting) return;
 
   if (!manager.info.chat?.messageFormat) {
     manager.client.call("ChatForwardToLogin", chat.Text, chat.Login, "");

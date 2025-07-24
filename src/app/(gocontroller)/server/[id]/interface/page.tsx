@@ -1,9 +1,14 @@
+import { getCommands } from "@/actions/database/commands";
 import { getInterfaces } from "@/actions/database/interfaces";
-import { getServerChatConfig } from "@/actions/database/servers";
+import {
+  getServerChatConfig,
+  getServerCommands,
+} from "@/actions/database/servers";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChatConfigForm from "@/forms/server/interface/chatconfig-form";
+import CommandsForm from "@/forms/server/interface/commands-form";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
 import { redirect } from "next/navigation";
@@ -24,6 +29,8 @@ export default async function ServerInterfacePage({
   const { data } = await getServerChatConfig(id);
 
   const { data: interfaces } = await getInterfaces(id);
+  const { data: serverCommands } = await getServerCommands(id);
+  const { data: commands } = await getCommands();
 
   return (
     <div className="flex flex-col gap-6 h-full">
@@ -38,6 +45,7 @@ export default async function ServerInterfacePage({
         <TabsList className="w-full">
           <TabsTrigger value="interface">Interface</TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>
+          <TabsTrigger value="commands">Commands</TabsTrigger>
         </TabsList>
 
         <TabsContent value="interface" className="flex flex-col gap-6 h-full">
@@ -56,6 +64,11 @@ export default async function ServerInterfacePage({
         <TabsContent value="chat" className="flex flex-col gap-6">
           <Card className="p-6">
             <ChatConfigForm serverId={id} chatConfig={data} />
+          </Card>
+        </TabsContent>
+        <TabsContent value="commands" className="flex flex-col gap-6">
+          <Card className="p-6">
+            <CommandsForm serverId={id} commands={commands} serverCommands={serverCommands} />
           </Card>
         </TabsContent>
       </Tabs>

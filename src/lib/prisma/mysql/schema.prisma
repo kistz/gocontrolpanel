@@ -234,6 +234,7 @@ model Commands {
   name        String
   description String?
   command     String
+  parameters  Json?
 
   serverCommands ServerCommands[]
 
@@ -248,6 +249,7 @@ model Commands {
 model ServerCommands {
   serverId  String
   commandId String
+  enabled   Boolean @default(true)
 
   server  Servers  @relation(fields: [serverId], references: [id], onDelete: Cascade)
   command Commands @relation(fields: [commandId], references: [id], onDelete: Cascade)
