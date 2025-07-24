@@ -167,12 +167,14 @@ export const authOptions: NextAuthOptions = {
       const publicGroups = await getPublicGroupsWithServers();
 
       token.groups.push(
-        ...publicGroups.map((g) => ({
-          id: g.id,
-          name: g.name,
-          role: "Member" as GroupRole,
-          servers: g.servers,
-        })),
+        ...publicGroups
+          .filter((g) => !token.groups.some((tg) => tg.id === g.id))
+          .map((g) => ({
+            id: g.id,
+            name: g.name,
+            role: "Member" as GroupRole,
+            servers: g.servers,
+          })),
       );
 
       return token;

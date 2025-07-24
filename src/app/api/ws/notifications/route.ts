@@ -74,7 +74,7 @@ export async function SOCKET(
           client.send(
             JSON.stringify({
               type: "adminCommand",
-              data: { notification },
+              data: notification,
             }),
           );
         }

@@ -1,10 +1,22 @@
-import { markNotificationAsRead } from "@/actions/database/notifications";
+"use client";
+import {
+  getNotifications,
+  markNotificationAsRead,
+} from "@/actions/database/notifications";
+import useWebSocket from "@/hooks/use-websocket";
 import { Notifications } from "@/lib/prisma/generated";
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { toast } from "sonner";
 
 interface NotificationContextType {
   notifications: Notifications[];
+  unreadCount: number;
   addNotification: (notification: Notifications) => void;
   markAsRead: (id: string) => Promise<void>;
 }
@@ -28,6 +40,32 @@ export const NotificationProvider = ({
 }) => {
   const [notifications, setNotifications] = useState<Notifications[]>([]);
 
+  const handleMessage = useCallback((_: string, data: Notifications) => {
+    addNotification(data);
+  }, []);
+
+  useWebSocket({
+    url: "/api/ws/notifications",
+    onMessage: handleMessage,
+  });
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const { data, error } = await getNotifications();
+        if (error) {
+          throw new Error(error);
+        }
+        setNotifications(data);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   const addNotification = (notification: Notifications) => {
     setNotifications((prev) => [...prev, notification]);
     toast.info(notification.message, {
@@ -49,7 +87,7 @@ export const NotificationProvider = ({
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, addNotification, markAsRead }}
+      value={{ notifications, unreadCount, addNotification, markAsRead }}
     >
       {children}
     </NotificationContext.Provider>
