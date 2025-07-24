@@ -30,6 +30,7 @@ export function NotificationsList() {
               <DropdownMenuItem
                 key={notification.id}
                 onMouseOver={() => markAsRead(notification.id)}
+                onClick={() => markAsRead(notification.id)}
               >
                 <Notification notification={notification} />
               </DropdownMenuItem>
