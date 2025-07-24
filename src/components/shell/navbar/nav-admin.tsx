@@ -28,13 +28,13 @@ import { NavGroup } from ".";
 
 export default async function NavAdmin({
   canViewUsers,
-  canViewAdmin,
+  canViewGroups,
   canViewServers,
   canViewRoles,
   canViewHetzner,
 }: {
   canViewUsers: boolean;
-  canViewAdmin: boolean;
+  canViewGroups: boolean;
   canViewServers: boolean;
   canViewRoles: boolean;
   canViewHetzner: boolean;
@@ -52,7 +52,7 @@ export default async function NavAdmin({
         name: "Groups",
         url: routes.admin.groups,
         icon: IconUsersGroup,
-        auth: canViewAdmin,
+        auth: canViewGroups,
       },
       {
         name: "Roles",

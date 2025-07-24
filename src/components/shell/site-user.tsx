@@ -1,6 +1,6 @@
 "use client";
 
-import { IconDotsVertical, IconLogout } from "@tabler/icons-react";
+import { IconBell, IconDotsVertical, IconLogout } from "@tabler/icons-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,15 +18,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useNotifications } from "@/providers/notification-provider";
 import { routes } from "@/routes";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "../theme-toggle";
+import { NotificationsList } from "./notifications-list";
 
 export function SiteUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { data: session } = useSession();
+  const { notifications, unreadCount } = useNotifications();
 
   const signOutHandler = async () => {
     const data = await signOut({
@@ -59,7 +62,18 @@ export function SiteUser() {
                   {session?.user.displayName}
                 </span>
               </div>
-              <IconDotsVertical className="ml-auto size-4" />
+              <div className="ml-auto flex gap-2">
+                <div className="relative">
+                  <IconBell className="size-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 text-center rounded-full bg-destructive text-[8px]">
+                      {unreadCount}
+                    </span>
+                  )}
+                </div>
+
+                <IconDotsVertical className="size-4" />
+              </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -84,6 +98,8 @@ export function SiteUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <NotificationsList />
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <ThemeToggle />

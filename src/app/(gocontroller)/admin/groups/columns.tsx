@@ -3,6 +3,7 @@ import {
   deleteGroup,
   GroupsWithUsersWithServers,
 } from "@/actions/database/groups";
+import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import EditGroupModal from "@/components/modals/edit-group";
 import Modal from "@/components/modals/modal";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -41,6 +43,19 @@ export const createColumns = (
     accessorKey: "_count.groupMembers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Members"} />
+    ),
+  },
+  {
+    accessorKey: "public",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Public"} />
+    ),
+    cell: ({ row }) => (
+      <BooleanDisplay
+        value={row.getValue("public") as boolean}
+        falseIcon={IconX}
+        trueIcon={IconCheck}
+      />
     ),
   },
   {

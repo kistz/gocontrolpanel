@@ -1,5 +1,5 @@
 import { getClient } from "@/lib/dbclient";
-import { Prisma, Users } from "@/lib/prisma/generated";
+import { Prisma, Servers, Users } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
 import "server-only";
 
@@ -126,4 +126,68 @@ export async function upsertUserAuth(
     },
     include: includeGroupsWithServers,
   });
+}
+
+export async function getPublicGroupsWithServers(): Promise<
+  {
+    id: string;
+    name: string;
+    servers: Omit<
+      Servers,
+      | "user"
+      | "password"
+      | "manualRouting"
+      | "messageFormat"
+      | "connectMessage"
+      | "disconnectMessage"
+      | "filemanagerPassword"
+      | "createdAt"
+      | "updatedAt"
+      | "deletedAt"
+    >[];
+  }[]
+> {
+  const db = getClient();
+  const groups = await db.groups.findMany({
+    where: {
+      deletedAt: null,
+      public: true,
+      groupServers: {
+        some: {
+          server: {
+            deletedAt: null,
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      groupServers: {
+        where: {
+          server: {
+            deletedAt: null,
+          },
+        },
+        select: {
+          server: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              host: true,
+              port: true,
+              filemanagerUrl: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return groups.map((group) => ({
+    id: group.id,
+    name: group.name,
+    servers: group.groupServers.map((gs) => gs.server),
+  }));
 }

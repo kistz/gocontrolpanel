@@ -1,0 +1,1 @@
+UPDATE users SET `authenticated` = 1 WHERE `ubiUid` IS NOT NULL;

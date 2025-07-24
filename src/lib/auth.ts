@@ -1,4 +1,5 @@
 import {
+  getPublicGroupsWithServers,
   getUserById,
   getUserByLogin,
   upsertUserAuth,
@@ -17,6 +18,7 @@ import { IncomingMessage } from "node:http";
 import slugid from "slugid";
 import { getWebIdentities } from "./api/nadeo";
 import config from "./config";
+import { GroupRole } from "./prisma/generated";
 import { getList, hasPermissionSync } from "./utils";
 
 const NadeoProvider = (): OAuthConfig<Profile> => ({
@@ -161,6 +163,19 @@ export const authOptions: NextAuthOptions = {
         name: s.server.name,
         role: s.role,
       }));
+
+      const publicGroups = await getPublicGroupsWithServers();
+
+      token.groups.push(
+        ...publicGroups
+          .filter((g) => !token.groups.some((tg) => tg.id === g.id))
+          .map((g) => ({
+            id: g.id,
+            name: g.name,
+            role: "Member" as GroupRole,
+            servers: g.servers,
+          })),
+      );
 
       return token;
     },

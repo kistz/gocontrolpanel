@@ -171,6 +171,13 @@ export default function EditGroupForm({
         />
 
         <FormElement
+          name="public"
+          label="Public Group"
+          type="checkbox"
+          description="Makes group visible to all users"
+        />
+
+        <FormElement
           name="groupServers"
           label="Servers"
           placeholder="Select servers"

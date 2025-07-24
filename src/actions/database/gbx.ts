@@ -1,8 +1,16 @@
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
-import { Maps } from "@/lib/prisma/generated";
+import { Maps, Prisma } from "@/lib/prisma/generated";
 import { ServerError } from "@/types/responses";
 import "server-only";
+
+const serversCommandsSchema = Prisma.validator<Prisma.ServerCommandsInclude>()({
+  command: true,
+});
+
+export type ServerCommandsWithCommand = Prisma.ServerCommandsGetPayload<{
+  include: typeof serversCommandsSchema;
+}>;
 
 export async function createMap(
   map: Omit<
@@ -139,4 +147,16 @@ export async function getMapByUid(uid: string): Promise<Maps | null> {
   const [updatedMap] = await checkAndUpdateMapsInfoIfNeeded([map]);
 
   return updatedMap;
+}
+
+export async function getServerCommands(
+  serverId: string,
+): Promise<ServerCommandsWithCommand[]> {
+  const db = getClient();
+  const commands = await db.serverCommands.findMany({
+    where: { serverId },
+    include: serversCommandsSchema,
+  });
+
+  return commands;
 }

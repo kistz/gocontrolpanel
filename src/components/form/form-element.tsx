@@ -50,12 +50,12 @@ export default function FormElement<TControl>({
   className,
   children,
 }: FormElementProps<TControl>) {
-  if (isHidden) return null;
-
   const {
     control,
     formState: { errors },
   } = useFormContext();
+
+  if (isHidden) return null;
 
   const error = errors[name];
 
