@@ -68,6 +68,7 @@ export async function SOCKET(
               type: "adminCommand",
               message: `${adminCommand.name} asked for help on server ${server.name}`,
               description: adminCommand.message,
+              serverId: server.id,
             },
           });
 

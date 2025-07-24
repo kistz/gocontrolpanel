@@ -64,15 +64,15 @@ export function SiteUser() {
               </div>
               <div className="ml-auto flex gap-2">
                 <div className="relative">
-                  <IconBell />
+                  <IconBell className="size-4" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs">
+                    <span className="absolute -top-1 -right-1 h-3 w-3 text-center rounded-full bg-destructive text-[8px]">
                       {unreadCount}
                     </span>
                   )}
                 </div>
 
-                <IconDotsVertical />
+                <IconDotsVertical className="size-4" />
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -99,7 +99,7 @@ export function SiteUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-              <NotificationsList />
+            <NotificationsList />
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <ThemeToggle />

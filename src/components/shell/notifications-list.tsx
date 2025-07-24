@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNotifications } from "@/providers/notification-provider";
 import { IconBell } from "@tabler/icons-react";
+import { Fragment } from "react";
 import Notification from "./notification";
 
 export function NotificationsList() {
@@ -25,13 +26,16 @@ export function NotificationsList() {
       <DropdownMenuSubContent className="max-h-[30vh] overflow-y-auto -translate-y-4">
         {notifications.length > 0 ? (
           notifications.map((notification, index) => (
-            <>
-            <DropdownMenuItem key={notification.id} onMouseOver={() => markAsRead(notification.id)}>
-              <Notification notification={notification} />
-            </DropdownMenuItem>
+            <Fragment key={index}>
+              <DropdownMenuItem
+                key={notification.id}
+                onMouseOver={() => markAsRead(notification.id)}
+              >
+                <Notification notification={notification} />
+              </DropdownMenuItem>
 
-            {index < notifications.length - 1 && <DropdownMenuSeparator />}
-            </>
+              {index < notifications.length - 1 && <DropdownMenuSeparator />}
+            </Fragment>
           ))
         ) : (
           <DropdownMenuItem disabled>No notifications</DropdownMenuItem>

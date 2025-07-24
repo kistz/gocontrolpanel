@@ -266,6 +266,7 @@ model Notifications {
   description String?
   read        Boolean  @default(false)
   timestamp   DateTime @default(now())
+  serverId    String?
 
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
