@@ -7,6 +7,7 @@ import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
@@ -42,7 +43,7 @@ export default async function ProjectPage({
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">Hetzner Project</h1>
           <h4 className="text-muted-foreground">
-            Manage your Hetzner servers for this project.
+            Manage your Hetzner servers, networks and volumes for this project.
           </h4>
         </div>
 
@@ -64,24 +65,45 @@ export default async function ProjectPage({
           )}
         </div>
       </div>
-      <PaginationTable
-        createColumns={createColumns}
-        args={{ projectId: id }}
-        fetchData={getHetznerServersPaginated}
-        fetchArgs={{ projectId: id }}
-        filter
-        actions={
-          canCreate && (
-            <Modal>
-              <AddHetznerServerModal data={id} />
-              <Button className="w-9 sm:w-auto">
-                <IconPlus />
-                <span className="hidden sm:inline">Add Server</span>
-              </Button>
-            </Modal>
-          )
-        }
-      />
+
+      <Tabs defaultValue="servers" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="servers">Servers</TabsTrigger>
+          <TabsTrigger value="networks">Networks</TabsTrigger>
+          <TabsTrigger value="volumes">Volumes</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="servers" className="flex flex-col gap-2">
+          <PaginationTable
+            createColumns={createColumns}
+            args={{ projectId: id }}
+            fetchData={getHetznerServersPaginated}
+            fetchArgs={{ projectId: id }}
+            filter
+            actions={
+              canCreate && (
+                <Modal>
+                  <AddHetznerServerModal data={id} />
+                  <Button className="w-9 sm:w-auto">
+                    <IconPlus />
+                    <span className="hidden sm:inline">Add Server</span>
+                  </Button>
+                </Modal>
+              )
+            }
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="networks"
+          className="flex flex-col gap-2"
+        ></TabsContent>
+
+        <TabsContent
+          value="volumes"
+          className="flex flex-col gap-2"
+        ></TabsContent>
+      </Tabs>
 
       <p className="text-sm text-muted-foreground">
         Important Notice: GoControlPanel is not the actual provider or host of
