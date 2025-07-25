@@ -26,8 +26,6 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
 ARG DB_TYPE
 ENV DB=$DB_TYPE
 
@@ -68,8 +66,6 @@ EXPOSE 3000
 
 ENV PORT=3000
 
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
 ARG DB_TYPE
 ENV DB=$DB_TYPE
 

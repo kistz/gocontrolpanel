@@ -1,12 +1,6 @@
 services:
   gocontrolpanel:
     image: marijnregterschot/gocontrolpanel:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
-        - DB_TYPE=mysql
     ports:
       - 3000:3000
     restart: unless-stopped
@@ -21,6 +15,7 @@ services:
       NADEO_SERVER_LOGIN: 
       NADEO_SERVER_PASSWORD: 
       NADEO_CONTACT: GoControlPanel / <your contact info>
+      DATABASE_URL: mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
       REDIS_URI: redis://redis:6379
       HETZNER_KEY: 
     depends_on:
