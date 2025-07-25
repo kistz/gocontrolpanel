@@ -1,6 +1,6 @@
 services:
   gocontrolpanel:
-    image: marijnregterschot/gocontrolpanel:beta
+    image: marijnregterschot/gocontrolpanel:beta # Use marijnregterschot/gocontrolpanel-postgres:beta if you are using PostgreSQL
     ports:
       - 3000:3000
     restart: unless-stopped

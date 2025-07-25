@@ -41,13 +41,7 @@ services:
       - db
   
   gocontrolpanel:
-    image: marijnregterschot/gocontrolpanel:latest
-    build:
-      context: ./../..
-      dockerfile: Dockerfile
-      args:
-        - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
-        - DB_TYPE=mysql
+    image: marijnregterschot/gocontrolpanel:beta # Use marijnregterschot/gocontrolpanel-postgres:beta if you are using PostgreSQL
     ports:
       - 3000:3000
     restart: unless-stopped
@@ -63,6 +57,7 @@ services:
       NADEO_SERVER_PASSWORD: 
       NADEO_CONTACT: GoControlPanel / <your contact info>
       REDIS_URI: redis://redis:6379
+      DATABASE_URL: mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
       HETZNER_KEY: 
     depends_on:
       - db

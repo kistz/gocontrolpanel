@@ -121,18 +121,15 @@ You will also need some credentials for the **Nadeo API** to configure the **GoC
 
 ## Getting Started
 
-This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup). There are also some boilerplate `docker-compose.yml` files available in the [docker](./docker/) folder for a variety of server controllers. Just move into the folder of your choice, plugin your own configurations and run the `docker compose up -d --build` command to start the services.
+This guide will help you set up and run the services for both completely new stacks and with existing stacks like [PyPlanet](#pyplanetevosc-stack-setup) or [EvoSC](#pyplanetevosc-stack-setup). There are also some boilerplate `docker-compose.yml` files available in the [docker](./docker/) folder for a variety of server controllers. Just copy the compose file of your choice, plugin your own configurations and run the `docker compose up -d` command to start the services.
 
 ## New Stack Setup
 
 This section will guide you through setting up a new stack using the provided `docker-compose.yml` file.
 
-### 1. Clone the Repository
+### 1. Copy the `docker-compose.yml` File
 
-```bash
-git clone https://github.com/MRegterschot/gocontrolpanel.git
-cd gocontrolpanel
-```
+First, copy the `docker-compose.yml` file from the repository to your desired directory. You can move it to any directory you want, the name of the directory will be the name of the stack.
 
 ### 2. Modify the Configuration
 
@@ -144,7 +141,7 @@ Make sure to update the environment variables for the services in your `docker-c
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins. Probably your own login, e.g., `v8vgGbx_TuKkBabAyn7nsQ`.
   - `DEFAULT_PERMISSIONS`: Comma-separated list of default permissions for new users. You can find a list of available permissions in the [Permissions](#permissions) section.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
-  - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
+  - `HETZNER_KEY`: If you are using the Hetzner Cloud API, make sure to set the this environment variable so that your API Tokens will be encrypted and stored securely in the database. This variable can be any random string, e.g., `myhetznerkey`.
 
 - **Dedicated Server Environment Variables**:
   - `TM_MASTERSERVER_LOGIN`: Login for the dedicated server (same as `NADEO_SERVER_LOGIN` in GoControlPanel).
@@ -155,10 +152,8 @@ Make sure to update the environment variables for the services in your `docker-c
 Run the following command to start all services defined in the `docker-compose.yml` file:
 
 ```bash
-docker compose up -d --build
+docker compose up -d
 ```
-
-> **Note:** The `--build` flag is only needed on the first run.
 
 ### 4. Access the GoControlPanel
 
@@ -174,52 +169,13 @@ This section will guide you through setting up the **GoControlPanel** with an ex
 
 First you need to navigate to your existing stack directory. Navigate to the directory where your `docker-compose.yml` file is located.
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/MRegterschot/gocontrolpanel.git
-```
-
-### 2. Create Database
-
-Create a new database for GoControlPanel in your existing database service. For the default PyPlanet and EvoSC stacks, this is usually a MariaDB database.
-The container name is likely something like `<current-folder>-db-1`.
-
-1. Log into the database container.
-
-```bash
-docker exec -it <container-name> mariadb -u root -p
-```
-
-> **Note:** The password `secret` is the default, but it may differ depending on your `docker-compose.yml` setup.
-
-2. Create a new database:
-
-```sql
-CREATE DATABASE gocontrolpanel;
-```
-
-3. Create a new user and grant permissions:
-
-```sql
-CREATE USER 'gocontrolpanel'@'%' IDENTIFIED BY 'VettePanel123';
-GRANT ALL PRIVILEGES ON gocontrolpanel.* TO 'gocontrolpanel'@'%';
-FLUSH PRIVILEGES;
-```
-
-### 3. Modify the Configuration
+### 2. Modify the `docker-compose.yml` File
 
 Paste the following configuration into your existing `docker-compose.yml` file.
 
 ```yaml
 gocontrolpanel:
-  image: marijnregterschot/gocontrolpanel:latest
-  build:
-    context: ./gocontrolpanel
-    dockerfile: Dockerfile
-    args:
-      - DATABASE_URL=mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
-      - DB_TYPE=mysql
+  image: marijnregterschot/gocontrolpanel:beta # Use marijnregterschot/gocontrolpanel-postgres:beta if you are using PostgreSQL
   ports:
     - 3000:3000
   restart: unless-stopped
@@ -235,6 +191,7 @@ gocontrolpanel:
     NADEO_SERVER_PASSWORD:
     NADEO_CONTACT: GoControlPanel / <your contact info>
     REDIS_URI: redis://redis:6379
+    DATABASE_URL: mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
     HETZNER_KEY:
   depends_on:
     - db
@@ -264,6 +221,33 @@ volumes:
 
 > **Note:** Make sure you are using the correct volume names for the filemanger service. For **PyPlanet**, the volume name is usually `tmserverData`, and for **EvoSC**, it is `serverData`.
 
+### 3. Create Database
+
+Create a new database for GoControlPanel in your existing database service. For the default PyPlanet and EvoSC stacks, this is usually a MariaDB database.
+The container name is likely something like `<current-folder>-db-1`.
+
+1. Log into the database container.
+
+```bash
+docker exec -it <container-name> mariadb -u root -p
+```
+
+> **Note:** The password `secret` is the default, but it may differ depending on your `docker-compose.yml` setup.
+
+2. Create a new database:
+
+```sql
+CREATE DATABASE gocontrolpanel;
+```
+
+3. Create a new user and grant permissions:
+
+```sql
+CREATE USER 'gocontrolpanel'@'%' IDENTIFIED BY 'VettePanel123';
+GRANT ALL PRIVILEGES ON gocontrolpanel.* TO 'gocontrolpanel'@'%';
+FLUSH PRIVILEGES;
+```
+
 ### 4. Modify the environment variables
 
 Make sure to update the environment variables for the added services in your `docker-compose.yml` file:
@@ -274,7 +258,7 @@ Make sure to update the environment variables for the added services in your `do
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - `DEFAULT_PERMISSIONS`: Comma-separated list of default permissions for new users. You can find a list of available permissions in the [Permissions](#permissions) section.
   - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
-  - **Hetzner Key**: If you are using the Hetzner Cloud API, make sure to set the `HETZNER_KEY` environment variable so that your API Tokens will be encrypted and stored securely in the database.
+  - `HETZNER_KEY`: If you are using the Hetzner Cloud API, make sure to set the this environment variable so that your API Tokens will be encrypted and stored securely in the database. This variable can be any random string, e.g., `myhetznerkey`.
 
 > **Note:** Make sure you are using the correct service name for the dedicated server. For **PyPlanet**, the service name is usually `dedicated`, and for **EvoSC**, it is `trackmania`.
 
@@ -283,7 +267,7 @@ Make sure to update the environment variables for the added services in your `do
 Run the following command to start the services.
 
 ```bash
-docker compose up -d --build
+docker compose up -d
 ```
 
 ### 7. Access the GoControlPanel
