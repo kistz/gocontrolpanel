@@ -140,11 +140,7 @@ export const createServersColumns = (
           )}
 
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
-            <HetznerServerDetailsModal
-              data={{
-                server,
-              }}
-            />
+            <HetznerServerDetailsModal data={server} />
           </Modal>
         </div>
       );

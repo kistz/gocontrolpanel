@@ -2,6 +2,7 @@
 
 import { deleteHetznerNetwork } from "@/actions/hetzner/networks";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import HetznerNetworkDetailsModal from "@/components/modals/hetzner-network-details";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -148,13 +149,9 @@ export const createNetworksColumns = (
             />
           )}
 
-          {/* <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
-            <HetznerNetworkDetailsModal
-              data={{
-                network,
-              }}
-            />
-          </Modal> */}
+          <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
+            <HetznerNetworkDetailsModal data={network} />
+          </Modal>
         </div>
       );
     },
