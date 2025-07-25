@@ -118,6 +118,11 @@ export async function getMapList(
                 (m) => m.mapUid === map.UId,
               );
 
+              if (newMaps.some((m) => m.uid === mapInfo.UId)) {
+                console.warn(`Duplicate map UID found: ${mapInfo.UId}`);
+                continue;
+              }
+
               newMaps.push({
                 id: crypto.randomUUID(),
                 name: mapInfo.Name || "Unknown",
