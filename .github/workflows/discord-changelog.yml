@@ -1,0 +1,31 @@
+name: Send Release Notes to Discord
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  post-discord-changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send release notes to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          # Escape quotes and newlines for JSON
+          SANITIZED_BODY=$(echo "$RELEASE_BODY" | jq -Rsa .)
+
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"username\": \"Release Bot\",
+              \"embeds\": [{
+                \"title\": \"📦 New Release: $RELEASE_NAME ($RELEASE_TAG)\",
+                \"description\": $SANITIZED_BODY,
+                \"color\": 5814783
+              }]
+            }"
