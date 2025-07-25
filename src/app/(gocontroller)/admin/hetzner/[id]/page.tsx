@@ -13,7 +13,10 @@ import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createColumns } from "./columns";
+import { createServersColumns } from "./servers-columns";
+import { createNetworksColumns } from "./networks-columns";
+import { getHetznerNetworksPaginated } from "@/actions/hetzner/networks";
+import AddHetznerNetworkModal from "@/components/modals/add-hetzner-network";
 
 export default async function ProjectPage({
   params,
@@ -75,7 +78,7 @@ export default async function ProjectPage({
 
         <TabsContent value="servers" className="flex flex-col gap-2">
           <PaginationTable
-            createColumns={createColumns}
+            createColumns={createServersColumns}
             args={{ projectId: id }}
             fetchData={getHetznerServersPaginated}
             fetchArgs={{ projectId: id }}
@@ -97,7 +100,26 @@ export default async function ProjectPage({
         <TabsContent
           value="networks"
           className="flex flex-col gap-2"
-        ></TabsContent>
+        >
+          <PaginationTable
+            createColumns={createNetworksColumns}
+            args={{ projectId: id }}
+            fetchData={getHetznerNetworksPaginated}
+            fetchArgs={{ projectId: id }}
+            filter
+            actions={
+              canCreate && (
+                <Modal>
+                  <AddHetznerNetworkModal data={id} />
+                  <Button className="w-9 sm:w-auto">
+                    <IconPlus />
+                    <span className="hidden sm:inline">Add Network</span>
+                  </Button>
+                </Modal>
+              )
+            }
+          />
+        </TabsContent>
 
         <TabsContent
           value="volumes"

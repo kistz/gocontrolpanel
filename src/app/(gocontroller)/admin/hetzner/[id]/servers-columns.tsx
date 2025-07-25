@@ -22,7 +22,7 @@ import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const createColumns = (
+export const createServersColumns = (
   refetch: () => void,
   data: {
     projectId: string;
@@ -40,15 +40,11 @@ export const createColumns = (
   },
   {
     accessorKey: "public_net.ipv4.ip",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"IP Address"} />
-    ),
+    header: () => <span>IP Address</span>,
   },
   {
     accessorKey: "server_type.name",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Server Type"} />
-    ),
+    header: () => <span>Server Type</span>,
   },
   {
     accessorKey: "created",

@@ -11,33 +11,43 @@ const hetznerNetworkNameSchema = z
     },
   );
 
-const ipRangeSchema = z.string().refine((value) => {
-  // 1. Check basic CIDR pattern
-  const cidrPattern = /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/;
-  if (!cidrPattern.test(value)) return false;
+const ipRangeSchema = z
+  .string()
+  .min(1, {
+    message: "IP range is required",
+  })
+  .refine(
+    (value) => {
+      // 1. Check basic CIDR pattern
+      const cidrPattern = /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/;
+      if (!cidrPattern.test(value)) return false;
 
-  const [ip, prefixStr] = value.split("/");
-  const prefix = parseInt(prefixStr, 10);
+      const [ip, prefixStr] = value.split("/");
+      const prefix = parseInt(prefixStr, 10);
 
-  // 2. Validate prefix
-  if (prefix < 0 || prefix > 32 || prefix > 24) return false;
+      // 2. Validate prefix
+      if (prefix < 0 || prefix > 32 || prefix > 24) return false;
 
-  // 3. Parse IP into octets
-  const octets = ip.split(".").map(Number);
-  if (octets.length !== 4 || octets.some((n) => n < 0 || n > 255)) return false;
+      // 3. Parse IP into octets
+      const octets = ip.split(".").map(Number);
+      if (octets.length !== 4 || octets.some((n) => n < 0 || n > 255))
+        return false;
 
-  // 4. Ensure it's in RFC1918 private ranges
-  const [a, b] = octets;
+      // 4. Ensure it's in RFC1918 private ranges
+      const [a, b] = octets;
 
-  const isPrivate =
-    a === 10 || // 10.0.0.0/8
-    (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0 – 172.31.255.255
-    (a === 192 && b === 168); // 192.168.0.0/16
+      const isPrivate =
+        a === 10 || // 10.0.0.0/8
+        (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0 – 172.31.255.255
+        (a === 192 && b === 168); // 192.168.0.0/16
 
-  return isPrivate && prefix <= 16; // Recommend /16 or larger network
-}, {
-  message: "Must be a private CIDR IP (RFC1918), /24 or larger, and /16 recommended.",
-});
+      return isPrivate && prefix <= 24; // Recommend /16 or larger network
+    },
+    {
+      message:
+        "Must be a private CIDR IP (RFC1918), /24 or larger, and /16 recommended.",
+    },
+  );
 
 export const AddHetznerNetworkSchema = z.object({
   name: hetznerNetworkNameSchema,
@@ -51,4 +61,6 @@ export const AddHetznerNetworkSchema = z.object({
   ),
 });
 
-export type AddHetznerNetworkSchemaType = z.infer<typeof AddHetznerNetworkSchema>;
+export type AddHetznerNetworkSchemaType = z.infer<
+  typeof AddHetznerNetworkSchema
+>;
