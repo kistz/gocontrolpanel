@@ -2,6 +2,7 @@
 
 import { AddHetznerDatabaseSchemaType } from "@/forms/admin/hetzner/add-hetzner-database-schema";
 import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/add-hetzner-server-schema";
+import { AttachHetznerServerToNetworkSchemaType } from "@/forms/admin/hetzner/attach-hetzner-server-to-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -271,8 +272,7 @@ export async function createHetznerDatabase(
 
       const dbData = {
         db_type: data.databaseType,
-        db_root_password:
-          data.databaseRootPassword || generateRandomString(16),
+        db_root_password: data.databaseRootPassword || generateRandomString(16),
         db_name: data.databaseName,
         db_user: data.databaseUser || generateRandomString(16),
         db_password: data.databasePassword || generateRandomString(16),
@@ -294,8 +294,8 @@ export async function createHetznerDatabase(
           "authorization.database.password": dbData.db_password,
         },
         public_net: {
-          enable_ipv4: true,
-          enable_ipv6: false,
+          enable_ipv4: false,
+          enable_ipv6: true,
         },
       };
 
@@ -310,6 +310,36 @@ export async function createHetznerDatabase(
       await setRateLimit(projectId, res);
 
       return res.data.server;
+    },
+  );
+}
+
+export async function attachHetznerServerToNetwork(
+  projectId: string,
+  serverId: number,
+  data: AttachHetznerServerToNetworkSchemaType,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const body = {
+        network: data.networkId,
+        ip: data.ip,
+      };
+
+      const res = await axiosHetzner.post(
+        `/servers/${serverId}/actions/attach_to_network`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await setRateLimit(projectId, res);
     },
   );
 }

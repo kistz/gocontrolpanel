@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteHetznerServer } from "@/actions/hetzner/servers";
+import AttachHetznerServerToNetworkModal from "@/components/modals/attach-hetzner-server-to-network";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import HetznerDatabaseDetailsModal from "@/components/modals/hetzner-database-details";
 import HetznerServerDetailsModal from "@/components/modals/hetzner-server-details";
@@ -57,7 +58,20 @@ export const createServersColumns = (
   },
   {
     accessorKey: "public_net.ipv4.ip",
-    header: () => <span>IP Address</span>,
+    header: () => <span>Public IP</span>,
+  },
+  {
+    accessorKey: "private_net",
+    header: () => <span>Private IPs</span>,
+    cell: ({ row }) => {
+      const privateNet = row.original.private_net || [];
+      return (
+        <span>
+          {privateNet.length > 0
+            && privateNet.map((net) => net.ip).join(", ")}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "server_type.name",
@@ -85,10 +99,17 @@ export const createServersColumns = (
       const [_, startTransition] = useTransition();
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
       const [isViewOpen, setIsViewOpen] = useState(false);
+      const [isAttachOpen, setIsAttachOpen] = useState(false);
 
       const canDelete = hasPermissionSync(
         session,
         routePermissions.admin.hetzner.servers.delete,
+        data.projectId,
+      );
+
+      const canCreate = hasPermissionSync(
+        session,
+        routePermissions.admin.hetzner.servers.create,
         data.projectId,
       );
 
@@ -141,16 +162,19 @@ export const createServersColumns = (
               <DropdownMenuItem onClick={() => setIsViewOpen(true)}>
                 View Details
               </DropdownMenuItem>
+              {(canDelete || canCreate) && <Separator />}
+              {canCreate && (
+                <DropdownMenuItem onClick={() => setIsAttachOpen(true)}>
+                  Attach to Network
+                </DropdownMenuItem>
+              )}
               {canDelete && (
-                <>
-                  <Separator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setIsDeleteOpen(true)}
-                  >
-                    Delete Server
-                  </DropdownMenuItem>
-                </>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsDeleteOpen(true)}
+                >
+                  Delete Server
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -170,6 +194,17 @@ export const createServersColumns = (
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
             {getDetailsModal()}
           </Modal>
+
+          {canCreate && (
+            <Modal isOpen={isAttachOpen} setIsOpen={setIsAttachOpen}>
+              <AttachHetznerServerToNetworkModal
+                data={{
+                  projectId: data.projectId,
+                  serverId: server.id,
+                }}
+              />
+            </Modal>
+          )}
         </div>
       );
     },
