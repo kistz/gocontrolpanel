@@ -57,7 +57,11 @@ export default function FormElement<TControl>({
 
   if (isHidden) return null;
 
-  const error = errors[name];
+  const getNestedError = (errors: any, path: string) => {
+    return path.split('.').reduce((acc, key) => acc?.[key], errors);
+  }
+
+  const error = getNestedError(errors, name);
 
   const getErrorMessage = (error: any): string | undefined => {
     if (!error) return undefined;
@@ -73,7 +77,7 @@ export default function FormElement<TControl>({
           .join(", ")
       : undefined;
   };
-
+  
   return (
     <FormField
       control={control}

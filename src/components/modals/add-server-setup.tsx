@@ -1,11 +1,11 @@
 "use client";
-import AddHetznerServerForm from "@/forms/admin/hetzner/server/add-hetzner-server-form";
+import ServerSetupForm from "@/forms/admin/hetzner/setup-steps/server-setup-form";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddHetznerServerModal({
+export default function AddServerSetupModal({
   closeModal,
   data,
 }: DefaultModalProps<string>) {
@@ -35,7 +35,7 @@ export default function AddHetznerServerModal({
         />
       </div>
 
-      <AddHetznerServerForm projectId={data} callback={handleSubmit} />
+      <ServerSetupForm projectId={data} callback={handleSubmit} />
     </Card>
   );
 }

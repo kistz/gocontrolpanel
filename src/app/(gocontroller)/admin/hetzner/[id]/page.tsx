@@ -6,8 +6,8 @@ import {
 import { getHetznerVolumesPaginated } from "@/actions/hetzner/volumes";
 import AddHetznerDatabaseModal from "@/components/modals/add-hetzner-database";
 import AddHetznerNetworkModal from "@/components/modals/add-hetzner-network";
-import AddHetznerServerModal from "@/components/modals/add-hetzner-server";
 import AddHetznerVolumeModal from "@/components/modals/add-hetzner-volume";
+import AddServerSetupModal from "@/components/modals/add-server-setup";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
@@ -98,7 +98,7 @@ export default async function ProjectPage({
                     </Button>
                   </Modal>
                   <Modal>
-                    <AddHetznerServerModal data={id} />
+                    <AddServerSetupModal data={id} />
                     <Button className="w-9 sm:w-auto">
                       <IconPlus />
                       <span className="hidden sm:inline">Add Server</span>
