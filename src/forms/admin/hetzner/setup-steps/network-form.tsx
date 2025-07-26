@@ -39,15 +39,17 @@ export default function NetworkForm({
   const existingNetwork = form.watch("network.existing");
 
   useEffect(() => {
+    if (newNetwork) {
     form.reset({
       ...form.getValues(),
       network: {
-        new: newNetwork,
+        new: true,
         name: "",
         ipRange: "",
         subnets: [],
       },
     });
+  }
   }, [newNetwork]);
 
   useEffect(() => {
@@ -70,7 +72,6 @@ export default function NetworkForm({
               })),
             },
           });
-          await form.trigger("network.ipRange");
         }
       }
     }

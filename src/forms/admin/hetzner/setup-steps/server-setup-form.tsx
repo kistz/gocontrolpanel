@@ -31,6 +31,7 @@ import {
   ServerSetupSchemaType,
   ServerStepSchema,
 } from "./server-setup-schema";
+import Summary from "./summary";
 
 type Steps = "server" | "controller" | "database" | "network" | "summary";
 
@@ -225,9 +226,6 @@ export default function ServerSetupForm({
       case "network":
         setStep("summary");
         break;
-      case "summary":
-        onSubmit(form.getValues() as ServerSetupSchemaType);
-        break;
     }
   };
 
@@ -321,6 +319,13 @@ export default function ServerSetupForm({
           onBack={previousStep}
           networks={networks}
           locations={locations}
+        />
+      </TabsContent>
+
+      <TabsContent value="summary">
+        <Summary
+          form={form}
+          onBack={previousStep}
         />
       </TabsContent>
     </Tabs>

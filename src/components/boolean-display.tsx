@@ -6,6 +6,7 @@ interface BooleanDisplayProps {
   trueIcon?: TablerIcon;
   falseIcon?: TablerIcon;
   className?: string;
+  size?: number;
 }
 
 export default function BooleanDisplay({
@@ -13,6 +14,7 @@ export default function BooleanDisplay({
   trueIcon,
   falseIcon,
   className,
+  size = 24,
 }: BooleanDisplayProps) {
   const defaultTrueIcon = trueIcon || IconCheck;
   const defaultFalseIcon = falseIcon || IconX;
@@ -20,8 +22,8 @@ export default function BooleanDisplay({
   return (
     <div className={className}>
       {value
-        ? React.createElement(defaultTrueIcon)
-        : React.createElement(defaultFalseIcon)}
+        ? React.createElement(defaultTrueIcon, { size })
+        : React.createElement(defaultFalseIcon, { size })}
     </div>
   );
 }
