@@ -11,17 +11,14 @@ export default function ServerControllerForm({
   form,
   onNext,
   onBack,
-  projectId,
 }: {
   form: UseFormReturn<ControllerStepSchemaType>;
   onNext: () => void;
   onBack: () => void;
-  projectId: string;
 }) {
   return (
     <Form {...form}>
       <form
-        onSubmit={() => onNext()}
         className="flex flex-col gap-4"
       >
         <FormElement
@@ -61,9 +58,9 @@ export default function ServerControllerForm({
             Previous
           </Button>
           <Button
-            type="submit"
             className="flex-1 max-w-32"
             disabled={!form.formState.isValid}
+            onClick={onNext}
           >
             Next
             <IconArrowNarrowRight />

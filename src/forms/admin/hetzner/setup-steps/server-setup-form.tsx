@@ -1,12 +1,26 @@
 "use client";
 
+import { getHetznerImages } from "@/actions/hetzner/images";
+import { getHetznerLocations } from "@/actions/hetzner/locations";
+import { getAllNetworks } from "@/actions/hetzner/networks";
+import { getServerTypes } from "@/actions/hetzner/server-types";
+import { getAllDatabases } from "@/actions/hetzner/servers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getErrorMessage } from "@/lib/utils";
+import { HetznerLocation } from "@/types/api/hetzner/locations";
+import { HetznerNetwork } from "@/types/api/hetzner/networks";
+import {
+  HetznerImage,
+  HetznerServer,
+  HetznerServerType,
+} from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ZodTypeAny } from "zod";
+import DatabaseForm from "./database-form";
+import NetworkForm from "./network-form";
 import ServerControllerForm from "./server-controller-form";
 import ServerForm from "./server-form";
 import {
@@ -19,13 +33,6 @@ import {
 } from "./server-setup-schema";
 
 type Steps = "server" | "controller" | "database" | "network" | "summary";
-const steps: Steps[] = [
-  "server",
-  "controller",
-  "database",
-  "network",
-  "summary",
-];
 
 export default function ServerSetupForm({
   projectId,
@@ -34,6 +41,130 @@ export default function ServerSetupForm({
   projectId: string;
   callback?: () => void;
 }) {
+  const [databases, setDatabases] = useState<HetznerServer[]>([]);
+  const [networks, setNetworks] = useState<HetznerNetwork[]>([]);
+  const [locations, setLocations] = useState<HetznerLocation[]>([]);
+  const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
+  const [images, setImages] = useState<HetznerImage[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      setLoading(true);
+
+      const [
+        databasesResult,
+        locationsResult,
+        serverTypesResult,
+        imagesResult,
+        networksResult,
+      ] = await Promise.allSettled([
+        getAllDatabases(projectId),
+        getHetznerLocations(projectId),
+        getServerTypes(projectId),
+        getHetznerImages(projectId),
+        getAllNetworks(projectId),
+      ]);
+
+      // Handle databases
+      if (databasesResult.status === "fulfilled") {
+        const { data, error } = databasesResult.value;
+        if (!error) {
+          setDatabases(data);
+        } else {
+          toast.error("Failed to fetch existing databases", {
+            description: error,
+          });
+        }
+      } else {
+        toast.error("Failed to fetch existing databases", {
+          description: getErrorMessage(databasesResult.reason),
+        });
+      }
+
+      // Handle locations
+      if (locationsResult.status === "fulfilled") {
+        const { data, error } = locationsResult.value;
+        if (!error) {
+          setLocations(data);
+          const defaultLocationName =
+            data.find((loc) => loc.name === "fsn1")?.name ||
+            data[0]?.name ||
+            "";
+          form.setValue("server.location", defaultLocationName);
+        } else {
+          toast.error("Failed to fetch locations", { description: error });
+          setError("Failed to get locations: " + error);
+        }
+      } else {
+        toast.error("Failed to fetch locations", {
+          description: getErrorMessage(locationsResult.reason),
+        });
+      }
+
+      // Handle server types
+      if (serverTypesResult.status === "fulfilled") {
+        const { data, error } = serverTypesResult.value;
+        if (!error) {
+          setServerTypes(data);
+          const defaultServerType =
+            data.find((st) => st.name === "cx22")?.id.toString() ||
+            data[0]?.id.toString() ||
+            "";
+          form.setValue("server.serverType", defaultServerType);
+        } else {
+          toast.error("Failed to fetch server types", { description: error });
+          setError("Failed to get server types: " + error);
+        }
+      } else {
+        toast.error("Failed to fetch server types", {
+          description: getErrorMessage(serverTypesResult.reason),
+        });
+      }
+
+      // Handle images
+      if (imagesResult.status === "fulfilled") {
+        const { data, error } = imagesResult.value;
+        if (!error) {
+          setImages(data);
+          const defaultImage =
+            data.find((img) => img.name === "ubuntu-24.04")?.id.toString() ||
+            data[0]?.id.toString() ||
+            "";
+          form.setValue("server.image", defaultImage);
+        } else {
+          toast.error("Failed to fetch images", { description: error });
+          setError("Failed to get images: " + error);
+        }
+      } else {
+        toast.error("Failed to fetch images", {
+          description: getErrorMessage(imagesResult.reason),
+        });
+      }
+
+      // Handle networks
+      if (networksResult.status === "fulfilled") {
+        const { data, error } = networksResult.value;
+        if (!error) {
+          setNetworks(data);
+        } else {
+          toast.error("Failed to fetch networks", { description: error });
+          setError("Failed to get networks: " + error);
+        }
+      } else {
+        toast.error("Failed to fetch networks", {
+          description: getErrorMessage(networksResult.reason),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const [step, setStep] = useState<Steps>("server");
 
   const schemaByStep: Record<Steps, ZodTypeAny> = {
@@ -76,7 +207,6 @@ export default function ServerSetupForm({
   }
 
   const controllerSelected = form.watch("server.controller");
-  const isValid = form.formState.isValid;
 
   const nextStep = async () => {
     const valid = await form.trigger();
@@ -120,6 +250,14 @@ export default function ServerSetupForm({
     }
   };
 
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
+  }
+
   return (
     <Tabs value={step} onValueChange={() => {}} className="w-full gap-3">
       <TabsList className="w-full">
@@ -127,42 +265,32 @@ export default function ServerSetupForm({
           <span className="block sm:hidden">1</span>
           <span className="hidden sm:block">Server</span>
         </TabsTrigger>
-        <TabsTrigger
-          value="controller"
-          disabled={!controllerSelected}
-          className="cursor-default"
-        >
+        <TabsTrigger value="controller" className="cursor-default">
           <span className="block sm:hidden">2</span>
           <span className="hidden sm:block">Controller</span>
         </TabsTrigger>
-        <TabsTrigger
-          value="database"
-          disabled={!controllerSelected}
-          className="cursor-default"
-        >
+        <TabsTrigger value="database" className="cursor-default">
           <span className="block sm:hidden">3</span>
           <span className="hidden sm:block">Database</span>
         </TabsTrigger>
-        <TabsTrigger
-          value="network"
-          disabled={!controllerSelected}
-          className="cursor-default"
-        >
+        <TabsTrigger value="network" className="cursor-default">
           <span className="block sm:hidden">4</span>
           <span className="hidden sm:block">Network</span>
         </TabsTrigger>
-        <TabsTrigger
-          value="summary"
-          disabled={!isValid}
-          className="cursor-default"
-        >
+        <TabsTrigger value="summary" className="cursor-default">
           <span className="block sm:hidden">5</span>
           <span className="hidden sm:block">Summary</span>
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="server">
-        <ServerForm form={form} onNext={nextStep} projectId={projectId} />
+        <ServerForm
+          form={form}
+          onNext={nextStep}
+          locations={locations}
+          serverTypes={serverTypes}
+          images={images}
+        />
       </TabsContent>
 
       <TabsContent value="controller">
@@ -170,7 +298,29 @@ export default function ServerSetupForm({
           form={form}
           onNext={nextStep}
           onBack={previousStep}
-          projectId={projectId}
+        />
+      </TabsContent>
+
+      <TabsContent value="database">
+        <DatabaseForm
+          form={form}
+          onNext={nextStep}
+          onBack={previousStep}
+          databases={databases}
+          serverTypes={serverTypes}
+          images={images}
+          locations={locations}
+          serverController={form.watch("serverController.type")}
+        />
+      </TabsContent>
+
+      <TabsContent value="network">
+        <NetworkForm
+          form={form}
+          onNext={nextStep}
+          onBack={previousStep}
+          networks={networks}
+          locations={locations}
         />
       </TabsContent>
     </Tabs>

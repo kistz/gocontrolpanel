@@ -4,7 +4,16 @@ import { HetznerMetaPagination } from "./meta";
 export interface HetznerServer {
   id: number;
   name: string;
-  status: string;
+  status:
+    | "running"
+    | "initializing"
+    | "starting"
+    | "stopping"
+    | "off"
+    | "deleting"
+    | "migrating"
+    | "rebuilding"
+    | "unknown";
   created: string;
   public_net: {
     ipv4: {

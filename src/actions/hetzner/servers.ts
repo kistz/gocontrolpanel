@@ -343,3 +343,36 @@ export async function attachHetznerServerToNetwork(
     },
   );
 }
+
+export async function getAllDatabases(
+  projectId: string,
+): Promise<ServerResponse<HetznerServer[]>> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const servers: HetznerServer[] = [];
+      let page = 1;
+      let totalEntries = 0;
+
+      do {
+        const res = await axiosHetzner.get<HetznerServersResponse>("/servers", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            page,
+            per_page: 50,
+          },
+        });
+
+        servers.push(...res.data.servers);
+        totalEntries = res.data.meta.pagination.total_entries || 0;
+        page++;
+      } while (servers.length < totalEntries);
+
+      return servers.filter((server) => server.labels.type === "database");
+    },
+  );
+}

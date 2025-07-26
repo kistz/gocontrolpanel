@@ -343,13 +343,3 @@ export function hasPermissionsJWTSync(
 
   return permissions.some((permission) => userPermissions.includes(permission));
 }
-
-export function ipInCidr(ip: string, cidr: string): boolean {
-  const [range, bitsStr] = cidr.split("/");
-  const bits = parseInt(bitsStr, 10);
-  const ipToInt = (ipStr: string) =>
-    ipStr.split(".").reduce((acc, octet) => (acc << 8) + parseInt(octet), 0);
-
-  const mask = bits === 0 ? 0 : ~(2 ** (32 - bits) - 1);
-  return (ipToInt(ip) & mask) === (ipToInt(range) & mask);
-}

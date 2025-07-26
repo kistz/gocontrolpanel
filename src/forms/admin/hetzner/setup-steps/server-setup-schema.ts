@@ -35,7 +35,7 @@ export const ServerSetupSchema = z
   .refine(
     (data) => {
       if (data.server.controller) {
-        return data.database !== undefined && data.network !== undefined;
+        return data.database?.name !== undefined && data.network?.name !== undefined;
       }
       return true;
     },

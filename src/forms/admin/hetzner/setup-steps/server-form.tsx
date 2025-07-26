@@ -1,112 +1,28 @@
 "use client";
 
-import { getHetznerImages } from "@/actions/hetzner/images";
-import { getHetznerLocations } from "@/actions/hetzner/locations";
-import { getServerTypes } from "@/actions/hetzner/server-types";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowRight } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
-import { toast } from "sonner";
 import { ServerStepSchemaType } from "./server-setup-schema";
 
 export default function ServerForm({
   form,
   onNext,
-  projectId,
+  locations,
+  serverTypes,
+  images,
 }: {
   form: UseFormReturn<ServerStepSchemaType>;
   onNext: () => void;
-  projectId: string;
+  locations: HetznerLocation[];
+  serverTypes: HetznerServerType[];
+  images: HetznerImage[];
 }) {
-  const [locations, setLocations] = useState<HetznerLocation[]>([]);
-  const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
-  const [images, setImages] = useState<HetznerImage[]>([]);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetch() {
-      try {
-        const { data, error } = await getHetznerLocations(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setLocations(data);
-        form.setValue(
-          "server.location",
-          data.length > 0
-            ? data.find((loc) => loc.name === "fsn1")?.name || data[0].name
-            : "",
-        );
-      } catch (err) {
-        setError("Failed to get locations: " + getErrorMessage(err));
-        toast.error("Failed to fetch locations", {
-          description: getErrorMessage(err),
-        });
-      }
-
-      try {
-        const { data, error } = await getServerTypes(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setServerTypes(data);
-        form.setValue(
-          "server.serverType",
-          data.length > 0
-            ? data.find((st) => st.name === "cx22")?.id.toString() ||
-                data[0].id.toString()
-            : "",
-        );
-      } catch (err) {
-        setError("Failed to get server types: " + getErrorMessage(err));
-        toast.error("Failed to fetch server types", {
-          description: getErrorMessage(err),
-        });
-      }
-
-      try {
-        const { data, error } = await getHetznerImages(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setImages(data);
-        form.setValue(
-          "server.image",
-          data.length > 0
-            ? data.find((img) => img.name === "ubuntu-24.04")?.id.toString() ||
-                data[0].id.toString()
-            : "",
-        );
-      } catch (err) {
-        setError("Failed to get images: " + getErrorMessage(err));
-        toast.error("Failed to fetch images", {
-          description: getErrorMessage(err),
-        });
-      }
-
-      setLoading(false);
-    }
-
-    fetch();
-  }, []);
-
-  if (loading) {
-    return <span className="text-muted-foreground">Loading...</span>;
-  }
-
-  if (error) {
-    return <span>{error}</span>;
-  }
-
   const selectedServerType = serverTypes.find(
     (type) => type.id.toString() === form.watch("server.serverType"),
   );
@@ -349,14 +265,17 @@ export default function ServerForm({
             description="Check this if you want to add a server controller."
           />
 
+<div className="flex justify-end">
+
           <Button
             type="submit"
-            className="w-full"
+            className="flex-1 max-w-32"
             disabled={!form.formState.isValid}
-          >
+            >
             Next
             <IconArrowNarrowRight />
           </Button>
+            </div>
         </div>
       </form>
     </Form>
