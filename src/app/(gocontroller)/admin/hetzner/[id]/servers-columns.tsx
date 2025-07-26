@@ -2,6 +2,7 @@
 
 import { deleteHetznerServer } from "@/actions/hetzner/servers";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import HetznerDatabaseDetailsModal from "@/components/modals/hetzner-database-details";
 import HetznerServerDetailsModal from "@/components/modals/hetzner-server-details";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
@@ -33,6 +34,22 @@ export const createServersColumns = (
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Server Name"} />
     ),
+  },
+  {
+    accessorKey: "labels",
+    header: () => <span>Type</span>,
+    cell: ({ row }) => {
+      const labels = row.original.labels || {};
+      const type = labels.type;
+      switch (type) {
+        case "dedi":
+          return <span>Dedicated</span>;
+        case "database":
+          return <span>Database ({labels["database.type"]})</span>;
+        default:
+          return <span>Unknown</span>;
+      }
+    },
   },
   {
     accessorKey: "status",
@@ -100,6 +117,17 @@ export const createServersColumns = (
         });
       };
 
+      const getDetailsModal = () => {
+        switch (server.labels.type) {
+          case "dedi":
+            return <HetznerServerDetailsModal data={server} />;
+          case "database":
+            return <HetznerDatabaseDetailsModal data={server} />;
+          default:
+            return <HetznerServerDetailsModal data={server} />;
+        }
+      };
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -140,7 +168,7 @@ export const createServersColumns = (
           )}
 
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
-            <HetznerServerDetailsModal data={server} />
+            {getDetailsModal()}
           </Modal>
         </div>
       );

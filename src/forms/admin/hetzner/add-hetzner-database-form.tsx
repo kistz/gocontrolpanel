@@ -344,7 +344,6 @@ export default function AddHetznerDatabaseForm({
             name={"databaseName"}
             label="Database Name"
             placeholder="Enter database name"
-            type="password"
             isRequired
           />
 

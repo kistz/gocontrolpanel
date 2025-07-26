@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -x -e
+
+apt update
+apt install -y docker.io
+
+db_type="{{{db_type}}}"
+
+if [ "$db_type" = "postgres" ]; then
+
+  echo "PostgreSQL setup not implemented yet"
+
+elif [ "$db_type" = "mysql" ]; then
+
+  docker run -d --restart always \
+    -e MYSQL_ROOT_PASSWORD="{{{db_root_password}}}" \
+    -e MYSQL_DATABASE="{{{db_name}}}" \
+    -e MYSQL_USER="{{{db_user}}}" \
+    -e MYSQL_PASSWORD="{{{db_password}}}" \
+    mysql:8.0 \
+    --character-set-server=utf8mb4 \
+    --collation-server=utf8mb4_unicode_ci \
+    --innodb-flush-log-at-trx-commit=0 \
+    --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+
+elif [ "$db_type" = "mariadb" ]; then
+
+  echo "MariaDB setup not implemented yet"
+
+else
+  echo "Unsupported database type: $db_type"
+  exit 1
+fi

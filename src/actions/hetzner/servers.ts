@@ -270,12 +270,12 @@ export async function createHetznerDatabase(
       const token = await getApiToken(projectId);
 
       const dbData = {
-        database_type: data.databaseType,
-        database_root_password:
+        db_type: data.databaseType,
+        db_root_password:
           data.databaseRootPassword || generateRandomString(16),
-        database_name: data.databaseName,
-        database_user: data.databaseUser || generateRandomString(16),
-        database_password: data.databasePassword || generateRandomString(16),
+        db_name: data.databaseName,
+        db_user: data.databaseUser || generateRandomString(16),
+        db_password: data.databasePassword || generateRandomString(16),
       };
 
       const userData = dbTemplate(dbData);
@@ -288,10 +288,10 @@ export async function createHetznerDatabase(
         user_data: userData,
         labels: {
           type: "database",
-          "database.type": dbData.database_type,
-          "authorization.database.name": dbData.database_name,
-          "authorization.database.user": dbData.database_user,
-          "authorization.database.password": dbData.database_password,
+          "database.type": dbData.db_type,
+          "authorization.database.name": dbData.db_name,
+          "authorization.database.user": dbData.db_user,
+          "authorization.database.password": dbData.db_password,
         },
         public_net: {
           enable_ipv4: true,
