@@ -1,5 +1,6 @@
 "use server";
 
+import { AddHetznerDatabaseSchemaType } from "@/forms/admin/hetzner/add-hetzner-database-schema";
 import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/add-hetzner-server-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
@@ -23,9 +24,16 @@ import { packageDirectorySync } from "pkg-dir";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
 
 const root = packageDirectorySync() || process.cwd();
-const templatePath = path.join(root, "hetzner", "server-init.sh.hbs");
-const templateContent = readFileSync(templatePath, "utf-8");
-const template = Handlebars.compile(templateContent);
+
+// Dedi template
+const dediTemplatePath = path.join(root, "hetzner", "server-init.sh.hbs");
+const dediTemplateContent = readFileSync(dediTemplatePath, "utf-8");
+const dediTemplate = Handlebars.compile(dediTemplateContent);
+
+// Database template
+const dbTemplatePath = path.join(root, "hetzner", "database-init.sh.hbs");
+const dbTemplateContent = readFileSync(dbTemplatePath, "utf-8");
+const dbTemplate = Handlebars.compile(dbTemplateContent);
 
 export async function getHetznerServersPaginated(
   pagination: PaginationState,
@@ -173,7 +181,7 @@ export async function createHetznerServer(
           data.filemanagerPassword || generateRandomString(16),
       };
 
-      const userData = template(dediData);
+      const userData = dediTemplate(dediData);
 
       const body = {
         name: data.name,
@@ -182,6 +190,7 @@ export async function createHetznerServer(
         location: data.location,
         user_data: userData,
         labels: {
+          type: "dedi",
           "authorization.superadmin.password": dediData.superadmin_password,
           "authorization.admin.password": dediData.admin_password,
           "authorization.user.password": dediData.user_password,
@@ -247,6 +256,58 @@ export async function getRecentlyCreatedHetznerServers(): Promise<
       );
 
       return servers;
+    },
+  );
+}
+
+export async function createHetznerDatabase(
+  projectId: string,
+  data: AddHetznerDatabaseSchemaType,
+): Promise<ServerResponse<HetznerServer>> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const dbData = {
+        database_root_password:
+          data.databaseRootPassword || generateRandomString(16),
+        database_name: data.databaseName,
+        database_user: data.databaseUser || generateRandomString(16),
+        database_password: data.databasePassword || generateRandomString(16),
+      };
+
+      const userData = dbTemplate(dbData);
+
+      const body = {
+        name: data.name,
+        server_type: parseInt(data.serverType),
+        image: parseInt(data.image),
+        location: data.location,
+        user_data: userData,
+        labels: {
+          type: "database",
+          "authorization.database.name": dbData.database_name,
+          "authorization.database.user": dbData.database_user,
+          "authorization.database.password": dbData.database_password,
+        },
+        public_net: {
+          enable_ipv4: true,
+          enable_ipv6: false,
+        },
+      };
+
+      const res = await axiosHetzner.post<{
+        server: HetznerServer;
+      }>("/servers", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      await setRateLimit(projectId, res);
+
+      return res.data.server;
     },
   );
 }
