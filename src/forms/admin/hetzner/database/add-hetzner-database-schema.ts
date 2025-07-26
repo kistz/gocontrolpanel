@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { hetznerServerNameSchema } from "./add-hetzner-server-schema";
+import { hetznerServerNameSchema } from "../server/add-hetzner-server-schema";
 
 export const AddHetznerDatabaseSchema = z.object({
   name: hetznerServerNameSchema,

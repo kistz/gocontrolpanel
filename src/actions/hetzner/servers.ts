@@ -1,8 +1,8 @@
 "use server";
 
-import { AddHetznerDatabaseSchemaType } from "@/forms/admin/hetzner/add-hetzner-database-schema";
-import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/add-hetzner-server-schema";
-import { AttachHetznerServerToNetworkSchemaType } from "@/forms/admin/hetzner/attach-hetzner-server-to-network-schema";
+import { AddHetznerDatabaseSchemaType } from "@/forms/admin/hetzner/database/add-hetzner-database-schema";
+import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/server/add-hetzner-server-schema";
+import { AttachHetznerServerToNetworkSchemaType } from "@/forms/admin/hetzner/server/attach-hetzner-server-to-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {

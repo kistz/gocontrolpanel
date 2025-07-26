@@ -1,5 +1,5 @@
 "use client";
-import AddHetznerDatabaseForm from "@/forms/admin/hetzner/add-hetzner-database-form";
+import AddHetznerDatabaseForm from "@/forms/admin/hetzner/database/add-hetzner-database-form";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";

@@ -1,5 +1,5 @@
 "use client";
-import AddHetznerServerForm from "@/forms/admin/hetzner/add-hetzner-server-form";
+import AddHetznerServerForm from "@/forms/admin/hetzner/server/add-hetzner-server-form";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";

@@ -9,7 +9,7 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
-import { AddHetznerVolumeSchemaType } from "@/forms/admin/hetzner/add-hetzner-volume-schema";
+import { AddHetznerVolumeSchemaType } from "@/forms/admin/hetzner/volume/add-hetzner-volume-schema";
 
 export async function getHetznerVolumesPaginated(
   pagination: PaginationState,

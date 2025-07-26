@@ -9,7 +9,7 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
-import { AddHetznerNetworkSchemaType } from "@/forms/admin/hetzner/add-hetzner-network-schema";
+import { AddHetznerNetworkSchemaType } from "@/forms/admin/hetzner/network/add-hetzner-network-schema";
 
 export async function getHetznerNetworksPaginated(
   pagination: PaginationState,

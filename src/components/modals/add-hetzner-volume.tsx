@@ -1,6 +1,5 @@
 "use client";
-import AddHetznerVolumeForm from "@/forms/admin/hetzner/add-hetzner-volume-form";
-import { HetznerServer } from "@/types/api/hetzner/servers";
+import AddHetznerVolumeForm from "@/forms/admin/hetzner/volume/add-hetzner-volume-form";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
@@ -36,10 +35,7 @@ export default function AddHetznerVolumeModal({
         />
       </div>
 
-      <AddHetznerVolumeForm
-        projectId={data}
-        callback={handleSubmit}
-      />
+      <AddHetznerVolumeForm projectId={data} callback={handleSubmit} />
     </Card>
   );
 }
