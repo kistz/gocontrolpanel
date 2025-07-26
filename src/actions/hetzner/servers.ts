@@ -270,6 +270,7 @@ export async function createHetznerDatabase(
       const token = await getApiToken(projectId);
 
       const dbData = {
+        database_type: data.databaseType,
         database_root_password:
           data.databaseRootPassword || generateRandomString(16),
         database_name: data.databaseName,
@@ -287,6 +288,7 @@ export async function createHetznerDatabase(
         user_data: userData,
         labels: {
           type: "database",
+          "database.type": dbData.database_type,
           "authorization.database.name": dbData.database_name,
           "authorization.database.user": dbData.database_user,
           "authorization.database.password": dbData.database_password,

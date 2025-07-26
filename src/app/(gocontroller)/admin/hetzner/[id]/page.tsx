@@ -4,14 +4,15 @@ import {
   getRateLimit,
 } from "@/actions/hetzner/servers";
 import { getHetznerVolumesPaginated } from "@/actions/hetzner/volumes";
+import AddHetznerDatabaseModal from "@/components/modals/add-hetzner-database";
 import AddHetznerNetworkModal from "@/components/modals/add-hetzner-network";
 import AddHetznerServerModal from "@/components/modals/add-hetzner-server";
+import AddHetznerVolumeModal from "@/components/modals/add-hetzner-volume";
 import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddHetznerVolumeForm from "@/forms/admin/hetzner/add-hetzner-volume-form";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
@@ -20,7 +21,6 @@ import { redirect } from "next/navigation";
 import { createNetworksColumns } from "./networks-columns";
 import { createServersColumns } from "./servers-columns";
 import { createVolumesColumns } from "./volumes-columns";
-import AddHetznerVolumeModal from "@/components/modals/add-hetzner-volume";
 
 export default async function ProjectPage({
   params,
@@ -89,22 +89,28 @@ export default async function ProjectPage({
             filter
             actions={
               canCreate && (
-                <Modal>
-                  <AddHetznerServerModal data={id} />
-                  <Button className="w-9 sm:w-auto">
-                    <IconPlus />
-                    <span className="hidden sm:inline">Add Server</span>
-                  </Button>
-                </Modal>
+                <div className="flex gap-2">
+                  <Modal>
+                    <AddHetznerDatabaseModal data={id} />
+                    <Button className="w-9 sm:w-auto" variant={"outline"}>
+                      <IconPlus />
+                      <span className="hidden sm:inline">Add Database</span>
+                    </Button>
+                  </Modal>
+                  <Modal>
+                    <AddHetznerServerModal data={id} />
+                    <Button className="w-9 sm:w-auto">
+                      <IconPlus />
+                      <span className="hidden sm:inline">Add Server</span>
+                    </Button>
+                  </Modal>
+                </div>
               )
             }
           />
         </TabsContent>
 
-        <TabsContent
-          value="networks"
-          className="flex flex-col gap-2"
-        >
+        <TabsContent value="networks" className="flex flex-col gap-2">
           <PaginationTable
             createColumns={createNetworksColumns}
             args={{ projectId: id }}
@@ -125,10 +131,7 @@ export default async function ProjectPage({
           />
         </TabsContent>
 
-        <TabsContent
-          value="volumes"
-          className="flex flex-col gap-2"
-        >
+        <TabsContent value="volumes" className="flex flex-col gap-2">
           <PaginationTable
             createColumns={createVolumesColumns}
             args={{ projectId: id }}
