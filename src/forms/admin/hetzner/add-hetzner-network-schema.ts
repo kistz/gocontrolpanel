@@ -7,7 +7,7 @@ const hetznerNetworkNameSchema = z
     /^(?!-)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/,
     {
       message:
-        "Invalid server name: must be lowercase letters, digits, dashes, and dots; must start and end with a letter or digit.",
+        "Invalid network name: must be lowercase letters, digits, dashes, and dots; must start and end with a letter or digit.",
     },
   );
 
