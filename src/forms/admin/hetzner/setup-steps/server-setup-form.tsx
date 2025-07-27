@@ -5,6 +5,7 @@ import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { getAllNetworks } from "@/actions/hetzner/networks";
 import { getServerTypes } from "@/actions/hetzner/server-types";
 import { getAllDatabases } from "@/actions/hetzner/servers";
+import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
@@ -27,7 +28,6 @@ import {
   ServerSetupSchemaType,
 } from "./server-setup-schema";
 import Summary from "./summary";
-import { Form } from "@/components/ui/form";
 
 type Steps = "server" | "serverController" | "database" | "network" | "summary";
 
@@ -312,7 +312,12 @@ export default function ServerSetupForm({
         </TabsContent>
 
         <TabsContent value="summary">
-          <Summary form={form} projectId={projectId} onBack={previousStep} />
+          <Summary
+            form={form}
+            projectId={projectId}
+            onBack={previousStep}
+            callback={callback}
+          />
         </TabsContent>
       </Form>
     </Tabs>

@@ -13,10 +13,12 @@ export default function Summary({
   form,
   projectId,
   onBack,
+  callback,
 }: {
   form: UseFormReturn<ServerSetupSchemaType>;
   projectId: string;
   onBack: () => void;
+  callback?: () => void;
 }) {
   const { watch } = form;
 
@@ -35,6 +37,9 @@ export default function Summary({
         throw new Error(error);
       }
       toast.success("Server setup successfully created");
+      if (callback) {
+        callback();
+      }
     } catch (error) {
       toast.error("Failed to create server setup", {
         description: getErrorMessage(error),
