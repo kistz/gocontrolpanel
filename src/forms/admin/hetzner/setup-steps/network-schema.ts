@@ -19,7 +19,6 @@ export const NetworkSchema = AddHetznerNetworkSchema.extend({
     });
   }
 
-  // ✅ Custom validations
   if (serverIp === databaseIp) {
     ctx.addIssue({
       path: ["serverIp"],

@@ -19,7 +19,7 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { readFileSync } from "fs";
-import Handlebars from "handlebars";
+import { Handlebars } from "@/lib/handlebars";
 import path from "path";
 import { packageDirectorySync } from "pkg-dir";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
@@ -29,12 +29,12 @@ const root = packageDirectorySync() || process.cwd();
 // Dedi template
 const dediTemplatePath = path.join(root, "hetzner", "server-init.sh.hbs");
 const dediTemplateContent = readFileSync(dediTemplatePath, "utf-8");
-const dediTemplate = Handlebars.compile(dediTemplateContent);
+export const dediTemplate = Handlebars.compile(dediTemplateContent);
 
 // Database template
 const dbTemplatePath = path.join(root, "hetzner", "database-init.sh.hbs");
 const dbTemplateContent = readFileSync(dbTemplatePath, "utf-8");
-const dbTemplate = Handlebars.compile(dbTemplateContent);
+export const dbTemplate = Handlebars.compile(dbTemplateContent);
 
 export async function getHetznerServersPaginated(
   pagination: PaginationState,

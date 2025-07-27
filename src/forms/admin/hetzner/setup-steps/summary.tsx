@@ -1,16 +1,21 @@
 "use client";
 
+import { createServerSetup } from "@/actions/hetzner/server-setup";
 import BooleanDisplay from "@/components/boolean-display";
 import { Button } from "@/components/ui/button";
-import { IconArrowNarrowLeft, IconPlus } from "@tabler/icons-react";
+import { getErrorMessage } from "@/lib/utils";
+import { IconArrowNarrowLeft } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
 import { ServerSetupSchemaType } from "./server-setup-schema";
 
 export default function Summary({
   form,
+  projectId,
   onBack,
 }: {
   form: UseFormReturn<ServerSetupSchemaType>;
+  projectId: string;
   onBack: () => void;
 }) {
   const { watch } = form;
@@ -23,6 +28,18 @@ export default function Summary({
   async function handleSubmit() {
     const values = form.getValues();
     console.log(values);
+
+    try {
+      const { error } = await createServerSetup(projectId, values);
+      if (error) {
+        throw new Error(error);
+      }
+      toast.success("Server setup successfully created");
+    } catch (error) {
+      toast.error("Failed to create server setup", {
+        description: getErrorMessage(error),
+      });
+    }
   }
 
   return (

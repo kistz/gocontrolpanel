@@ -2,7 +2,7 @@
 
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { FormLabel } from "@/components/ui/form";
+import { FormLabel, FormMessage } from "@/components/ui/form";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { HetznerServer } from "@/types/api/hetzner/servers";
@@ -48,13 +48,13 @@ export default function NetworkForm({
   useEffect(() => {
     if (newNetwork) {
       setExistingDatabaseIp(undefined);
+      remove();
       form.reset({
         ...form.getValues(),
         network: {
           new: true,
           name: "",
           ipRange: "",
-          subnets: [],
         },
       });
     }
@@ -137,7 +137,10 @@ export default function NetworkForm({
           />
 
           <div className="flex flex-col gap-2">
-            <FormLabel>Subnets</FormLabel>
+            <FormLabel>
+              Subnets{" "}
+              <span className="text-xs text-muted-foreground">(Required)</span>
+            </FormLabel>
             {subnets.map((_, index) => (
               <div key={index} className="flex flex-col sm:flex-row gap-2">
                 <div className="flex gap-2">

@@ -312,7 +312,7 @@ export default function ServerSetupForm({
         </TabsContent>
 
         <TabsContent value="summary">
-          <Summary form={form} onBack={previousStep} />
+          <Summary form={form} projectId={projectId} onBack={previousStep} />
         </TabsContent>
       </Form>
     </Tabs>
