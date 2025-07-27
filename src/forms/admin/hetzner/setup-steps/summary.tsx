@@ -22,6 +22,7 @@ export default function Summary({
 
   async function handleSubmit() {
     const values = form.getValues();
+    console.log(values);
   }
 
   return (
@@ -29,7 +30,7 @@ export default function Summary({
       <div className="gap-4 grid sm:grid-cols-2 sm:gap-8 text-sm">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <h4 className="text-muted-foreground">General</h4>
+            <h4 className="text-muted-foreground">Server</h4>
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col">
                 <span className="font-semibold">Name</span>
@@ -46,7 +47,7 @@ export default function Summary({
               <div className="flex flex-col">
                 <span className="font-semibold">Controller</span>
                 <span className="truncate">
-                  <BooleanDisplay value={!!controller} size={20} />
+                  <BooleanDisplay value={!!server.controller} size={20} />
                 </span>
               </div>
             </div>

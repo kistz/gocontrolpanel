@@ -5,22 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
-import { ControllerStepSchemaType } from "./server-setup-schema";
+import { ServerSetupSchemaType } from "./server-setup-schema";
 
 export default function ServerControllerForm({
   form,
   onNext,
   onBack,
 }: {
-  form: UseFormReturn<ControllerStepSchemaType>;
+  form: UseFormReturn<ServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
 }) {
   return (
     <Form {...form}>
-      <form
-        className="flex flex-col gap-4"
-      >
+      <form className="flex flex-col gap-4">
         <FormElement
           name="serverController.type"
           label="Controller"
@@ -53,7 +51,11 @@ export default function ServerControllerForm({
         )}
 
         <div className="flex gap-2 justify-between">
-          <Button className="flex-1 max-w-32" variant="outline" onClick={onBack}>
+          <Button
+            className="flex-1 max-w-32"
+            variant="outline"
+            onClick={onBack}
+          >
             <IconArrowNarrowLeft />
             Previous
           </Button>

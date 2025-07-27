@@ -325,7 +325,7 @@ export async function attachHetznerServerToNetwork(
       const token = await getApiToken(projectId);
 
       const body = {
-        network: data.networkId,
+        network: parseInt(data.networkId),
         ip: data.ip,
       };
 

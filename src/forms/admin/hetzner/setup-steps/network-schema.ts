@@ -10,6 +10,14 @@ export const NetworkSchema = AddHetznerNetworkSchema.extend({
 }).superRefine((data, ctx) => {
   const { ipRange, serverIp, databaseIp } = data;
 
+  if (serverIp === databaseIp) {
+    ctx.addIssue({
+      path: ["serverIp"],
+      code: z.ZodIssueCode.custom,
+      message: "Server IP and Database IP cannot be the same.",
+    });
+  }
+
   if (!inRange(serverIp, ipRange)) {
     ctx.addIssue({
       path: ["serverIp"],

@@ -8,7 +8,7 @@ import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
-import { ServerStepSchemaType } from "./server-setup-schema";
+import { ServerSetupSchemaType } from "./server-setup-schema";
 
 export default function ServerForm({
   form,
@@ -17,7 +17,7 @@ export default function ServerForm({
   serverTypes,
   images,
 }: {
-  form: UseFormReturn<ServerStepSchemaType>;
+  form: UseFormReturn<ServerSetupSchemaType>;
   onNext: () => void;
   locations: HetznerLocation[];
   serverTypes: HetznerServerType[];
@@ -265,17 +265,16 @@ export default function ServerForm({
             description="Check this if you want to add a server controller."
           />
 
-<div className="flex justify-end">
-
-          <Button
-            type="submit"
-            className="flex-1 max-w-32"
-            disabled={!form.formState.isValid}
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              className="flex-1 max-w-32"
+              disabled={!form.formState.isValid}
             >
-            Next
-            <IconArrowNarrowRight />
-          </Button>
-            </div>
+              Next
+              <IconArrowNarrowRight />
+            </Button>
+          </div>
         </div>
       </form>
     </Form>

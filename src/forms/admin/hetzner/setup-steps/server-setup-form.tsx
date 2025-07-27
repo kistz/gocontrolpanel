@@ -15,25 +15,20 @@ import {
   HetznerServerType,
 } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ZodTypeAny } from "zod";
 import DatabaseForm from "./database-form";
 import NetworkForm from "./network-form";
 import ServerControllerForm from "./server-controller-form";
 import ServerForm from "./server-form";
 import {
-  ControllerStepSchema,
-  DatabaseStepSchema,
-  NetworkStepSchema,
   ServerSetupSchema,
   ServerSetupSchemaType,
-  ServerStepSchema,
 } from "./server-setup-schema";
 import Summary from "./summary";
 
-type Steps = "server" | "controller" | "database" | "network" | "summary";
+type Steps = "server" | "serverController" | "database" | "network" | "summary";
 
 export default function ServerSetupForm({
   projectId,
@@ -168,18 +163,8 @@ export default function ServerSetupForm({
 
   const [step, setStep] = useState<Steps>("server");
 
-  const schemaByStep: Record<Steps, ZodTypeAny> = {
-    server: ServerStepSchema,
-    controller: ControllerStepSchema,
-    database: DatabaseStepSchema,
-    network: NetworkStepSchema,
-    summary: ServerSetupSchema,
-  };
-
-  const currentSchema = useMemo(() => schemaByStep[step], [step]);
-
-  const form = useForm({
-    resolver: zodResolver(currentSchema),
+  const form = useForm<ServerSetupSchemaType>({
+    resolver: zodResolver(ServerSetupSchema),
     mode: "onChange",
     defaultValues: {
       server: {},
@@ -189,35 +174,32 @@ export default function ServerSetupForm({
     },
   });
 
-  async function onSubmit(values: ServerSetupSchemaType) {
-    try {
-      // Here you would typically call an API to submit the form data
-      // For example:
-      // const response = await submitServerSetup(projectId, values);
-      // if (response.error) throw new Error(response.error);
-
-      toast.success("Server setup successfully completed");
-      if (callback) {
-        callback();
-      }
-    } catch (error) {
-      toast.error("Failed to set up server", {
-        description: getErrorMessage(error),
-      });
-    }
-  }
-
   const controllerSelected = form.watch("server.controller");
 
+  useEffect(() => {
+    if (!controllerSelected) {
+      form.reset({
+        ...form.getValues(),
+        serverController: undefined,
+        database: undefined,
+        network: undefined,
+      });
+    }
+  }, [controllerSelected]);
+
   const nextStep = async () => {
-    const valid = await form.trigger();
-    if (!valid) return;
+    if (step !== "summary") {
+      const valid = await form.trigger(
+        step as "server" | "serverController" | "database" | "network",
+      );
+      if (!valid) return;
+    }
 
     switch (step) {
       case "server":
-        setStep(controllerSelected ? "controller" : "summary");
+        setStep(controllerSelected ? "serverController" : "summary");
         break;
-      case "controller":
+      case "serverController":
         setStep("database");
         break;
       case "database":
@@ -231,17 +213,21 @@ export default function ServerSetupForm({
 
   const previousStep = () => {
     switch (step) {
-      case "controller":
+      case "serverController":
         setStep("server");
         break;
       case "database":
-        setStep("controller");
+        setStep("serverController");
         break;
       case "network":
         setStep("database");
         break;
       case "summary":
-        setStep("network");
+        if (!controllerSelected) {
+          setStep("server");
+        } else {
+          setStep("network");
+        }
         break;
       default:
         setStep("server");
@@ -263,7 +249,7 @@ export default function ServerSetupForm({
           <span className="block sm:hidden">1</span>
           <span className="hidden sm:block">Server</span>
         </TabsTrigger>
-        <TabsTrigger value="controller" className="cursor-default">
+        <TabsTrigger value="serverController" className="cursor-default">
           <span className="block sm:hidden">2</span>
           <span className="hidden sm:block">Controller</span>
         </TabsTrigger>
@@ -291,7 +277,7 @@ export default function ServerSetupForm({
         />
       </TabsContent>
 
-      <TabsContent value="controller">
+      <TabsContent value="serverController">
         <ServerControllerForm
           form={form}
           onNext={nextStep}
@@ -318,15 +304,13 @@ export default function ServerSetupForm({
           onNext={nextStep}
           onBack={previousStep}
           networks={networks}
+          databases={databases}
           locations={locations}
         />
       </TabsContent>
 
       <TabsContent value="summary">
-        <Summary
-          form={form}
-          onBack={previousStep}
-        />
+        <Summary form={form} onBack={previousStep} />
       </TabsContent>
     </Tabs>
   );

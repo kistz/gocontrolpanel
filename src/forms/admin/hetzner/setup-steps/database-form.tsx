@@ -13,7 +13,7 @@ import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
 import { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
-import { DatabaseStepSchemaType } from "./server-setup-schema";
+import { ServerSetupSchemaType } from "./server-setup-schema";
 
 export default function DatabaseForm({
   form,
@@ -25,7 +25,7 @@ export default function DatabaseForm({
   locations,
   serverController,
 }: {
-  form: UseFormReturn<DatabaseStepSchemaType>;
+  form: UseFormReturn<ServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
   databases: HetznerServer[];
@@ -74,7 +74,9 @@ export default function DatabaseForm({
   useEffect(() => {
     async function check() {
       if (existingDatabase) {
-        const db = databases.find((db) => db.id.toString() === existingDatabase);
+        const db = databases.find(
+          (db) => db.id.toString() === existingDatabase,
+        );
         if (db) {
           form.reset({
             ...form.getValues(),

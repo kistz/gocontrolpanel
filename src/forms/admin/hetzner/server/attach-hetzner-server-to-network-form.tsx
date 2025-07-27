@@ -1,11 +1,14 @@
 "use client";
 
+import { getAllNetworks } from "@/actions/hetzner/networks";
 import { attachHetznerServerToNetwork } from "@/actions/hetzner/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
+import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -22,6 +25,40 @@ export default function AttachHetznerServerToNetworkForm({
   serverId: number;
   callback?: () => void;
 }) {
+  const [networks, setNetworks] = useState<HetznerNetwork[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      setLoading(true);
+
+      const [networksResult] = await Promise.allSettled([
+        getAllNetworks(projectId),
+      ]);
+
+      // Handle networks
+      if (networksResult.status === "fulfilled") {
+        const { data, error } = networksResult.value;
+        if (!error) {
+          setNetworks(data);
+        } else {
+          toast.error("Failed to fetch networks", { description: error });
+          setError("Failed to get networks: " + error);
+        }
+      } else {
+        toast.error("Failed to fetch networks", {
+          description: getErrorMessage(networksResult.reason),
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetch();
+  }, []);
+
   const form = useForm<AttachHetznerServerToNetworkSchemaType>({
     resolver: zodResolver(AttachHetznerServerToNetworkSchema),
   });
@@ -47,6 +84,14 @@ export default function AttachHetznerServerToNetworkForm({
     }
   }
 
+  if (loading) {
+    return <span className="text-muted-foreground">Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
+  }
+
   return (
     <Form {...form}>
       <form
@@ -55,11 +100,24 @@ export default function AttachHetznerServerToNetworkForm({
       >
         <FormElement
           name="networkId"
-          label="Network ID"
-          placeholder="Enter network ID"
-          type="number"
+          label="Network"
+          placeholder="Select a network"
+          className="min-w-32"
+          options={networks.map((nw) => ({
+            value: nw.id.toString(),
+            label: nw.name,
+          }))}
+          type="select"
           isRequired
         />
+
+        <div className="flex flex-col text-sm">
+          <span>IP Range</span>
+          <span className="text-muted-foreground">
+            {networks.find((nw) => nw.id.toString() === form.watch("networkId"))
+              ?.ip_range || "-"}
+          </span>
+        </div>
 
         <FormElement
           name="ip"

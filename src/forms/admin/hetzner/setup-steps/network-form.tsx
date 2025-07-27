@@ -5,27 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
+import { HetznerServer } from "@/types/api/hetzner/servers";
 import {
   IconArrowNarrowLeft,
   IconArrowNarrowRight,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { NetworkStepSchemaType } from "./server-setup-schema";
+import { ServerSetupSchemaType } from "./server-setup-schema";
 
 export default function NetworkForm({
   form,
   onNext,
   onBack,
   networks,
+  databases,
   locations,
 }: {
-  form: UseFormReturn<NetworkStepSchemaType>;
+  form: UseFormReturn<ServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
   networks: HetznerNetwork[];
+  databases: HetznerServer[];
   locations: HetznerLocation[];
 }) {
   const uniqueLocations = Array.from(
@@ -38,26 +41,40 @@ export default function NetworkForm({
 
   const existingNetwork = form.watch("network.existing");
 
+  const [existingDatabaseIp, setExistingDatabaseIp] = useState<
+    string | undefined
+  >();
+
   useEffect(() => {
     if (newNetwork) {
-    form.reset({
-      ...form.getValues(),
-      network: {
-        new: true,
-        name: "",
-        ipRange: "",
-        subnets: [],
-      },
-    });
-  }
+      form.reset({
+        ...form.getValues(),
+        network: {
+          new: true,
+          name: "",
+          ipRange: "",
+          subnets: [],
+        },
+      });
+    }
   }, [newNetwork]);
 
   useEffect(() => {
     async function check() {
-
       if (existingNetwork) {
         const nw = networks.find((nw) => nw.id.toString() === existingNetwork);
         if (nw) {
+          const dbInNetwork = nw.servers.find(
+            (s) => s.toString() === form.watch("database.existing"),
+          );
+          if (dbInNetwork) {
+            setExistingDatabaseIp(
+              databases
+                .find((db) => db.id === dbInNetwork)
+                ?.private_net.find((net) => net.network === nw.id)?.ip,
+            );
+          }
+
           form.reset({
             ...form.getValues(),
             network: {
@@ -70,6 +87,7 @@ export default function NetworkForm({
                 ipRange: subnet.ip_range,
                 networkZone: subnet.network_zone,
               })),
+              databaseIp: existingDatabaseIp || form.getValues("network.databaseIp") || "",
             },
           });
         }
@@ -197,7 +215,6 @@ export default function NetworkForm({
               }))}
             />
 
-            
             <div className="flex flex-col text-sm">
               <span>IP Range</span>
               <span className="text-muted-foreground">
@@ -218,6 +235,7 @@ export default function NetworkForm({
           name="network.databaseIp"
           label="Database IP"
           placeholder="Enter database IP"
+          isDisabled={!!existingDatabaseIp}
           isRequired
         />
 
