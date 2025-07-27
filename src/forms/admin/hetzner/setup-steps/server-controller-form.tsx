@@ -2,7 +2,6 @@
 
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import { ServerSetupSchemaType } from "./server-setup-schema";
@@ -17,59 +16,47 @@ export default function ServerControllerForm({
   onBack: () => void;
 }) {
   return (
-    <Form {...form}>
-      <form className="flex flex-col gap-4">
-        <FormElement
-          name="serverController.type"
-          label="Controller"
-          description="Select the server controller you want to use"
-          className="min-w-32"
-          isRequired
-          type="select"
-          options={[
-            { value: "evosc", label: "EvoSC" },
-            { value: "maniacontrol", label: "ManiaControl" },
-            { value: "minicontrol", label: "MiniControl" },
-            { value: "pyplanet", label: "PyPlanet" },
-          ]}
-        />
+    <form className="flex flex-col gap-4">
+      <FormElement
+        name="serverController.type"
+        label="Controller"
+        description="Select the server controller you want to use"
+        className="min-w-32"
+        isRequired
+        type="select"
+        options={[
+          { value: "evosc", label: "EvoSC" },
+          { value: "maniacontrol", label: "ManiaControl" },
+          { value: "minicontrol", label: "MiniControl" },
+          { value: "pyplanet", label: "PyPlanet" },
+        ]}
+      />
 
-        {form.watch("serverController.type") === "maniacontrol" && (
-          <ManiaControlSettingsForm />
-        )}
+      {form.watch("serverController.type") === "maniacontrol" && (
+        <ManiaControlSettingsForm />
+      )}
 
-        {form.watch("serverController.type") === "evosc" && (
-          <EvoSCSettingsForm />
-        )}
+      {form.watch("serverController.type") === "evosc" && <EvoSCSettingsForm />}
 
-        {form.watch("serverController.type") === "minicontrol" && (
-          <MiniControlSettingsForm />
-        )}
+      {form.watch("serverController.type") === "minicontrol" && (
+        <MiniControlSettingsForm />
+      )}
 
-        {form.watch("serverController.type") === "pyplanet" && (
-          <PyPlanetSettingsForm />
-        )}
+      {form.watch("serverController.type") === "pyplanet" && (
+        <PyPlanetSettingsForm />
+      )}
 
-        <div className="flex gap-2 justify-between">
-          <Button
-            className="flex-1 max-w-32"
-            variant="outline"
-            onClick={onBack}
-          >
-            <IconArrowNarrowLeft />
-            Previous
-          </Button>
-          <Button
-            className="flex-1 max-w-32"
-            disabled={!form.formState.isValid}
-            onClick={onNext}
-          >
-            Next
-            <IconArrowNarrowRight />
-          </Button>
-        </div>
-      </form>
-    </Form>
+      <div className="flex gap-2 justify-between">
+        <Button className="flex-1 max-w-32" variant="outline" onClick={onBack}>
+          <IconArrowNarrowLeft />
+          Previous
+        </Button>
+        <Button className="flex-1 max-w-32" type="button" onClick={onNext}>
+          Next
+          <IconArrowNarrowRight />
+        </Button>
+      </div>
+    </form>
   );
 }
 

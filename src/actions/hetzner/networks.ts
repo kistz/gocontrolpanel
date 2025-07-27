@@ -1,6 +1,7 @@
 "use server";
 
 import { AddHetznerNetworkSchemaType } from "@/forms/admin/hetzner/network/add-hetzner-network-schema";
+import { AddSubnetToNetworkSchemaType } from "@/forms/admin/hetzner/network/add-subnet-to-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -144,6 +145,37 @@ export async function getAllNetworks(
       } while (networks.length < totalEntries);
 
       return networks;
+    },
+  );
+}
+
+export async function addSubnetToNetwork(
+  projectId: string,
+  networkId: number,
+  data: AddSubnetToNetworkSchemaType,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const body = {
+        type: data.type,
+        ip_range: data.ipRange || undefined,
+        network_zone: data.networkZone,
+      };
+
+      const res = await axiosHetzner.post(
+        `/networks/${networkId}/actions/add_subnet`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await setRateLimit(projectId, res);
     },
   );
 }

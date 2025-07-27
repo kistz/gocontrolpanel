@@ -2,7 +2,7 @@
 
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { Form, FormLabel } from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/form";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { HetznerServer } from "@/types/api/hetzner/servers";
@@ -47,6 +47,7 @@ export default function NetworkForm({
 
   useEffect(() => {
     if (newNetwork) {
+      setExistingDatabaseIp(undefined);
       form.reset({
         ...form.getValues(),
         network: {
@@ -67,12 +68,12 @@ export default function NetworkForm({
           const dbInNetwork = nw.servers.find(
             (s) => s.toString() === form.watch("database.existing"),
           );
+          let existingDb: string | undefined;
           if (dbInNetwork) {
-            setExistingDatabaseIp(
-              databases
-                .find((db) => db.id === dbInNetwork)
-                ?.private_net.find((net) => net.network === nw.id)?.ip,
-            );
+            ((existingDb = databases
+              .find((db) => db.id === dbInNetwork)
+              ?.private_net.find((net) => net.network === nw.id)?.ip),
+              setExistingDatabaseIp(existingDb));
           }
 
           form.reset({
@@ -87,7 +88,10 @@ export default function NetworkForm({
                 ipRange: subnet.ip_range,
                 networkZone: subnet.network_zone,
               })),
-              databaseIp: existingDatabaseIp || form.getValues("network.databaseIp") || "",
+              serverIp: form.getValues("network.serverIp") || "",
+              databaseIp:
+                existingDb || form.getValues("network.databaseIp") || "",
+              databaseInNetwork: !!existingDb,
             },
           });
         }
@@ -108,156 +112,146 @@ export default function NetworkForm({
   });
 
   return (
-    <Form {...form}>
-      <form className={"flex flex-col gap-4"}>
-        <FormElement
-          name="network.new"
-          label="New Network"
-          type="checkbox"
-          description="Create a new network for this server"
-        />
+    <form className={"flex flex-col gap-4"}>
+      <FormElement
+        name="network.new"
+        label="New Network"
+        type="checkbox"
+        description="Create a new network for this server"
+      />
 
-        {newNetwork ? (
-          <>
-            <FormElement
-              name="network.name"
-              label="Network Name"
-              placeholder="Enter network name"
-              isRequired
-            />
+      {newNetwork ? (
+        <>
+          <FormElement
+            name="network.name"
+            label="Network Name"
+            placeholder="Enter network name"
+            isRequired
+          />
 
-            <FormElement
-              name="network.ipRange"
-              label="IP Range"
-              placeholder="Enter IP range (e.g., 10.0.0.0/16)"
-              isRequired
-            />
+          <FormElement
+            name="network.ipRange"
+            label="IP Range"
+            placeholder="Enter IP range (e.g., 10.0.0.0/16)"
+            isRequired
+          />
 
-            <div className="flex flex-col gap-2">
-              <FormLabel>Subnets</FormLabel>
-              {subnets.map((_, index) => (
-                <div key={index} className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex gap-2">
-                    <FormElement
-                      name={`network.subnets.${index}.type`}
-                      placeholder="Select subnet type"
-                      type="select"
-                      options={[
-                        { value: "cloud", label: "Cloud" },
-                        { value: "server", label: "Server" },
-                        { value: "vswitch", label: "VSwitch" },
-                      ]}
-                      isRequired
-                    />
+          <div className="flex flex-col gap-2">
+            <FormLabel>Subnets</FormLabel>
+            {subnets.map((_, index) => (
+              <div key={index} className="flex flex-col sm:flex-row gap-2">
+                <div className="flex gap-2">
+                  <FormElement
+                    name={`network.subnets.${index}.type`}
+                    placeholder="Select subnet type"
+                    type="select"
+                    options={[
+                      { value: "cloud", label: "Cloud" },
+                      { value: "server", label: "Server" },
+                      { value: "vswitch", label: "VSwitch" },
+                    ]}
+                    isRequired
+                  />
 
-                    <FormElement
-                      name={`network.subnets.${index}.ipRange`}
-                      placeholder="Enter subnet IP range"
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <FormElement
-                      name={`network.subnets.${index}.networkZone`}
-                      placeholder="Select network zone"
-                      type="select"
-                      options={uniqueLocations.map((loc) => ({
-                        value: loc.network_zone,
-                        label: loc.network_zone,
-                      }))}
-                      isRequired
-                    />
-
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size={"icon"}
-                      onClick={() => remove(index)}
-                    >
-                      <IconTrash />
-                      <span className="sr-only">Remove Subnet</span>
-                    </Button>
-                  </div>
+                  <FormElement
+                    name={`network.subnets.${index}.ipRange`}
+                    placeholder="Enter subnet IP range (e.g., 10.0.0.0/16)"
+                  />
                 </div>
-              ))}
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  append({
-                    type: "cloud",
-                    networkZone:
-                      uniqueLocations.length > 0
-                        ? uniqueLocations.find(
-                            (loc) => loc.network_zone === "eu-central",
-                          )?.network_zone || uniqueLocations[0].network_zone
-                        : "",
-                  })
-                }
-              >
-                <IconPlus />
-                Add Subnet
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <FormElement
-              name="network.existing"
-              label="Existing Network"
-              description="Select an existing network to use for this server"
-              className="min-w-32"
-              type="select"
-              options={networks.map((nw) => ({
-                value: nw.id.toString(),
-                label: nw.name,
-              }))}
-            />
+                <div className="flex gap-2">
+                  <FormElement
+                    name={`network.subnets.${index}.networkZone`}
+                    placeholder="Select network zone"
+                    type="select"
+                    options={uniqueLocations.map((loc) => ({
+                      value: loc.network_zone,
+                      label: loc.network_zone,
+                    }))}
+                    isRequired
+                  />
 
-            <div className="flex flex-col text-sm">
-              <span>IP Range</span>
-              <span className="text-muted-foreground">
-                {form.watch("network.ipRange") || "-"}
-              </span>
-            </div>
-          </>
-        )}
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size={"icon"}
+                    onClick={() => remove(index)}
+                  >
+                    <IconTrash />
+                    <span className="sr-only">Remove Subnet</span>
+                  </Button>
+                </div>
+              </div>
+            ))}
 
-        <FormElement
-          name="network.serverIp"
-          label="Server IP"
-          placeholder="Enter server IP"
-          isRequired
-        />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                append({
+                  type: "cloud",
+                  networkZone:
+                    uniqueLocations.length > 0
+                      ? uniqueLocations.find(
+                          (loc) => loc.network_zone === "eu-central",
+                        )?.network_zone || uniqueLocations[0].network_zone
+                      : "",
+                })
+              }
+            >
+              <IconPlus />
+              Add Subnet
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <FormElement
+            name="network.existing"
+            label="Existing Network"
+            description="Select an existing network to use for this server"
+            className="min-w-32"
+            type="select"
+            options={networks.map((nw) => ({
+              value: nw.id.toString(),
+              label: nw.name,
+            }))}
+          />
 
-        <FormElement
-          name="network.databaseIp"
-          label="Database IP"
-          placeholder="Enter database IP"
-          isDisabled={!!existingDatabaseIp}
-          isRequired
-        />
+          <div className="flex flex-col text-sm">
+            <span>IP Range</span>
+            <span className="text-muted-foreground">
+              {form.watch("network.ipRange") || "-"}
+            </span>
+          </div>
+        </>
+      )}
 
-        <div className="flex gap-2 justify-between">
-          <Button
-            className="flex-1 max-w-32"
-            variant="outline"
-            onClick={onBack}
-          >
-            <IconArrowNarrowLeft />
-            Previous
-          </Button>
-          <Button
-            className="flex-1 max-w-32"
-            disabled={!form.formState.isValid}
-            onClick={onNext}
-          >
-            Next
-            <IconArrowNarrowRight />
-          </Button>
-        </div>
-      </form>
-    </Form>
+      <FormElement
+        name="network.serverIp"
+        label="Server IP"
+        placeholder="Enter server IP"
+        isRequired
+      />
+
+      <FormElement
+        name="network.databaseIp"
+        label="Database IP"
+        placeholder="Enter database IP"
+        isDisabled={!!existingDatabaseIp}
+        isRequired
+      />
+
+      <div className="flex gap-2 justify-between">
+        <Button className="flex-1 max-w-32" variant="outline" onClick={onBack}>
+          <IconArrowNarrowLeft />
+          Previous
+        </Button>
+        <Button className="flex-1 max-w-32" type="button" onClick={onNext}>
+          Next
+          <IconArrowNarrowRight />
+        </Button>
+      </div>
+    </form>
   );
 }

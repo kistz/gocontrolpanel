@@ -121,45 +121,44 @@ export default function AddHetznerNetworkForm({
           {subnets.map((_, index) => (
             <div key={index} className="flex flex-col sm:flex-row gap-2">
               <div className="flex gap-2">
-              <FormElement
-                name={`subnets.${index}.type`}
-                placeholder="Select subnet type"
-                type="select"
-                options={[
-                  { value: "cloud", label: "Cloud" },
-                  { value: "server", label: "Server" },
-                  { value: "vswitch", label: "VSwitch" },
-                ]}
-                isRequired
-              />
+                <FormElement
+                  name={`subnets.${index}.type`}
+                  placeholder="Select subnet type"
+                  type="select"
+                  options={[
+                    { value: "cloud", label: "Cloud" },
+                    { value: "server", label: "Server" },
+                  ]}
+                  isRequired
+                />
 
-              <FormElement
-                name={`subnets.${index}.ipRange`}
-                placeholder="Enter subnet IP range"
-              />
+                <FormElement
+                  name={`subnets.${index}.ipRange`}
+                  placeholder="Enter subnet IP range (e.g., 10.0.0.0/16)"
+                />
               </div>
 
-<div className="flex gap-2">
-              <FormElement
-                name={`subnets.${index}.networkZone`}
-                placeholder="Select network zone"
-                type="select"
-                options={locations.map((loc) => ({
-                  value: loc.network_zone,
-                  label: loc.network_zone,
-                }))}
-                isRequired
-              />
+              <div className="flex gap-2">
+                <FormElement
+                  name={`subnets.${index}.networkZone`}
+                  placeholder="Select network zone"
+                  type="select"
+                  options={locations.map((loc) => ({
+                    value: loc.network_zone,
+                    label: loc.network_zone,
+                  }))}
+                  isRequired
+                />
 
-              <Button
-                type="button"
-                variant="destructive"
-                size={"icon"}
-                onClick={() => remove(index)}
-              >
-                <IconTrash />
-                <span className="sr-only">Remove Subnet</span>
-              </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size={"icon"}
+                  onClick={() => remove(index)}
+                >
+                  <IconTrash />
+                  <span className="sr-only">Remove Subnet</span>
+                </Button>
               </div>
             </div>
           ))}

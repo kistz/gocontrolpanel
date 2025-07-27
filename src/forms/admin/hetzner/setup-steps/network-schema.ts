@@ -7,9 +7,19 @@ export const NetworkSchema = AddHetznerNetworkSchema.extend({
   existing: z.string().optional(),
   serverIp: z.string(),
   databaseIp: z.string(),
+  databaseInNetwork: z.boolean().optional(),
 }).superRefine((data, ctx) => {
-  const { ipRange, serverIp, databaseIp } = data;
+  const { ipRange, serverIp, databaseIp, new: isNew, existing } = data;
 
+  if (!isNew && (!existing || existing.trim() === "")) {
+    ctx.addIssue({
+      path: ["existing"],
+      code: z.ZodIssueCode.custom,
+      message: "Existing network must be selected unless creating a new one.",
+    });
+  }
+
+  // ✅ Custom validations
   if (serverIp === databaseIp) {
     ctx.addIssue({
       path: ["serverIp"],

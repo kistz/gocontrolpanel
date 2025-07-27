@@ -27,6 +27,7 @@ import {
   ServerSetupSchemaType,
 } from "./server-setup-schema";
 import Summary from "./summary";
+import { Form } from "@/components/ui/form";
 
 type Steps = "server" | "serverController" | "database" | "network" | "summary";
 
@@ -267,51 +268,53 @@ export default function ServerSetupForm({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="server">
-        <ServerForm
-          form={form}
-          onNext={nextStep}
-          locations={locations}
-          serverTypes={serverTypes}
-          images={images}
-        />
-      </TabsContent>
+      <Form {...form}>
+        <TabsContent value="server">
+          <ServerForm
+            form={form}
+            onNext={nextStep}
+            locations={locations}
+            serverTypes={serverTypes}
+            images={images}
+          />
+        </TabsContent>
 
-      <TabsContent value="serverController">
-        <ServerControllerForm
-          form={form}
-          onNext={nextStep}
-          onBack={previousStep}
-        />
-      </TabsContent>
+        <TabsContent value="serverController">
+          <ServerControllerForm
+            form={form}
+            onNext={nextStep}
+            onBack={previousStep}
+          />
+        </TabsContent>
 
-      <TabsContent value="database">
-        <DatabaseForm
-          form={form}
-          onNext={nextStep}
-          onBack={previousStep}
-          databases={databases}
-          serverTypes={serverTypes}
-          images={images}
-          locations={locations}
-          serverController={form.watch("serverController.type")}
-        />
-      </TabsContent>
+        <TabsContent value="database">
+          <DatabaseForm
+            form={form}
+            onNext={nextStep}
+            onBack={previousStep}
+            databases={databases}
+            serverTypes={serverTypes}
+            images={images}
+            locations={locations}
+            serverController={form.watch("serverController.type")}
+          />
+        </TabsContent>
 
-      <TabsContent value="network">
-        <NetworkForm
-          form={form}
-          onNext={nextStep}
-          onBack={previousStep}
-          networks={networks}
-          databases={databases}
-          locations={locations}
-        />
-      </TabsContent>
+        <TabsContent value="network">
+          <NetworkForm
+            form={form}
+            onNext={nextStep}
+            onBack={previousStep}
+            networks={networks}
+            databases={databases}
+            locations={locations}
+          />
+        </TabsContent>
 
-      <TabsContent value="summary">
-        <Summary form={form} onBack={previousStep} />
-      </TabsContent>
+        <TabsContent value="summary">
+          <Summary form={form} onBack={previousStep} />
+        </TabsContent>
+      </Form>
     </Tabs>
   );
 }
