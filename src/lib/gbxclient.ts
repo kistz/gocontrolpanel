@@ -121,9 +121,9 @@ export class GbxClientManager extends EventEmitter {
         serverCommands: {
           include: {
             command: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!server) throw new Error(`Server ${this.serverId} not found`);
@@ -262,6 +262,15 @@ export async function getGbxClientManager(
   }
 
   return appGlobals.gbxClients[serverId];
+}
+
+export async function deleteGbxClientManager(serverId: string): Promise<void> {
+  const manager = appGlobals.gbxClients?.[serverId];
+  if (!manager) return;
+
+  manager.removeAllListeners();
+
+  delete appGlobals.gbxClients?.[serverId];
 }
 
 async function callbackListener(
@@ -973,14 +982,14 @@ async function handleCommand(manager: GbxClientManager, chat: PlayerChat) {
   const cmd = manager.info.commands.find(
     (c) => c.command.command.toLowerCase() === command,
   );
-  
+
   if (!cmd || !cmd.enabled) return;
 
   switch (cmd.command.name.toLowerCase()) {
     case "admin":
       await handleAdminCommand(manager, chat, params);
       break;
-  } 
+  }
 }
 
 async function onPlayerChat(manager: GbxClientManager, chat: PlayerChat) {
