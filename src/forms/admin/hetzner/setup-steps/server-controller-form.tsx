@@ -11,6 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { ServerSetupSchemaType } from "./server-setup-schema";
+import { useEffect } from "react";
 
 export default function ServerControllerForm({
   form,
@@ -68,6 +69,13 @@ export default function ServerControllerForm({
 
 function ManiaControlSettingsForm() {
   const form = useFormContext<ServerSetupSchemaType>();
+
+  useEffect(() => {
+    form.setValue(
+      "serverController.admins",
+      form.getValues("serverController.admins") || [],
+    );
+  }, []);
 
   return (
     <div className="flex flex-col gap-2">

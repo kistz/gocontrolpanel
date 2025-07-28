@@ -9,7 +9,7 @@ import {
   HetznerServerType,
 } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
 import { ServerSetupSchemaType } from "./server-setup-schema";
@@ -33,12 +33,19 @@ export default function DatabaseForm({
   locations: HetznerLocation[];
   serverController: string | undefined;
 }) {
+  const isFirstRender = useRef(true);
+
   const [creatingNewDatabase, setCreatingNewDatabase] = useState(false);
   const newDatabase = form.watch("database.new");
 
   const existingDatabase = form.watch("database.existing");
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     if (newDatabase) {
       form.reset({
         ...form.getValues(),

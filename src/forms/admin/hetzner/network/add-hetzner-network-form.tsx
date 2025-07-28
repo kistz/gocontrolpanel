@@ -135,6 +135,7 @@ export default function AddHetznerNetworkForm({
                 <FormElement
                   name={`subnets.${index}.ipRange`}
                   placeholder="Enter subnet IP range (e.g., 10.0.0.0/16)"
+                  className="max-w-32"
                 />
               </div>
 
@@ -142,6 +143,7 @@ export default function AddHetznerNetworkForm({
                 <FormElement
                   name={`subnets.${index}.networkZone`}
                   placeholder="Select network zone"
+                  className="max-w-24"
                   type="select"
                   options={locations.map((loc) => ({
                     value: loc.network_zone,

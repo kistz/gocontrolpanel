@@ -29,8 +29,7 @@ export default function Summary({
 
   async function handleSubmit() {
     const values = form.getValues();
-    console.log(values);
-
+    
     try {
       const { error } = await createServerSetup(projectId, values);
       if (error) {

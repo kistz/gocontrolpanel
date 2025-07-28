@@ -2,7 +2,7 @@
 
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { FormLabel, FormMessage } from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/form";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { HetznerServer } from "@/types/api/hetzner/servers";
@@ -12,7 +12,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { ServerSetupSchemaType } from "./server-setup-schema";
 
@@ -31,6 +31,8 @@ export default function NetworkForm({
   databases: HetznerServer[];
   locations: HetznerLocation[];
 }) {
+  const isFirstRender = useRef(true);
+
   const uniqueLocations = Array.from(
     new Map(locations.map((loc) => [loc.network_zone, loc])),
   )
@@ -46,6 +48,11 @@ export default function NetworkForm({
   >();
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     if (newNetwork) {
       setExistingDatabaseIp(undefined);
       remove();
@@ -54,7 +61,21 @@ export default function NetworkForm({
         network: {
           new: true,
           name: "",
-          ipRange: "",
+          ipRange: "10.0.0.0/16",
+          subnets: [
+            {
+              type: "cloud",
+              ipRange: "10.0.0.0/16",
+              networkZone:
+                uniqueLocations.length > 0
+                  ? uniqueLocations.find(
+                      (loc) => loc.network_zone === "eu-central",
+                    )?.network_zone || uniqueLocations[0].network_zone
+                  : "",
+            },
+          ],
+          serverIp: "10.0.0.3",
+          databaseIp: "10.0.0.2",
         },
       });
     }
@@ -151,7 +172,6 @@ export default function NetworkForm({
                     options={[
                       { value: "cloud", label: "Cloud" },
                       { value: "server", label: "Server" },
-                      { value: "vswitch", label: "VSwitch" },
                     ]}
                     isRequired
                   />
@@ -159,6 +179,7 @@ export default function NetworkForm({
                   <FormElement
                     name={`network.subnets.${index}.ipRange`}
                     placeholder="Enter subnet IP range (e.g., 10.0.0.0/16)"
+                    className="max-w-32"
                   />
                 </div>
 
@@ -166,6 +187,7 @@ export default function NetworkForm({
                   <FormElement
                     name={`network.subnets.${index}.networkZone`}
                     placeholder="Select network zone"
+                    className="max-w-24"
                     type="select"
                     options={uniqueLocations.map((loc) => ({
                       value: loc.network_zone,
@@ -219,6 +241,7 @@ export default function NetworkForm({
               value: nw.id.toString(),
               label: nw.name,
             }))}
+            isRequired
           />
 
           <div className="flex flex-col text-sm">
