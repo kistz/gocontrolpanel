@@ -47,6 +47,9 @@ export default function DatabaseForm({
                 serverTypes[0].id.toString()
               : "",
           name: "",
+          databaseName: "",
+          databaseUser: "",
+          databasePassword: "",
         },
       });
       setCreatingNewDatabase(true);
@@ -69,6 +72,8 @@ export default function DatabaseForm({
               existing: db.id.toString(),
               name: db.name,
               databaseName: db.labels["authorization.database.name"],
+              databaseUser: db.labels["authorization.database.user"],
+              databasePassword: db.labels["authorization.database.password"],
               serverType: db.server_type?.id.toString(),
             },
           });
