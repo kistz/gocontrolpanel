@@ -30,7 +30,7 @@ services:
 
   pyplanet:
     image: pyplanet/pyplanet:latest
-    restart: unless-stopped
+    restart: always
     environment:
       PY_ADMINS: ${PY_ADMINS}
       DB_NAME: ${DB_NAME}

@@ -30,7 +30,7 @@ services:
 
   minicontrol:
     image: evoesports/minicontrol:latest
-    restart: unless-stopped
+    restart: always
     environment:
       XMLRPC_HOST: dedicated
       XMLRPC_PORT: 5000
