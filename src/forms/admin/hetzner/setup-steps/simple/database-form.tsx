@@ -43,12 +43,13 @@ export default function DatabaseForm({
           new: true,
           serverType:
             serverTypes.length > 0
-              ? serverTypes.find((st) => st.name === "cx22")?.id.toString() ||
+              ? serverTypes.find((st) => st.name === "cpx11")?.id.toString() ||
                 serverTypes[0].id.toString()
               : "",
           name: "",
           databaseIp: undefined,
           networkId: undefined,
+          databaseType: undefined,
           databaseName: "",
           databaseUser: undefined,
           databasePassword: undefined,
@@ -75,6 +76,7 @@ export default function DatabaseForm({
               name: db.name,
               databaseIp: db.private_net[0]?.ip,
               networkId: db.private_net[0]?.network,
+              databaseType: db.labels["database.type"],
               databaseName: db.labels["authorization.database.name"],
               databaseUser: db.labels["authorization.database.user"],
               databasePassword: db.labels["authorization.database.password"],
@@ -97,29 +99,6 @@ export default function DatabaseForm({
     selectedServerType?.prices.find(
       (price) => price.location === form.getValues("server.location"),
     ) || selectedServerType?.prices.find((price) => price.location === "fsn1");
-
-  let databaseOptions = [];
-  switch (serverController) {
-    case "evosc":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
-      break;
-    case "maniacontrol":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
-      break;
-    case "minicontrol":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
-      break;
-    case "pyplanet":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
-      break;
-    default:
-      databaseOptions = [
-        { value: "mysql", label: "MySQL" },
-        { value: "postgres", label: "PostgreSQL" },
-        { value: "mariadb", label: "MariaDB" },
-      ];
-      break;
-  }
 
   return (
     <form className={"flex flex-col gap-4"}>

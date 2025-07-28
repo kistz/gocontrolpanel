@@ -286,6 +286,7 @@ export async function createHetznerDatabase(
         image: data.image,
         location: data.location,
         user_data: userData,
+        networks: [data.networkId],
         labels: {
           type: "database",
           "database.type": dbData.db_type,

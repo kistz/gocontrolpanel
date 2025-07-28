@@ -9,7 +9,14 @@ db_type="{{{db_type}}}"
 
 if [ "$db_type" = "postgres" ]; then
 
-  echo "PostgreSQL setup not implemented yet"
+  docker run -d --restart always \
+    -e POSTGRES_USER="{{{db_user}}}" \
+    -e POSTGRES_PASSWORD="{{{db_password}}}" \
+    -e POSTGRES_DB="{{{db_name}}}" \
+    -p 5432:5432 \
+    postgres:16 \
+    -c client_encoding=UTF8 \
+    -c log_statement=all
 
 elif [ "$db_type" = "mysql" ]; then
 
@@ -27,7 +34,16 @@ elif [ "$db_type" = "mysql" ]; then
 
 elif [ "$db_type" = "mariadb" ]; then
 
-  echo "MariaDB setup not implemented yet"
+  docker run -d --restart always \
+    -e MARIADB_ROOT_PASSWORD="{{{db_root_password}}}" \
+    -e MARIADB_DATABASE="{{{db_name}}}" \
+    -e MARIADB_USER="{{{db_user}}}" \
+    -e MARIADB_PASSWORD="{{{db_password}}}" \
+    -p 3306:3306 \
+    mariadb:11 \
+    --character-set-server=utf8mb4 \
+    --collation-server=utf8mb4_unicode_ci \
+    --innodb-flush-log-at-trx-commit=0
 
 else
   echo "Unsupported database type: $db_type"

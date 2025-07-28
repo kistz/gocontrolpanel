@@ -11,6 +11,7 @@ export const AddHetznerDatabaseSchema = z.object({
   databaseRootPassword: z.string().optional(),
   databaseUser: z.string().optional(),
   databasePassword: z.string().optional(),
+  networkId: z.number().optional(),
 });
 
 export type AddHetznerDatabaseSchemaType = z.infer<

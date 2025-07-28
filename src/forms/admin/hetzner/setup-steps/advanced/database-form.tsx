@@ -59,7 +59,7 @@ export default function DatabaseForm({
               : "",
           serverType:
             serverTypes.length > 0
-              ? serverTypes.find((st) => st.name === "cx22")?.id.toString() ||
+              ? serverTypes.find((st) => st.name === "cpx11")?.id.toString() ||
                 serverTypes[0].id.toString()
               : "",
           location:
@@ -131,16 +131,29 @@ export default function DatabaseForm({
   let databaseOptions = [];
   switch (serverController) {
     case "evosc":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
+      databaseOptions = [
+        { value: "mysql", label: "MySQL" },
+        { value: "mariadb", label: "MariaDB" },
+      ];
       break;
     case "maniacontrol":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
+      databaseOptions = [
+        { value: "mysql", label: "MySQL" },
+        { value: "mariadb", label: "MariaDB" },
+      ];
       break;
     case "minicontrol":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
+      databaseOptions = [
+        { value: "mysql", label: "MySQL" },
+        { value: "postgres", label: "PostgreSQL" },
+        { value: "mariadb", label: "MariaDB" },
+      ];
       break;
     case "pyplanet":
-      databaseOptions = [{ value: "mysql", label: "MySQL" }];
+      databaseOptions = [
+        { value: "mysql", label: "MySQL" },
+        { value: "mariadb", label: "MariaDB" },
+      ];
       break;
     default:
       databaseOptions = [

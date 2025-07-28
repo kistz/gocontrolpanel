@@ -8,7 +8,7 @@ import {
   getKeyHetznerRecentlyCreatedServers,
   getRedisClient,
 } from "@/lib/redis";
-import { generateRandomString } from "@/lib/utils";
+import { generateRandomString, sleep } from "@/lib/utils";
 import { HetznerServer, HetznerServerCache } from "@/types/api/hetzner/servers";
 import { ServerResponse } from "@/types/responses";
 import { createHetznerNetwork } from "./networks";
@@ -17,7 +17,7 @@ import {
   createHetznerDatabase,
   dediTemplate,
 } from "./servers";
-import { getApiToken, setRateLimit } from "./util";
+import { getApiToken, getHetznerServer, setRateLimit } from "./util";
 
 export async function createAdvancedServerSetup(
   projectId: string,
@@ -52,25 +52,75 @@ export async function createAdvancedServerSetup(
         networkId = parseInt(network.existing);
       }
 
+      if (!networkId && server.controller) {
+        throw new Error("Network must be created or selected for controller servers.");
+      }
+
       let databaseId: number | undefined = undefined;
+      let createdDatabase: HetznerServer | undefined = undefined;
       if (server.controller && database?.new) {
         const { data, error } = await createHetznerDatabase(
           projectId,
-          database,
+          {
+            ...database,
+            networkId
+          },
         );
         if (error) {
           throw new Error(error);
         }
+        createdDatabase = data;
         databaseId = data.id;
       } else if (server.controller && database?.existing) {
         databaseId = parseInt(database.existing);
+
+        if (!network?.databaseInNetwork) {
+          if (!networkId) {
+            throw new Error("Network must be selected for existing databases.");
+          }
+
+          const { error: dbError } = await attachHetznerServerToNetwork(
+            projectId,
+            databaseId,
+            {
+              networkId: networkId.toString(),
+            },
+          );
+
+          let count = 0;
+          do {
+            await sleep(1000);
+            console.log("Waiting for database to be attached to network...");
+            const updatedServer = await getHetznerServer(
+              projectId,
+              databaseId,
+            );
+            createdDatabase = updatedServer;
+            count++;
+          } while (!createdDatabase.private_net.find(
+            (net) => net.network === networkId,
+          ) && count < 10);
+
+          if (!createdDatabase.private_net.find(
+            (net) => net.network === networkId,
+          )) {
+            createdDatabase.private_net?.push({
+              network: networkId,
+              ip: networkId.toString().split(".").slice(0, 3).join(".") + ".63",
+            });
+          }
+
+          if (dbError) {
+            throw new Error(dbError);
+          }
+        }
       }
 
       const dediData = {
         server_controller: server.controller ? serverController : undefined,
         db: {
-          host: network?.databaseIp,
-          port: 3306,
+          host: createdDatabase?.private_net.find((net) => net.network === networkId)?.ip || network?.databaseIp || "",
+          port: database?.databaseType === "postgres" ? 5432 : 3306,
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
@@ -133,20 +183,9 @@ export async function createAdvancedServerSetup(
 
       const serverId = res.data.server.id;
 
-      if (server.controller && networkId) {
-        if (databaseId && !network?.databaseInNetwork) {
-          const { error: dbError } = await attachHetznerServerToNetwork(
-            projectId,
-            databaseId,
-            {
-              networkId: networkId.toString(),
-              ip: dediData.db.host,
-            },
-          );
-
-          if (dbError) {
-            throw new Error(dbError);
-          }
+      if (server.controller) {
+        if (!networkId) {
+          throw new Error("Network must be created or selected for controller servers.");
         }
 
         const { error: serverError } = await attachHetznerServerToNetwork(
@@ -229,7 +268,7 @@ export async function createSimpleServerSetup(
         server_controller: server.controller ? serverController : undefined,
         db: {
           host: database?.databaseIp || "10.0.0.2",
-          port: 3306,
+          port: database?.databaseType === "postgres" ? 5432 : 3306,
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),

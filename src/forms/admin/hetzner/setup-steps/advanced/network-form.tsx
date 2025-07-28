@@ -43,10 +43,6 @@ export default function NetworkForm({
 
   const existingNetwork = form.watch("network.existing");
 
-  const [existingDatabaseIp, setExistingDatabaseIp] = useState<
-    string | undefined
-  >();
-
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -54,7 +50,6 @@ export default function NetworkForm({
     }
 
     if (newNetwork) {
-      setExistingDatabaseIp(undefined);
       remove();
       form.reset({
         ...form.getValues(),
@@ -74,7 +69,7 @@ export default function NetworkForm({
                   : "",
             },
           ],
-          databaseIp: "10.0.0.2",
+          databaseIp: undefined,
         },
       });
     }
@@ -90,10 +85,9 @@ export default function NetworkForm({
           );
           let existingDb: string | undefined;
           if (dbInNetwork) {
-            ((existingDb = databases
+            existingDb = databases
               .find((db) => db.id === dbInNetwork)
-              ?.private_net.find((net) => net.network === nw.id)?.ip),
-              setExistingDatabaseIp(existingDb));
+              ?.private_net.find((net) => net.network === nw.id)?.ip
           }
 
           form.reset({
@@ -108,8 +102,7 @@ export default function NetworkForm({
                 ipRange: subnet.ip_range,
                 networkZone: subnet.network_zone,
               })),
-              databaseIp:
-                existingDb || form.getValues("network.databaseIp") || "",
+              databaseIp: existingDb,
               databaseInNetwork: !!existingDb,
             },
           });
@@ -250,14 +243,6 @@ export default function NetworkForm({
           </div>
         </>
       )}
-
-      <FormElement
-        name="network.databaseIp"
-        label="Database IP"
-        placeholder="Enter database IP"
-        isDisabled={!!existingDatabaseIp}
-        isRequired
-      />
 
       <div className="flex gap-2 justify-between">
         <Button className="flex-1 max-w-32" variant="outline" onClick={onBack}>

@@ -64,7 +64,7 @@ export default function AddHetznerDatabaseForm({
         form.setValue(
           "serverType",
           data.length > 0
-            ? data.find((st) => st.name === "cx22")?.id.toString() ||
+            ? data.find((st) => st.name === "cpx11")?.id.toString() ||
                 data[0].id.toString()
             : "",
         );
@@ -105,7 +105,7 @@ export default function AddHetznerDatabaseForm({
     resolver: zodResolver(AddHetznerDatabaseSchema),
     defaultValues: {
       databaseType: "mysql",
-    }
+    },
   });
 
   async function onSubmit(values: AddHetznerDatabaseSchemaType) {

@@ -10,7 +10,10 @@ import { useForm } from "react-hook-form";
 import DatabaseForm from "./database-form";
 import ServerControllerForm from "./server-controller-form";
 import ServerForm from "./server-form";
-import { SimpleServerSetupSchema, SimpleServerSetupSchemaType } from "./server-setup-schema";
+import {
+  SimpleServerSetupSchema,
+  SimpleServerSetupSchemaType,
+} from "./server-setup-schema";
 import Summary from "./summary";
 
 type Steps = "server" | "serverController" | "database" | "summary";
@@ -42,8 +45,9 @@ export default function SimpleServerSetupForm({
             : "",
         serverType:
           serverTypes.length > 0
-            ? serverTypes.find((type) => type.name === "cx22")?.id.toString() ||
-              serverTypes[0]?.id.toString()
+            ? serverTypes
+                .find((type) => type.name === "cpx11")
+                ?.id.toString() || serverTypes[0]?.id.toString()
             : "",
       },
       serverController: undefined,
