@@ -8,9 +8,9 @@ apt install -y docker.io docker-compose-v2 curl unzip
 
 # Fetch Docker Compose setup
 cd /root
-curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/29-servercontrollers-for-hetzner.zip
+curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/master.zip
 unzip gcp.zip
-cd gocontrolpanel-29-servercontrollers-for-hetzner/hetzner
+cd gocontrolpanel-master/hetzner
 
 {{#if server_controller.type}}
 export DB_HOST='{{{db.host}}}'
