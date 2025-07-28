@@ -10,9 +10,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { HetznerVolume } from "@/types/api/hetzner/volumes";
@@ -45,9 +45,7 @@ export const createVolumesColumns = (
   {
     accessorKey: "location",
     header: () => <span>Location</span>,
-    cell: ({ row }) => (
-      <span>{row.original.location.name}</span>
-    )
+    cell: ({ row }) => <span>{row.original.location.name}</span>,
   },
   {
     accessorKey: "size",
@@ -122,7 +120,7 @@ export const createVolumesColumns = (
               </DropdownMenuItem>
               {canDelete && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}

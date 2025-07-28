@@ -13,9 +13,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { HetznerServer } from "@/types/api/hetzner/servers";
@@ -165,7 +165,7 @@ export const createServersColumns = (
               </DropdownMenuItem>
               {canCreate && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setIsAttachOpen(true)}>
                     Attach to Network
                   </DropdownMenuItem>
@@ -176,7 +176,7 @@ export const createServersColumns = (
               )}
               {canDelete && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}

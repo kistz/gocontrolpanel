@@ -11,9 +11,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
@@ -133,7 +133,7 @@ export const createNetworksColumns = (
               </DropdownMenuItem>
               {canCreate && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setIsAddSubnetOpen(true)}>
                     Add Subnet
                   </DropdownMenuItem>
@@ -141,7 +141,7 @@ export const createNetworksColumns = (
               )}
               {canDelete && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}
