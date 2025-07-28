@@ -6,7 +6,7 @@ import { HetznerServer, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import { SimpleServerSetupSchemaType } from "./server-setup-schema";
 
 export default function DatabaseForm({
   form,
@@ -16,7 +16,7 @@ export default function DatabaseForm({
   serverTypes,
   serverController,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<SimpleServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
   databases: HetznerServer[];
@@ -115,81 +115,81 @@ export default function DatabaseForm({
     <form className={"flex flex-col gap-4"}>
       {creatingNewDatabase ? (
         <div className="flex flex-col gap-4">
-            <FormElement
-              name="database.new"
-              label="New Database"
-              type="checkbox"
-              description="Create a new database for this server"
-            />
+          <FormElement
+            name="database.new"
+            label="New Database"
+            type="checkbox"
+            description="Create a new database for this server"
+          />
 
-            <FormElement
-              name={"database.name"}
-              label="Server Name"
-              placeholder="Enter server name"
-              isRequired
-            />
+          <FormElement
+            name={"database.name"}
+            label="Server Name"
+            placeholder="Enter server name"
+            isRequired
+          />
 
-            <FormElement
-              name={"database.serverType"}
-              label="Server Type"
-              placeholder="Select server type"
-              type="select"
-              className="w-32"
-              options={serverTypes.map((type) => ({
-                value: type.id.toString(),
-                label: type.name,
-              }))}
-              isRequired
-            />
+          <FormElement
+            name={"database.serverType"}
+            label="Server Type"
+            placeholder="Select server type"
+            type="select"
+            className="w-32"
+            options={serverTypes.map((type) => ({
+              value: type.id.toString(),
+              label: type.name,
+            }))}
+            isRequired
+          />
 
-            {/* Database Type Info */}
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex flex-col">
-                <span className="font-semibold">Description</span>
-                <span className="truncate">
-                  {selectedServerType?.description || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Cores</span>
-                <span className="truncate">
-                  {selectedServerType?.cores || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Memory</span>
-                <span className="truncate">
-                  {selectedServerType?.memory
-                    ? `${selectedServerType.memory} GB`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Disk</span>
-                <span className="truncate">
-                  {selectedServerType?.disk
-                    ? `${selectedServerType.disk} GB`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Hourly Price</span>
-                <span className="truncate">
-                  {pricing
-                    ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Monthly Price</span>
-                <span className="truncate">
-                  {pricing
-                    ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
-                    : "-"}
-                </span>
-              </div>
+          {/* Database Type Info */}
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="flex flex-col">
+              <span className="font-semibold">Description</span>
+              <span className="truncate">
+                {selectedServerType?.description || "-"}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Cores</span>
+              <span className="truncate">
+                {selectedServerType?.cores || "-"}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Memory</span>
+              <span className="truncate">
+                {selectedServerType?.memory
+                  ? `${selectedServerType.memory} GB`
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Disk</span>
+              <span className="truncate">
+                {selectedServerType?.disk
+                  ? `${selectedServerType.disk} GB`
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Hourly Price</span>
+              <span className="truncate">
+                {pricing
+                  ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Monthly Price</span>
+              <span className="truncate">
+                {pricing
+                  ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
+                  : "-"}
+              </span>
             </div>
           </div>
+        </div>
       ) : (
         <>
           <FormElement

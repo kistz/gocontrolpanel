@@ -1,13 +1,13 @@
 "use client";
 
-import { createServerSetup } from "@/actions/hetzner/server-setup";
+import { createAdvancedServerSetup } from "@/actions/hetzner/server-setup";
 import BooleanDisplay from "@/components/boolean-display";
 import { Button } from "@/components/ui/button";
 import { getErrorMessage } from "@/lib/utils";
 import { IconArrowNarrowLeft } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import { AdvancedServerSetupSchemaType } from "./server-setup-schema";
 
 export default function Summary({
   form,
@@ -15,7 +15,7 @@ export default function Summary({
   onBack,
   callback,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<AdvancedServerSetupSchemaType>;
   projectId: string;
   onBack: () => void;
   callback?: () => void;
@@ -31,7 +31,7 @@ export default function Summary({
     const values = form.getValues();
 
     try {
-      const { error } = await createServerSetup(projectId, values);
+      const { error } = await createAdvancedServerSetup(projectId, values);
       if (error) {
         throw new Error(error);
       }
@@ -86,8 +86,8 @@ export default function Summary({
                   <span className="font-semibold">Admins</span>
                   <span className="truncate">
                     {"admins" in controller && controller.admins
-                      ? Array.isArray(controller.admins)
-                        && controller.admins.length
+                      ? Array.isArray(controller.admins) &&
+                        controller.admins.length
                       : "-"}
                   </span>
                 </div>

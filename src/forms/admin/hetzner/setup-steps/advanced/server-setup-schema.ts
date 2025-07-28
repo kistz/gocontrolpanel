@@ -4,11 +4,11 @@ import { NetworkSchema } from "./network-schema";
 import { ServerControllerSchema } from "./server-controller-schema";
 import { ServerSchema } from "./server-schema";
 
-export const ServerSetupSchema = z.object({
+export const AdvancedServerSetupSchema = z.object({
   server: ServerSchema,
   serverController: ServerControllerSchema.optional(),
   database: DatabaseSchema.optional(),
   network: NetworkSchema.optional(),
 });
 
-export type ServerSetupSchemaType = z.infer<typeof ServerSetupSchema>;
+export type AdvancedServerSetupSchemaType = z.infer<typeof AdvancedServerSetupSchema>;

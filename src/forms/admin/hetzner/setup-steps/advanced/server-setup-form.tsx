@@ -17,8 +17,8 @@ import NetworkForm from "./network-form";
 import ServerControllerForm from "./server-controller-form";
 import ServerForm from "./server-form";
 import {
-  ServerSetupSchema,
-  ServerSetupSchemaType,
+  AdvancedServerSetupSchema,
+  AdvancedServerSetupSchemaType,
 } from "./server-setup-schema";
 import Summary from "./summary";
 
@@ -43,8 +43,8 @@ export default function AdvancedServerSetupForm({
 }) {
   const [step, setStep] = useState<Steps>("server");
 
-  const form = useForm<ServerSetupSchemaType>({
-    resolver: zodResolver(ServerSetupSchema),
+  const form = useForm<AdvancedServerSetupSchemaType>({
+    resolver: zodResolver(AdvancedServerSetupSchema),
     mode: "onChange",
     defaultValues: {
       server: {

@@ -3,11 +3,11 @@
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
-import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
+import { HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import { SimpleServerSetupSchemaType } from "./server-setup-schema";
 
 export default function ServerForm({
   form,
@@ -15,7 +15,7 @@ export default function ServerForm({
   locations,
   serverTypes,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<SimpleServerSetupSchemaType>;
   onNext: () => void;
   locations: HetznerLocation[];
   serverTypes: HetznerServerType[];

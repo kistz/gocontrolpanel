@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import { AdvancedServerSetupSchemaType } from "./server-setup-schema";
 
 export default function NetworkForm({
   form,
@@ -24,7 +24,7 @@ export default function NetworkForm({
   databases,
   locations,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<AdvancedServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
   networks: HetznerNetwork[];

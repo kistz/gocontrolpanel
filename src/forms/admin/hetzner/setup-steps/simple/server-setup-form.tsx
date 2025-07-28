@@ -3,22 +3,15 @@
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
-import {
-  HetznerImage,
-  HetznerServer,
-  HetznerServerType,
-} from "@/types/api/hetzner/servers";
+import { HetznerServer, HetznerServerType } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import DatabaseForm from "./database-form";
-import ServerForm from "./server-form";
-import {
-  ServerSetupSchema,
-  ServerSetupSchemaType,
-} from "./server-setup-schema";
-import Summary from "./summary";
 import ServerControllerForm from "./server-controller-form";
+import ServerForm from "./server-form";
+import { SimpleServerSetupSchema, SimpleServerSetupSchemaType } from "./server-setup-schema";
+import Summary from "./summary";
 
 type Steps = "server" | "serverController" | "database" | "summary";
 
@@ -37,8 +30,8 @@ export default function SimpleServerSetupForm({
 }) {
   const [step, setStep] = useState<Steps>("server");
 
-  const form = useForm<ServerSetupSchemaType>({
-    resolver: zodResolver(ServerSetupSchema),
+  const form = useForm<SimpleServerSetupSchemaType>({
+    resolver: zodResolver(SimpleServerSetupSchema),
     mode: "onChange",
     defaultValues: {
       server: {

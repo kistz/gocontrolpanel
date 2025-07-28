@@ -1,6 +1,7 @@
 "use server";
 
-import { ServerSetupSchemaType } from "@/forms/admin/hetzner/setup-steps/advanced/server-setup-schema";
+import { AdvancedServerSetupSchemaType } from "@/forms/admin/hetzner/setup-steps/advanced/server-setup-schema";
+import { SimpleServerSetupSchemaType } from "@/forms/admin/hetzner/setup-steps/simple/server-setup-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -18,9 +19,9 @@ import {
 } from "./servers";
 import { getApiToken, setRateLimit } from "./util";
 
-export async function createServerSetup(
+export async function createAdvancedServerSetup(
   projectId: string,
-  data: ServerSetupSchemaType,
+  data: AdvancedServerSetupSchemaType,
 ): Promise<ServerResponse<HetznerServer>> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
@@ -162,6 +163,18 @@ export async function createServerSetup(
       }
 
       return res.data.server;
+    },
+  );
+}
+
+export async function createSimpleServerSetup(
+  projectId: string,
+  data: SimpleServerSetupSchemaType,
+): Promise<ServerResponse<HetznerServer>> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      return {} as HetznerServer;
     },
   );
 }

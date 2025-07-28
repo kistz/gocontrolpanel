@@ -12,14 +12,16 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import {
+  SimpleServerSetupSchemaType,
+} from "./server-setup-schema";
 
 export default function ServerControllerForm({
   form,
   onNext,
   onBack,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<SimpleServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
 }) {
@@ -69,7 +71,7 @@ export default function ServerControllerForm({
 }
 
 function ManiaControlSettingsForm() {
-  const form = useFormContext<ServerSetupSchemaType>();
+  const form = useFormContext<SimpleServerSetupSchemaType>();
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -130,7 +132,7 @@ function EvoSCSettingsForm() {
 }
 
 function MiniControlSettingsForm() {
-  const form = useFormContext<ServerSetupSchemaType>();
+  const form = useFormContext<SimpleServerSetupSchemaType>();
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -266,7 +268,7 @@ function MiniControlSettingsForm() {
 }
 
 function PyPlanetSettingsForm() {
-  const form = useFormContext<ServerSetupSchemaType>();
+  const form = useFormContext<SimpleServerSetupSchemaType>();
   const { data: session } = useSession();
 
   useEffect(() => {

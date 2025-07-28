@@ -6,7 +6,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { IconArrowNarrowLeft } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import { SimpleServerSetupSchemaType } from "./server-setup-schema";
 
 export default function Summary({
   form,
@@ -14,7 +14,7 @@ export default function Summary({
   onBack,
   callback,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<SimpleServerSetupSchemaType>;
   projectId: string;
   onBack: () => void;
   callback?: () => void;

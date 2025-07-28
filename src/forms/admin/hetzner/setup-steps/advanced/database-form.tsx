@@ -12,7 +12,7 @@ import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
-import { ServerSetupSchemaType } from "./server-setup-schema";
+import { AdvancedServerSetupSchemaType } from "./server-setup-schema";
 
 export default function DatabaseForm({
   form,
@@ -24,7 +24,7 @@ export default function DatabaseForm({
   locations,
   serverController,
 }: {
-  form: UseFormReturn<ServerSetupSchemaType>;
+  form: UseFormReturn<AdvancedServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
   databases: HetznerServer[];

@@ -3,10 +3,10 @@ import { DatabaseSchema } from "./database-schema";
 import { ServerSchema } from "./server-schema";
 import { ServerControllerSchema } from "./server-controller-schema";
 
-export const ServerSetupSchema = z.object({
+export const SimpleServerSetupSchema = z.object({
   server: ServerSchema,
   serverController: ServerControllerSchema.optional(),
   database: DatabaseSchema.optional(),
 });
 
-export type ServerSetupSchemaType = z.infer<typeof ServerSetupSchema>;
+export type SimpleServerSetupSchemaType = z.infer<typeof SimpleServerSetupSchema>;
