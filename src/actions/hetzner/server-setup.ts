@@ -97,7 +97,7 @@ export async function createServerSetup(
         user_data: userData,
         labels: {
           type: "dedi",
-          "servercontroller.type": serverController?.type || "-",
+          "servercontroller.type": serverController?.type,
           "authorization.superadmin.password": dediData.superadmin_password,
           "authorization.admin.password": dediData.admin_password,
           "authorization.user.password": dediData.user_password,
