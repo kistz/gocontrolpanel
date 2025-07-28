@@ -89,8 +89,8 @@ export async function createServerSetup(
 
       const body = {
         name: server.name,
-        server_type: parseInt(server.serverType),
-        image: parseInt(server.image),
+        server_type: server.serverType,
+        image: server.image,
         location: server.location,
         user_data: userData,
         labels: {

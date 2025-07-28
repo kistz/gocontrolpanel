@@ -282,8 +282,8 @@ export async function createHetznerDatabase(
 
       const body = {
         name: data.name,
-        server_type: parseInt(data.serverType),
-        image: parseInt(data.image),
+        server_type: data.serverType,
+        image: data.image,
         location: data.location,
         user_data: userData,
         labels: {
@@ -298,6 +298,8 @@ export async function createHetznerDatabase(
           enable_ipv6: true,
         },
       };
+      
+      console.log(body);
 
       const res = await axiosHetzner.post<{
         server: HetznerServer;
