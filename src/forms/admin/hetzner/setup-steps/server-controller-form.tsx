@@ -9,9 +9,9 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
+import { useEffect } from "react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { ServerSetupSchemaType } from "./server-setup-schema";
-import { useEffect } from "react";
 
 export default function ServerControllerForm({
   form,
@@ -128,36 +128,135 @@ function EvoSCSettingsForm() {
 }
 
 function MiniControlSettingsForm() {
+  const form = useFormContext<ServerSetupSchemaType>();
+
+  useEffect(() => {
+    form.setValue(
+      "serverController.admins",
+      form.getValues("serverController.admins") || [],
+    );
+    form.setValue(
+      "serverController.excludedPlugins",
+      form.getValues("serverController.excludedPlugins") || [],
+    );
+  }, []);
+
   return (
     <>
-      <FormElement
-        name="serverController.admins"
-        label="Admins"
-        description="List of admin usernames"
-        isRequired
-      />
-      <FormElement
-        name="serverController.excludedPlugins"
-        label="Excluded Plugins"
-        description="List of plugins to exclude from MiniControl"
-      />
+      <div className="flex flex-col gap-2">
+        <FormLabel className="text-sm">Admins</FormLabel>
+        {form.watch("serverController.admins")?.map((_, index) => (
+          <div key={index} className="flex items-end gap-2">
+            <div className="flex-1">
+              <FormElement
+                name={`serverController.admins.${index}`}
+                className="w-full"
+                placeholder="Enter admin login"
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant="destructive"
+              size={"icon"}
+              onClick={() => {
+                const currentAdmins = form.getValues("serverController.admins");
+                form.setValue(
+                  "serverController.admins",
+                  currentAdmins?.filter((_, i) => i !== index),
+                );
+              }}
+            >
+              <IconTrash />
+              <span className="sr-only">Remove Admin</span>
+            </Button>
+          </div>
+        ))}
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            const currentAdmins =
+              form.getValues("serverController.admins") || [];
+            form.setValue("serverController.admins", [...currentAdmins, ""]);
+          }}
+        >
+          <IconPlus />
+          Add Admin
+        </Button>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <FormLabel className="text-sm">Excluded Plugins</FormLabel>
+        {form.watch("serverController.excludedPlugins")?.map((_, index) => (
+          <div key={index} className="flex items-end gap-2">
+            <div className="flex-1">
+              <FormElement
+                name={`serverController.excludedPlugins.${index}`}
+                className="w-full"
+                placeholder="Enter plugin name"
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant="destructive"
+              size={"icon"}
+              onClick={() => {
+                const currentExcludedPlugins = form.getValues(
+                  "serverController.excludedPlugins",
+                );
+                form.setValue(
+                  "serverController.excludedPlugins",
+                  currentExcludedPlugins?.filter((_, i) => i !== index),
+                );
+              }}
+            >
+              <IconTrash />
+              <span className="sr-only">Remove Plugin</span>
+            </Button>
+          </div>
+        ))}
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            const currentExcludedPlugins =
+              form.getValues("serverController.excludedPlugins") || [];
+            form.setValue("serverController.excludedPlugins", [
+              ...currentExcludedPlugins,
+              "",
+            ]);
+          }}
+        >
+          <IconPlus />
+          Add Plugin
+        </Button>
+      </div>
+
       <FormElement
         name="serverController.contactInfo"
         label="Contact Info"
         description="Contact information so nadeo can reach you"
         isRequired
       />
+
       <FormElement
         name="serverController.identifier"
         label="Identifier"
         description="Trackmania API identifier"
         type="text"
+        isRequired
       />
+
       <FormElement
         name="serverController.secret"
         label="Secret"
         description="Trackmania API secret"
         type="password"
+        isRequired
       />
     </>
   );
