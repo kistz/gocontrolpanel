@@ -4,13 +4,6 @@ import { AddHetznerDatabaseSchema } from "../../database/add-hetzner-database-sc
 export const DatabaseSchema = AddHetznerDatabaseSchema.extend({
   new: z.boolean().optional(),
   existing: z.string().optional(),
-  image: z.string().min(1, { message: "Image is required" }),
-  location: z.string().min(1, { message: "Location is required" }),
-  databaseType: z.string().min(1, { message: "Database type is required" }),
-  databaseRootPassword: z.string().optional(),
-  databaseName: z.string().min(1, { message: "Database name is required" }),
-  databaseUser: z.string().optional(),
-  databasePassword: z.string().optional(),
 }).refine(
   (data) => {
     return data.new || (data.existing && data.existing.trim() !== "");

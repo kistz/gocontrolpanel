@@ -68,6 +68,7 @@ export default function DatabaseForm({
               new: false,
               existing: db.id.toString(),
               name: db.name,
+              databaseName: db.labels["authorization.database.name"],
               serverType: db.server_type?.id.toString(),
             },
           });
@@ -189,6 +190,13 @@ export default function DatabaseForm({
               </span>
             </div>
           </div>
+
+          <FormElement
+            name={"database.databaseName"}
+            label="Database Name"
+            placeholder="Enter database name"
+            isRequired
+          />
         </div>
       ) : (
         <>
