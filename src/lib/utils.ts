@@ -53,7 +53,6 @@ export function generatePath(
   }, path);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getDivergingList<T extends Record<string, any>>(
   list1: T[],
   list2: T[],
