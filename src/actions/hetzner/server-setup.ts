@@ -41,18 +41,18 @@ export async function createServerSetup(
       const token = await getApiToken(projectId);
 
       let networkId: number | undefined = undefined;
-      if (network?.new) {
+      if (server.controller && network?.new) {
         const { data, error } = await createHetznerNetwork(projectId, network);
         if (error) {
           throw new Error(error);
         }
         networkId = data.id;
-      } else if (network?.existing) {
+      } else if (server.controller && network?.existing) {
         networkId = parseInt(network.existing);
       }
 
       let databaseId: number | undefined = undefined;
-      if (database?.new) {
+      if (server.controller && database?.new) {
         const { data, error } = await createHetznerDatabase(
           projectId,
           database,
@@ -61,7 +61,7 @@ export async function createServerSetup(
           throw new Error(error);
         }
         databaseId = data.id;
-      } else if (database?.existing) {
+      } else if (server.controller && database?.existing) {
         databaseId = parseInt(database.existing);
       }
 
@@ -87,8 +87,6 @@ export async function createServerSetup(
 
       const userData = dediTemplate(dediData);
 
-      console.log(userData);
-
       const body = {
         name: server.name,
         server_type: server.serverType,
@@ -108,8 +106,6 @@ export async function createServerSetup(
           enable_ipv6: false,
         },
       };
-
-      console.log(body);
 
       const res = await axiosHetzner.post<{
         server: HetznerServer;
@@ -136,7 +132,7 @@ export async function createServerSetup(
 
       const serverId = res.data.server.id;
 
-      if (networkId) {
+      if (server.controller && networkId) {
         const { error: serverError } = await attachHetznerServerToNetwork(
           projectId,
           serverId,
