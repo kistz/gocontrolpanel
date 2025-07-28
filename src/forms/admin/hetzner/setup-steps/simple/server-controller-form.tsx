@@ -9,10 +9,10 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { ServerSetupSchemaType } from "./server-setup-schema";
-import { useSession } from "next-auth/react";
 
 export default function ServerControllerForm({
   form,

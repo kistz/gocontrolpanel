@@ -3,7 +3,6 @@
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
-import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import {
   HetznerImage,
   HetznerServer,
@@ -13,32 +12,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import DatabaseForm from "./database-form";
-import NetworkForm from "./network-form";
-import ServerControllerForm from "./server-controller-form";
 import ServerForm from "./server-form";
 import {
   ServerSetupSchema,
   ServerSetupSchemaType,
 } from "./server-setup-schema";
 import Summary from "./summary";
+import ServerControllerForm from "./server-controller-form";
 
-type Steps = "server" | "serverController" | "database" | "network" | "summary";
+type Steps = "server" | "serverController" | "database" | "summary";
 
-export default function AdvancedServerSetupForm({
+export default function SimpleServerSetupForm({
   projectId,
   locations,
   databases,
   serverTypes,
-  images,
-  networks,
   callback,
 }: {
   projectId: string;
   locations: HetznerLocation[];
   databases: HetznerServer[];
   serverTypes: HetznerServerType[];
-  images: HetznerImage[];
-  networks: HetznerNetwork[];
   callback?: () => void;
 }) {
   const [step, setStep] = useState<Steps>("server");
@@ -58,16 +52,9 @@ export default function AdvancedServerSetupForm({
             ? serverTypes.find((type) => type.name === "cx22")?.id.toString() ||
               serverTypes[0]?.id.toString()
             : "",
-        image:
-          images.length > 0
-            ? images
-                .find((img) => img.name === "ubuntu-20.04")
-                ?.id.toString() || images[0]?.id.toString()
-            : "",
       },
       serverController: undefined,
       database: undefined,
-      network: undefined,
     },
   });
 
@@ -79,7 +66,6 @@ export default function AdvancedServerSetupForm({
         ...form.getValues(),
         serverController: undefined,
         database: undefined,
-        network: undefined,
       });
     }
   }, [controllerSelected]);
@@ -87,7 +73,7 @@ export default function AdvancedServerSetupForm({
   const nextStep = async () => {
     if (step !== "summary") {
       const valid = await form.trigger(
-        step as "server" | "serverController" | "database" | "network",
+        step as "server" | "serverController" | "database",
       );
       if (!valid) return;
     }
@@ -100,9 +86,6 @@ export default function AdvancedServerSetupForm({
         setStep("database");
         break;
       case "database":
-        setStep("network");
-        break;
-      case "network":
         setStep("summary");
         break;
     }
@@ -116,14 +99,11 @@ export default function AdvancedServerSetupForm({
       case "database":
         setStep("serverController");
         break;
-      case "network":
-        setStep("database");
-        break;
       case "summary":
         if (!controllerSelected) {
           setStep("server");
         } else {
-          setStep("network");
+          setStep("database");
         }
         break;
       default:
@@ -146,12 +126,8 @@ export default function AdvancedServerSetupForm({
           <span className="block sm:hidden">3</span>
           <span className="hidden sm:block">Database</span>
         </TabsTrigger>
-        <TabsTrigger value="network" className="cursor-default">
-          <span className="block sm:hidden">4</span>
-          <span className="hidden sm:block">Network</span>
-        </TabsTrigger>
         <TabsTrigger value="summary" className="cursor-default">
-          <span className="block sm:hidden">5</span>
+          <span className="block sm:hidden">4</span>
           <span className="hidden sm:block">Summary</span>
         </TabsTrigger>
       </TabsList>
@@ -163,7 +139,6 @@ export default function AdvancedServerSetupForm({
             onNext={nextStep}
             locations={locations}
             serverTypes={serverTypes}
-            images={images}
           />
         </TabsContent>
 
@@ -182,20 +157,7 @@ export default function AdvancedServerSetupForm({
             onBack={previousStep}
             databases={databases}
             serverTypes={serverTypes}
-            images={images}
-            locations={locations}
             serverController={form.watch("serverController.type")}
-          />
-        </TabsContent>
-
-        <TabsContent value="network">
-          <NetworkForm
-            form={form}
-            onNext={nextStep}
-            onBack={previousStep}
-            networks={networks}
-            databases={databases}
-            locations={locations}
           />
         </TabsContent>
 
