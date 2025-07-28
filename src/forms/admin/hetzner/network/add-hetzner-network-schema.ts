@@ -58,7 +58,9 @@ export const AddHetznerNetworkSchema = z.object({
       ipRange: z.string().optional(),
       networkZone: z.string().min(1, { message: "Network zone is required" }),
     }),
-  ),
+  ).min(1, {
+    message: "At least one subnet must be defined",
+  }),
 });
 
 export type AddHetznerNetworkSchemaType = z.infer<

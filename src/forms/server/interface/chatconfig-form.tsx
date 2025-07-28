@@ -101,6 +101,7 @@ export default function ChatConfigForm({
             description="Requires manual routing to be enabled. Define the format for chat messages. Available variables: {login}, {nickName}, {message}."
             type="text"
             placeholder="{nickName}: {message}"
+            rootClassName="max-w-full"
             className="max-w-128"
           />
 
@@ -119,6 +120,7 @@ export default function ChatConfigForm({
             type="text"
             placeholder="Welcome to the server {nickName}!"
             className="max-w-128"
+            rootClassName="max-w-full"
           />
 
           {connectMessageValue && (
@@ -135,6 +137,7 @@ export default function ChatConfigForm({
             description="Message sent when a player disconnects. Available variables: {login}, {nickName}."
             type="text"
             placeholder="Goodbye {nickName}!"
+            rootClassName="max-w-full"
             className="max-w-128"
           />
 

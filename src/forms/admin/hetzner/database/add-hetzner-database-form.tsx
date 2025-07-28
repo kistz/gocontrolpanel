@@ -3,7 +3,7 @@
 import { getHetznerImages } from "@/actions/hetzner/images";
 import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { getServerTypes } from "@/actions/hetzner/server-types";
-import { createHetznerServer } from "@/actions/hetzner/servers";
+import { createHetznerDatabase } from "@/actions/hetzner/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -16,11 +16,11 @@ import { useForm } from "react-hook-form";
 import Flag from "react-world-flags";
 import { toast } from "sonner";
 import {
-  AddHetznerServerSchema,
-  AddHetznerServerSchemaType,
-} from "./add-hetzner-server-schema";
+  AddHetznerDatabaseSchema,
+  AddHetznerDatabaseSchemaType,
+} from "./add-hetzner-database-schema";
 
-export default function AddHetznerServerForm({
+export default function AddHetznerDatabaseForm({
   projectId,
   callback,
 }: {
@@ -45,10 +45,9 @@ export default function AddHetznerServerForm({
         form.setValue(
           "location",
           data.length > 0
-            ? data.find((loc) => loc.name === "fsn1")?.name ||
-              data[0].name
-              : "",
-          );
+            ? data.find((loc) => loc.name === "fsn1")?.name || data[0].name
+            : "",
+        );
       } catch (err) {
         setError("Failed to get locations: " + getErrorMessage(err));
         toast.error("Failed to fetch locations", {
@@ -65,8 +64,8 @@ export default function AddHetznerServerForm({
         form.setValue(
           "serverType",
           data.length > 0
-            ? data.find((st) => st.name === "cx22")?.id.toString() ||
-              data[0].id.toString()
+            ? data.find((st) => st.name === "cpx11")?.id.toString() ||
+                data[0].id.toString()
             : "",
         );
       } catch (err) {
@@ -85,8 +84,8 @@ export default function AddHetznerServerForm({
         form.setValue(
           "image",
           data.length > 0
-            ? data.find((img) => img.name === "ubuntu-24.04")?.id.toString() ||
-              data[0].id.toString()
+            ? data.find((img) => img.name === "ubuntu-20.04")?.id.toString() ||
+                data[0].id.toString()
             : "",
         );
       } catch (err) {
@@ -102,23 +101,26 @@ export default function AddHetznerServerForm({
     fetch();
   }, []);
 
-  const form = useForm<AddHetznerServerSchemaType>({
-    resolver: zodResolver(AddHetznerServerSchema),
+  const form = useForm<AddHetznerDatabaseSchemaType>({
+    resolver: zodResolver(AddHetznerDatabaseSchema),
+    defaultValues: {
+      databaseType: "mysql",
+    },
   });
 
-  async function onSubmit(values: AddHetznerServerSchemaType) {
+  async function onSubmit(values: AddHetznerDatabaseSchemaType) {
     try {
-      const { error } = await createHetznerServer(projectId, values);
+      const { error } = await createHetznerDatabase(projectId, values);
       if (error) {
         throw new Error(error);
       }
 
-      toast.success("Hetzner server successfully created");
+      toast.success("Hetzner database successfully created");
       if (callback) {
         callback();
       }
     } catch (error) {
-      toast.error("Failed to create Hetzner server", {
+      toast.error("Failed to create Hetzner database", {
         description: getErrorMessage(error),
       });
     }
@@ -176,7 +178,7 @@ export default function AddHetznerServerForm({
             isRequired
           />
 
-          {/* Server Type Info */}
+          {/* Database Type Info */}
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="flex flex-col">
               <span className="font-semibold">Description</span>
@@ -284,11 +286,13 @@ export default function AddHetznerServerForm({
               </span>
             </div>
           </div>
+        </div>
 
+        <div className="flex flex-col gap-4">
           <FormElement
             name={"location"}
             label="Location"
-            placeholder="Select server location"
+            placeholder="Select database location"
             type="select"
             className="w-64"
             options={locations.map((location) => ({
@@ -315,56 +319,45 @@ export default function AddHetznerServerForm({
               <span className="truncate">{selectedLocation?.city || "-"}</span>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-4">
+
           <FormElement
-            name={"dediLogin"}
-            label="Trackmania Server Login"
-            placeholder="Enter server login"
+            name={"databaseType"}
+            label="Database Type"
+            placeholder="Select database type"
+            type="select"
+            options={[
+              { value: "mysql", label: "MySQL" },
+              { value: "postgres", label: "PostgreSQL" },
+              { value: "mariadb", label: "MariaDB" },
+            ]}
             isRequired
           />
 
           <FormElement
-            name={"dediPassword"}
-            label="Trackmania Server Password"
-            placeholder="Enter server password"
+            name={"databaseRootPassword"}
+            label="Database Root Password"
+            placeholder="Enter database root password"
             type="password"
+          />
+
+          <FormElement
+            name={"databaseName"}
+            label="Database Name"
+            placeholder="Enter database name"
             isRequired
           />
 
           <FormElement
-            name={"roomPassword"}
-            label="Room Password"
-            placeholder="Enter room password"
+            name={"databaseUser"}
+            label="Database User"
+            placeholder="Enter database user"
           />
 
           <FormElement
-            name={"superAdminPassword"}
-            label="Super Admin Password"
-            placeholder="Enter super admin password"
+            name={"databasePassword"}
+            label="Database Password"
+            placeholder="Enter database password"
             type="password"
-          />
-
-          <FormElement
-            name={"adminPassword"}
-            label="Admin Password"
-            placeholder="Enter admin password"
-            type="password"
-          />
-
-          <FormElement
-            name={"userPassword"}
-            label="User Password"
-            placeholder="Enter user password"
-            type="password"
-          />
-
-          <FormElement
-            name={"filemanagerPassword"}
-            label="File Manager Password"
-            placeholder="Enter file manager password"
-            type="password"
-            description="This password will be used to access the file manager."
           />
 
           <Button
@@ -372,7 +365,7 @@ export default function AddHetznerServerForm({
             className="w-full"
             disabled={form.formState.isSubmitting}
           >
-            Add Server
+            Add Database
           </Button>
         </div>
       </form>

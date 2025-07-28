@@ -138,6 +138,7 @@ export default function AddProjectForm({
           name="name"
           label="Project Name"
           placeholder="Enter project name"
+          rootClassName="max-w-full"
           isRequired
         />
 

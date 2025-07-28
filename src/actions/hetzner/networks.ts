@@ -1,5 +1,7 @@
 "use server";
 
+import { AddHetznerNetworkSchemaType } from "@/forms/admin/hetzner/network/add-hetzner-network-schema";
+import { AddSubnetToNetworkSchemaType } from "@/forms/admin/hetzner/network/add-subnet-to-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -9,7 +11,6 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
-import { AddHetznerNetworkSchemaType } from "@/forms/admin/hetzner/add-hetzner-network-schema";
 
 export async function getHetznerNetworksPaginated(
   pagination: PaginationState,
@@ -108,6 +109,73 @@ export async function createHetznerNetwork(
       await setRateLimit(projectId, res);
 
       return res.data.network;
+    },
+  );
+}
+
+export async function getAllNetworks(
+  projectId: string,
+): Promise<ServerResponse<HetznerNetwork[]>> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:view", `hetzner:${projectId}:moderator`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const networks: HetznerNetwork[] = [];
+      let page = 1;
+      let totalEntries = 0;
+
+      do {
+        const res = await axiosHetzner.get<HetznerNetworksResponse>(
+          "/networks",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: {
+              page,
+              per_page: 50,
+            },
+          },
+        );
+
+        networks.push(...res.data.networks);
+        totalEntries = res.data.meta.pagination.total_entries || 0;
+        page++;
+      } while (networks.length < totalEntries);
+
+      return networks;
+    },
+  );
+}
+
+export async function addSubnetToNetwork(
+  projectId: string,
+  networkId: number,
+  data: AddSubnetToNetworkSchemaType,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const body = {
+        type: data.type,
+        ip_range: data.ipRange || undefined,
+        network_zone: data.networkZone,
+      };
+
+      const res = await axiosHetzner.post(
+        `/networks/${networkId}/actions/add_subnet`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await setRateLimit(projectId, res);
     },
   );
 }

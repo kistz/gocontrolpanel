@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteHetznerNetwork } from "@/actions/hetzner/networks";
+import AddSubnetToNetworkModal from "@/components/modals/add-subnet-to-network";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import HetznerNetworkDetailsModal from "@/components/modals/hetzner-network-details";
 import Modal from "@/components/modals/modal";
@@ -10,9 +11,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
@@ -78,6 +79,13 @@ export const createNetworksColumns = (
       const [_, startTransition] = useTransition();
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
       const [isViewOpen, setIsViewOpen] = useState(false);
+      const [isAddSubnetOpen, setIsAddSubnetOpen] = useState(false);
+
+      const canCreate = hasPermissionSync(
+        session,
+        routePermissions.admin.hetzner.servers.create,
+        data.projectId,
+      );
 
       const canDelete = hasPermissionSync(
         session,
@@ -123,9 +131,17 @@ export const createNetworksColumns = (
               <DropdownMenuItem onClick={() => setIsViewOpen(true)}>
                 View Details
               </DropdownMenuItem>
+              {canCreate && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsAddSubnetOpen(true)}>
+                    Add Subnet
+                  </DropdownMenuItem>
+                </>
+              )}
               {canDelete && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}
@@ -152,6 +168,17 @@ export const createNetworksColumns = (
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
             <HetznerNetworkDetailsModal data={network} />
           </Modal>
+
+          {canCreate && (
+            <Modal isOpen={isAddSubnetOpen} setIsOpen={setIsAddSubnetOpen}>
+              <AddSubnetToNetworkModal
+                data={{
+                  projectId: data.projectId,
+                  network,
+                }}
+              />
+            </Modal>
+          )}
         </div>
       );
     },

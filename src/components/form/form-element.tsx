@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import RenderInput from "./render-input";
+import clsx from "clsx";
 
 interface FormElementProps<TControl> {
   name: Path<TControl>;
@@ -27,6 +28,7 @@ interface FormElementProps<TControl> {
   max?: number;
   onSearch?: (query?: string) => void;
   className?: string;
+  rootClassName?: string;
   children?: React.ReactNode;
 }
 
@@ -48,6 +50,7 @@ export default function FormElement<TControl>({
   max,
   onSearch,
   className,
+  rootClassName,
   children,
 }: FormElementProps<TControl>) {
   const {
@@ -57,7 +60,11 @@ export default function FormElement<TControl>({
 
   if (isHidden) return null;
 
-  const error = errors[name];
+  const getNestedError = (errors: any, path: string) => {
+    return path.split('.').reduce((acc, key) => acc?.[key], errors);
+  }
+
+  const error = getNestedError(errors, name);
 
   const getErrorMessage = (error: any): string | undefined => {
     if (!error) return undefined;
@@ -73,13 +80,13 @@ export default function FormElement<TControl>({
           .join(", ")
       : undefined;
   };
-
+  
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={clsx("max-w-92", rootClassName)}>
           {(label || description) && (
             <div>
               {label && (
@@ -89,7 +96,7 @@ export default function FormElement<TControl>({
                 >
                   {label}{" "}
                   {isRequired && (
-                    <span className="text-xs text-muted-foreground">
+                    <span data-error={!!error} className="text-xs text-muted-foreground data-[error=true]:text-destructive">
                       (Required)
                     </span>
                   )}

@@ -3,7 +3,7 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { updateFileManager } from "@/lib/filemanager";
-import { getGbxClientManager } from "@/lib/gbxclient";
+import { deleteGbxClientManager, getGbxClientManager } from "@/lib/gbxclient";
 import { Prisma, Servers } from "@/lib/prisma/generated";
 import {
   getKeyHetznerRecentlyCreatedServers,
@@ -324,6 +324,7 @@ export async function deleteServer(serverId: string): Promise<ServerResponse> {
         where: { id: serverId },
         data: { deletedAt: new Date() },
       });
+      await deleteGbxClientManager(serverId);
     },
   );
 }

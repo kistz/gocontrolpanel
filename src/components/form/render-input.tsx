@@ -98,6 +98,7 @@ export default function RenderInput<TControl extends FieldValues>({
             autoFocus={autoFocus}
           />
           <Button
+            type="button"
             variant={null}
             className="absolute right-0 top-1/2 -translate-y-1/2"
             onClick={() => {

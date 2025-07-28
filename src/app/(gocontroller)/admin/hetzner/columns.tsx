@@ -12,9 +12,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
@@ -112,19 +112,24 @@ export const createColumns = (
                   View Project
                 </DropdownMenuItem>
               )}
-              {canView && (canEdit || canDelete) && <Separator />}
               {canEdit && (
-                <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                  Edit Project
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                    Edit Project
+                  </DropdownMenuItem>
+                </>
               )}
               {canDelete && (
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => setIsOpen(true)}
-                >
-                  Delete Project
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setIsOpen(true)}
+                  >
+                    Delete Project
+                  </DropdownMenuItem>
+                </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

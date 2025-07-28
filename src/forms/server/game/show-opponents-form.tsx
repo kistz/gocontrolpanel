@@ -49,6 +49,7 @@ export default function ShowOpponentsForm({
           label="Show Opponents"
           description="The number of opponents to show. 0 is no override, 1 is show all, rest is the number of opponents."
           placeholder="Show Opponents..."
+          rootClassName="max-w-full"
           className="w-20"
           isRequired
           type="number"

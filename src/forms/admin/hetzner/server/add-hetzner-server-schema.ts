@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-const hetznerServerNameSchema = z
+export const hetznerServerNameSchema = z
   .string()
+  .min(1, { message: "Server name is required" })
   .max(253, { message: "Server name must be at most 253 characters" })
   .regex(
     /^(?!-)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/,

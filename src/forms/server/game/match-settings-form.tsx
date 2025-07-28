@@ -65,6 +65,7 @@ export default function MatchSettingsForm({ serverId }: { serverId: string }) {
           description="The name of the file to save/load match settings."
           placeholder="matchlist.txt"
           className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
+          rootClassName="max-w-full"
           isRequired
         >
           <div className="gap-2 hidden max-[500px]:hidden max-[960px]:flex min-[1080px]:flex">

@@ -18,6 +18,8 @@ export default function HetznerServerDetailsModal({
     (price) => price.location === data.datacenter.location.name,
   );
 
+  const serverController = data.labels["servercontroller.type"];
+
   const passwords = {
     superAdmin: data.labels["authorization.superadmin.password"],
     admin: data.labels["authorization.admin.password"],
@@ -52,8 +54,8 @@ export default function HetznerServerDetailsModal({
                 <span className="truncate">{data.name}</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold">Status</span>
-                <span className="truncate">{data.status}</span>
+                <span className="font-semibold">Controller</span>
+                <span className="truncate">{serverController || "-"}</span>
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold">Created At</span>
