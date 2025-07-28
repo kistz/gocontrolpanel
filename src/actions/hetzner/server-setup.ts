@@ -90,7 +90,6 @@ export async function createAdvancedServerSetup(
           let count = 0;
           do {
             await sleep(1000);
-            console.log("Waiting for database to be attached to network...");
             const updatedServer = await getHetznerServer(
               projectId,
               databaseId,
