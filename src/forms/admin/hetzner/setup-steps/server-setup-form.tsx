@@ -127,7 +127,7 @@ export default function ServerSetupForm({
         if (!error) {
           setImages(data);
           const defaultImage =
-            data.find((img) => img.name === "ubuntu-24.04")?.id.toString() ||
+            data.find((img) => img.name === "ubuntu-20.04")?.id.toString() ||
             data[0]?.id.toString() ||
             "";
           form.setValue("server.image", defaultImage);

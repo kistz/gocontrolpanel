@@ -84,7 +84,7 @@ export default function AddHetznerDatabaseForm({
         form.setValue(
           "image",
           data.length > 0
-            ? data.find((img) => img.name === "ubuntu-24.04")?.id.toString() ||
+            ? data.find((img) => img.name === "ubuntu-20.04")?.id.toString() ||
                 data[0].id.toString()
             : "",
         );

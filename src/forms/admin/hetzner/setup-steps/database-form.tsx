@@ -9,7 +9,7 @@ import {
   HetznerServerType,
 } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
 import { ServerSetupSchemaType } from "./server-setup-schema";
@@ -33,6 +33,7 @@ export default function DatabaseForm({
   locations: HetznerLocation[];
   serverController: string | undefined;
 }) {
+  const [creatingNewDatabase, setCreatingNewDatabase] = useState(false);
   const newDatabase = form.watch("database.new");
 
   const existingDatabase = form.watch("database.existing");
@@ -46,7 +47,7 @@ export default function DatabaseForm({
           image:
             images.length > 0
               ? images
-                  .find((img) => img.name === "ubuntu-24.04")
+                  .find((img) => img.name === "ubuntu-20.04")
                   ?.id.toString() || images[0].id.toString()
               : "",
           serverType:
@@ -67,6 +68,9 @@ export default function DatabaseForm({
           databasePassword: "",
         },
       });
+      setCreatingNewDatabase(true);
+    } else {
+      setCreatingNewDatabase(false);
     }
   }, [newDatabase]);
 
@@ -142,7 +146,7 @@ export default function DatabaseForm({
 
   return (
     <form className={"flex flex-col gap-4"}>
-      {newDatabase ? (
+      {creatingNewDatabase ? (
         <div className="gap-4 grid sm:grid-cols-2 sm:gap-8">
           <div className="flex flex-col gap-4">
             <FormElement

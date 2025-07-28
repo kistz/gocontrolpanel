@@ -25,6 +25,15 @@ export async function createServerSetup(
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
     async () => {
+      if (data.database?.new) {
+        data.database = {
+          ...data.database,
+          databaseRootPassword: data.database.databaseRootPassword || generateRandomString(16),
+          databaseUser: data.database.databaseUser || generateRandomString(16),
+          databasePassword: data.database.databasePassword || generateRandomString(16),
+        }
+      }
+
       const { server, serverController, database, network } = data;
 
       const token = await getApiToken(projectId);
