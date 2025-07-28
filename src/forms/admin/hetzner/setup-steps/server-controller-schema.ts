@@ -2,7 +2,7 @@ import z from "zod";
 
 const ManiaControlSettings = z.object({
   type: z.literal("maniacontrol"),
-  admins: z.array(z.string()).optional(),
+  admins: z.array(z.string()),
 });
 
 const EvoSCSettings = z.object({
@@ -11,8 +11,8 @@ const EvoSCSettings = z.object({
 
 const MiniControlSettings = z.object({
   type: z.literal("minicontrol"),
-  admins: z.array(z.string()).optional(),
-  excludedPlugins: z.array(z.string()).optional(),
+  admins: z.array(z.string()),
+  excludedPlugins: z.array(z.string()),
   contactInfo: z.string().min(1, {
     message: "Contact info is required",
   }),

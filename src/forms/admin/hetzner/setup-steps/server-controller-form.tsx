@@ -2,8 +2,14 @@
 
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
-import { UseFormReturn } from "react-hook-form";
+import { FormLabel } from "@/components/ui/form";
+import {
+  IconArrowNarrowLeft,
+  IconArrowNarrowRight,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
+import { useFormContext, UseFormReturn } from "react-hook-form";
 import { ServerSetupSchemaType } from "./server-setup-schema";
 
 export default function ServerControllerForm({
@@ -61,15 +67,51 @@ export default function ServerControllerForm({
 }
 
 function ManiaControlSettingsForm() {
+  const form = useFormContext<ServerSetupSchemaType>();
+
   return (
-    <>
-      <FormElement
-        name="serverController.admins"
-        label="Admins"
-        description="List of admin usernames"
-        isRequired
-      />
-    </>
+    <div className="flex flex-col gap-2">
+      <FormLabel className="text-sm">Admins</FormLabel>
+      {form.watch("serverController.admins")?.map((_, index) => (
+        <div key={index} className="flex items-end gap-2">
+          <div className="flex-1">
+            <FormElement
+              name={`serverController.admins.${index}`}
+              className="w-full"
+              placeholder="Enter admin login"
+            />
+          </div>
+
+          <Button
+            type="button"
+            variant="destructive"
+            size={"icon"}
+            onClick={() => {
+              const currentAdmins = form.getValues("serverController.admins");
+              form.setValue(
+                "serverController.admins",
+                currentAdmins?.filter((_, i) => i !== index),
+              );
+            }}
+          >
+            <IconTrash />
+            <span className="sr-only">Remove Admin</span>
+          </Button>
+        </div>
+      ))}
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          const currentAdmins = form.getValues("serverController.admins") || [];
+          form.setValue("serverController.admins", [...currentAdmins, ""]);
+        }}
+      >
+        <IconPlus />
+        Add Admin
+      </Button>
+    </div>
   );
 }
 

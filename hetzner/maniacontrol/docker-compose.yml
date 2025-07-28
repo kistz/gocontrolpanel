@@ -28,23 +28,20 @@ services:
     volumes:
       - user-data:/app/UserData
 
-  evosc:
-    image: evotm/evosc:latest
+  maniacontrol:
+    image: amzgbeu/trackmaniacontrol:latest
     restart: always
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      RPC_IP: dedicated
-      RPC_LOGIN: SuperAdmin
-      RPC_PASSWORD: ${TM_AUTHORIZATION_SUPERADMIN_PASSWORD}
+      SERVER: dedicated
+      MYSQL_HOST: ${DB_HOST}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MASTERADMINS: ${MC_ADMINS}
     volumes:
-      - evosc-data:/controller
-      - user-data:/server/UserData
+      - user-data:/opt/Trackmania/UserData
     depends_on:
       - dedicated
 
 volumes:
   user-data:
-  evosc-data:

@@ -88,8 +88,7 @@ export default function Summary({
                   <span className="truncate">
                     {"admins" in controller && controller.admins
                       ? Array.isArray(controller.admins)
-                        ? controller.admins.join(", ")
-                        : controller.admins
+                        && controller.admins.length
                       : "-"}
                   </span>
                 </div>
