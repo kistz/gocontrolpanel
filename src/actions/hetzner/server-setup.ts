@@ -1,6 +1,6 @@
 "use server";
 
-import { ServerSetupSchemaType } from "@/forms/admin/hetzner/setup-steps/server-setup-schema";
+import { ServerSetupSchemaType } from "@/forms/admin/hetzner/setup-steps/advanced/server-setup-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -28,10 +28,12 @@ export async function createServerSetup(
       if (data.database?.new) {
         data.database = {
           ...data.database,
-          databaseRootPassword: data.database.databaseRootPassword || generateRandomString(16),
+          databaseRootPassword:
+            data.database.databaseRootPassword || generateRandomString(16),
           databaseUser: data.database.databaseUser || generateRandomString(16),
-          databasePassword: data.database.databasePassword || generateRandomString(16),
-        }
+          databasePassword:
+            data.database.databasePassword || generateRandomString(16),
+        };
       }
 
       const { server, serverController, database, network } = data;

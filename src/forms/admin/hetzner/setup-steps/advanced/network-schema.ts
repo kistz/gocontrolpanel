@@ -1,6 +1,6 @@
 import { inRange } from "range_check";
 import { z } from "zod";
-import { AddHetznerNetworkSchema } from "../network/add-hetzner-network-schema";
+import { AddHetznerNetworkSchema } from "../../network/add-hetzner-network-schema";
 
 export const NetworkSchema = AddHetznerNetworkSchema.extend({
   new: z.boolean().optional(),

@@ -1,5 +1,5 @@
 "use client";
-import ServerSetupForm from "@/forms/admin/hetzner/setup-steps/server-setup-form";
+import ServerSetupForm from "@/forms/admin/hetzner/setup-steps/advanced/server-setup-form";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
