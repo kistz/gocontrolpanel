@@ -154,7 +154,6 @@ export default function SimpleServerSetupForm({
             onBack={previousStep}
             databases={databases}
             serverTypes={serverTypes}
-            serverController={form.watch("serverController.type")}
           />
         </TabsContent>
 

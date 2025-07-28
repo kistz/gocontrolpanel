@@ -12,7 +12,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { AdvancedServerSetupSchemaType } from "./server-setup-schema";
 
@@ -87,7 +87,7 @@ export default function NetworkForm({
           if (dbInNetwork) {
             existingDb = databases
               .find((db) => db.id === dbInNetwork)
-              ?.private_net.find((net) => net.network === nw.id)?.ip
+              ?.private_net.find((net) => net.network === nw.id)?.ip;
           }
 
           form.reset({

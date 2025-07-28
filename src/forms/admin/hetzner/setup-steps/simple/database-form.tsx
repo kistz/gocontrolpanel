@@ -14,14 +14,12 @@ export default function DatabaseForm({
   onBack,
   databases,
   serverTypes,
-  serverController,
 }: {
   form: UseFormReturn<SimpleServerSetupSchemaType>;
   onNext: () => void;
   onBack: () => void;
   databases: HetznerServer[];
   serverTypes: HetznerServerType[];
-  serverController: string | undefined;
 }) {
   const isFirstRender = useRef(true);
 
