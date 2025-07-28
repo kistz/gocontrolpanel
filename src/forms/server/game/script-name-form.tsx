@@ -50,6 +50,7 @@ export default function ScriptNameForm({
           name={"scriptName"}
           label="Script Name"
           description="The name of the script to load."
+          rootClassName="max-w-full"
           options={scripts.map((script) => ({
             label: script,
             value: script,
