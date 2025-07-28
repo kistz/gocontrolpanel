@@ -189,7 +189,7 @@ export async function createSimpleServerSetup(
       const token = await getApiToken(projectId);
 
       let networkId: number | undefined = undefined;
-      if (server.controller) {
+      if (server.controller && !database?.networkId) {
         const { data, error } = await createHetznerNetwork(projectId, {
           name: `${server.name}-network-${generateRandomString(8)}`,
           ipRange: "10.0.0.0/16",
@@ -205,6 +205,8 @@ export async function createSimpleServerSetup(
           throw new Error(error);
         }
         networkId = data.id;
+      } else if (server.controller) {
+        networkId = database?.networkId;
       }
 
       let databaseId: number | undefined = undefined;
@@ -226,7 +228,7 @@ export async function createSimpleServerSetup(
       const dediData = {
         server_controller: server.controller ? serverController : undefined,
         db: {
-          host: "10.0.0.2",
+          host: database?.databaseIp || "10.0.0.2",
           port: 3306,
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
@@ -294,11 +296,11 @@ export async function createSimpleServerSetup(
           serverId,
           {
             networkId: networkId.toString(),
-            ip: "10.0.0.3"
+            ip: database?.serverIp || "10.0.0.3",
           },
         );
 
-        if (databaseId) {
+        if (databaseId && !database?.databaseIp) {
           const { error: dbError } = await attachHetznerServerToNetwork(
             projectId,
             databaseId,

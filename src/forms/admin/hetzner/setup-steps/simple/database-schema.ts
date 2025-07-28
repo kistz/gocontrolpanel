@@ -12,6 +12,9 @@ export const DatabaseSchema = AddHetznerDatabaseSchema.omit({
   .extend({
     new: z.boolean().optional(),
     existing: z.string().optional(),
+    databaseIp: z.string().optional(),
+    networkId: z.number().optional(),
+    serverIp: z.string().optional(),
     databaseType: z.string().optional(),
     databaseRootPassword: z.string().optional(),
     databaseUser: z.string().optional(),

@@ -47,9 +47,12 @@ export default function DatabaseForm({
                 serverTypes[0].id.toString()
               : "",
           name: "",
+          serverIp: undefined,
+          databaseIp: undefined,
+          networkId: undefined,
           databaseName: "",
-          databaseUser: "",
-          databasePassword: "",
+          databaseUser: undefined,
+          databasePassword: undefined,
         },
       });
       setCreatingNewDatabase(true);
@@ -71,6 +74,8 @@ export default function DatabaseForm({
               new: false,
               existing: db.id.toString(),
               name: db.name,
+              databaseIp: db.private_net[0]?.ip,
+              networkId: db.private_net[0]?.network,
               databaseName: db.labels["authorization.database.name"],
               databaseUser: db.labels["authorization.database.user"],
               databasePassword: db.labels["authorization.database.password"],
@@ -223,6 +228,21 @@ export default function DatabaseForm({
               value: db.id.toString(),
               label: db.name,
             }))}
+          />
+
+          <div className="flex flex-col text-sm">
+            <span>Database IP Address</span>
+            <span className="text-muted-foreground">
+              {form.watch("database.databaseIp") || "-"}
+            </span>
+          </div>
+
+          <FormElement
+            name="database.serverIp"
+            label="Server IP"
+            description="Needs to be in the same range as the database"
+            placeholder="Enter server IP (e.g., 10.0.0.4)"
+            isRequired
           />
         </>
       )}
