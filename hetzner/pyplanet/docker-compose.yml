@@ -42,6 +42,7 @@ services:
       DEDI_USER: SuperAdmin
       DEDI_PASS: ${TM_AUTHORIZATION_SUPERADMIN_PASSWORD}
     volumes:
+      - ./base.py:/app/server/settings/base.py
       - pyplanet-data:/app/server
       - user-data:/server/UserData
     depends_on:
