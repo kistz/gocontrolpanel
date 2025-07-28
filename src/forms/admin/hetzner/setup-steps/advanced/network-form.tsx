@@ -74,7 +74,7 @@ export default function NetworkForm({
                   : "",
             },
           ],
-          databaseIp: "10.0.0.3",
+          databaseIp: "10.0.0.2",
         },
       });
     }

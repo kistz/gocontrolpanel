@@ -134,14 +134,6 @@ export async function createAdvancedServerSetup(
       const serverId = res.data.server.id;
 
       if (server.controller && networkId) {
-        const { error: serverError } = await attachHetznerServerToNetwork(
-          projectId,
-          serverId,
-          {
-            networkId: networkId.toString(),
-          },
-        );
-
         if (databaseId && !network?.databaseInNetwork) {
           const { error: dbError } = await attachHetznerServerToNetwork(
             projectId,
@@ -156,6 +148,14 @@ export async function createAdvancedServerSetup(
             throw new Error(dbError);
           }
         }
+
+        const { error: serverError } = await attachHetznerServerToNetwork(
+          projectId,
+          serverId,
+          {
+            networkId: networkId.toString(),
+          },
+        );
 
         if (serverError) {
           throw new Error(serverError);
@@ -291,15 +291,6 @@ export async function createSimpleServerSetup(
       const serverId = res.data.server.id;
 
       if (server.controller && networkId) {
-        const { error: serverError } = await attachHetznerServerToNetwork(
-          projectId,
-          serverId,
-          {
-            networkId: networkId.toString(),
-            ip: database?.serverIp || "10.0.0.3",
-          },
-        );
-
         if (databaseId && !database?.databaseIp) {
           const { error: dbError } = await attachHetznerServerToNetwork(
             projectId,
@@ -314,6 +305,14 @@ export async function createSimpleServerSetup(
             throw new Error(dbError);
           }
         }
+
+        const { error: serverError } = await attachHetznerServerToNetwork(
+          projectId,
+          serverId,
+          {
+            networkId: networkId.toString(),
+          },
+        );
 
         if (serverError) {
           throw new Error(serverError);

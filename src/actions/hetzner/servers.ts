@@ -298,8 +298,6 @@ export async function createHetznerDatabase(
           enable_ipv6: true,
         },
       };
-      
-      console.log(body);
 
       const res = await axiosHetzner.post<{
         server: HetznerServer;
