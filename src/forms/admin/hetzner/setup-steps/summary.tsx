@@ -29,7 +29,7 @@ export default function Summary({
 
   async function handleSubmit() {
     const values = form.getValues();
-    
+
     try {
       const { error } = await createServerSetup(projectId, values);
       if (error) {
@@ -124,10 +124,6 @@ export default function Summary({
                 <div className="flex flex-col">
                   <span className="font-semibold">IP Range</span>
                   <span className="truncate">{network.ipRange}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold">Server IP</span>
-                  <span className="truncate">{network.serverIp}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-semibold">Database IP</span>

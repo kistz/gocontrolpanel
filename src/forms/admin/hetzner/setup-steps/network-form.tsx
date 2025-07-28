@@ -74,7 +74,6 @@ export default function NetworkForm({
                   : "",
             },
           ],
-          serverIp: "10.0.0.3",
           databaseIp: "10.0.0.2",
         },
       });
@@ -109,7 +108,6 @@ export default function NetworkForm({
                 ipRange: subnet.ip_range,
                 networkZone: subnet.network_zone,
               })),
-              serverIp: form.getValues("network.serverIp") || "",
               databaseIp:
                 existingDb || form.getValues("network.databaseIp") || "",
               databaseInNetwork: !!existingDb,
@@ -252,13 +250,6 @@ export default function NetworkForm({
           </div>
         </>
       )}
-
-      <FormElement
-        name="network.serverIp"
-        label="Server IP"
-        placeholder="Enter server IP"
-        isRequired
-      />
 
       <FormElement
         name="network.databaseIp"

@@ -140,7 +140,6 @@ export async function createServerSetup(
           serverId,
           {
             networkId: networkId.toString(),
-            ip: network?.serverIp,
           },
         );
 
