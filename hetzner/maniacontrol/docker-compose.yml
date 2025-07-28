@@ -33,6 +33,7 @@ services:
     restart: always
     environment:
       SERVER: dedicated
+      SUPERADMIN_PASSWORD: ${TM_AUTHORIZATION_SUPERADMIN_PASSWORD}
       MYSQL_HOST: ${DB_HOST}
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
