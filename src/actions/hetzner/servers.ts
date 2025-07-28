@@ -344,6 +344,31 @@ export async function attachHetznerServerToNetwork(
   );
 }
 
+export async function detachHetznerServerFromNetwork(
+  projectId: string,
+  serverId: number,
+  network: number,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const res = await axiosHetzner.post(
+        `/servers/${serverId}/actions/detach_from_network`,
+        { network },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await setRateLimit(projectId, res);
+    },
+  );
+}
+
 export async function getAllDatabases(
   projectId: string,
 ): Promise<ServerResponse<HetznerServer[]>> {

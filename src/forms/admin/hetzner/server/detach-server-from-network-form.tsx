@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllNetworks } from "@/actions/hetzner/networks";
-import { attachHetznerServerToNetwork } from "@/actions/hetzner/servers";
+import { detachHetznerServerFromNetwork } from "@/actions/hetzner/servers";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -12,11 +12,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
-  AttachHetznerServerToNetworkSchema,
-  AttachHetznerServerToNetworkSchemaType,
-} from "./attach-hetzner-server-to-network-schema";
+  DetachServerFromNetworkSchema,
+  DetachServerFromNetworkSchemaType,
+} from "./detach-server-from-network-schema";
 
-export default function AttachHetznerServerToNetworkForm({
+export default function DetachServerFromNetworkForm({
   projectId,
   serverId,
   callback,
@@ -42,10 +42,10 @@ export default function AttachHetznerServerToNetworkForm({
       if (networksResult.status === "fulfilled") {
         const { data, error } = networksResult.value;
         if (!error) {
-          const filteredData = data.filter(
-            (network) => !network.servers.includes(serverId),
+          const filteredNetworks = data.filter((network) =>
+            network.servers.includes(serverId),
           );
-          setNetworks(filteredData);
+          setNetworks(filteredNetworks);
         } else {
           toast.error("Failed to fetch networks", { description: error });
           setError("Failed to get networks: " + error);
@@ -62,26 +62,26 @@ export default function AttachHetznerServerToNetworkForm({
     fetch();
   }, []);
 
-  const form = useForm<AttachHetznerServerToNetworkSchemaType>({
-    resolver: zodResolver(AttachHetznerServerToNetworkSchema),
+  const form = useForm<DetachServerFromNetworkSchemaType>({
+    resolver: zodResolver(DetachServerFromNetworkSchema),
   });
 
-  async function onSubmit(values: AttachHetznerServerToNetworkSchemaType) {
+  async function onSubmit(values: DetachServerFromNetworkSchemaType) {
     try {
-      const { error } = await attachHetznerServerToNetwork(
+      const { error } = await detachHetznerServerFromNetwork(
         projectId,
         serverId,
-        values,
+        parseInt(values.network),
       );
       if (error) {
         throw new Error(error);
       }
-      toast.success("Hetzner server attached to network successfully");
+      toast.success("Server successfully detached from network");
       if (callback) {
         callback();
       }
     } catch (error) {
-      toast.error("Failed to attach Hetzner server", {
+      toast.error("Failed to detach server", {
         description: getErrorMessage(error),
       });
     }
@@ -102,7 +102,7 @@ export default function AttachHetznerServerToNetworkForm({
         className="flex flex-col gap-4"
       >
         <FormElement
-          name="networkId"
+          name="network"
           label="Network"
           placeholder="Select a network"
           className="min-w-32"
@@ -112,20 +112,6 @@ export default function AttachHetznerServerToNetworkForm({
           }))}
           type="select"
           isRequired
-        />
-
-        <div className="flex flex-col text-sm">
-          <span>IP Range</span>
-          <span className="text-muted-foreground">
-            {networks.find((nw) => nw.id.toString() === form.watch("networkId"))
-              ?.ip_range || "-"}
-          </span>
-        </div>
-
-        <FormElement
-          name="ip"
-          label="IP Address"
-          placeholder="Enter IP address"
         />
 
         <Button
