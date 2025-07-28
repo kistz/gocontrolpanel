@@ -117,6 +117,7 @@ export default function ModeScriptSettingsForm({
               placeholder={element.placeholder}
               className={element.className}
               type={element.type}
+              rootClassName="max-w-full"
             />
           ))}
           <Button
@@ -138,6 +139,7 @@ export default function ModeScriptSettingsForm({
               placeholder={element.placeholder}
               className={element.className}
               type={element.type}
+              rootClassName="max-w-full"
             />
           ))}
           <Button

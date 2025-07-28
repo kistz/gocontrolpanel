@@ -1,0 +1,54 @@
+services:
+  dedicated:
+    image: evoesports/trackmania:latest
+    restart: always
+    environment:
+      TM_MASTERSERVER_LOGIN: ${TM_MASTERSERVER_LOGIN}
+      TM_MASTERSERVER_PASSWORD: ${TM_MASTERSERVER_PASSWORD}
+      TM_SERVER_NAME: Match Server
+      TM_SERVER_PASSWORD: ${TM_SERVER_PASSWORD}
+      TM_SYSTEM_XMLRPC_ALLOWREMOTE: "true"
+      TM_SYSTEM_FORCE_IP_ADDRESS: "${TM_SYSTEM_FORCE_IP_ADDRESS}:2350"
+      TM_AUTHORIZATION_SUPERADMIN_PASSWORD: ${TM_AUTHORIZATION_SUPERADMIN_PASSWORD}
+      TM_AUTHORIZATION_ADMIN_PASSWORD: ${TM_AUTHORIZATION_ADMIN_PASSWORD}
+      TM_AUTHORIZATION_USER_PASSWORD: ${TM_AUTHORIZATION_USER_PASSWORD}
+    ports:
+      - 2350:2350/tcp
+      - 2350:2350/udp
+      - 5000:5000/tcp
+    volumes:
+      - user-data:/server/UserData
+  filemanager:
+    image: marijnregterschot/trackmania-server-fm:latest
+    restart: always
+    ports:
+      - 3300:3300/tcp
+    environment:
+      FM_PASSWORD: ${FM_PASSWORD}
+    volumes:
+      - user-data:/app/UserData
+
+  minicontrol:
+    image: evoesports/minicontrol:latest
+    restart: always
+    environment:
+      XMLRPC_HOST: dedicated
+      XMLRPC_PORT: 5000
+      XMLRPC_USER: SuperAdmin
+      XMLRPC_PASS: ${TM_AUTHORIZATION_SUPERADMIN_PASSWORD}
+      EXCLUDED_PLUGINS: ${MINI_EXCLUDED_PLUGINS}
+      ERROR_REPORTING: false
+      SERVER_LOGIN: ${TM_MASTERSERVER_LOGIN}
+      SERVER_PASS: ${TM_MASTERSERVER_PASSWORD}
+      CONTACT_INFO: MiniControl / ${MINI_CONTACT_INFO}
+      IDENTIFIER: ${MINI_IDENTIFIER}
+      SECRET: ${MINI_SECRET}
+      DATABASE: mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+      ADMINS: ${MINI_ADMINS}
+    volumes:
+      - user-data:/server/UserData
+    depends_on:
+      - dedicated
+
+volumes:
+  user-data:

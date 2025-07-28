@@ -3,8 +3,13 @@
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { updateFileManager } from "@/lib/filemanager";
-import { getGbxClientManager } from "@/lib/gbxclient";
+import { deleteGbxClientManager, getGbxClientManager } from "@/lib/gbxclient";
 import { Prisma, Servers } from "@/lib/prisma/generated";
+import {
+  getKeyHetznerRecentlyCreatedServers,
+  getRedisClient,
+} from "@/lib/redis";
+import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { ServerCommandsWithCommand } from "./gbx";
@@ -141,6 +146,7 @@ export async function createServer(
     | "updatedAt"
     | "deletedAt"
   >,
+  recentlyCreatedProjectId?: string,
 ): Promise<ServerResponse<ServersWithUsers>> {
   return doServerActionWithAuth(["servers:create"], async () => {
     const db = getClient();
@@ -158,6 +164,24 @@ export async function createServer(
       },
       include: serversUsersSchema,
     });
+
+    if (recentlyCreatedProjectId) {
+      const client = await getRedisClient();
+      const key = getKeyHetznerRecentlyCreatedServers(recentlyCreatedProjectId);
+  
+      const servers = await client.lrange(key, 0, -1);
+  
+      const updatedServers = servers
+        .map((item) => JSON.parse(item))
+        .filter((server: HetznerServerCache) => server.ip !== newServer.host);
+  
+      await client.del(key);
+      if (updatedServers.length > 0) {
+        await client.rpush(key, ...updatedServers.map((s) => JSON.stringify(s)));
+        await client.expire(key, 60 * 60 * 2); // Keep for 2 hours
+      }
+    }
+
     return newServer;
   });
 }
@@ -300,6 +324,7 @@ export async function deleteServer(serverId: string): Promise<ServerResponse> {
         where: { id: serverId },
         data: { deletedAt: new Date() },
       });
+      await deleteGbxClientManager(serverId);
     },
   );
 }

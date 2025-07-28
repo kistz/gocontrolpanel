@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
@@ -120,6 +121,7 @@ export const createColumns = (
                   Edit group
                 </DropdownMenuItem>
               )}
+              {canEdit && canDelete && <DropdownMenuSeparator />}
               {canDelete && (
                 <DropdownMenuItem
                   variant="destructive"

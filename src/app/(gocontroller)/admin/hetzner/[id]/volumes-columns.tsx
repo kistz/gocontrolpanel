@@ -1,8 +1,8 @@
 "use client";
 
-import { deleteHetznerServer } from "@/actions/hetzner/servers";
+import { deleteHetznerVolume } from "@/actions/hetzner/volumes";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import HetznerServerDetailsModal from "@/components/modals/hetzner-server-details";
+import HetznerVolumeDetailsModal from "@/components/modals/hetzner-volume-details";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -10,28 +10,28 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
-import { HetznerServer } from "@/types/api/hetzner/servers";
+import { HetznerVolume } from "@/types/api/hetzner/volumes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const createColumns = (
+export const createVolumesColumns = (
   refetch: () => void,
   data: {
     projectId: string;
   },
-): ColumnDef<HetznerServer>[] => [
+): ColumnDef<HetznerVolume>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Server Name"} />
+      <DataTableColumnHeader column={column} title={"Volume Name"} />
     ),
   },
   {
@@ -39,16 +39,17 @@ export const createColumns = (
     header: () => <span>Status</span>,
   },
   {
-    accessorKey: "public_net.ipv4.ip",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"IP Address"} />
-    ),
+    accessorKey: "server",
+    header: () => <span>Server</span>,
   },
   {
-    accessorKey: "server_type.name",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Server Type"} />
-    ),
+    accessorKey: "location",
+    header: () => <span>Location</span>,
+    cell: ({ row }) => <span>{row.original.location.name}</span>,
+  },
+  {
+    accessorKey: "size",
+    header: () => <span>Size</span>,
   },
   {
     accessorKey: "created",
@@ -67,7 +68,7 @@ export const createColumns = (
   {
     id: "actions",
     cell: ({ row }) => {
-      const server = row.original;
+      const volume = row.original;
       const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -81,23 +82,23 @@ export const createColumns = (
 
       const handleDelete = () => {
         if (!canDelete) {
-          toast.error("You do not have permission to delete this server.");
+          toast.error("You do not have permission to delete this volume.");
           return;
         }
 
         startTransition(async () => {
           try {
-            const { error } = await deleteHetznerServer(
+            const { error } = await deleteHetznerVolume(
               data.projectId,
-              server.id,
+              volume.id,
             );
             if (error) {
               throw new Error(error);
             }
             refetch();
-            toast.success("Server successfully deleted");
+            toast.success("Volume successfully deleted");
           } catch (error) {
-            toast.error("Error deleting server", {
+            toast.error("Error deleting volume", {
               description: getErrorMessage(error),
             });
           }
@@ -119,12 +120,12 @@ export const createColumns = (
               </DropdownMenuItem>
               {canDelete && (
                 <>
-                  <Separator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}
                   >
-                    Delete Server
+                    Delete Volume
                   </DropdownMenuItem>
                 </>
               )}
@@ -136,19 +137,15 @@ export const createColumns = (
               isOpen={isDeleteOpen}
               onClose={() => setIsDeleteOpen(false)}
               onConfirm={handleDelete}
-              title="Delete server"
-              description={`Are you sure you want to delete ${server.name}?`}
+              title="Delete volume"
+              description={`Are you sure you want to delete ${volume.name}?`}
               confirmText="Delete"
               cancelText="Cancel"
             />
           )}
 
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
-            <HetznerServerDetailsModal
-              data={{
-                server,
-              }}
-            />
+            <HetznerVolumeDetailsModal data={volume} />
           </Modal>
         </div>
       );

@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Roles } from "@/lib/prisma/generated";
@@ -113,6 +114,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
                   Edit role
                 </DropdownMenuItem>
               )}
+              {canEdit && canDelete && <DropdownMenuSeparator />}
               {canDelete && (
                 <DropdownMenuItem
                   variant="destructive"

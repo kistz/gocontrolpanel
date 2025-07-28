@@ -106,6 +106,7 @@ export default function EditProjectForm({
           name="name"
           label="Project Name"
           placeholder="Enter project name"
+          rootClassName="max-w-full"
           isRequired
         />
 

@@ -4,7 +4,16 @@ import { HetznerMetaPagination } from "./meta";
 export interface HetznerServer {
   id: number;
   name: string;
-  status: string;
+  status:
+    | "running"
+    | "initializing"
+    | "starting"
+    | "stopping"
+    | "off"
+    | "deleting"
+    | "migrating"
+    | "rebuilding"
+    | "unknown";
   created: string;
   public_net: {
     ipv4: {
@@ -112,4 +121,14 @@ export interface HetznerImage {
 export interface HetznerImagesResponse {
   images: HetznerImage[];
   meta: HetznerMetaPagination;
+}
+
+export interface HetznerServerCache {
+  id: number;
+  projectId: string;
+  name: string;
+  ip?: string;
+  labels: {
+    [key: string]: string;
+  };
 }
