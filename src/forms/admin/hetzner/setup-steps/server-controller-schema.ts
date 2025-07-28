@@ -22,6 +22,7 @@ const MiniControlSettings = z.object({
 
 const PyPlanetSettings = z.object({
   type: z.literal("pyplanet"),
+  admins: z.array(z.string()),
 });
 
 export const ServerControllerSchema = z.discriminatedUnion("type", [

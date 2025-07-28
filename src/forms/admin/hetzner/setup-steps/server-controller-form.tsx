@@ -263,5 +263,57 @@ function MiniControlSettingsForm() {
 }
 
 function PyPlanetSettingsForm() {
-  return <></>;
+  const form = useFormContext<ServerSetupSchemaType>();
+
+  useEffect(() => {
+    form.setValue(
+      "serverController.admins",
+      form.getValues("serverController.admins") || [],
+    );
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <FormLabel className="text-sm">Admins</FormLabel>
+      {form.watch("serverController.admins")?.map((_, index) => (
+        <div key={index} className="flex items-end gap-2">
+          <div className="flex-1">
+            <FormElement
+              name={`serverController.admins.${index}`}
+              className="w-full"
+              placeholder="Enter admin login"
+            />
+          </div>
+
+          <Button
+            type="button"
+            variant="destructive"
+            size={"icon"}
+            onClick={() => {
+              const currentAdmins = form.getValues("serverController.admins");
+              form.setValue(
+                "serverController.admins",
+                currentAdmins?.filter((_, i) => i !== index),
+              );
+            }}
+          >
+            <IconTrash />
+            <span className="sr-only">Remove Admin</span>
+          </Button>
+        </div>
+      ))}
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          const currentAdmins = form.getValues("serverController.admins") || [];
+          form.setValue("serverController.admins", [...currentAdmins, ""]);
+        }}
+      >
+        <IconPlus />
+        Add Admin
+      </Button>
+    </div>
+  );
 }

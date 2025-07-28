@@ -41,7 +41,8 @@ export MINI_SECRET='{{{server_controller.secret}}}'
 {{/ifEq}}
 
 {{#ifEq server_controller.type "pyplanet"}}
-# Export PyPlanet environment variables 
+# Export PyPlanet environment variables
+export PY_ADMINS='{{{server_controller.admins}}}'
 {{/ifEq}}
 
 # Set environment variables
