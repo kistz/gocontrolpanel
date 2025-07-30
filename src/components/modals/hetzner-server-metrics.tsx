@@ -45,13 +45,7 @@ export default function HetznerServerMetricsModal({
   const [diskMetrics, setDiskMetrics] = useState<MetricsData[]>([]);
   const [networkMetrics, setNetworkMetrics] = useState<MetricsData[]>([]);
 
-  const [timeRange, setTimeRange] = useState<number>(isMobile ? 7 : 30);
-
-  useEffect(() => {
-    if (isMobile && timeRange === 30) {
-      setTimeRange(7);
-    }
-  }, [isMobile]);
+  const [timeRange, setTimeRange] = useState<number>(30);
 
   function formatMetrics(metrics: HetznerServerMetrics) {
     const { time_series } = metrics;
@@ -191,7 +185,7 @@ export default function HetznerServerMetricsModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Server Metrics</h1>
+        <h1 className="text-xl font-bold">{isMobile ? "Metrics" : "Server Metrics"}</h1>
 
         <div className="flex gap-4 items-center">
           <ToggleGroup
@@ -210,7 +204,7 @@ export default function HetznerServerMetricsModal({
             onValueChange={(value) => setTimeRange(Number(value))}
           >
             <SelectTrigger
-              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate sm:hidden"
+              className="flex w-32 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate sm:hidden"
               size="sm"
               aria-label="Select a value"
             >
@@ -244,7 +238,7 @@ export default function HetznerServerMetricsModal({
             config={cpuChartConfig}
             className="h-64 w-full relative"
           >
-            <AreaChart accessibilityLayer data={cpuMetrics}>
+            <AreaChart accessibilityLayer data={cpuMetrics} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id="fillCpu" x1="0" y1="0" x2="0" y2="1">
                   <stop
