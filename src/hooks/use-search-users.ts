@@ -16,7 +16,6 @@ export function useSearchUsers({ defaultUsers }: UseSearchUsersProps) {
   useEffect(() => {
     async function getDefaultUsers() {
       if (!defaultUsers || defaultUsers.length === 0) {
-        setSearchResults([]);
         setLoading(false);
         return;
       }
@@ -42,7 +41,6 @@ export function useSearchUsers({ defaultUsers }: UseSearchUsersProps) {
 
   async function search(query?: string) {
     if (!query?.trim()) {
-      setSearchResults([]);
       setSearching(false);
       return;
     }

@@ -92,7 +92,8 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         <PopoverContent align="start" className="w-auto p-1 z-[9999]">
           {loading ? (
             <div className="p-2 text-sm px-2 py-1 ">Searching...</div>
-          ) : searchResults.filter((r) =>
+          ) : (isControlled ? !value : !rawInput) ||
+            searchResults.filter((r) =>
               r.label
                 .toLowerCase()
                 .includes((isControlled ? value : rawInput).toLowerCase()),

@@ -178,7 +178,7 @@ export async function searchUser(
 
       const user = await db.users.findFirst({
         where: {
-          OR: [{ login: search }, { nickName: search }],
+          OR: [{ login: { equals: search } }, { nickName: { equals: search } }],
         },
         select: {
           id: true,
