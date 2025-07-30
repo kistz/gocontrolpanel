@@ -6,6 +6,7 @@ import ConfirmModal from "@/components/modals/confirm-modal";
 import DetachServerFromNetworkModal from "@/components/modals/detach-server-from-network";
 import HetznerDatabaseDetailsModal from "@/components/modals/hetzner-database-details";
 import HetznerServerDetailsModal from "@/components/modals/hetzner-server-details";
+import HetznerServerMetricsModal from "@/components/modals/hetzner-server-metrics";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,7 @@ export const createServersColumns = (
       const [_, startTransition] = useTransition();
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
       const [isViewOpen, setIsViewOpen] = useState(false);
+      const [isMetricsOpen, setIsMetricsOpen] = useState(false);
       const [isAttachOpen, setIsAttachOpen] = useState(false);
       const [isDetachOpen, setIsDetachOpen] = useState(false);
 
@@ -163,6 +165,9 @@ export const createServersColumns = (
               <DropdownMenuItem onClick={() => setIsViewOpen(true)}>
                 View Details
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsMetricsOpen(true)}>
+                View Metrics
+              </DropdownMenuItem>
               {canCreate && (
                 <>
                   <DropdownMenuSeparator />
@@ -202,6 +207,16 @@ export const createServersColumns = (
 
           <Modal isOpen={isViewOpen} setIsOpen={setIsViewOpen}>
             {getDetailsModal()}
+          </Modal>
+
+          <Modal isOpen={isMetricsOpen} setIsOpen={setIsMetricsOpen}>
+            <HetznerServerMetricsModal
+              closeModal={() => setIsMetricsOpen(false)}
+              data={{
+                projectId: data.projectId,
+                serverId: server.id,
+              }}
+            />
           </Modal>
 
           {canCreate && (

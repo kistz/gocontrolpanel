@@ -132,3 +132,18 @@ export interface HetznerServerCache {
     [key: string]: string;
   };
 }
+
+export interface HetznerServerMetrics {
+  start: string;
+  end: string;
+  step: number;
+  time_series: {
+    [metric: string]: {
+      values: [number, string][];
+    };
+  };
+}
+
+export interface HetznerServerMetricsResponse {
+  metrics: HetznerServerMetrics;
+}
