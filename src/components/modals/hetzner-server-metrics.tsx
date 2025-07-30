@@ -238,7 +238,7 @@ export default function HetznerServerMetricsModal({
             config={cpuChartConfig}
             className="h-64 w-full relative"
           >
-            <AreaChart accessibilityLayer data={cpuMetrics} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+            <AreaChart accessibilityLayer data={cpuMetrics}>
               <defs>
                 <linearGradient id="fillCpu" x1="0" y1="0" x2="0" y2="1">
                   <stop
