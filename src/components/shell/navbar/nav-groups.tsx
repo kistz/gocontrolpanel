@@ -15,11 +15,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import useWebSocket from "@/hooks/use-websocket";
-import { generatePath, hasPermissionSync, useCurrentid } from "@/lib/utils";
+import { generatePath, hasPermissionSync } from "@/lib/utils";
 import { useNotifications } from "@/providers/notification-provider";
+import { useServers } from "@/providers/servers-provider";
 import { routePermissions, routes } from "@/routes";
-import { ServerInfo } from "@/types/server";
 import {
   IconActivity,
   IconAdjustmentsAlt,
@@ -33,9 +32,7 @@ import {
 import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useMemo } from "react";
 
 interface ServerNavGroup {
   name: string;
@@ -55,60 +52,10 @@ interface ServerNavGroup {
 }
 
 export default function NavGroups() {
-  const pathname = usePathname();
   const { data: session } = useSession();
-  const router = useRouter();
-  const [servers, setServers] = useState<ServerInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [serverId, setServerId] = useState<string | null>(null);
   const { notifications } = useNotifications();
 
-  const handleMessage = useCallback((type: string, data: any) => {
-    switch (type) {
-      case "servers":
-        setServers(data);
-        setLoading(false);
-        break;
-      case "connect":
-        setServers((prev) =>
-          prev.map((server) =>
-            server.id === data.serverId
-              ? { ...server, isConnected: true }
-              : server,
-          ),
-        );
-        break;
-      case "disconnect":
-        setServers((prev) =>
-          prev.map((server) =>
-            server.id === data.serverId
-              ? { ...server, isConnected: false }
-              : server,
-          ),
-        );
-        break;
-    }
-  }, []);
-
-  useWebSocket({
-    url: "/api/ws/servers",
-    onMessage: handleMessage,
-    onError: () => setLoading(false),
-  });
-
-  useEffect(() => {
-    const uuid = useCurrentid(pathname);
-    setServerId(uuid);
-  }, [pathname]);
-
-  useEffect(() => {
-    for (const server of servers) {
-      if (server.id === serverId && !server.isConnected) {
-        toast.error(`Server ${server.name} is offline`);
-        router.push("/");
-      }
-    }
-  }, [servers]);
+  const { servers, serverId, loading } = useServers();
 
   const groupsSidebarGroup: ServerNavGroup[] = useMemo(
     () =>
