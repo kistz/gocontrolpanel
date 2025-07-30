@@ -4,7 +4,7 @@ import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { createHetznerNetwork } from "@/actions/hetzner/networks";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { Form, FormLabel } from "@/components/ui/form";
+import { Form, FormLabel, FormMessage } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -193,9 +193,9 @@ export default function AddHetznerNetworkForm({
           </Button>
 
           {form.formState.errors.subnets && (
-            <span className="text-destructive text-xs">
+            <FormMessage className="text-destructive text-xs">
               {form.formState.errors.subnets.message}
-            </span>
+            </FormMessage>
           )}
         </div>
 
