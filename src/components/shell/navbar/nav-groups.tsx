@@ -255,10 +255,10 @@ export default function NavGroups() {
     );
   }
 
-  return groupsSidebarGroup.map((group) => (
+  return groupsSidebarGroup.map((group, index) => (
     <SidebarGroup
       className="group-data-[collapsible=icon]:hidden select-none"
-      key={group.name || "default"}
+      key={index}
     >
       {group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
