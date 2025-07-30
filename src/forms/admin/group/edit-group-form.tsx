@@ -12,7 +12,7 @@ import { GroupRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditGroupSchema, EditGroupSchemaType } from "./edit-group-schema";
@@ -29,7 +29,12 @@ export default function EditGroupForm({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { search, searchResults, searching, loading: searchLoading } = useSearchUsers({
+  const {
+    search,
+    searchResults,
+    searching,
+    loading: searchLoading,
+  } = useSearchUsers({
     defaultUsers: group.groupMembers.map((user) => user.userId),
   });
 

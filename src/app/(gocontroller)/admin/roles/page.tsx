@@ -1,12 +1,9 @@
 import { getRolesPaginated } from "@/actions/database/roles";
-import AddRoleModal from "@/components/modals/add-role";
-import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
-import { Button } from "@/components/ui/button";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
-import { IconPlus } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
+import { createActions } from "./actions";
 import { createColumns } from "./columns";
 
 export default async function AdminRolesPage() {
@@ -31,17 +28,8 @@ export default async function AdminRolesPage() {
       <PaginationTable
         createColumns={createColumns}
         fetchData={getRolesPaginated}
-        actions={
-          canCreate && (
-            <Modal>
-              <AddRoleModal />
-              <Button className="w-9 sm:w-auto">
-                <IconPlus />
-                <span className="hidden sm:inline">Add Role</span>
-              </Button>
-            </Modal>
-          )
-        }
+        actions={createActions}
+        actionsAllowed={canCreate}
         filter
       />
     </div>

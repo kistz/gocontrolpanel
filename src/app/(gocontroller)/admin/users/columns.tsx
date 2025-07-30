@@ -83,14 +83,12 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
       <DataTableColumnHeader column={column} title={"Joined"} />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      const date = row.original.createdAt;
+      return (
+        <span>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </span>
+      );
     },
   },
   {
@@ -180,9 +178,8 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             <Modal
               isOpen={isEditOpen}
               setIsOpen={setIsEditOpen}
-              onClose={() => refetch()}
             >
-              <EditUserModal data={user} />
+              <EditUserModal data={user} onSubmit={refetch} />
             </Modal>
           )}
         </div>

@@ -1,22 +1,25 @@
 "use client";
-import { HetznerProjectsWithUsers } from "@/actions/database/hetzner-projects";
-import EditProjectForm from "@/forms/admin/hetzner/edit-project-form";
+import RemoveSubnetFromNetworkForm from "@/forms/admin/hetzner/network/remove-subnet-from-network-form";
+import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { IconX } from "@tabler/icons-react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function EditProjectModal({
+export default function RemoveSubnetFromNetworkModal({
   closeModal,
   onSubmit,
   data,
-}: DefaultModalProps<HetznerProjectsWithUsers>) {
+}: DefaultModalProps<{
+  projectId: string;
+  network: HetznerNetwork;
+}>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const handleCallback = () => {
+  const handleSubmit = () => {
     onSubmit?.();
     closeModal?.();
   };
@@ -27,13 +30,18 @@ export default function EditProjectModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Edit {data.name}</h1>
+        <h1 className="text-xl font-bold">Remove Subnet from Network</h1>
         <IconX
           className="h-6 w-6 cursor-pointer text-muted-foreground"
           onClick={closeModal}
         />
       </div>
-      <EditProjectForm project={data} callback={handleCallback} />
+
+      <RemoveSubnetFromNetworkForm
+        projectId={data.projectId}
+        network={data.network}
+        callback={handleSubmit}
+      />
     </Card>
   );
 }

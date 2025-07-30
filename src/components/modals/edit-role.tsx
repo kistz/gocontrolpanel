@@ -7,12 +7,18 @@ import { DefaultModalProps } from "./default-props";
 
 export default function EditRoleModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<Roles>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleCallback = () => {
+    onSubmit?.();
+    closeModal?.();
   };
 
   return (
@@ -27,7 +33,7 @@ export default function EditRoleModal({
           onClick={closeModal}
         />
       </div>
-      <EditRoleForm role={data} callback={closeModal} />
+      <EditRoleForm role={data} callback={handleCallback} />
     </Card>
   );
 }

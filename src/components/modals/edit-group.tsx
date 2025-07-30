@@ -8,6 +8,7 @@ import { DefaultModalProps } from "./default-props";
 
 export default function EditGroupModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<GroupsWithUsersWithServers>) {
   const { update } = useSession();
@@ -19,6 +20,7 @@ export default function EditGroupModal({
   };
 
   const handleCallback = () => {
+    onSubmit?.();
     closeModal?.();
     update();
   };

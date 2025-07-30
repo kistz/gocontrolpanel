@@ -1,23 +1,20 @@
 "use client";
 import AddRoleForm from "@/forms/admin/role/add-role-form";
 import { IconX } from "@tabler/icons-react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddRoleModal({ closeModal }: DefaultModalProps) {
-  const router = useRouter();
-  const { update } = useSession();
-
+export default function AddRoleModal({
+  closeModal,
+  onSubmit,
+}: DefaultModalProps) {
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
   const handleCallback = () => {
+    onSubmit?.();
     closeModal?.();
-    update();
-    router.refresh();
   };
 
   return (

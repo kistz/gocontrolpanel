@@ -4,7 +4,7 @@ import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { createHetznerNetwork } from "@/actions/hetzner/networks";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { Form, FormLabel } from "@/components/ui/form";
+import { Form, FormLabel, FormMessage } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -72,6 +72,7 @@ export default function AddHetznerNetworkForm({
 
   async function onSubmit(values: AddHetznerNetworkSchemaType) {
     try {
+      console.log("Submitting values:", values);
       const { error } = await createHetznerNetwork(projectId, values);
       if (error) {
         throw new Error(error);
@@ -117,7 +118,15 @@ export default function AddHetznerNetworkForm({
         />
 
         <div className="flex flex-col gap-2">
-          <FormLabel>Subnets</FormLabel>
+          <FormLabel data-error={!!form.formState.errors.subnets}>
+            Subnets{" "}
+            <span
+              data-error={!!form.formState.errors.subnets}
+              className="text-xs text-muted-foreground data-[error=true]:text-destructive"
+            >
+              (Required)
+            </span>
+          </FormLabel>
           {subnets.map((_, index) => (
             <div key={index} className="flex flex-col sm:flex-row gap-2">
               <div className="flex gap-2">
@@ -182,6 +191,12 @@ export default function AddHetznerNetworkForm({
             <IconPlus />
             Add Subnet
           </Button>
+
+          {form.formState.errors.subnets && (
+            <FormMessage className="text-destructive text-xs">
+              {form.formState.errors.subnets.message}
+            </FormMessage>
+          )}
         </div>
 
         <Button

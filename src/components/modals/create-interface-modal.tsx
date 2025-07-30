@@ -20,10 +20,8 @@ export default function CreateInterfaceModal({
   };
 
   const handleSubmit = (newInterface: Interfaces) => {
+    onSubmit?.(newInterface);
     closeModal?.();
-    if (onSubmit) {
-      onSubmit(newInterface);
-    }
   };
 
   return (

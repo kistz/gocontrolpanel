@@ -7,12 +7,18 @@ import { DefaultModalProps } from "./default-props";
 
 export default function EditServerModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<ServersWithUsers>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleCallback = () => {
+    onSubmit?.();
+    closeModal?.();
   };
 
   return (
@@ -27,7 +33,7 @@ export default function EditServerModal({
           onClick={closeModal}
         />
       </div>
-      <EditServerForm server={data} callback={closeModal} />
+      <EditServerForm server={data} callback={handleCallback} />
     </Card>
   );
 }

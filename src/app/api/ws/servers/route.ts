@@ -20,7 +20,10 @@ export async function SOCKET(
     return;
   }
 
-  const servers = token?.groups?.flatMap((group) => group.servers) || [];
+  const allServers = token?.groups?.flatMap((group) => group.servers) || [];
+  const servers = [
+    ...new Map(allServers.map((server) => [server.id, server])).values(),
+  ];
 
   const serverManagers: {
     manager: GbxClientManager;
