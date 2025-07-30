@@ -40,7 +40,6 @@ export default function HetznerServerMetricsModal({
   const isMobile = useIsMobile();
 
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const [cpuMetrics, setCpuMetrics] = useState<MetricsData[]>([]);
   const [diskMetrics, setDiskMetrics] = useState<MetricsData[]>([]);
@@ -126,7 +125,6 @@ export default function HetznerServerMetricsModal({
   const fetchMetrics = async () => {
     if (!data) return;
 
-    setLoading(true);
     const start = new Date();
     start.setDate(start.getDate() - timeRange);
 
@@ -134,7 +132,6 @@ export default function HetznerServerMetricsModal({
       const { data: metrics, error } = await getHetznerServerMetrics(
         data.projectId,
         data.serverId,
-        // new Date(new Date().getTime() - 1 * 60 * 60 * 1000),
         start,
       );
       if (error) {
@@ -146,8 +143,6 @@ export default function HetznerServerMetricsModal({
       toast.error("Failed to fetch metrics", {
         description: getErrorMessage(error),
       });
-    } finally {
-      setLoading(false);
     }
   };
 
