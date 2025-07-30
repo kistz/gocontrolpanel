@@ -5,6 +5,7 @@ import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/server/add-het
 import { AttachHetznerServerToNetworkSchemaType } from "@/forms/admin/hetzner/server/attach-hetzner-server-to-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
+import { Handlebars } from "@/lib/handlebars";
 import {
   getKeyHetznerRateLimit,
   getKeyHetznerRecentlyCreatedServers,
@@ -14,12 +15,13 @@ import { generateRandomString } from "@/lib/utils";
 import {
   HetznerServer,
   HetznerServerCache,
+  HetznerServerMetrics,
+  HetznerServerMetricsResponse,
   HetznerServersResponse,
 } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { readFileSync } from "fs";
-import { Handlebars } from "@/lib/handlebars";
 import path from "path";
 import { packageDirectorySync } from "pkg-dir";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
@@ -399,6 +401,40 @@ export async function getAllDatabases(
       } while (servers.length < totalEntries);
 
       return servers.filter((server) => server.labels.type === "database");
+    },
+  );
+}
+
+export async function getHetznerServerMetrics(
+  projectId: string,
+  serverId: number,
+  start: Date,
+  end: Date = new Date(),
+): Promise<ServerResponse<HetznerServerMetrics>> {
+  return doServerActionWithAuth(
+    [
+      "hetzner:servers:view",
+      `hetzner:${projectId}:moderator`,
+      `hetzner:${projectId}:admin`,
+    ],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const res = await axiosHetzner.get<HetznerServerMetricsResponse>(
+        `/servers/${serverId}/metrics`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            type: "cpu,disk,network",
+            start: start.toISOString(),
+            end: end.toISOString(),
+          },
+        },
+      );
+      
+      return res.data.metrics;
     },
   );
 }
