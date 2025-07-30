@@ -103,8 +103,10 @@ export async function getHetznerProjectsPaginated(
             ? getList(project.apiTokens).map((token) =>
                 decryptHetznerToken(token),
               )
-            : [],
-          apiTokensCount: getList(project.apiTokens).length,
+            : Array.from(
+                { length: getList(project.apiTokens).length },
+                () => crypto.randomUUID(),
+              ),
         })),
       };
     },
