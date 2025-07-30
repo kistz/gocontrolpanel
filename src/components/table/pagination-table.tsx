@@ -26,7 +26,7 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
-interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
+interface PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs> {
   createColumns: (
     refetch: () => void,
     data: TArgs,
@@ -44,11 +44,12 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
   pageSize?: number;
   filter?: boolean;
   fetchArgs?: TFetch;
-  actions?: (refetch: () => void) => React.ReactNode;
+  actions?: (refetch: () => void, args?: TActionArgs) => React.ReactNode;
   actionsAllowed?: boolean;
+  actionsArgs?: TActionArgs;
 }
 
-export function PaginationTable<TData, TValue, TArgs, TFetch>({
+export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
   createColumns,
   fetchData,
   args = {} as TArgs,
@@ -57,7 +58,8 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   fetchArgs = {} as TFetch,
   actions,
   actionsAllowed = true,
-}: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
+  actionsArgs,
+}: PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageSize,
     pageIndex: 0,
@@ -116,7 +118,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
             />
           )}
 
-          {actionsAllowed && actions && actions(refetch)}
+          {actionsAllowed && actions && actions(refetch, actionsArgs)}
         </div>
       )}
 

@@ -161,12 +161,8 @@ export const createColumns = (
           )}
 
           {canEdit && (
-            <Modal
-              isOpen={isEditOpen}
-              setIsOpen={setIsEditOpen}
-              onClose={() => refetch()}
-            >
-              <EditProjectModal data={project} />
+            <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
+              <EditProjectModal data={project} onSubmit={refetch} />
             </Modal>
           )}
         </div>

@@ -2,23 +2,21 @@
 import AddServerForm from "@/forms/admin/server/add-server-form";
 import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { IconX } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function AddServerModal({
   data,
+  onSubmit,
   closeModal,
 }: DefaultModalProps<HetznerServerCache[]>) {
-  const router = useRouter();
-
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
   const handleSubmit = () => {
+    onSubmit?.();
     closeModal?.();
-    router.refresh();
   };
 
   return (

@@ -1,12 +1,9 @@
 import { getHetznerProjectsPaginated } from "@/actions/database/hetzner-projects";
-import AddProjectModal from "@/components/modals/add-project";
-import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
-import { Button } from "@/components/ui/button";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
-import { IconPlus } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
+import { createActions } from "./actions";
 import { createColumns } from "./columns";
 
 export default async function AdminHetznerPage() {
@@ -31,17 +28,8 @@ export default async function AdminHetznerPage() {
       <PaginationTable
         fetchData={getHetznerProjectsPaginated}
         createColumns={createColumns}
-        actions={
-          canCreate && (
-            <Modal>
-              <AddProjectModal />
-              <Button className="w-9 sm:w-auto">
-                <IconPlus />
-                <span className="hidden sm:inline">Add Project</span>
-              </Button>
-            </Modal>
-          )
-        }
+        actions={createActions}
+        actionsAllowed={canCreate}
         filter
       />
     </div>

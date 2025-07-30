@@ -2,16 +2,14 @@
 import { HetznerProjectsWithUsers } from "@/actions/database/hetzner-projects";
 import EditProjectForm from "@/forms/admin/hetzner/edit-project-form";
 import { IconX } from "@tabler/icons-react";
-import { useSession } from "next-auth/react";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function EditProjectModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<HetznerProjectsWithUsers>) {
-  const { update } = useSession();
-
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -19,8 +17,8 @@ export default function EditProjectModal({
   };
 
   const handleCallback = () => {
+    onSubmit?.();
     closeModal?.();
-    update();
   };
 
   return (

@@ -157,9 +157,8 @@ export const createColumns = (
             <Modal
               isOpen={editIsOpen}
               setIsOpen={setEditIsOpen}
-              onClose={() => refetch()}
             >
-              <EditServerModal data={server} />
+              <EditServerModal data={server} onSubmit={refetch} />
             </Modal>
           )}
         </div>
