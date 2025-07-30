@@ -15,7 +15,6 @@ import {
   HetznerServerType,
 } from "@/types/api/hetzner/servers";
 import { IconX } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
@@ -144,7 +143,7 @@ export default function AddServerSetupModal({
 
     fetch();
   }, []);
-  
+
   const [mode, setMode] = useState<Mode>("simple");
 
   if (!data) return null;
