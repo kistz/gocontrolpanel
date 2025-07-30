@@ -43,6 +43,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs> {
   args?: TArgs;
   pageSize?: number;
   filter?: boolean;
+  sortingField?: string;
   fetchArgs?: TFetch;
   actions?: (refetch: () => void, args?: TActionArgs) => React.ReactNode;
   actionsAllowed?: boolean;
@@ -55,6 +56,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
   args = {} as TArgs,
   pageSize = 10,
   filter = false,
+  sortingField = "createdAt",
   fetchArgs = {} as TFetch,
   actions,
   actionsAllowed = true,
@@ -64,7 +66,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
     pageSize,
     pageIndex: 0,
   });
-  const { sorting, setSorting, field, order } = useSorting();
+  const { sorting, setSorting, field, order } = useSorting(sortingField);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const { data, totalCount, loading, refetch } = usePaginationAPI<
     TData,

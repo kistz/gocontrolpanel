@@ -85,6 +85,7 @@ export default async function ProjectPage({
             actions={createServerActions}
             actionsArgs={{ id }}
             actionsAllowed={canCreate}
+            sortingField="id"
             filter
           />
         </TabsContent>
@@ -98,6 +99,7 @@ export default async function ProjectPage({
             actions={createNetworkActions}
             actionsArgs={{ id }}
             actionsAllowed={canCreate}
+            sortingField="id"
             filter
           />
         </TabsContent>
@@ -111,6 +113,7 @@ export default async function ProjectPage({
             actions={createVolumeActions}
             actionsArgs={{ id }}
             actionsAllowed={canCreate}
+            sortingField="id"
             filter
           />
         </TabsContent>
