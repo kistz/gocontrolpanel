@@ -4,14 +4,10 @@ import {
   updateGroup,
 } from "@/actions/database/groups";
 import { getServersMinimal, ServerMinimal } from "@/actions/database/servers";
-import {
-  getUsersMinimal,
-  searchUsers,
-  UserMinimal,
-} from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
+import { useSearchUsers } from "@/hooks/use-search-users";
 import { GroupRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +29,14 @@ export default function EditGroupForm({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchResults, setSearchResults] = useState<UserMinimal[]>([]);
-  const [searching, setSearching] = useState(false);
+  const {
+    search,
+    searchResults,
+    searching,
+    loading: searchLoading,
+  } = useSearchUsers({
+    defaultUsers: group.groupMembers.map((user) => user.userId),
+  });
 
   useEffect(() => {
     async function fetch() {
@@ -47,19 +49,6 @@ export default function EditGroupForm({
       } catch (error) {
         setError("Failed to get servers: " + getErrorMessage(error));
         toast.error("Failed to fetch servers", {
-          description: getErrorMessage(error),
-        });
-      }
-
-      try {
-        const { data, error } = await getUsersMinimal();
-        if (error) {
-          throw new Error(error);
-        }
-        setSearchResults(data);
-      } catch (error) {
-        setError("Failed to search users: " + getErrorMessage(error));
-        toast.error("Failed to search users", {
           description: getErrorMessage(error),
         });
       }
@@ -119,31 +108,7 @@ export default function EditGroupForm({
     }
   }
 
-  const handleSearch = async (query?: string) => {
-    if (!query?.trim()) {
-      return;
-    }
-    setSearching(true);
-    try {
-      const { data, error } = await searchUsers(query);
-      if (error) {
-        throw new Error(error);
-      }
-      setSearchResults((prev) => {
-        const existingIds = new Set(prev.map((u) => u.id));
-        return [...prev, ...data.filter((u) => !existingIds.has(u.id))];
-      });
-    } catch (error) {
-      setError("Failed to search users: " + getErrorMessage(error));
-      toast.error("Failed to search users", {
-        description: getErrorMessage(error),
-      });
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  if (loading) {
+  if (loading || searchLoading) {
     return <span className="text-muted-foreground">Loading...</span>;
   }
 
@@ -192,13 +157,13 @@ export default function EditGroupForm({
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Members</FormLabel>
           {memberFields.map((field, index) => (
-            <div key={field.id} className="flex items-end gap-2">
+            <div key={field.id} className="flex gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`groupMembers.${index}.userId`}
                   className="w-full"
                   placeholder="Search user..."
-                  onSearch={handleSearch}
+                  onSearch={search}
                   options={searchResults.map((u) => ({
                     label: u.nickName,
                     value: u.id,

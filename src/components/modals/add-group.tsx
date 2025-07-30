@@ -2,12 +2,13 @@
 import AddGroupForm from "@/forms/admin/group/add-group-form";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
-export default function AddGroupModal({ closeModal }: DefaultModalProps) {
-  const router = useRouter();
+export default function AddGroupModal({
+  closeModal,
+  onSubmit,
+}: DefaultModalProps) {
   const { update } = useSession();
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -15,9 +16,9 @@ export default function AddGroupModal({ closeModal }: DefaultModalProps) {
   };
 
   const handleCallback = () => {
+    onSubmit?.();
     closeModal?.();
     update();
-    router.refresh();
   };
 
   return (

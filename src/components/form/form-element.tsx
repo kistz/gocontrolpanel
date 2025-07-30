@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Path, useFormContext } from "react-hook-form";
 import {
   FormControl,
@@ -8,7 +9,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import RenderInput from "./render-input";
-import clsx from "clsx";
 
 interface FormElementProps<TControl> {
   name: Path<TControl>;
@@ -61,8 +61,8 @@ export default function FormElement<TControl>({
   if (isHidden) return null;
 
   const getNestedError = (errors: any, path: string) => {
-    return path.split('.').reduce((acc, key) => acc?.[key], errors);
-  }
+    return path.split(".").reduce((acc, key) => acc?.[key], errors);
+  };
 
   const error = getNestedError(errors, name);
 
@@ -80,7 +80,7 @@ export default function FormElement<TControl>({
           .join(", ")
       : undefined;
   };
-  
+
   return (
     <FormField
       control={control}
@@ -96,7 +96,10 @@ export default function FormElement<TControl>({
                 >
                   {label}{" "}
                   {isRequired && (
-                    <span data-error={!!error} className="text-xs text-muted-foreground data-[error=true]:text-destructive">
+                    <span
+                      data-error={!!error}
+                      className="text-xs text-muted-foreground data-[error=true]:text-destructive"
+                    >
                       (Required)
                     </span>
                   )}
@@ -129,7 +132,7 @@ export default function FormElement<TControl>({
             </div>
           </FormControl>
           {error && (
-            <FormMessage className="text-destructive">
+            <FormMessage className="text-destructive text-xs">
               {getErrorMessage(error)}
             </FormMessage>
           )}

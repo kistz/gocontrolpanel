@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { getErrorMessage, getList, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -34,14 +34,32 @@ export const createColumns = (
     ),
   },
   {
-    accessorKey: "apiTokensCount",
+    accessorKey: "apiTokens",
     header: "API Tokens",
+    cell: ({ row }) => {
+      const tokens = getList(row.original.apiTokens);
+      return <span>{tokens.length}</span>;
+    },
   },
   {
     accessorKey: "_count.hetznerProjectUsers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Users" />
     ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Created At"} />
+    ),
+    cell: ({ row }) => {
+      const date = row.original.createdAt;
+      return (
+        <span>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </span>
+      );
+    },
   },
   {
     id: "actions",
@@ -107,22 +125,25 @@ export const createColumns = (
             <DropdownMenuContent align="end">
               {canView && (
                 <DropdownMenuItem
+                  disabled={getList(project.apiTokens).length === 0}
                   onClick={() => router.push(`/admin/hetzner/${project.id}`)}
                 >
                   View Project
                 </DropdownMenuItem>
               )}
+
               {canEdit && (
                 <>
-                  <DropdownMenuSeparator />
+                  {canView && <DropdownMenuSeparator />}
                   <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
                     Edit Project
                   </DropdownMenuItem>
                 </>
               )}
+
               {canDelete && (
                 <>
-                  <DropdownMenuSeparator />
+                  {(canView || canEdit) && <DropdownMenuSeparator />}
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsOpen(true)}
@@ -147,12 +168,8 @@ export const createColumns = (
           )}
 
           {canEdit && (
-            <Modal
-              isOpen={isEditOpen}
-              setIsOpen={setIsEditOpen}
-              onClose={() => refetch()}
-            >
-              <EditProjectModal data={project} />
+            <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
+              <EditProjectModal data={project} onSubmit={refetch} />
             </Modal>
           )}
         </div>

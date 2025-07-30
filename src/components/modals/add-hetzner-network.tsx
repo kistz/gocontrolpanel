@@ -1,25 +1,23 @@
 "use client";
 import AddHetznerNetworkForm from "@/forms/admin/hetzner/network/add-hetzner-network-form";
 import { IconX } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function AddHetznerNetworkModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<string>) {
-  const router = useRouter();
-
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    onSubmit?.();
     closeModal?.();
-    router.refresh();
   };
 
   return (

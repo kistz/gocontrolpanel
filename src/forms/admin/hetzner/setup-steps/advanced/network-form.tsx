@@ -2,7 +2,7 @@
 
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
-import { FormLabel } from "@/components/ui/form";
+import { FormLabel, FormMessage } from "@/components/ui/form";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { HetznerServer } from "@/types/api/hetzner/servers";
@@ -149,9 +149,14 @@ export default function NetworkForm({
           />
 
           <div className="flex flex-col gap-2">
-            <FormLabel>
+            <FormLabel data-error={!!form.formState.errors.network?.subnets}>
               Subnets{" "}
-              <span className="text-xs text-muted-foreground">(Required)</span>
+              <span
+                className="text-xs text-muted-foreground data-[error=true]:text-destructive"
+                data-error={!!form.formState.errors.network?.subnets}
+              >
+                (Required)
+              </span>
             </FormLabel>
             {subnets.map((_, index) => (
               <div key={index} className="flex flex-col sm:flex-row gap-2">
@@ -218,6 +223,12 @@ export default function NetworkForm({
               <IconPlus />
               Add Subnet
             </Button>
+
+            {form.formState.errors.network?.subnets && (
+              <FormMessage className="text-destructive text-xs">
+                {form.formState.errors.network.subnets.message}
+              </FormMessage>
+            )}
           </div>
         </>
       ) : (

@@ -85,7 +85,7 @@ function pathToRegex(path: string) {
 }
 
 // Use in a React client component
-export function useCurrentid(pathname: string): string | null {
+export function useCurrentId(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);
@@ -310,7 +310,6 @@ export function hasPermissionsJWTSync(
 ): boolean {
   if (jwt.admin) return true;
   if (!permissions || permissions.length === 0) return true;
-
 
   const userPermissions = jwt.permissions;
 

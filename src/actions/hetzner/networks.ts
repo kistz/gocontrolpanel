@@ -11,6 +11,7 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
+import { RemoveSubnetFromNetworkSchemaType } from "@/forms/admin/hetzner/network/remove-subnet-from-network-schema";
 
 export async function getHetznerNetworksPaginated(
   pagination: PaginationState,
@@ -168,6 +169,31 @@ export async function addSubnetToNetwork(
       const res = await axiosHetzner.post(
         `/networks/${networkId}/actions/add_subnet`,
         body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await setRateLimit(projectId, res);
+    },
+  );
+}
+
+export async function removeSubnetFromNetwork(
+  projectId: string,
+  networkId: number,
+  data: RemoveSubnetFromNetworkSchemaType,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    async () => {
+      const token = await getApiToken(projectId);
+
+      const res = await axiosHetzner.post(
+        `/networks/${networkId}/actions/delete_subnet`,
+        { ip_range: data.ipRange },
         {
           headers: {
             Authorization: `Bearer ${token}`,

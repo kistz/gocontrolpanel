@@ -1,28 +1,26 @@
 "use client";
 import DetachServerFromNetworkForm from "@/forms/admin/hetzner/server/detach-server-from-network-form";
 import { IconX } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function DetachServerFromNetworkModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<{
   projectId: string;
   serverId: number;
 }>) {
-  const router = useRouter();
-
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    onSubmit?.();
     closeModal?.();
-    router.refresh();
   };
 
   return (

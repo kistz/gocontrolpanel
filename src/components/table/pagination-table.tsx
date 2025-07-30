@@ -26,7 +26,7 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 
-interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
+interface PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs> {
   createColumns: (
     refetch: () => void,
     data: TArgs,
@@ -43,24 +43,30 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
   args?: TArgs;
   pageSize?: number;
   filter?: boolean;
+  sortingField?: string;
   fetchArgs?: TFetch;
-  actions?: React.ReactNode;
+  actions?: (refetch: () => void, args?: TActionArgs) => React.ReactNode;
+  actionsAllowed?: boolean;
+  actionsArgs?: TActionArgs;
 }
 
-export function PaginationTable<TData, TValue, TArgs, TFetch>({
+export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
   createColumns,
   fetchData,
   args = {} as TArgs,
   pageSize = 10,
   filter = false,
+  sortingField = "createdAt",
   fetchArgs = {} as TFetch,
   actions,
-}: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
+  actionsAllowed = true,
+  actionsArgs,
+}: PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageSize,
     pageIndex: 0,
   });
-  const { sorting, setSorting, field, order } = useSorting();
+  const { sorting, setSorting, field, order } = useSorting(sortingField);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const { data, totalCount, loading, refetch } = usePaginationAPI<
     TData,
@@ -114,7 +120,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
             />
           )}
 
-          {actions}
+          {actionsAllowed && actions && actions(refetch, actionsArgs)}
         </div>
       )}
 

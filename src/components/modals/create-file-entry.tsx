@@ -21,9 +21,7 @@ export default function CreateFileEntryModal({
   };
 
   const handleSubmit = (fileEntry: FileEntry) => {
-    if (onSubmit) {
-      onSubmit(fileEntry);
-    }
+    onSubmit?.(fileEntry);
     closeModal?.();
   };
 

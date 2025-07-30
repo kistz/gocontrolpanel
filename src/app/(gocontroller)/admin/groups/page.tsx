@@ -1,12 +1,9 @@
 import { getGroupsPaginated } from "@/actions/database/groups";
-import AddGroupModal from "@/components/modals/add-group";
-import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
-import { Button } from "@/components/ui/button";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
-import { IconPlus } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
+import { createActions } from "./actions";
 import { createColumns } from "./columns";
 
 export default async function AdminGroupsPage() {
@@ -16,8 +13,6 @@ export default async function AdminGroupsPage() {
   }
 
   const canCreate = await hasPermission(routePermissions.admin.groups.create);
-
-  const key = crypto.randomUUID();
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,24 +26,12 @@ export default async function AdminGroupsPage() {
       </div>
 
       <PaginationTable
-        key={key}
         createColumns={createColumns}
         fetchData={getGroupsPaginated}
-        actions={
-          canCreate && (
-            <Modal>
-              <AddGroupModal />
-              <Button className="w-9 sm:w-auto">
-                <IconPlus />
-                <span className="hidden sm:inline">Add Group</span>
-              </Button>
-            </Modal>
-          )
-        }
+        actions={createActions}
+        actionsAllowed={canCreate}
         filter
       />
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";

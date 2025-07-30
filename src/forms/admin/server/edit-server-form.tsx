@@ -1,18 +1,13 @@
 "use client";
 import { ServersWithUsers, updateServer } from "@/actions/database/servers";
-import {
-  getUsersMinimal,
-  searchUsers,
-  UserMinimal,
-} from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
+import { useSearchUsers } from "@/hooks/use-search-users";
 import { UserServerRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
@@ -24,32 +19,9 @@ export default function EditServerForm({
   server: ServersWithUsers;
   callback?: () => void;
 }) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [searchResults, setSearchResults] = useState<UserMinimal[]>([]);
-  const [searching, setSearching] = useState(false);
-
-  useEffect(() => {
-    async function fetch() {
-      try {
-        const { data, error } = await getUsersMinimal();
-        if (error) {
-          throw new Error(error);
-        }
-        setSearchResults(data);
-      } catch (error) {
-        setError("Failed to get users: " + getErrorMessage(error));
-        toast.error("Failed to fetch users", {
-          description: getErrorMessage(error),
-        });
-      }
-
-      setLoading(false);
-    }
-
-    fetch();
-  }, []);
+  const { search, searchResults, searching, loading } = useSearchUsers({
+    defaultUsers: server.userServers.map((userServer) => userServer.userId),
+  });
 
   const form = useForm<EditServerSchemaType>({
     resolver: zodResolver(EditServerSchema),
@@ -102,36 +74,8 @@ export default function EditServerForm({
     }
   }
 
-  const handleSearch = async (query?: string) => {
-    if (!query?.trim()) {
-      return;
-    }
-    setSearching(true);
-    try {
-      const { data, error } = await searchUsers(query);
-      if (error) {
-        throw new Error(error);
-      }
-      setSearchResults((prev) => {
-        const existingIds = new Set(prev.map((u) => u.id));
-        return [...prev, ...data.filter((u) => !existingIds.has(u.id))];
-      });
-    } catch (error) {
-      setError("Failed to search users: " + getErrorMessage(error));
-      toast.error("Failed to search users", {
-        description: getErrorMessage(error),
-      });
-    } finally {
-      setSearching(false);
-    }
-  };
-
   if (loading) {
     return <span className="text-muted-foreground">Loading...</span>;
-  }
-
-  if (error) {
-    return <span>{error}</span>;
   }
 
   return (
@@ -192,13 +136,13 @@ export default function EditServerForm({
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Users</FormLabel>
           {userFields.map((field, index) => (
-            <div key={field.id} className="flex items-end gap-2">
+            <div key={field.id} className="flex gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`userServers.${index}.userId`}
                   className="w-full"
                   placeholder="Search user..."
-                  onSearch={handleSearch}
+                  onSearch={search}
                   options={searchResults.map((u) => ({
                     label: u.nickName,
                     value: u.id,

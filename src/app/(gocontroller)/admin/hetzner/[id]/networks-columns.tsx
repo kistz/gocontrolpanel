@@ -5,6 +5,7 @@ import AddSubnetToNetworkModal from "@/components/modals/add-subnet-to-network";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import HetznerNetworkDetailsModal from "@/components/modals/hetzner-network-details";
 import Modal from "@/components/modals/modal";
+import RemoveSubnetFromNetworkModal from "@/components/modals/remove-subnet-from-network";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,6 +81,7 @@ export const createNetworksColumns = (
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
       const [isViewOpen, setIsViewOpen] = useState(false);
       const [isAddSubnetOpen, setIsAddSubnetOpen] = useState(false);
+      const [isRemoveSubnetOpen, setIsRemoveSubnetOpen] = useState(false);
 
       const canCreate = hasPermissionSync(
         session,
@@ -137,6 +139,9 @@ export const createNetworksColumns = (
                   <DropdownMenuItem onClick={() => setIsAddSubnetOpen(true)}>
                     Add Subnet
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsRemoveSubnetOpen(true)}>
+                    Remove Subnet
+                  </DropdownMenuItem>
                 </>
               )}
               {canDelete && (
@@ -170,14 +175,30 @@ export const createNetworksColumns = (
           </Modal>
 
           {canCreate && (
-            <Modal isOpen={isAddSubnetOpen} setIsOpen={setIsAddSubnetOpen}>
-              <AddSubnetToNetworkModal
-                data={{
-                  projectId: data.projectId,
-                  network,
-                }}
-              />
-            </Modal>
+            <>
+              <Modal isOpen={isAddSubnetOpen} setIsOpen={setIsAddSubnetOpen}>
+                <AddSubnetToNetworkModal
+                  onSubmit={refetch}
+                  data={{
+                    projectId: data.projectId,
+                    network,
+                  }}
+                />
+              </Modal>
+
+              <Modal
+                isOpen={isRemoveSubnetOpen}
+                setIsOpen={setIsRemoveSubnetOpen}
+              >
+                <RemoveSubnetFromNetworkModal
+                  onSubmit={refetch}
+                  data={{
+                    projectId: data.projectId,
+                    network,
+                  }}
+                />
+              </Modal>
+            </>
           )}
         </div>
       );

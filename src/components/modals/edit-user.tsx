@@ -7,12 +7,18 @@ import { DefaultModalProps } from "./default-props";
 
 export default function EditUserModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<Users>) {
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleCallback = () => {
+    onSubmit?.();
+    closeModal?.();
   };
 
   return (
@@ -27,7 +33,7 @@ export default function EditUserModal({
           onClick={closeModal}
         />
       </div>
-      <EditUserForm user={data} callback={closeModal} />
+      <EditUserForm user={data} callback={handleCallback} />
     </Card>
   );
 }

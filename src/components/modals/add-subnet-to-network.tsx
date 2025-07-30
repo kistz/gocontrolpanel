@@ -2,28 +2,26 @@
 import AddSubnetToNetworkForm from "@/forms/admin/hetzner/network/add-subnet-to-network-form";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { IconX } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { DefaultModalProps } from "./default-props";
 
 export default function AddSubnetToNetworkModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<{
   projectId: string;
   network: HetznerNetwork;
 }>) {
-  const router = useRouter();
-
   if (!data) return null;
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    onSubmit?.();
     closeModal?.();
-    router.refresh();
   };
 
   return (
