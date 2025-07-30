@@ -3,15 +3,14 @@ import {
   HetznerProjectsWithUsers,
   updateHetznerProject,
 } from "@/actions/database/hetzner-projects";
-import { getUsersMinimal, UserMinimal } from "@/actions/database/users";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
+import { useSearchUsers } from "@/hooks/use-search-users";
 import { HetznerProjectRole } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -26,31 +25,9 @@ export default function EditProjectForm({
   project: HetznerProjectsWithUsers;
   callback?: () => void;
 }) {
-  const [users, setUsers] = useState<UserMinimal[]>([]);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const { data, error } = await getUsersMinimal();
-        if (error) {
-          throw new Error(error);
-        }
-        setUsers(data);
-      } catch (err) {
-        setError("Failed to get users: " + getErrorMessage(err));
-        toast.error("Failed to fetch users", {
-          description: getErrorMessage(err),
-        });
-      }
-
-      setLoading(false);
-    }
-
-    fetchUsers();
-  }, []);
+  const { search, searchResults, searching, loading } = useSearchUsers({
+    defaultUsers: project.hetznerProjectUsers.map((user) => user.userId),
+  });
 
   const form = useForm<EditProjectSchemaType>({
     resolver: zodResolver(EditProjectSchema),
@@ -92,10 +69,6 @@ export default function EditProjectForm({
     return <span className="text-muted-foreground">Loading...</span>;
   }
 
-  if (error) {
-    return <span>{error}</span>;
-  }
-
   return (
     <Form {...form}>
       <form
@@ -114,7 +87,7 @@ export default function EditProjectForm({
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">API Tokens</FormLabel>
           {form.watch("apiTokens")?.map((_, index) => (
-            <div key={index} className="flex items-end gap-2">
+            <div key={index} className="flex gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`apiTokens.${index}`}
@@ -157,17 +130,19 @@ export default function EditProjectForm({
         <div className="flex flex-col gap-2">
           <FormLabel className="text-sm">Users</FormLabel>
           {form.watch("hetznerProjectUsers")?.map((_, index) => (
-            <div key={index} className="flex items-end gap-2">
+            <div key={index} className="flex gap-2">
               <div className="flex-1">
                 <FormElement
                   name={`hetznerProjectUsers.${index}.userId`}
                   className="w-full"
-                  placeholder="Select user"
-                  options={users.map((u) => ({
+                  placeholder="Search user..."
+                  onSearch={search}
+                  options={searchResults.map((u) => ({
                     label: u.nickName,
                     value: u.id,
                   }))}
-                  type="select"
+                  isLoading={searching}
+                  type="search"
                 />
               </div>
               <FormElement

@@ -10,7 +10,7 @@ export const AddServerSchema = z.object({
   userServers: z
     .array(
       z.object({
-        userId: z.string().min(1, "User is required"),
+        userId: z.string().uuid("Please select the found user"),
         role: z.string().min(1, "Role is required"),
       }),
     )

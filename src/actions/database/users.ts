@@ -44,6 +44,39 @@ export async function getUsersMinimal(): Promise<
   );
 }
 
+export async function getUsersByIds(
+  ids: string[],
+): Promise<ServerResponse<UserMinimal[]>> {
+  return doServerActionWithAuth(
+    [
+      "groups:create",
+      "groups:edit",
+      "groups::admin",
+      "servers:create",
+      "servers:edit",
+      "servers::admin",
+      "hetzner:create",
+      "hetzner:edit",
+      "hetzner::admin",
+    ],
+    async () => {
+      const db = getClient();
+      const users = await db.users.findMany({
+        where: {
+          id: { in: ids },
+        },
+        select: {
+          id: true,
+          login: true,
+          nickName: true,
+        },
+      });
+
+      return users;
+    },
+  );
+}
+
 export async function getUsersPaginated(
   pagination: PaginationState,
   sorting: { field: string; order: "asc" | "desc" },
@@ -125,9 +158,9 @@ export async function deleteUserById(userId: string): Promise<ServerResponse> {
   });
 }
 
-export async function searchUsers(
+export async function searchUser(
   search: string,
-): Promise<ServerResponse<UserMinimal[]>> {
+): Promise<ServerResponse<UserMinimal | null>> {
   return doServerActionWithAuth(
     [
       "groups:create",
@@ -143,9 +176,24 @@ export async function searchUsers(
     async () => {
       const db = getClient();
 
-      if (search.length > 3 ) {
+      const user = await db.users.findFirst({
+        where: {
+          OR: [{ login: search }, { nickName: search }],
+        },
+        select: {
+          id: true,
+          login: true,
+          nickName: true,
+        },
+      });
+
+      if (user) {
+        return user;
+      }
+
+      if (search.length > 3) {
         const { data: accountNames } = await searchAccountNames([search]);
-  
+
         if (Object.keys(accountNames).length > 0) {
           await db.users.createMany({
             data: Object.entries(accountNames).map(
@@ -160,12 +208,9 @@ export async function searchUsers(
         }
       }
 
-      const users = await db.users.findMany({
+      const newUser = await db.users.findFirst({
         where: {
-          OR: [
-            { login: { contains: search } },
-            { nickName: { contains: search } },
-          ],
+          OR: [{ login: search }, { nickName: search }],
         },
         select: {
           id: true,
@@ -174,7 +219,7 @@ export async function searchUsers(
         },
       });
 
-      return users;
+      return newUser;
     },
   );
 }
