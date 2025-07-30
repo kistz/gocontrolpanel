@@ -208,6 +208,7 @@ export const createServersColumns = (
             <>
               <Modal isOpen={isAttachOpen} setIsOpen={setIsAttachOpen}>
                 <AttachHetznerServerToNetworkModal
+                  onSubmit={refetch}
                   data={{
                     projectId: data.projectId,
                     serverId: server.id,
@@ -217,6 +218,7 @@ export const createServersColumns = (
 
               <Modal isOpen={isDetachOpen} setIsOpen={setIsDetachOpen}>
                 <DetachServerFromNetworkModal
+                  onSubmit={refetch}
                   data={{
                     projectId: data.projectId,
                     serverId: server.id,

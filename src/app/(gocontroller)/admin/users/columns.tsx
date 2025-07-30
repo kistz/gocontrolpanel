@@ -178,9 +178,8 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             <Modal
               isOpen={isEditOpen}
               setIsOpen={setIsEditOpen}
-              onClose={refetch}
             >
-              <EditUserModal data={user} />
+              <EditUserModal data={user} onSubmit={refetch} />
             </Modal>
           )}
         </div>

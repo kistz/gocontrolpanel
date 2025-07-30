@@ -4,22 +4,18 @@ import {
   getRateLimit,
 } from "@/actions/hetzner/servers";
 import { getHetznerVolumesPaginated } from "@/actions/hetzner/volumes";
-import AddHetznerDatabaseModal from "@/components/modals/add-hetzner-database";
-import AddHetznerNetworkModal from "@/components/modals/add-hetzner-network";
-import AddHetznerVolumeModal from "@/components/modals/add-hetzner-volume";
-import AddServerSetupModal from "@/components/modals/add-server-setup";
-import Modal from "@/components/modals/modal";
 import { PaginationTable } from "@/components/table/pagination-table";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
-import { IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { createNetworkActions } from "./networks-actions";
 import { createNetworksColumns } from "./networks-columns";
+import { createServerActions } from "./servers-actions";
 import { createServersColumns } from "./servers-columns";
+import { createVolumeActions } from "./volumes-actions";
 import { createVolumesColumns } from "./volumes-columns";
 
 export default async function ProjectPage({
@@ -86,27 +82,10 @@ export default async function ProjectPage({
             args={{ projectId: id }}
             fetchData={getHetznerServersPaginated}
             fetchArgs={{ projectId: id }}
+            actions={createServerActions}
+            actionsArgs={{ id }}
+            actionsAllowed={canCreate}
             filter
-            actions={
-              canCreate && (
-                <div className="flex gap-2">
-                  <Modal>
-                    <AddHetznerDatabaseModal data={id} />
-                    <Button className="w-9 sm:w-auto" variant={"outline"}>
-                      <IconPlus />
-                      <span className="hidden sm:inline">Add Database</span>
-                    </Button>
-                  </Modal>
-                  <Modal>
-                    <AddServerSetupModal data={id} />
-                    <Button className="w-9 sm:w-auto">
-                      <IconPlus />
-                      <span className="hidden sm:inline">Add Server</span>
-                    </Button>
-                  </Modal>
-                </div>
-              )
-            }
           />
         </TabsContent>
 
@@ -116,18 +95,10 @@ export default async function ProjectPage({
             args={{ projectId: id }}
             fetchData={getHetznerNetworksPaginated}
             fetchArgs={{ projectId: id }}
+            actions={createNetworkActions}
+            actionsArgs={{ id }}
+            actionsAllowed={canCreate}
             filter
-            actions={
-              canCreate && (
-                <Modal>
-                  <AddHetznerNetworkModal data={id} />
-                  <Button className="w-9 sm:w-auto">
-                    <IconPlus />
-                    <span className="hidden sm:inline">Add Network</span>
-                  </Button>
-                </Modal>
-              )
-            }
           />
         </TabsContent>
 
@@ -137,18 +108,10 @@ export default async function ProjectPage({
             args={{ projectId: id }}
             fetchData={getHetznerVolumesPaginated}
             fetchArgs={{ projectId: id }}
+            actions={createVolumeActions}
+            actionsArgs={{ id }}
+            actionsAllowed={canCreate}
             filter
-            actions={
-              canCreate && (
-                <Modal>
-                  <AddHetznerVolumeModal data={id} />
-                  <Button className="w-9 sm:w-auto">
-                    <IconPlus />
-                    <span className="hidden sm:inline">Add Volume</span>
-                  </Button>
-                </Modal>
-              )
-            }
           />
         </TabsContent>
       </Tabs>

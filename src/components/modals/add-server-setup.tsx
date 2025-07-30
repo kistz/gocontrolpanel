@@ -32,6 +32,7 @@ type Mode = "simple" | "advanced";
 
 export default function AddServerSetupModal({
   closeModal,
+  onSubmit,
   data,
 }: DefaultModalProps<string>) {
   const [databases, setDatabases] = useState<HetznerServer[]>([]);
@@ -143,9 +144,7 @@ export default function AddServerSetupModal({
 
     fetch();
   }, []);
-
-  const router = useRouter();
-
+  
   const [mode, setMode] = useState<Mode>("simple");
 
   if (!data) return null;
@@ -154,9 +153,9 @@ export default function AddServerSetupModal({
     e.stopPropagation();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    onSubmit?.();
     closeModal?.();
-    router.refresh();
   };
 
   return (

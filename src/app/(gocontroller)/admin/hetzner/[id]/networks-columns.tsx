@@ -172,6 +172,7 @@ export const createNetworksColumns = (
           {canCreate && (
             <Modal isOpen={isAddSubnetOpen} setIsOpen={setIsAddSubnetOpen}>
               <AddSubnetToNetworkModal
+                onSubmit={refetch}
                 data={{
                   projectId: data.projectId,
                   network,
