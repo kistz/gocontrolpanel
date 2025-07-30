@@ -8,6 +8,7 @@ import { routePermissions, routes } from "@/routes";
 import { IconPlus } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { createColumns } from "./columns";
+import { createActions } from "./actions";
 
 export default async function AdminGroupsPage() {
   const canView = await hasPermission(routePermissions.admin.groups.view);
@@ -34,17 +35,8 @@ export default async function AdminGroupsPage() {
         key={key}
         createColumns={createColumns}
         fetchData={getGroupsPaginated}
-        actions={
-          canCreate && (
-            <Modal>
-              <AddGroupModal />
-              <Button className="w-9 sm:w-auto">
-                <IconPlus />
-                <span className="hidden sm:inline">Add Group</span>
-              </Button>
-            </Modal>
-          )
-        }
+        actions={createActions}
+        actionsAllowed={canCreate}
         filter
       />
     </div>

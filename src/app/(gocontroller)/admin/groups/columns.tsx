@@ -163,9 +163,8 @@ export const createColumns = (
             <Modal
               isOpen={isEditOpen}
               setIsOpen={setIsEditOpen}
-              onClose={() => refetch()}
             >
-              <EditGroupModal data={group} />
+              <EditGroupModal onSubmit={refetch} data={group} />
             </Modal>
           )}
         </div>

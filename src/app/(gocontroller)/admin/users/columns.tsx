@@ -178,7 +178,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
             <Modal
               isOpen={isEditOpen}
               setIsOpen={setIsEditOpen}
-              onClose={() => refetch()}
+              onClose={refetch}
             >
               <EditUserModal data={user} />
             </Modal>

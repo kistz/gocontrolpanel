@@ -44,7 +44,8 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch> {
   pageSize?: number;
   filter?: boolean;
   fetchArgs?: TFetch;
-  actions?: React.ReactNode;
+  actions?: (refetch: () => void) => React.ReactNode;
+  actionsAllowed?: boolean;
 }
 
 export function PaginationTable<TData, TValue, TArgs, TFetch>({
@@ -55,6 +56,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
   filter = false,
   fetchArgs = {} as TFetch,
   actions,
+  actionsAllowed = true,
 }: PaginationTableProps<TData, TValue, TArgs, TFetch>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageSize,
@@ -114,7 +116,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch>({
             />
           )}
 
-          {actions}
+          {actionsAllowed && actions && actions(refetch)}
         </div>
       )}
 
