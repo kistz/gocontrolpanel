@@ -56,6 +56,20 @@ export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
     },
   },
   {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Created At"} />
+    ),
+    cell: ({ row }) => {
+      const date = row.original.createdAt;
+      return (
+        <span>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </span>
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const role = row.original;

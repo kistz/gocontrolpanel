@@ -55,6 +55,20 @@ export const createColumns = (
     ),
   },
   {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Created At"} />
+    ),
+    cell: ({ row }) => {
+      const date = row.original.createdAt;
+      return (
+        <span>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </span>
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const server = row.original;
