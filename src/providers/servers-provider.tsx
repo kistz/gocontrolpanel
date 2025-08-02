@@ -1,7 +1,7 @@
 "use client";
 
 import useWebSocket from "@/hooks/use-websocket";
-import { useCurrentId } from "@/lib/utils";
+import { getCurrentId } from "@/lib/utils";
 import { ServerInfo } from "@/types/server";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -69,7 +69,7 @@ export const ServersProvider = ({
   }, []);
 
   useEffect(() => {
-    const uuid = useCurrentId(pathname);
+    const uuid = getCurrentId(pathname);
     setServerId(uuid);
   }, [pathname]);
 
@@ -80,7 +80,7 @@ export const ServersProvider = ({
         router.push("/");
       }
     }
-  }, [servers]);
+  }, [servers, router, serverId]);
 
   useWebSocket({
     url: "/api/ws/servers",

@@ -2,7 +2,10 @@ import { axiosHetzner } from "@/lib/axios/hetzner";
 import { getHetznerProject } from "@/lib/hetzner";
 import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
 import { getList } from "@/lib/utils";
-import { HetznerServer, HetznerServersResponse } from "@/types/api/hetzner/servers";
+import {
+  HetznerServer,
+  HetznerServersResponse,
+} from "@/types/api/hetzner/servers";
 import { AxiosResponse } from "axios";
 import "server-only";
 
@@ -57,14 +60,11 @@ export async function getHetznerServer(
 
   const res = await axiosHetzner.get<{
     server: HetznerServer;
-  }>(
-    `/servers/${serverId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  }>(`/servers/${serverId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   await setRateLimit(projectId, res);
 

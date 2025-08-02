@@ -1,4 +1,8 @@
-import { getUsersByIds, searchUser, UserMinimal } from "@/actions/database/users";
+import {
+  getUsersByIds,
+  searchUser,
+  UserMinimal,
+} from "@/actions/database/users";
 import { getErrorMessage } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -55,12 +59,12 @@ export function useSearchUsers({ defaultUsers }: UseSearchUsersProps) {
       }
       if (!data) return;
 
-      setSearchResults(prev => {
-        if (prev.some(user => user.id === data.id)) {
+      setSearchResults((prev) => {
+        if (prev.some((user) => user.id === data.id)) {
           return prev;
         }
         return [...prev, data];
-      });  
+      });
     } catch (error) {
       setError("Failed to search users: " + getErrorMessage(error));
       toast.error("Failed to search users", {

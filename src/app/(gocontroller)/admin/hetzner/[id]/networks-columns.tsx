@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { deleteHetznerNetwork } from "@/actions/hetzner/networks";

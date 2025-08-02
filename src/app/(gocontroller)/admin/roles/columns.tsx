@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { deleteRole } from "@/actions/database/roles";
@@ -153,10 +154,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Roles>[] => [
           )}
 
           {canEdit && (
-            <Modal
-              isOpen={isEditOpen}
-              setIsOpen={setIsEditOpen}
-            >
+            <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
               <EditRoleModal onSubmit={refetch} data={role} />
             </Modal>
           )}

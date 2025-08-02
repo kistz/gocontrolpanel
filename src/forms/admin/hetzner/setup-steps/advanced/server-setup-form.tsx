@@ -55,8 +55,9 @@ export default function AdvancedServerSetupForm({
             : "",
         serverType:
           serverTypes.length > 0
-            ? serverTypes.find((type) => type.name === "cpx11")?.id.toString() ||
-              serverTypes[0]?.id.toString()
+            ? serverTypes
+                .find((type) => type.name === "cpx11")
+                ?.id.toString() || serverTypes[0]?.id.toString()
             : "",
         image:
           images.length > 0

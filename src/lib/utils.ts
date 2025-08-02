@@ -84,8 +84,7 @@ function pathToRegex(path: string) {
   return new RegExp("^" + path.replace(/:[^/]+/g, "([^/]+)") + "$");
 }
 
-// Use in a React client component
-export function useCurrentId(pathname: string): string | null {
+export function getCurrentId(pathname: string): string | null {
   for (const route of Object.values(routes.servers)) {
     const regex = pathToRegex(route);
     const match = pathname?.match(regex);

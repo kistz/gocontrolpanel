@@ -2,6 +2,7 @@
 
 import { AddHetznerNetworkSchemaType } from "@/forms/admin/hetzner/network/add-hetzner-network-schema";
 import { AddSubnetToNetworkSchemaType } from "@/forms/admin/hetzner/network/add-subnet-to-network-schema";
+import { RemoveSubnetFromNetworkSchemaType } from "@/forms/admin/hetzner/network/remove-subnet-from-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -11,7 +12,6 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
-import { RemoveSubnetFromNetworkSchemaType } from "@/forms/admin/hetzner/network/remove-subnet-from-network-schema";
 
 export async function getHetznerNetworksPaginated(
   pagination: PaginationState,

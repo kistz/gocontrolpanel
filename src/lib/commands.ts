@@ -23,7 +23,11 @@ export async function handleAdminCommand(
     timestamp: new Date(),
   };
 
-  manager.client.call("ChatSendServerMessageToLogin", "Admins have been notified", chat.Login);
+  manager.client.call(
+    "ChatSendServerMessageToLogin",
+    "Admins have been notified",
+    chat.Login,
+  );
 
   manager.emit("adminCommand", adminCommand);
 }

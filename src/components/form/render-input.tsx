@@ -13,6 +13,7 @@ import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { MultiSelect } from "../ui/multi-select";
+import { SearchInput } from "../ui/search-input";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { SearchInput } from "../ui/search-input";
 
 interface RenderInputProps<TControl extends FieldValues> {
   field: ControllerRenderProps<TControl>;

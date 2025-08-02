@@ -68,7 +68,11 @@ export default async function ServerInterfacePage({
         </TabsContent>
         <TabsContent value="commands" className="flex flex-col gap-6">
           <Card className="p-6">
-            <CommandsForm serverId={id} commands={commands} serverCommands={serverCommands} />
+            <CommandsForm
+              serverId={id}
+              commands={commands}
+              serverCommands={serverCommands}
+            />
           </Card>
         </TabsContent>
       </Tabs>

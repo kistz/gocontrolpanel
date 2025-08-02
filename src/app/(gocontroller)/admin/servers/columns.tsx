@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { deleteServer, ServersWithUsers } from "@/actions/database/servers";
@@ -154,10 +155,7 @@ export const createColumns = (
           )}
 
           {canEdit && (
-            <Modal
-              isOpen={editIsOpen}
-              setIsOpen={setEditIsOpen}
-            >
+            <Modal isOpen={editIsOpen} setIsOpen={setEditIsOpen}>
               <EditServerModal data={server} onSubmit={refetch} />
             </Modal>
           )}

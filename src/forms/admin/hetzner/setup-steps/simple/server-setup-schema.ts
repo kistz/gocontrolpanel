@@ -1,7 +1,7 @@
 import z from "zod";
 import { DatabaseSchema } from "./database-schema";
-import { ServerSchema } from "./server-schema";
 import { ServerControllerSchema } from "./server-controller-schema";
+import { ServerSchema } from "./server-schema";
 
 export const SimpleServerSetupSchema = z.object({
   server: ServerSchema,
@@ -9,4 +9,6 @@ export const SimpleServerSetupSchema = z.object({
   database: DatabaseSchema.optional(),
 });
 
-export type SimpleServerSetupSchemaType = z.infer<typeof SimpleServerSetupSchema>;
+export type SimpleServerSetupSchemaType = z.infer<
+  typeof SimpleServerSetupSchema
+>;

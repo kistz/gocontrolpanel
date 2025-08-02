@@ -168,16 +168,19 @@ export async function createServer(
     if (recentlyCreatedProjectId) {
       const client = await getRedisClient();
       const key = getKeyHetznerRecentlyCreatedServers(recentlyCreatedProjectId);
-  
+
       const servers = await client.lrange(key, 0, -1);
-  
+
       const updatedServers = servers
         .map((item) => JSON.parse(item))
         .filter((server: HetznerServerCache) => server.ip !== newServer.host);
-  
+
       await client.del(key);
       if (updatedServers.length > 0) {
-        await client.rpush(key, ...updatedServers.map((s) => JSON.stringify(s)));
+        await client.rpush(
+          key,
+          ...updatedServers.map((s) => JSON.stringify(s)),
+        );
         await client.expire(key, 60 * 60 * 2); // Keep for 2 hours
       }
     }

@@ -81,9 +81,7 @@ export default function AddHetznerVolumeForm({
     }
   }
 
-  const location = locations.find(
-    (loc) => loc.name === form.watch("location"),
-  );
+  const location = locations.find((loc) => loc.name === form.watch("location"));
 
   if (loading) {
     return <span className="text-muted-foreground">Loading...</span>;

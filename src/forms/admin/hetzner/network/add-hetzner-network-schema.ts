@@ -52,15 +52,17 @@ const ipRangeSchema = z
 export const AddHetznerNetworkSchema = z.object({
   name: hetznerNetworkNameSchema,
   ipRange: ipRangeSchema,
-  subnets: z.array(
-    z.object({
-      type: z.enum(["cloud", "server", "vswitch"]),
-      ipRange: z.string().optional(),
-      networkZone: z.string().min(1, { message: "Network zone is required" }),
+  subnets: z
+    .array(
+      z.object({
+        type: z.enum(["cloud", "server", "vswitch"]),
+        ipRange: z.string().optional(),
+        networkZone: z.string().min(1, { message: "Network zone is required" }),
+      }),
+    )
+    .min(1, {
+      message: "At least one subnet must be defined",
     }),
-  ).min(1, {
-    message: "At least one subnet must be defined",
-  }),
 });
 
 export type AddHetznerNetworkSchemaType = z.infer<

@@ -185,7 +185,9 @@ export default function HetznerServerMetricsModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{isMobile ? "Metrics" : "Server Metrics"}</h1>
+        <h1 className="text-xl font-bold">
+          {isMobile ? "Metrics" : "Server Metrics"}
+        </h1>
 
         <div className="flex gap-4 items-center">
           <ToggleGroup
