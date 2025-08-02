@@ -22,7 +22,7 @@ jobs:
         run: bun install
 
       - name: Generate MySQL Prisma files
-        run: bun run prisma generate
+        run: bun run generate
         env:
           DB_TYPE: mysql
 
@@ -30,7 +30,7 @@ jobs:
         run: bun run build
 
       - name: Generate Postgres Prisma files
-        run: bun run prisma generate
+        run: bun run generate
         env:
           DB_TYPE: postgres
 
