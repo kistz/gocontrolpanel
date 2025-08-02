@@ -7,6 +7,13 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        db:
+          - name: mysql
+            suffix: ""
+          - name: postgres
+            suffix: -postgres
 
     steps:
       - name: Checkout repository
@@ -24,40 +31,17 @@ jobs:
           echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           echo "IS_PRERELEASE=${{ github.event.release.prerelease }}" >> $GITHUB_ENV
 
-      - name: Build and tag MySQL image
+      - name: Build and tag image
         run: |
-          IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}
-          docker build -t $IMAGE:${{ env.RELEASE_TAG }} . --build-arg DB_TYPE=mysql
+          IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}${{ matrix.db.suffix }}
+          docker build -t $IMAGE:${{ env.RELEASE_TAG }} . --build-arg DB_TYPE=${{ matrix.db.name }}
 
           if [ "${{ env.IS_PRERELEASE }}" = "true" ]; then
             docker tag $IMAGE:${{ env.RELEASE_TAG }} $IMAGE:beta
+            docker push $IMAGE:beta
           else
             docker tag $IMAGE:${{ env.RELEASE_TAG }} $IMAGE:latest
+            docker push $IMAGE:latest
           fi
 
-      - name: Build and tag Postgres image
-        run: |
-          IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}-postgres
-          docker build -t $IMAGE:${{ env.RELEASE_TAG }} . --build-arg DB_TYPE=postgres
-
-          if [ "${{ env.IS_PRERELEASE }}" = "true" ]; then
-            docker tag $IMAGE:${{ env.RELEASE_TAG }} $IMAGE:beta
-          else
-            docker tag $IMAGE:${{ env.RELEASE_TAG }} $IMAGE:latest
-          fi
-
-      - name: Push Docker images
-        run: |
-          BASE_IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}
-          POSTGRES_IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}-postgres
-
-          docker push $BASE_IMAGE:${{ env.RELEASE_TAG }}
-          docker push $POSTGRES_IMAGE:${{ env.RELEASE_TAG }}
-
-          if [ "${{ env.IS_PRERELEASE }}" = "true" ]; then
-            docker push $BASE_IMAGE:beta
-            docker push $POSTGRES_IMAGE:beta
-          else
-            docker push $BASE_IMAGE:latest
-            docker push $POSTGRES_IMAGE:latest
-          fi
+          docker push $IMAGE:${{ env.RELEASE_TAG }}
