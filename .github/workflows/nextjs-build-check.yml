@@ -21,5 +21,18 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build project
+      - name: Generate MySQL Prisma files
+        run: bun run prisma generate
+        env:
+          DB_TYPE: mysql
+
+      - name: Build MySQL project
+        run: bun run build
+
+      - name: Generate Postgres Prisma files
+        run: bun run prisma generate
+        env:
+          DB_TYPE: postgres
+
+      - name: Build Postgres project
         run: bun run build
