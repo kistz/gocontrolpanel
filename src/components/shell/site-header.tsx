@@ -51,8 +51,6 @@ export function SiteHeader() {
         .map((item) => getUpdatedBreadCrumbs(item.path))
         .find((crumbs) => crumbs !== null) || [],
     );
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, params]);
 
   return (

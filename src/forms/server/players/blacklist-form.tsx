@@ -85,11 +85,7 @@ export default function BlacklistForm({
   return (
     <Form {...form}>
       <form className="flex flex-col sm:flex-row gap-2 w-full justify-between">
-        <FormElement
-          name="filename"
-          placeholder="blacklist.txt"
-          isRequired
-        />
+        <FormElement name="filename" placeholder="blacklist.txt" isRequired />
 
         <div className="flex gap-2 justify-between w-full">
           <div className="flex gap-2">

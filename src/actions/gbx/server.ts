@@ -131,7 +131,7 @@ export async function getLocalMaps(
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${fileManager.password}`,
+          Authorization: `Bearer ${fileManager.password}`,
         },
       });
 

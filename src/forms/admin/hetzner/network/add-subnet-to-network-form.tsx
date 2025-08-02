@@ -116,7 +116,10 @@ export default function AddSubnetToNetworkForm({
           isRequired
         />
 
-        <FormElement name={"ipRange"} placeholder="Enter subnet IP range (e.g., 10.0.0.0/16)" />
+        <FormElement
+          name={"ipRange"}
+          placeholder="Enter subnet IP range (e.g., 10.0.0.0/16)"
+        />
 
         <FormElement
           name={"networkZone"}

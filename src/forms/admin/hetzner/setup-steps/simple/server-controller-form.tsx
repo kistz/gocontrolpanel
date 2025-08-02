@@ -12,9 +12,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
-import {
-  SimpleServerSetupSchemaType,
-} from "./server-setup-schema";
+import { SimpleServerSetupSchemaType } from "./server-setup-schema";
 
 export default function ServerControllerForm({
   form,

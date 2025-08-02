@@ -11,4 +11,6 @@ export const AdvancedServerSetupSchema = z.object({
   network: NetworkSchema.optional(),
 });
 
-export type AdvancedServerSetupSchemaType = z.infer<typeof AdvancedServerSetupSchema>;
+export type AdvancedServerSetupSchemaType = z.infer<
+  typeof AdvancedServerSetupSchema
+>;

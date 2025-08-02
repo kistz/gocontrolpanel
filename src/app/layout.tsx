@@ -18,6 +18,42 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "GoControlPanel",
   description: "Manage your trackmania servers with ease.",
+  keywords: ["Trackmania", "Servers", "Administration", "GoControlPanel"],
+  authors: [
+    {
+      name: "Marijn Regterschot",
+      url: "https://github.com/MRegterschot",
+    },
+  ],
+  creator: "Marijn Regterschot",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "GoControlPanel",
+    description: "Manage your trackmania servers with ease.",
+    url: "https://gocontrolpanel.com",
+    siteName: "GoControlPanel",
+    images: [
+      {
+        url: "https://gocontrolpanel.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "GoControlPanel Open Graph Image",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GoControlPanel",
+    description: "Manage your trackmania servers with ease.",
+    images: ["https://gocontrolpanel.com/twitter-image.png"],
+    creator: "@MRegterschot",
+  },
 };
 
 export default function RootLayout({

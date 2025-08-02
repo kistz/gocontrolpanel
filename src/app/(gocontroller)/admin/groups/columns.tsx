@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import {
   deleteGroup,
@@ -160,10 +161,7 @@ export const createColumns = (
           )}
 
           {canEdit && (
-            <Modal
-              isOpen={isEditOpen}
-              setIsOpen={setIsEditOpen}
-            >
+            <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
               <EditGroupModal onSubmit={refetch} data={group} />
             </Modal>
           )}

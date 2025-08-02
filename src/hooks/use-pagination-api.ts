@@ -52,7 +52,6 @@ export const usePaginationAPI = <TData, TFetch>(
 
   useEffect(() => {
     fetchDataFromAPI();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pagination.pageIndex,
     pagination.pageSize,

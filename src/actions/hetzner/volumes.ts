@@ -1,5 +1,6 @@
 "use server";
 
+import { AddHetznerVolumeSchemaType } from "@/forms/admin/hetzner/volume/add-hetzner-volume-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import {
@@ -9,7 +10,6 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getApiToken, setRateLimit } from "./util";
-import { AddHetznerVolumeSchemaType } from "@/forms/admin/hetzner/volume/add-hetzner-volume-schema";
 
 export async function getHetznerVolumesPaginated(
   pagination: PaginationState,
@@ -93,7 +93,7 @@ export async function createHetznerVolume(
         format: "ext4",
         location: data.location,
       };
-      
+
       const res = await axiosHetzner.post<{
         volume: HetznerVolume;
       }>("/volumes", body, {

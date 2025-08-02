@@ -38,5 +38,5 @@ export const getKeyHetznerRateLimit = (projectId: string) =>
 export const getKeyHetznerServerTypes = () => "hetzner:server-types";
 export const getKeyHetznerImages = () => "hetzner:images";
 export const getKeyHetznerLocations = () => "hetzner:locations";
-export const getKeyHetznerRecentlyCreatedServers = (projectId: string) => 
+export const getKeyHetznerRecentlyCreatedServers = (projectId: string) =>
   `hetzner:recently-created-servers:${projectId}`;

@@ -433,7 +433,7 @@ export async function getHetznerServerMetrics(
           },
         },
       );
-      
+
       return res.data.metrics;
     },
   );

@@ -53,19 +53,18 @@ export async function createAdvancedServerSetup(
       }
 
       if (!networkId && server.controller) {
-        throw new Error("Network must be created or selected for controller servers.");
+        throw new Error(
+          "Network must be created or selected for controller servers.",
+        );
       }
 
       let databaseId: number | undefined = undefined;
       let createdDatabase: HetznerServer | undefined = undefined;
       if (server.controller && database?.new) {
-        const { data, error } = await createHetznerDatabase(
-          projectId,
-          {
-            ...database,
-            networkId
-          },
-        );
+        const { data, error } = await createHetznerDatabase(projectId, {
+          ...database,
+          networkId,
+        });
         if (error) {
           throw new Error(error);
         }
@@ -90,19 +89,21 @@ export async function createAdvancedServerSetup(
           let count = 0;
           do {
             await sleep(1000);
-            const updatedServer = await getHetznerServer(
-              projectId,
-              databaseId,
-            );
+            const updatedServer = await getHetznerServer(projectId, databaseId);
             createdDatabase = updatedServer;
             count++;
-          } while (!createdDatabase.private_net.find(
-            (net) => net.network === networkId,
-          ) && count < 10);
+          } while (
+            !createdDatabase.private_net.find(
+              (net) => net.network === networkId,
+            ) &&
+            count < 10
+          );
 
-          if (!createdDatabase.private_net.find(
-            (net) => net.network === networkId,
-          )) {
+          if (
+            !createdDatabase.private_net.find(
+              (net) => net.network === networkId,
+            )
+          ) {
             createdDatabase.private_net?.push({
               network: networkId,
               ip: networkId.toString().split(".").slice(0, 3).join(".") + ".63",
@@ -118,7 +119,12 @@ export async function createAdvancedServerSetup(
       const dediData = {
         server_controller: server.controller ? serverController : undefined,
         db: {
-          host: createdDatabase?.private_net.find((net) => net.network === networkId)?.ip || network?.databaseIp || "",
+          host:
+            createdDatabase?.private_net.find(
+              (net) => net.network === networkId,
+            )?.ip ||
+            network?.databaseIp ||
+            "",
           port: database?.databaseType === "postgres" ? 5432 : 3306,
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
@@ -184,7 +190,9 @@ export async function createAdvancedServerSetup(
 
       if (server.controller) {
         if (!networkId) {
-          throw new Error("Network must be created or selected for controller servers.");
+          throw new Error(
+            "Network must be created or selected for controller servers.",
+          );
         }
 
         const { error: serverError } = await attachHetznerServerToNetwork(

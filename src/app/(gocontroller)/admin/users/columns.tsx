@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { deleteUserById } from "@/actions/database/users";
@@ -175,10 +176,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
           )}
 
           {canEdit && (
-            <Modal
-              isOpen={isEditOpen}
-              setIsOpen={setIsEditOpen}
-            >
+            <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen}>
               <EditUserModal data={user} onSubmit={refetch} />
             </Modal>
           )}
