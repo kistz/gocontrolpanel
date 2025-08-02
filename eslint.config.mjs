@@ -29,7 +29,6 @@ const eslintConfig = [
       "react-hooks/exhaustive-deps": "off",
       "react-hooks/rules-of-hooks": "warn",
       "@typescript-eslint/no-explicit-any": "off",
-      // "@next/next/no-img-element": "off",
     },
   },
 ];
