@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy, IconEye, IconRestore, IconRotate } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ShowOpponentsSchema, ShowOpponentsSchemaType } from "./game-schema";
@@ -57,38 +58,29 @@ export default function ShowOpponentsForm({
           <div className="flex gap-2">
             <Button
               variant={"outline"}
-              className="w-20"
               type="button"
               onClick={() => showOpponentsForm.setValue("showOpponents", 0)}
             >
-              Reset
+              <IconRotate className="rotate-180" />
+              <span className="hidden sm:block">Reset</span>
             </Button>
             <Button
               variant={"outline"}
-              className="w-20"
               type="button"
               onClick={() => showOpponentsForm.setValue("showOpponents", 1)}
             >
-              Show All
+              <IconEye />
+              <span className="hidden sm:block">Show All</span>
             </Button>
             <Button
-              className="w-20 hidden max-[500px]:hidden max-[960px]:block min-[1140px]:block"
               type="submit"
               disabled={showOpponentsForm.formState.isSubmitting}
             >
+              <IconDeviceFloppy />
               Save
             </Button>
           </div>
         </FormElement>
-        <div className="flex flex-col gap-1 max-[500px]:flex max-[960px]:hidden min-[1140px]:hidden">
-          <Button
-            className="w-20"
-            type="submit"
-            disabled={showOpponentsForm.formState.isSubmitting}
-          >
-            Save
-          </Button>
-        </div>
       </form>
     </Form>
   );

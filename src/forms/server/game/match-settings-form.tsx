@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy, IconFileSettings } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MatchSettingsSchema, MatchSettingsSchemaType } from "./game-schema";
@@ -62,38 +63,27 @@ export default function MatchSettingsForm({ serverId }: { serverId: string }) {
         <FormElement
           name={"filename"}
           label="Match Settings"
-          description="The name of the file to save/load match settings."
+          description="The name of the file to load/save match settings."
           placeholder="matchlist.txt"
-          className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
+          className="w-full sm:w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)]"
           rootClassName="max-w-full"
           isRequired
         >
-          <div className="gap-2 hidden max-[500px]:hidden max-[960px]:flex min-[1080px]:flex">
+          <div className="gap-2 flex">
             <Button
-              className="w-20"
               type="button"
+              variant={"outline"}
               onClick={onLoadMatchSettings}
             >
-              Load
+              <IconFileSettings />
+              <span className="hidden sm:block">Load</span>
             </Button>
-            <Button
-              className="w-20"
-              type="button"
-              onClick={onSaveMatchSettings}
-            >
-              Save
+            <Button type="button" onClick={onSaveMatchSettings}>
+              <IconDeviceFloppy />
+              <span className="hidden sm:block">Save</span>
             </Button>
           </div>
         </FormElement>
-
-        <div className="flex gap-2 max-[500px]:flex max-[960px]:hidden min-[1080px]:hidden">
-          <Button className="w-20" type="button" onClick={onLoadMatchSettings}>
-            Load
-          </Button>
-          <Button className="w-20" type="button" onClick={onSaveMatchSettings}>
-            Save
-          </Button>
-        </div>
       </form>
     </Form>
   );

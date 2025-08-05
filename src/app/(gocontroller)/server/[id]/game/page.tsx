@@ -107,7 +107,7 @@ export default async function ServerGamePage({
 
           {canGameSettings && (
             <Card className="p-6">
-              <div className="flex gap-6 flex-col min-[960px]:flex-row">
+              <div className="flex gap-6 flex-col xl:flex-row">
                 <div className="flex flex-col gap-4 flex-1">
                   <ShowOpponentsForm
                     serverId={id}

@@ -13,6 +13,7 @@ import {
   ServerSettingsSchema,
   ServerSettingsSchemaType,
 } from "./settings-schema";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function SettingsForm({ serverId }: { serverId: string }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -219,6 +220,7 @@ export default function SettingsForm({ serverId }: { serverId: string }) {
           className="mt-4 w-1/4 min-w-24"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>
