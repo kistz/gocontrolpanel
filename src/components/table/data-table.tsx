@@ -31,6 +31,8 @@ interface DataTableProps<TData, TValue> {
   filter?: boolean;
   pagination?: boolean;
   actions?: React.ReactNode;
+  globalFilter?: string;
+  onGlobalFilterChange?: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,9 +42,17 @@ export function DataTable<TData, TValue>({
   filter = false,
   pagination = false,
   actions,
+  globalFilter: globalFilterProp,
+  onGlobalFilterChange,
 }: DataTableProps<TData, TValue>) {
+  const [internalGlobalFilter, setInternalGlobalFilter] = useState("");
+
+  const isControlled = globalFilterProp !== undefined && onGlobalFilterChange !== undefined;
+
+  const globalFilter = isControlled ? globalFilterProp : internalGlobalFilter;
+  const setGlobalFilter = isControlled ? onGlobalFilterChange : setInternalGlobalFilter;
+
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState<string>("");
 
   const table = useReactTable({
     data,
@@ -80,7 +90,6 @@ export function DataTable<TData, TValue>({
               className="flex-1 sm:max-w-1/3"
             />
           )}
-
           {actions}
         </div>
       )}
