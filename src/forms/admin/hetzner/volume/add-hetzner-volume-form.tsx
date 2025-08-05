@@ -16,6 +16,7 @@ import {
   AddHetznerVolumeSchema,
   AddHetznerVolumeSchemaType,
 } from "./add-hetzner-volume-schema";
+import { IconDeviceFloppy, IconPlus } from "@tabler/icons-react";
 
 export default function AddHetznerVolumeForm({
   projectId,
@@ -142,7 +143,8 @@ export default function AddHetznerVolumeForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Volume
         </Button>
       </form>
     </Form>

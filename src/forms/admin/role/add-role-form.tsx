@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddRoleSchema, AddRoleSchemaType } from "./add-role-schema";
+import { IconDeviceFloppy, IconPlus } from "@tabler/icons-react";
 
 export default function AddRoleForm({ callback }: { callback?: () => void }) {
   const form = useForm<AddRoleSchemaType>({
@@ -76,7 +77,8 @@ export default function AddRoleForm({ callback }: { callback?: () => void }) {
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Role
         </Button>
       </form>
     </Form>

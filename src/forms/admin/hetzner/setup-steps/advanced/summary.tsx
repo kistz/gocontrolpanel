@@ -4,7 +4,7 @@ import { createAdvancedServerSetup } from "@/actions/hetzner/server-setup";
 import BooleanDisplay from "@/components/boolean-display";
 import { Button } from "@/components/ui/button";
 import { getErrorMessage } from "@/lib/utils";
-import { IconArrowNarrowLeft } from "@tabler/icons-react";
+import { IconArrowNarrowLeft, IconPlus } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { AdvancedServerSetupSchemaType } from "./server-setup-schema";
@@ -146,6 +146,7 @@ export default function Summary({
             className="flex-1 max-w-32"
             disabled={!form.formState.isValid || form.formState.isSubmitting}
           >
+            <IconPlus />
             Finish Setup
           </Button>
         </div>

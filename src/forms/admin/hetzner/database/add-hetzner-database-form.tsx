@@ -11,6 +11,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Flag from "react-world-flags";
@@ -365,6 +366,7 @@ export default function AddHetznerDatabaseForm({
             className="w-full"
             disabled={form.formState.isSubmitting}
           >
+            <IconPlus />
             Add Database
           </Button>
         </div>

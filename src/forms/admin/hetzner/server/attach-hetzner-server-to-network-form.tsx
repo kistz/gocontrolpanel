@@ -15,6 +15,7 @@ import {
   AttachHetznerServerToNetworkSchema,
   AttachHetznerServerToNetworkSchemaType,
 } from "./attach-hetzner-server-to-network-schema";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function AttachHetznerServerToNetworkForm({
   projectId,
@@ -133,6 +134,7 @@ export default function AttachHetznerServerToNetworkForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

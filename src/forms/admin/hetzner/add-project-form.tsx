@@ -7,7 +7,7 @@ import { useSearchUsers } from "@/hooks/use-search-users";
 import { HetznerProjectRole } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -186,7 +186,8 @@ export default function AddProjectForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Project
         </Button>
       </form>
     </Form>

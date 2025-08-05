@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditRoleSchema, EditRoleSchemaType } from "./edit-role-schema";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 export default function EditRoleForm({
   role,
   callback,
@@ -87,6 +88,7 @@ export default function EditRoleForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

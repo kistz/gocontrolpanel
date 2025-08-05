@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { FileEntry } from "@/types/filemanager";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -86,6 +87,7 @@ export default function CreateFileEntryForm({
           className="w-full"
           disabled={form.formState.isSubmitting}
         >
+          <IconPlus />
           {isDir ? "Create Directory" : "Create File"}
         </Button>
       </form>
