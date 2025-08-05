@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { blacklistSchema, BlacklistSchemaType } from "./blacklist-schema";
+import { IconDeviceFloppy, IconFileSettings, IconTrash } from "@tabler/icons-react";
 
 export default function BlacklistForm({
   serverId,
@@ -89,10 +90,12 @@ export default function BlacklistForm({
 
         <div className="flex gap-2 justify-between w-full">
           <div className="flex gap-2">
-            <Button className="w-20" type="button" onClick={onLoad}>
+            <Button type="button" onClick={onLoad}>
+              <IconFileSettings />
               Load
             </Button>
-            <Button className="w-20" type="button" onClick={onSave}>
+            <Button type="button" onClick={onSave}>
+              <IconDeviceFloppy />
               Save
             </Button>
           </div>
@@ -100,6 +103,7 @@ export default function BlacklistForm({
             variant="destructive"
             onClick={() => setConfirmClearBlacklist(true)}
           >
+            <IconTrash />
             Clear Blacklist
           </Button>
         </div>

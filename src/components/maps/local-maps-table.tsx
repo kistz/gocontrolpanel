@@ -5,6 +5,7 @@ import { getLocalMaps } from "@/actions/gbx/server";
 import { createColumns as createLocalMapColumns } from "@/app/(gocontroller)/server/[id]/maps/local-maps-columns";
 import { getErrorMessage } from "@/lib/utils";
 import { LocalMapInfo } from "@/types/map";
+import { IconMapPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
@@ -71,7 +72,10 @@ export default function LocalMapsTable({ serverId }: { serverId: string }) {
       pagination
       actions={
         <>
-          <Button onClick={() => setIsConfirmOpen(true)}>Add All Maps</Button>
+          <Button onClick={() => setIsConfirmOpen(true)}>
+            <IconMapPlus />
+            Add All Maps
+          </Button>
 
           <ConfirmModal
             isOpen={isConfirmOpen}

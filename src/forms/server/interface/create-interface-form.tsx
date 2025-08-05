@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { Interfaces } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -60,6 +61,7 @@ export default function CreateInterfaceForm({
         />
 
         <Button type="submit" className="w-full mt-4">
+          <IconPlus />
           Create Interface
         </Button>
       </form>

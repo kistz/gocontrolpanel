@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { ModeScriptInfo } from "@/types/gbx";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -121,10 +122,11 @@ export default function ModeScriptSettingsForm({
             />
           ))}
           <Button
-            className="w-20 hidden max-sm:hidden max-[768px]:block min-[960px]:block mt-4"
+            className="w-20 hidden max-sm:hidden max-[768px]:flex min-[960px]:flex mt-4"
             type="submit"
             disabled={modeScriptSettingsForm.formState.isSubmitting}
           >
+            <IconDeviceFloppy />
             Save
           </Button>
         </div>
@@ -143,10 +145,11 @@ export default function ModeScriptSettingsForm({
             />
           ))}
           <Button
-            className="w-20 block max-sm:block max-[768px]:hidden min-[960px]:hidden mt-4"
+            className="w-20 flex max-sm:flex max-[768px]:hidden min-[960px]:hidden mt-4"
             type="submit"
             disabled={modeScriptSettingsForm.formState.isSubmitting}
           >
+            <IconDeviceFloppy />
             Save
           </Button>
         </div>

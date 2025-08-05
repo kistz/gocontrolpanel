@@ -200,7 +200,8 @@ export default function AddGroupForm({ callback }: { callback?: () => void }) {
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Group
         </Button>
       </form>
     </Form>

@@ -119,7 +119,7 @@ export default function RenderInput<TControl extends FieldValues>({
           <SelectTrigger className={className}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
-          <SelectContent className="z-9999">
+          <SelectContent className="z-9999 max-w-[95vw]">
             {options?.map((option) => (
               <SelectItem
                 key={option.value}

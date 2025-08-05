@@ -4,7 +4,7 @@ import { createSimpleServerSetup } from "@/actions/hetzner/server-setup";
 import BooleanDisplay from "@/components/boolean-display";
 import { Button } from "@/components/ui/button";
 import { getErrorMessage } from "@/lib/utils";
-import { IconArrowNarrowLeft } from "@tabler/icons-react";
+import { IconArrowNarrowLeft, IconPlus } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { SimpleServerSetupSchemaType } from "./server-setup-schema";
@@ -126,6 +126,7 @@ export default function Summary({
             disabled={!form.formState.isValid || form.formState.isSubmitting}
             type="submit"
           >
+            <IconPlus />
             Finish Setup
           </Button>
         </div>

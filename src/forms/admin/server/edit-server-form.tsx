@@ -7,7 +7,7 @@ import { useSearchUsers } from "@/hooks/use-search-users";
 import { UserServerRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditServerSchema, EditServerSchemaType } from "./edit-server-schema";
@@ -202,6 +202,7 @@ export default function EditServerForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Edit Server
         </Button>
       </form>

@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { Users } from "@/lib/prisma/generated";
 import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconClipboardPlus, IconDeviceFloppy } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -131,6 +132,7 @@ export default function EditUserForm({
               form.setValue("permissions", getList(selectedRole?.permissions));
             }}
           >
+            <IconClipboardPlus />
             Apply Role Preset
           </Button>
         </div>
@@ -140,6 +142,7 @@ export default function EditUserForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

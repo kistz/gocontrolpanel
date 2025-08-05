@@ -204,7 +204,8 @@ export default function AddHetznerNetworkForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Network
         </Button>
       </form>
     </Form>

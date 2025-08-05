@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PlaylistSchema, PlaylistSchemaType } from "./game-schema";
+import { IconLayoutDistributeHorizontal, IconPlaylistAdd } from "@tabler/icons-react";
 
 export default function PlaylistForm({ serverId }: { serverId: string }) {
   const playlistForm = useForm<PlaylistSchemaType>({
@@ -58,28 +59,25 @@ export default function PlaylistForm({ serverId }: { serverId: string }) {
           label="Playlist"
           description="The name of the file to append/insert playlist."
           placeholder="playlist.txt"
-          className="w-1/2 xl:w-2/3 xl:max-w-[calc(100%-192px)] min-w-48"
+          className="w-full sm:w-1/3 xl:w-2/3 xl:max-w-[calc(100%-192px)]"
           rootClassName="max-w-full"
           isRequired
         >
-          <div className="gap-2 hidden max-[500px]:hidden max-[960px]:flex min-[1080px]:flex">
-            <Button className="w-20" type="button" onClick={onAppendPlaylist}>
-              Append
+          <div className="gap-2 flex">
+            <Button
+              type="button"
+              variant={"outline"}
+              onClick={onAppendPlaylist}
+            >
+              <IconPlaylistAdd />
+              <span className="hidden sm:block">Append</span>
             </Button>
-            <Button className="w-20" type="button" onClick={onInsertPlaylist}>
-              Insert
+            <Button type="button" onClick={onInsertPlaylist}>
+              <IconLayoutDistributeHorizontal />
+              <span className="hidden sm:block">Insert</span>
             </Button>
           </div>
         </FormElement>
-
-        <div className="flex gap-2 max-[500px]:flex max-[960px]:hidden min-[1080px]:hidden">
-          <Button className="w-20" type="button" onClick={onAppendPlaylist}>
-            Append
-          </Button>
-          <Button className="w-20" type="button" onClick={onInsertPlaylist}>
-            Insert
-          </Button>
-        </div>
       </form>
     </Form>
   );

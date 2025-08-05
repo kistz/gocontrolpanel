@@ -186,7 +186,8 @@ export default function AddProjectForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Project
         </Button>
       </form>
     </Form>

@@ -15,6 +15,7 @@ import {
   DetachServerFromNetworkSchema,
   DetachServerFromNetworkSchemaType,
 } from "./detach-server-from-network-schema";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function DetachServerFromNetworkForm({
   projectId,
@@ -119,6 +120,7 @@ export default function DetachServerFromNetworkForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

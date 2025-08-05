@@ -9,6 +9,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -138,7 +139,8 @@ export default function AddSubnetToNetworkForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Subnet
         </Button>
       </form>
     </Form>

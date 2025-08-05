@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconScriptPlus } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ScriptNameSchema, ScriptNameSchemaType } from "./game-schema";
@@ -55,16 +56,16 @@ export default function ScriptNameForm({
             label: script,
             value: script,
           }))}
-          className="w-[200px] min-[500px]:w-1/2"
+          className="max-w-48 sm:max-w-full sm:w-1/2"
           type="select"
           isRequired
         >
           <Button
-            className="w-20"
             type="submit"
             disabled={scriptNameForm.formState.isSubmitting}
           >
-            Load
+            <IconScriptPlus />
+            <span className="hidden sm:block">Load Script</span>
           </Button>
         </FormElement>
       </form>

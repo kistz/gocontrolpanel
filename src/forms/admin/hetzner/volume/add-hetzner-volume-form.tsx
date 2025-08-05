@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Flag from "react-world-flags";
@@ -142,7 +143,8 @@ export default function AddHetznerVolumeForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Volume
         </Button>
       </form>
     </Form>

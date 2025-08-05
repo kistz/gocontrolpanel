@@ -222,6 +222,7 @@ export default function AddServerForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconPlus />
           Add Server
         </Button>
       </form>

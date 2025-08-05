@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { Commands } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { CommandsSchema, CommandsSchemaType } from "./commands-schema";
@@ -70,6 +71,7 @@ export default function CommandsForm({
           disabled={form.formState.isSubmitting}
           className="max-w-24"
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

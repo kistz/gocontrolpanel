@@ -1,8 +1,14 @@
 "use client";
 import { addMapList, removeMapList } from "@/actions/gbx/map";
 import { createColumns } from "@/app/(gocontroller)/server/[id]/maps/map-order-columns";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Maps } from "@/lib/prisma/generated";
 import { getDivergingList, getErrorMessage } from "@/lib/utils";
+import {
+  IconDeviceFloppy,
+  IconMapMinus,
+  IconRotate,
+} from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
@@ -17,6 +23,8 @@ export default function MapOrder({
   mapList: Maps[];
   serverId: string;
 }) {
+  const isMobile = useIsMobile();
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const [defaultMapList, setDefaultMapList] = useState<Maps[]>(mapList);
@@ -98,12 +106,9 @@ export default function MapOrder({
         />
       </div>
       <div className="flex gap-2 ml-auto">
-        <Button variant="destructive" className="hidden sm:block" onClick={() => setIsConfirmOpen(true)}>
-          Remove All Maps
-        </Button>
-
-        <Button variant="destructive" className="block sm:hidden" onClick={() => setIsConfirmOpen(true)}>
-          Remove All
+        <Button variant="destructive" onClick={() => setIsConfirmOpen(true)}>
+          <IconMapMinus />
+          Remove All {!isMobile ? "Maps" : ""}
         </Button>
 
         <ConfirmModal
@@ -117,9 +122,13 @@ export default function MapOrder({
         />
 
         <Button variant="outline" onClick={resetMapOrder}>
-          Reset Order
+          <IconRotate className="rotate-180" />
+          Reset {!isMobile ? "Order" : ""}
         </Button>
-        <Button onClick={saveMapOrder}>Save Order</Button>
+        <Button onClick={saveMapOrder}>
+          <IconDeviceFloppy />
+          Save {!isMobile ? "Order" : ""}
+        </Button>
       </div>
     </div>
   );

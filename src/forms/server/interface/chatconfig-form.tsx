@@ -10,6 +10,7 @@ import {
   getErrorMessage,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -153,6 +154,7 @@ export default function ChatConfigForm({
           disabled={form.formState.isSubmitting}
           className="max-w-24"
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

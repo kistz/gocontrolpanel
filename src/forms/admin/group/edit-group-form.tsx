@@ -11,7 +11,7 @@ import { useSearchUsers } from "@/hooks/use-search-users";
 import { GroupRole } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -209,6 +209,7 @@ export default function EditGroupForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>
