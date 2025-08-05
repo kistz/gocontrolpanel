@@ -98,8 +98,12 @@ export default function MapOrder({
         />
       </div>
       <div className="flex gap-2 ml-auto">
-        <Button variant="destructive" onClick={() => setIsConfirmOpen(true)}>
+        <Button variant="destructive" className="hidden sm:block" onClick={() => setIsConfirmOpen(true)}>
           Remove All Maps
+        </Button>
+
+        <Button variant="destructive" className="block sm:hidden" onClick={() => setIsConfirmOpen(true)}>
+          Remove All
         </Button>
 
         <ConfirmModal
