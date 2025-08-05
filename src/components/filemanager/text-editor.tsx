@@ -5,6 +5,7 @@ import { generatePath, getErrorMessage, pathToBreadcrumbs } from "@/lib/utils";
 import { routes } from "@/routes";
 import { cpp } from "@codemirror/lang-cpp";
 import { xml } from "@codemirror/lang-xml";
+import { IconCancel, IconDeviceFloppy } from "@tabler/icons-react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -117,9 +118,13 @@ export default function TextEditor({
         />
         <div className="flex gap-2">
           <Button variant={"outline"} onClick={handleCancel}>
+            <IconCancel />
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave}>
+            <IconDeviceFloppy />
+            Save
+          </Button>
         </div>
       </div>
 
