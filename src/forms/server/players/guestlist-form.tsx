@@ -11,6 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  IconDeviceFloppy,
+  IconFileSettings,
+  IconTrash,
+} from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -88,10 +93,12 @@ export default function GuestlistForm({
 
         <div className="flex gap-2 justify-between w-full">
           <div className="flex gap-2">
-            <Button className="w-20" type="button" onClick={onLoad}>
+            <Button type="button" onClick={onLoad}>
+              <IconFileSettings />
               Load
             </Button>
-            <Button className="w-20" type="button" onClick={onSave}>
+            <Button type="button" onClick={onSave}>
+              <IconDeviceFloppy />
               Save
             </Button>
           </div>
@@ -99,6 +106,7 @@ export default function GuestlistForm({
             variant="destructive"
             onClick={() => setConfirmClearGuestlist(true)}
           >
+            <IconTrash />
             Clear Guestlist
           </Button>
         </div>

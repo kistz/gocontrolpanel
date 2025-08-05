@@ -10,7 +10,7 @@ import { useSearchUsers } from "@/hooks/use-search-users";
 import { HetznerProjectRole } from "@/lib/prisma/generated";
 import { getErrorMessage, getList } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -192,6 +192,7 @@ export default function EditProjectForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
+          <IconDeviceFloppy />
           Save
         </Button>
       </form>

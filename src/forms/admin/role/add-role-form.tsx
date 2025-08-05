@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconPlus } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AddRoleSchema, AddRoleSchemaType } from "./add-role-schema";
@@ -76,7 +77,8 @@ export default function AddRoleForm({ callback }: { callback?: () => void }) {
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconPlus />
+          Add Role
         </Button>
       </form>
     </Form>

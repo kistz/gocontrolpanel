@@ -4,6 +4,7 @@ import { cleanBanList, getBanList } from "@/actions/gbx/player";
 import { createColumns } from "@/app/(gocontroller)/server/[id]/players/banlist-columns";
 import { getErrorMessage } from "@/lib/utils";
 import { PlayerInfo } from "@/types/player";
+import { IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
@@ -66,6 +67,7 @@ export default function BanlistList({ serverId }: BanlistListProps) {
             variant="destructive"
             onClick={() => setConfirmClearBanlist(true)}
           >
+            <IconTrash />
             <span className="text-sm">Clear Banlist</span>
           </Button>
         }

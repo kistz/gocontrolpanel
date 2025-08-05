@@ -3,6 +3,7 @@ import { connectFakePlayer } from "@/actions/gbx/player";
 import { getErrorMessage } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { IconUserPlus } from "@tabler/icons-react";
 
 interface DevDashboardProps {
   serverId: string;
@@ -28,6 +29,7 @@ export default function DevDashboard({ serverId }: DevDashboardProps) {
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Dev Dashboard</h1>
       <Button variant="outline" onClick={handleAddPlayer}>
+        <IconUserPlus />
         Add Fake Player
       </Button>
     </div>

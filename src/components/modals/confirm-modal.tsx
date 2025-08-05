@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Button } from "../ui/button";
+import { IconCancel, IconCheck } from "@tabler/icons-react";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -61,6 +62,7 @@ export default function ConfirmModal({
 
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
+            <IconCancel />
             {cancelText}
           </Button>
           <Button
@@ -70,6 +72,7 @@ export default function ConfirmModal({
               onClose();
             }}
           >
+            <IconCheck />
             {confirmText}
           </Button>
         </div>

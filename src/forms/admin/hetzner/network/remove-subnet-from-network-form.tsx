@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconMinus } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -75,7 +76,8 @@ export default function RemoveSubnetFromNetworkForm({
           className="w-full mt-4"
           disabled={form.formState.isSubmitting}
         >
-          Save
+          <IconMinus />
+          Remove Subnet
         </Button>
       </form>
     </Form>

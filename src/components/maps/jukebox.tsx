@@ -11,6 +11,7 @@ import { createColumns as createMapColumns } from "@/app/(gocontroller)/server/[
 import { Maps } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { JukeboxMap } from "@/types/map";
+import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DndList } from "../dnd/dnd-list";
@@ -113,11 +114,15 @@ export default function Jukebox({ serverId, jukebox, maps }: JukeboxProps) {
             setData={setJukeboxOrder}
             serverId={serverId}
           />
-          <div className="flex flex-row-reverse gap-2">
-            <Button onClick={saveJukebox}>Save Jukebox</Button>
-
+          <div className="flex gap-2 ml-auto">
             <Button variant={"destructive"} onClick={onClearJukebox}>
+              <IconTrash />
               Clear Jukebox
+            </Button>
+
+            <Button onClick={saveJukebox}>
+              <IconDeviceFloppy />
+              Save Jukebox
             </Button>
           </div>
         </div>

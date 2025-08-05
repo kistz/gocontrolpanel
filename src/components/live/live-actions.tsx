@@ -1,6 +1,12 @@
 "use client";
 import { triggerModeScriptEventArray } from "@/actions/gbx/game";
 import { getErrorMessage } from "@/lib/utils";
+import {
+  IconChevronRight,
+  IconChevronsRight,
+  IconPlayerPause,
+  IconPlayerPlay,
+} from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -85,18 +91,21 @@ export default function LiveActions({
       <div className="flex gap-2 flex-wrap">
         {pauseAvailable && (
           <Button variant={"outline"} onClick={handlePause}>
+            {isPaused ? <IconPlayerPlay /> : <IconPlayerPause />}
             {isPaused ? "Resume" : "Pause"}
           </Button>
         )}
 
         {isWarmUp && (
           <Button variant={"outline"} onClick={handleEndWarmUpRound}>
+            <IconChevronRight />
             End Warmup Round
           </Button>
         )}
 
         {isWarmUp && (
           <Button variant={"outline"} onClick={handleEndWarmUp}>
+            <IconChevronsRight />
             End Warmup
           </Button>
         )}

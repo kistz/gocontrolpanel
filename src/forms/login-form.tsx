@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { IconDeviceGamepad2 } from "@tabler/icons-react";
+import { IconDeviceGamepad2, IconKey } from "@tabler/icons-react";
 
 interface LoginFormProps {
   className?: string;
@@ -23,6 +23,7 @@ export function LoginForm({
         </div>
 
         <Button className="w-full" onClick={handleLogin}>
+          <IconKey />
           Login with Nadeo
         </Button>
       </div>
