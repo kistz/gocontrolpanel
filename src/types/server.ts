@@ -1,4 +1,4 @@
-import { ServerCommandsWithCommand } from "@/actions/database/gbx";
+import { ServerPluginsWithPlugin } from "@/actions/database/gbx";
 import { LiveInfo } from "./live";
 import { PlayerInfo } from "./player";
 
@@ -21,5 +21,5 @@ export interface ServerClientInfo {
   activePlayers: PlayerInfo[];
   liveInfo: LiveInfo;
   chat?: ChatConfig;
-  commands: ServerCommandsWithCommand[];
+  plugins: ServerPluginsWithPlugin[];
 }

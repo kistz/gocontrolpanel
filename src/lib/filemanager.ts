@@ -45,7 +45,24 @@ export async function getFileManager(serverId: string): Promise<FileManager> {
     throw new Error(`FileManager with id ${serverId} not found`);
   }
 
-  return appGlobals.fileManagers[serverId];
+  const fileManager = appGlobals.fileManagers[serverId];
+
+  const res = await fetch(`${fileManager.url}/health`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${fileManager.password}`,
+    },
+  });
+
+  fileManager.health = res.status === 200;
+
+  return fileManager;
+}
+
+export async function getFileManagerHealth(serverId: string): Promise<boolean> {
+  const fileManager = await getFileManager(serverId);
+  return fileManager.health;
 }
 
 export async function updateFileManager(

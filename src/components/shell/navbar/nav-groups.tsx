@@ -1,4 +1,5 @@
 "use client";
+import IconTmx from "@/components/icons/tmx-svg";
 import {
   Collapsible,
   CollapsibleContent,
@@ -130,6 +131,18 @@ export default function NavGroups() {
                   auth: hasPermissionSync(
                     session,
                     routePermissions.servers.interface,
+                    server.id,
+                  ),
+                },
+                {
+                  name: "TMX",
+                  url: generatePath(routes.servers.tmx, {
+                    id: server.id,
+                  }),
+                  icon: IconTmx,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.tmx,
                     server.id,
                   ),
                 },

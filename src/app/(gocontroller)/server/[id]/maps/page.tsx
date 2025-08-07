@@ -5,7 +5,7 @@ import LocalMapsTable from "@/components/maps/local-maps-table";
 import MapOrder from "@/components/maps/map-order";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
-import { getFileManager } from "@/lib/filemanager";
+import { getFileManagerHealth } from "@/lib/filemanager";
 import { routePermissions, routes } from "@/routes";
 import { redirect } from "next/navigation";
 
@@ -24,9 +24,9 @@ export default async function ServerMapsPage({
   const { data: maps } = await getMapList(id);
   const { data: jukebox } = await getJukebox(id);
 
-  let filemanager = null;
+  let fmHealth = false;
   try {
-    filemanager = await getFileManager(id);
+    fmHealth = await getFileManagerHealth(id);
   } catch (err) {
     console.error("Failed to fetch file manager:", err);
   }
@@ -47,7 +47,7 @@ export default async function ServerMapsPage({
         <TabsContent value="maps" className="flex flex-col gap-6">
           <MapOrder mapList={maps} serverId={id} />
 
-          {filemanager?.health && <LocalMapsTable serverId={id} />}
+          {fmHealth && <LocalMapsTable serverId={id} />}
         </TabsContent>
         <TabsContent value="jukebox" className="flex flex-col gap-6">
           <p className="text-muted-foreground">
