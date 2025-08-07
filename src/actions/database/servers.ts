@@ -233,13 +233,23 @@ export async function updateServer(
         },
         include: serversUsersSchema,
       });
-
-      const filemanagerUrlChanged =
+      
+      let filemanagerUrlChanged =
         scalarFields.filemanagerUrl !== originalServer?.filemanagerUrl;
+      if (!filemanagerUrlChanged && !scalarFields.filemanagerUrl) {
+        filemanagerUrlChanged = false;
+      }
 
-      const filemanagerPasswordChanged =
+      let filemanagerPasswordChanged =
         scalarFields.filemanagerPassword !==
         originalServer?.filemanagerPassword;
+
+      if (
+        !scalarFields.filemanagerPassword &&
+        !originalServer?.filemanagerPassword
+      ) {
+        filemanagerPasswordChanged = false;
+      }
 
       if (filemanagerUrlChanged || filemanagerPasswordChanged) {
         await updateFileManager(
