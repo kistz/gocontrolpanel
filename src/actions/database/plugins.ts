@@ -5,6 +5,7 @@ import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
 import { ServerResponse } from "@/types/responses";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const pluginCommandsSchema = Prisma.validator<Prisma.PluginsInclude>()({
   commands: true,
 });
