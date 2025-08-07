@@ -60,7 +60,7 @@ export class GbxClientManager extends EventEmitter {
         pauseAvailable: false,
         isPaused: false,
       },
-      commands: [],
+      plugins: [],
     };
 
     this.client.on("disconnect", () => {
@@ -125,9 +125,13 @@ export class GbxClientManager extends EventEmitter {
     const server = await db.servers.findUnique({
       where: { id: this.serverId },
       include: {
-        serverCommands: {
+        serverPlugins: {
           include: {
-            command: true,
+            plugin: {
+              include: {
+                commands: true,
+              },
+            },
           },
         },
       },
@@ -169,7 +173,7 @@ export class GbxClientManager extends EventEmitter {
       disconnectMessage: server.disconnectMessage,
     };
 
-    this.info.commands = server.serverCommands;
+    this.info.plugins = server.serverPlugins;
 
     await setupListeners(this, server.id);
     await syncPlayerList(this);
@@ -278,6 +282,7 @@ export async function deleteGbxClientManager(serverId: string): Promise<void> {
   manager.removeAllListeners();
   manager.stopReconnect();
 
+  console.log(manager);
   delete appGlobals.gbxClients?.[serverId];
 }
 
@@ -981,20 +986,20 @@ async function onElimination(
 }
 
 async function handleCommand(manager: GbxClientManager, chat: PlayerChat) {
-  if (manager.info.commands.length === 0) return;
-  if (!manager.info.commands.some((c) => c.enabled)) return;
+  if (manager.info.plugins.length === 0) return;
+  if (!manager.info.plugins.some((c) => c.enabled)) return;
 
   const command = chat.Text.split(" ")[0].toLowerCase();
   const params = chat.Text.split(" ").slice(1);
 
-  const cmd = manager.info.commands.find(
-    (c) => c.command.command.toLowerCase() === command,
+  const plugin = manager.info.plugins.find((p) =>
+    p.plugin.commands?.some((c) => c.command.toLowerCase() === command),
   );
 
-  if (!cmd || !cmd.enabled) return;
+  if (!plugin || !plugin.enabled) return;
 
-  switch (cmd.command.name.toLowerCase()) {
-    case "admin":
+  switch (command) {
+    case "/admin":
       await handleAdminCommand(manager, chat, params);
       break;
   }

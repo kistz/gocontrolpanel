@@ -12,7 +12,7 @@ import {
 import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { ServerCommandsWithCommand } from "./gbx";
+import { ServerPluginsWithPlugin } from "./gbx";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editServer = Prisma.validator<Prisma.ServersInclude>()({
@@ -233,7 +233,7 @@ export async function updateServer(
         },
         include: serversUsersSchema,
       });
-      
+
       let filemanagerUrlChanged =
         scalarFields.filemanagerUrl !== originalServer?.filemanagerUrl;
       if (!filemanagerUrlChanged && !scalarFields.filemanagerUrl) {
@@ -342,59 +342,69 @@ export async function deleteServer(serverId: string): Promise<ServerResponse> {
   );
 }
 
-export async function updateServerCommands(
+export async function updateServerPlugins(
   serverId: string,
-  commands: {
-    commandId: string;
+  plugins: {
+    pluginId: string;
     enabled: boolean;
   }[],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const db = getClient();
-    const commandUpdates = commands.map((c) =>
-      db.serverCommands.upsert({
+    const pluginUpdates = plugins.map((p) =>
+      db.serverPlugins.upsert({
         where: {
-          serverId_commandId: {
+          serverId_pluginId: {
             serverId,
-            commandId: c.commandId,
+            pluginId: p.pluginId,
           },
         },
         create: {
           serverId,
-          commandId: c.commandId,
-          enabled: c.enabled,
+          pluginId: p.pluginId,
+          enabled: p.enabled,
         },
         update: {
-          enabled: c.enabled,
+          enabled: p.enabled,
         },
       }),
     );
 
-    await db.$transaction(commandUpdates);
+    await db.$transaction(pluginUpdates);
 
-    const updatedCommands = await db.serverCommands.findMany({
+    const updatedPlugins = await db.serverPlugins.findMany({
       where: { serverId },
       include: {
-        command: true,
+        plugin: {
+          include: {
+            commands: true,
+          },
+        },
       },
     });
 
     const manager = await getGbxClientManager(serverId);
 
-    manager.info.commands = updatedCommands;
+    manager.info.plugins = updatedPlugins;
   });
 }
 
-export async function getServerCommands(
+export async function getServerPlugins(
   serverId: string,
-): Promise<ServerResponse<ServerCommandsWithCommand[]>> {
+): Promise<ServerResponse<ServerPluginsWithPlugin[]>> {
   return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
     const db = getClient();
-    const commands = await db.serverCommands.findMany({
+    const plugins = await db.serverPlugins.findMany({
       where: { serverId },
-      include: { command: true },
+      include: {
+        plugin: {
+          include: {
+            commands: true,
+          },
+        },
+      },
     });
 
-    return commands;
+    return plugins;
   });
 }

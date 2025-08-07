@@ -4,12 +4,16 @@ import { Maps, Prisma } from "@/lib/prisma/generated";
 import { ServerError } from "@/types/responses";
 import "server-only";
 
-const serversCommandsSchema = Prisma.validator<Prisma.ServerCommandsInclude>()({
-  command: true,
+const serversPluginsSchema = Prisma.validator<Prisma.ServerPluginsInclude>()({
+  plugin: {
+    include: {
+      commands: true,
+    },
+  },
 });
 
-export type ServerCommandsWithCommand = Prisma.ServerCommandsGetPayload<{
-  include: typeof serversCommandsSchema;
+export type ServerPluginsWithPlugin = Prisma.ServerPluginsGetPayload<{
+  include: typeof serversPluginsSchema;
 }>;
 
 export async function createMap(
@@ -149,14 +153,14 @@ export async function getMapByUid(uid: string): Promise<Maps | null> {
   return updatedMap;
 }
 
-export async function getServerCommands(
+export async function getServerPlugins(
   serverId: string,
-): Promise<ServerCommandsWithCommand[]> {
+): Promise<ServerPluginsWithPlugin[]> {
   const db = getClient();
-  const commands = await db.serverCommands.findMany({
+  const plugins = await db.serverPlugins.findMany({
     where: { serverId },
-    include: serversCommandsSchema,
+    include: serversPluginsSchema,
   });
 
-  return commands;
+  return plugins;
 }
