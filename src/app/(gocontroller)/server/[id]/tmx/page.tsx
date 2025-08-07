@@ -1,3 +1,4 @@
+import MapSearch from "@/components/tmx/mapsearch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
@@ -29,7 +30,7 @@ export default async function ServerTMXPage({
           <TabsTrigger value="mappacks">Mappacks</TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
-
+          <MapSearch serverId={id} />
         </TabsContent>
         <TabsContent
           value="mappacks"
