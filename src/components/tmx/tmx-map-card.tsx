@@ -20,7 +20,7 @@ export default function TMXMapCard({
   return (
     <Card className={cn("flex flex-col flex-1 relative", className)}>
       <div className="relative">
-        {map.HasThumbnail ? (
+        {map.HasThumbnail || imagePosition > 0 ? (
           <Image
             src={`https://trackmania.exchange/mapimage/${map.MapId}${imagePosition > -1 ? `/${imagePosition}` : ""}`}
             fill
