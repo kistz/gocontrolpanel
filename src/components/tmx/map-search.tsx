@@ -30,7 +30,7 @@ export default function MapSearch({
     setLoading(true);
 
     try {
-      let params: Record<string, string> = {
+      const params: Record<string, string> = {
         name: nameQuery,
       };
 

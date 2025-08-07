@@ -1,15 +1,13 @@
 "use client";
 
-import { searchMaps } from "@/actions/tmx/maps";
+import { searchMappacks } from "@/actions/tmx/mappacks";
 import { getErrorMessage } from "@/lib/utils";
-import { TMXMap, TMXMappack } from "@/types/api/tmx";
+import { TMXMappack } from "@/types/api/tmx";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import TMXMapCard from "./tmx-map-card";
-import { searchMappacks } from "@/actions/tmx/mappacks";
 import TMXMappackCard from "./tmx-mappack-card";
 
 export default function MappackSearch({
@@ -31,7 +29,7 @@ export default function MappackSearch({
     setLoading(true);
 
     try {
-      let params: Record<string, string> = {
+      const params: Record<string, string> = {
         name: nameQuery,
       };
 
