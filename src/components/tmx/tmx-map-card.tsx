@@ -1,14 +1,20 @@
 import { cn } from "@/lib/utils";
 import { TMXMap } from "@/types/api/tmx";
-import { IconPhoto, IconUser } from "@tabler/icons-react";
+import { IconPhoto, IconTrophyFilled, IconUser } from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
+import MapMedals from "../maps/map-medals";
+import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 
 export default function TMXMapCard({
+  serverId,
+  fmHealth,
   map,
   className,
 }: {
+  serverId: string;
+  fmHealth: boolean;
   map: TMXMap;
   className?: string;
 }) {
@@ -50,6 +56,34 @@ export default function TMXMapCard({
             ></span>
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-col p-2 gap-2">
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-2 justify-between">
+            <div className="flex gap-1">
+              {map.Tags.map((tag, index) => (
+                <Badge key={index} variant={"outline"}>
+                  {tag.Name}
+                </Badge>
+              ))}
+            </div>
+
+            <div className="flex gap-2 items-center">
+              <span>{map.AwardCount}</span>
+              <IconTrophyFilled className="text-yellow-400" size={18} />
+            </div>
+          </div>
+        </div>
+
+        <MapMedals
+          medals={{
+            authorTime: map.Medals.Author,
+            goldTime: map.Medals.Gold,
+            silverTime: map.Medals.Silver,
+            bronzeTime: map.Medals.Bronze,
+          }}
+        />
       </div>
     </Card>
   );

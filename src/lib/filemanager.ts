@@ -48,6 +48,11 @@ export async function getFileManager(serverId: string): Promise<FileManager> {
   return appGlobals.fileManagers[serverId];
 }
 
+export async function getFileManagerHealth(serverId: string): Promise<boolean> {
+  const fileManager = await getFileManager(serverId);
+  return fileManager.health;
+}
+
 export async function updateFileManager(
   serverId: string,
   url?: string | null,

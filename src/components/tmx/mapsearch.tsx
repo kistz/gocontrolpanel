@@ -10,7 +10,13 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import TMXMapCard from "./tmx-map-card";
 
-export default function MapSearch({ serverId }: { serverId: string }) {
+export default function MapSearch({
+  serverId,
+  fmHealth,
+}: {
+  serverId: string;
+  fmHealth: boolean;
+}) {
   const [nameQuery, setNameQuery] = useState("");
   const [authorQuery, setAuthorQuery] = useState("");
 
@@ -33,7 +39,8 @@ export default function MapSearch({ serverId }: { serverId: string }) {
       }
 
       if (more) {
-        params.after = searchResults[searchResults.length - 1]?.MapId.toString();
+        params.after =
+          searchResults[searchResults.length - 1]?.MapId.toString();
       }
 
       const { data, error } = await searchMaps(serverId, params);
@@ -91,7 +98,12 @@ export default function MapSearch({ serverId }: { serverId: string }) {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             {searchResults.map((map, index) => (
-              <TMXMapCard key={index} map={map} />
+              <TMXMapCard
+                key={index}
+                serverId={serverId}
+                map={map}
+                fmHealth={fmHealth}
+              />
             ))}
           </div>
 
