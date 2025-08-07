@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
         hostname: "trackmania.exchange",
         port: "",
         pathname: "/mapimage/**",
-        search: "",
+        search: "?hq=true",
       },
     ],
     minimumCacheTTL: 60 * 60 * 24, // 1 day

@@ -18,18 +18,24 @@ export default function MapSearch({ serverId }: { serverId: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const onSearch = async () => {
+  const onSearch = async (more?: boolean) => {
     setLoading(true);
 
     try {
       const { data, error } = await searchMaps(serverId, {
         name: query,
+        ...(more
+          ? { after: searchResults[searchResults.length - 1]?.MapId.toString() }
+          : {}),
       });
       if (error) {
         throw new Error(error);
       }
 
-      setSearchResults(data.Results);
+      setError(null);
+      setSearchResults(
+        more ? [...searchResults, ...data.Results] : data.Results,
+      );
       setHasMoreResults(data.More);
     } catch (err) {
       setError("Failed to search maps: " + getErrorMessage(err));
@@ -49,7 +55,7 @@ export default function MapSearch({ serverId }: { serverId: string }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <Button onClick={onSearch} disabled={loading}>
+        <Button onClick={() => onSearch()} disabled={loading}>
           <IconSearch />
           Search
         </Button>
@@ -59,7 +65,7 @@ export default function MapSearch({ serverId }: { serverId: string }) {
 
       {searchResults.length > 0 ? (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             {searchResults.map((map) => (
               <TMXMapCard key={map.MapId} map={map} />
             ))}
@@ -68,7 +74,7 @@ export default function MapSearch({ serverId }: { serverId: string }) {
           {hasMoreResults && (
             <Button
               className="max-w-32 mx-auto"
-              onClick={onSearch}
+              onClick={() => onSearch(true)}
               disabled={loading}
               variant={"outline"}
             >
@@ -76,6 +82,8 @@ export default function MapSearch({ serverId }: { serverId: string }) {
             </Button>
           )}
         </div>
+      ) : loading ? (
+        <span>Loading...</span>
       ) : (
         <span>No results found</span>
       )}
