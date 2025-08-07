@@ -1,3 +1,8 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { hasPermission } from "@/lib/auth";
+import { routePermissions, routes } from "@/routes";
+import { redirect } from "next/navigation";
+
 export default async function ServerTMXPage({
   params,
 }: {
@@ -5,11 +10,32 @@ export default async function ServerTMXPage({
 }) {
   const { id } = await params;
 
+  const canView = await hasPermission(routePermissions.servers.tmx, id);
+  if (!canView) {
+    redirect(routes.dashboard);
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <h1 className="text-2xl font-bold mb-4">TMX Maps for Server {id}</h1>
-      <p className="text-gray-600">This page will display TMX maps for server {id}.</p>
-      {/* Additional content can be added here */}
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold">Search TrackmaniaExchange</h1>
+        <h4 className="text-muted-foreground">
+          Search for maps or mappacks from TrackmaniaExchange and add them to your server.
+        </h4>
+      </div>
+      <Tabs defaultValue="maps" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="maps">Maps</TabsTrigger>
+          <TabsTrigger value="mappacks">Mappacks</TabsTrigger>
+        </TabsList>
+        <TabsContent value="maps" className="flex flex-col gap-6">
+
+        </TabsContent>
+        <TabsContent
+          value="mappacks"
+          className="flex flex-col gap-6"
+        ></TabsContent>
+      </Tabs>
     </div>
   );
 }
