@@ -173,10 +173,10 @@ model Servers {
   connectMessage    String?
   disconnectMessage String?
 
-  interfaces     Interfaces[]
-  groupServers   GroupServers[]
-  userServers    UserServers[]
-  serverCommands ServerCommands[]
+  interfaces    Interfaces[]
+  groupServers  GroupServers[]
+  userServers   UserServers[]
+  serverPlugins ServerPlugins[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -216,7 +216,7 @@ model GroupServers {
 }
 
 model Roles {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   description String?
   permissions Json
@@ -236,7 +236,8 @@ model Commands {
   command     String
   parameters  Json?
 
-  serverCommands ServerCommands[]
+  pluginId String?
+  plugin   Plugins? @relation(fields: [pluginId], references: [id], onDelete: Cascade)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -246,16 +247,32 @@ model Commands {
   @@map("commands")
 }
 
-model ServerCommands {
-  serverId  String
-  commandId String
-  enabled   Boolean @default(true)
+model Plugins {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
 
-  server  Servers  @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  command Commands @relation(fields: [commandId], references: [id], onDelete: Cascade)
+  commands      Commands[]
+  serverPlugins ServerPlugins[]
 
-  @@id([serverId, commandId])
-  @@map("server_commands")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("plugins")
+}
+
+model ServerPlugins {
+  serverId String
+  pluginId String
+  enabled  Boolean
+
+  server Servers @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  plugin Plugins @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+
+  @@id([serverId, pluginId])
+  @@map("server_plugins")
 }
 
 model Notifications {
