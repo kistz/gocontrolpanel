@@ -16,6 +16,13 @@ export interface TMXMedals {
   Bronze: number;
 }
 
+export interface TMXImage {
+  Position: number;
+  Width: number;
+  Height: number;
+  HasHighQuality: boolean;
+}
+
 export interface TMXMap {
   MapId: number;
   MapUid: string;
@@ -29,6 +36,7 @@ export interface TMXMap {
   Tags: TMXTag[];
   Medals: TMXMedals;
   HasThumbnail: boolean;
+  Images: TMXImage[];
 }
 
 export interface TMXMapSearch {

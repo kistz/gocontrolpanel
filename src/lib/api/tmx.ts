@@ -22,6 +22,7 @@ export async function searchTMXMaps(
     "Medals.Bronze",
     "Name",
     "Tags",
+    "Images",
   ];
 
   const params = new URLSearchParams({
