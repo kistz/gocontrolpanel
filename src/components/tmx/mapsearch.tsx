@@ -62,6 +62,13 @@ export default function MapSearch({
       setLoading(false);
     }
   };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      onSearch();
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-end">
@@ -69,10 +76,10 @@ export default function MapSearch({
           <span className="text-nowrap text-sm">Map Name</span>
           <Input
             type="text"
-            className="max-w-92"
             placeholder="Search map name..."
             value={nameQuery}
             onChange={(e) => setNameQuery(e.target.value)}
+            onKeyDown={onKeyDown}
           />
         </div>
 
@@ -80,10 +87,10 @@ export default function MapSearch({
           <span className="text-nowrap text-sm">Author</span>
           <Input
             type="text"
-            className="max-w-92"
             placeholder="Search author..."
             value={authorQuery}
             onChange={(e) => setAuthorQuery(e.target.value)}
+            onKeyDown={onKeyDown}
           />
         </div>
         <Button onClick={() => onSearch()} disabled={loading}>
@@ -96,7 +103,7 @@ export default function MapSearch({
 
       {searchResults.length > 0 ? (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
             {searchResults.map((map, index) => (
               <TMXMapCard
                 key={index}

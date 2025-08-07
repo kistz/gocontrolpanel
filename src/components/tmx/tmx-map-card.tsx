@@ -61,7 +61,7 @@ export default function TMXMapCard({
       <div className="flex flex-col p-2 gap-2">
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 justify-between">
-            <div className="flex gap-1">
+            <div className="flex gap-1 overflow-x-hidden">
               {map.Tags.map((tag, index) => (
                 <Badge key={index} variant={"outline"}>
                   {tag.Name}
