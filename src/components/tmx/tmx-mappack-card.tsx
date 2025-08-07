@@ -1,45 +1,39 @@
-import { addMapToServer, downloadMap } from "@/actions/tmx/maps";
+import { addMappackToServer, downloadMappack } from "@/actions/tmx/mappacks";
 import { cn, getErrorMessage } from "@/lib/utils";
-import { TMXMap } from "@/types/api/tmx";
+import { TMXMappack } from "@/types/api/tmx";
 import {
   IconDownload,
+  IconMap,
   IconMapPlus,
   IconPhoto,
-  IconTrophyFilled,
   IconUser,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
-import MapMedals from "../maps/map-medals";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
 
-export default function TMXMapCard({
+export default function TMXMappackCard({
   serverId,
   fmHealth,
-  map,
+  mappack,
   className,
 }: {
   serverId: string;
   fmHealth: boolean;
-  map: TMXMap;
+  mappack: TMXMappack;
   className?: string;
 }) {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const imagePosition = map.Images.reduce(
-    (max, img) => Math.max(max, img.Position),
-    -1,
-  );
-
   const onDownload = async () => {
     try {
       if (!fmHealth) {
-        toast.error("File manager is not healthy, cannot download map");
+        toast.error("File manager is not healthy, cannot download mappack");
         return;
       }
 
@@ -47,16 +41,20 @@ export default function TMXMapCard({
 
       setIsDownloading(true);
 
-      const { error } = await downloadMap(serverId, map.MapId);
+      const { error } = await downloadMappack(
+        serverId,
+        mappack.MappackId,
+        mappack.Name,
+      );
       if (error) {
         throw new Error(error);
       }
 
-      toast.success("Map successfully downloaded", {
-        description: "You can find it in the Maps/Downloaded folder",
+      toast.success("Mappack successfully downloaded", {
+        description: `You can find the maps in the Maps/Downloaded/${mappack.Name} folder`,
       });
     } catch (err) {
-      toast.error("Failed to download map", {
+      toast.error("Failed to download mappack", {
         description: getErrorMessage(err),
       });
     } finally {
@@ -67,7 +65,7 @@ export default function TMXMapCard({
   const onAdd = async () => {
     try {
       if (!fmHealth) {
-        toast.error("File manager is not healthy, cannot add map");
+        toast.error("File manager is not healthy, cannot add mappack");
         return;
       }
 
@@ -75,14 +73,18 @@ export default function TMXMapCard({
 
       setIsDownloading(true);
 
-      const { error } = await addMapToServer(serverId, map.MapId);
+      const { error } = await addMappackToServer(
+        serverId,
+        mappack.MappackId,
+        mappack.Name,
+      );
       if (error) {
         throw new Error(error);
       }
 
-      toast.success("Map successfully added to server");
+      toast.success("Mappack successfully added to server");
     } catch (err) {
-      toast.error("Failed to add map to server", {
+      toast.error("Failed to add mappack to server", {
         description: getErrorMessage(err),
       });
     } finally {
@@ -93,11 +95,11 @@ export default function TMXMapCard({
   return (
     <Card className={cn("flex flex-col flex-1 relative", className)}>
       <div className="relative">
-        {map.HasThumbnail || imagePosition > 0 ? (
+        {mappack.Image ? (
           <Image
-            src={`https://trackmania.exchange/mapimage/${map.MapId}${imagePosition > -1 ? `/${imagePosition}` : ""}`}
+            src={`https://trackmania.exchange/mappackthumb/${mappack.MappackId}`}
             fill
-            alt={map.Name}
+            alt={mappack.Name}
             className="static! rounded-t-lg h-40! object-cover"
           />
         ) : (
@@ -109,7 +111,7 @@ export default function TMXMapCard({
           <h3
             className="truncate text-lg font-semibold text-white"
             dangerouslySetInnerHTML={{
-              __html: parseTmTags(map.GbxMapName ?? ""),
+              __html: parseTmTags(mappack.Name ?? ""),
             }}
           ></h3>
 
@@ -118,7 +120,7 @@ export default function TMXMapCard({
             <span
               className="text-sm truncate"
               dangerouslySetInnerHTML={{
-                __html: parseTmTags(map.Authors[0]?.User.Name ?? ""),
+                __html: parseTmTags(mappack.Owner.Name ?? ""),
               }}
             ></span>
           </div>
@@ -129,7 +131,7 @@ export default function TMXMapCard({
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 justify-between">
             <div className="flex gap-1 overflow-x-hidden">
-              {map.Tags.map((tag, index) => (
+              {mappack.Tags.map((tag, index) => (
                 <Badge key={index} variant={"outline"}>
                   {tag.Name}
                 </Badge>
@@ -137,20 +139,11 @@ export default function TMXMapCard({
             </div>
 
             <div className="flex gap-2 items-center">
-              <span>{map.AwardCount}</span>
-              <IconTrophyFilled className="text-yellow-400" size={18} />
+              <span>{mappack.MapCount}</span>
+              <IconMap size={18} />
             </div>
           </div>
         </div>
-
-        <MapMedals
-          medals={{
-            authorTime: map.Medals.Author,
-            goldTime: map.Medals.Gold,
-            silverTime: map.Medals.Silver,
-            bronzeTime: map.Medals.Bronze,
-          }}
-        />
 
         {fmHealth && (
           <>

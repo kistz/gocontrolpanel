@@ -1,4 +1,4 @@
-import { TMXMapSearch } from "@/types/api/tmx";
+import { TMXMappackSearch, TMXMapSearch } from "@/types/api/tmx";
 import "server-only";
 import config from "../config";
 import { withRateLimit } from "../ratelimiter";
@@ -6,7 +6,7 @@ import { withRateLimit } from "../ratelimiter";
 const TMX_URL = "https://trackmania.exchange";
 
 export async function searchTMXMaps(
-  queryParams: Record<string, string | number>,
+  queryParams: Record<string, string>,
   count: number = 12,
 ): Promise<TMXMapSearch> {
   const fields = [
@@ -34,6 +34,35 @@ export async function searchTMXMaps(
   const url = `${TMX_URL}/api/maps?${params.toString()}`;
 
   const data = await doRequest<TMXMapSearch>(url, "tmx:searchMaps");
+
+  return data;
+}
+
+export async function searchTMXMappacks(
+  queryParams: Record<string, string>,
+  count: number = 12,
+): Promise<TMXMappackSearch> {
+  const fields = [
+    "MappackId",
+    "Name",
+    "Description",
+    "MapCount",
+    "Owner.Name",
+    "Owner.UserId",
+    "Image.Width",
+    "Image.Height",
+    "Tags",
+  ];
+
+  const params = new URLSearchParams({
+    ...queryParams,
+    fields: fields.join(","),
+    count: count.toString(),
+  });
+
+  const url = `${TMX_URL}/api/mappacks?${params.toString()}`;
+
+  const data = await doRequest<TMXMappackSearch>(url, "tmx:searchMappacks");
 
   return data;
 }

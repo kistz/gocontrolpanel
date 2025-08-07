@@ -43,3 +43,21 @@ export interface TMXMapSearch {
   More: boolean;
   Results: TMXMap[];
 }
+
+export interface TMXMappack {
+  MappackId: number;
+  Name: string;
+  Description: string | null;
+  MapCount: number;
+  Owner: TMXUser;
+  Image: {
+    Width: number;
+    Height: number;
+  } | null;
+  Tags: TMXTag[];
+}
+
+export interface TMXMappackSearch {
+  More: boolean;
+  Results: TMXMappack[];
+}
