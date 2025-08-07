@@ -54,6 +54,7 @@ input[type="checkbox"][aria-hidden="true"] {
 
 @theme {
   --breakpoint-xs: 480px;
+  --breakpoint-3xl: 112rem;
 }
 
 @theme inline {

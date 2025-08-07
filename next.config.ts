@@ -18,6 +18,20 @@ const nextConfig: NextConfig = {
         pathname: "/**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "trackmania.exchange",
+        port: "",
+        pathname: "/mapimage/**",
+        search: "",
+      },
+      {
+        protocol: "https",
+        hostname: "trackmania.exchange",
+        port: "",
+        pathname: "/mappackthumb/**",
+        search: "",
+      },
     ],
     minimumCacheTTL: 60 * 60 * 24, // 1 day
   },
