@@ -96,6 +96,13 @@ export class GbxClientManager extends EventEmitter {
     this.listenerMap.delete(listenerId);
   }
 
+  stopReconnect() {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+  }
+
   private scheduleReconnect() {
     if (this.reconnectTimeout) return; // avoid multiple schedules
 
@@ -269,6 +276,7 @@ export async function deleteGbxClientManager(serverId: string): Promise<void> {
   if (!manager) return;
 
   manager.removeAllListeners();
+  manager.stopReconnect();
 
   delete appGlobals.gbxClients?.[serverId];
 }
