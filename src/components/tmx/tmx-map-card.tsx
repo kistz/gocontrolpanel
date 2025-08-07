@@ -22,7 +22,7 @@ export default function TMXMapCard({
       <div className="relative">
         {map.HasThumbnail || imagePosition > 0 ? (
           <Image
-            src={`https://trackmania.exchange/mapimage/${map.MapId}${imagePosition > -1 ? `/${imagePosition}` : ""}?hq=true`}
+            src={`https://trackmania.exchange/mapimage/${map.MapId}${imagePosition > -1 ? `/${imagePosition}` : ""}`}
             fill
             alt={map.Name}
             className="static! rounded-t-lg h-40! object-cover"

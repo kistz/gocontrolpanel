@@ -11,7 +11,9 @@ import { Input } from "../ui/input";
 import TMXMapCard from "./tmx-map-card";
 
 export default function MapSearch({ serverId }: { serverId: string }) {
-  const [query, setQuery] = useState("");
+  const [nameQuery, setNameQuery] = useState("");
+  const [authorQuery, setAuthorQuery] = useState("");
+
   const [searchResults, setSearchResults] = useState<TMXMap[]>([]);
   const [hasMoreResults, setHasMoreResults] = useState(false);
 
@@ -22,12 +24,19 @@ export default function MapSearch({ serverId }: { serverId: string }) {
     setLoading(true);
 
     try {
-      const { data, error } = await searchMaps(serverId, {
-        name: query,
-        ...(more
-          ? { after: searchResults[searchResults.length - 1]?.MapId.toString() }
-          : {}),
-      });
+      let params: Record<string, string> = {
+        name: nameQuery,
+      };
+
+      if (authorQuery) {
+        params.author = authorQuery;
+      }
+
+      if (more) {
+        params.after = searchResults[searchResults.length - 1]?.MapId.toString();
+      }
+
+      const { data, error } = await searchMaps(serverId, params);
       if (error) {
         throw new Error(error);
       }
@@ -48,13 +57,28 @@ export default function MapSearch({ serverId }: { serverId: string }) {
   };
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2 w-1/3">
-        <Input
-          type="text"
-          placeholder="Search maps..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <div className="flex gap-2 items-end">
+        <div className="flex flex-col gap-1">
+          <span className="text-nowrap text-sm">Map Name</span>
+          <Input
+            type="text"
+            className="max-w-92"
+            placeholder="Search map name..."
+            value={nameQuery}
+            onChange={(e) => setNameQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="flex gap-1 flex-col">
+          <span className="text-nowrap text-sm">Author</span>
+          <Input
+            type="text"
+            className="max-w-92"
+            placeholder="Search author..."
+            value={authorQuery}
+            onChange={(e) => setAuthorQuery(e.target.value)}
+          />
+        </div>
         <Button onClick={() => onSearch()} disabled={loading}>
           <IconSearch />
           Search
@@ -66,8 +90,8 @@ export default function MapSearch({ serverId }: { serverId: string }) {
       {searchResults.length > 0 ? (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {searchResults.map((map) => (
-              <TMXMapCard key={map.MapId} map={map} />
+            {searchResults.map((map, index) => (
+              <TMXMapCard key={index} map={map} />
             ))}
           </div>
 
