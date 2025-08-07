@@ -1,11 +1,22 @@
-import { cn } from "@/lib/utils";
+import { addMapToServer, downloadMap } from "@/actions/tmx/maps";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { TMXMap } from "@/types/api/tmx";
-import { IconPhoto, IconTrophyFilled, IconUser } from "@tabler/icons-react";
+import {
+  IconDownload,
+  IconMapPlus,
+  IconPhoto,
+  IconTrophyFilled,
+  IconUser,
+} from "@tabler/icons-react";
 import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 import MapMedals from "../maps/map-medals";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 export default function TMXMapCard({
   serverId,
@@ -18,10 +29,66 @@ export default function TMXMapCard({
   map: TMXMap;
   className?: string;
 }) {
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const imagePosition = map.Images.reduce(
     (max, img) => Math.max(max, img.Position),
     -1,
   );
+
+  const onDownload = async () => {
+    try {
+      if (!fmHealth) {
+        toast.error("File manager is not healthy, cannot download map");
+        return;
+      }
+
+      if (isDownloading) return;
+
+      setIsDownloading(true);
+
+      const { error } = await downloadMap(serverId, map.MapId);
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast.success("Map successfully downloaded", {
+        description: "You can find it in the Maps/Downloaded folder",
+      });
+    } catch (err) {
+      toast.error("Failed to download map", {
+        description: getErrorMessage(err),
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const onAddMap = async () => {
+    try {
+      if (!fmHealth) {
+        toast.error("File manager is not healthy, cannot add map");
+        return;
+      }
+
+      if (isDownloading) return;
+
+      setIsDownloading(true);
+
+      const { error } = await addMapToServer(serverId, map.MapId);
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast.success("Map successfully added to server");
+    } catch (err) {
+      toast.error("Failed to add map to server", {
+        description: getErrorMessage(err),
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <Card className={cn("flex flex-col flex-1 relative", className)}>
@@ -84,6 +151,30 @@ export default function TMXMapCard({
             bronzeTime: map.Medals.Bronze,
           }}
         />
+
+        {fmHealth && (
+          <>
+            <Separator />
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={onDownload}
+                disabled={isDownloading}
+              >
+                <IconDownload />
+                Download
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onAddMap}
+                disabled={isDownloading}
+              >
+                <IconMapPlus />
+                Add to Server
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </Card>
   );

@@ -38,6 +38,29 @@ export async function searchTMXMaps(
   return data;
 }
 
+export async function downloadTMXMap(
+  mapId: number,
+  mappackId?: number,
+): Promise<File> {
+  const url = `${TMX_URL}/mapgbx/${mapId}${mappackId ? `?mappackId=${mappackId}` : ""}`;
+
+  const res = await fetch(url, {
+    headers: {
+      "Content-Type": "application/x-gbx",
+      "User-Agent": config.NADEO.CONTACT,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to download map: ${res.statusText}`);
+  }
+
+  const blob = await res.blob();
+  return new File([blob], `map_${mapId}.Map.Gbx`, {
+    type: "application/x-gbx",
+  });
+}
+
 async function doRequest<T>(url: string, key: string): Promise<T> {
   return withRateLimit<T>(key, async () => {
     const res = await fetch(url, {
