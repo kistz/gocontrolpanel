@@ -8,9 +8,9 @@ apt install -y docker.io docker-compose-v2 curl unzip
 
 # Fetch Docker Compose setup
 cd /root
-curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/63-add-option-to-create-database-on-the-same-server-as-the-dedicated-server.zip
+curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/master.zip
 unzip gcp.zip
-cd gocontrolpanel-63-add-option-to-create-database-on-the-same-server-as-the-dedicated-server/hetzner
+cd gocontrolpanel-master/hetzner
 
 COMPOSE_FILES="-f docker-compose.yml"
 
