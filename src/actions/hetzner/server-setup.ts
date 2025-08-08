@@ -260,7 +260,7 @@ export async function createSimpleServerSetup(
         const { data, error } = await createHetznerDatabase(projectId, {
           ...database,
           databaseType: database.databaseType || "mysql",
-          image: "ubuntu-20.04",
+          image: "ubuntu-22.04",
           location: server.location,
         });
         if (error) {
@@ -294,7 +294,7 @@ export async function createSimpleServerSetup(
       const body = {
         name: server.name,
         server_type: server.serverType,
-        image: "ubuntu-20.04",
+        image: "ubuntu-22.04",
         location: server.location,
         user_data: userData,
         labels: {

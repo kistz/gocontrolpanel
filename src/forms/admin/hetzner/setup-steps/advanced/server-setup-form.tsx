@@ -62,7 +62,7 @@ export default function AdvancedServerSetupForm({
         image:
           images.length > 0
             ? images
-                .find((img) => img.name === "ubuntu-20.04")
+                .find((img) => img.name === "ubuntu-22.04")
                 ?.id.toString() || images[0]?.id.toString()
             : "",
       },
