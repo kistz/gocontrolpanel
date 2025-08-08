@@ -256,6 +256,24 @@ export default function DatabaseForm({
                     </span>
                   </div>
                 </div>
+              </>
+            )}
+
+            {form.watch("database.local") && (
+              <FormElement
+                name={"database.databaseType"}
+                label="Database Type"
+                placeholder="Select database type"
+                type="select"
+                options={databaseOptions}
+                isRequired
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {!form.watch("database.local") && (
+              <>
                 <FormElement
                   name={"database.location"}
                   label="Location"
@@ -290,17 +308,17 @@ export default function DatabaseForm({
                 </div>
               </>
             )}
-          </div>
 
-          <div className="flex flex-col gap-4">
-            <FormElement
-              name={"database.databaseType"}
-              label="Database Type"
-              placeholder="Select database type"
-              type="select"
-              options={databaseOptions}
-              isRequired
-            />
+            {!form.watch("database.local") && (
+              <FormElement
+                name={"database.databaseType"}
+                label="Database Type"
+                placeholder="Select database type"
+                type="select"
+                options={databaseOptions}
+                isRequired
+              />
+            )}
 
             <FormElement
               name={"database.databaseRootPassword"}
