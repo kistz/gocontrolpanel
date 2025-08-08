@@ -153,8 +153,6 @@ export async function createAdvancedServerSetup(
 
       const userData = dediTemplate(dediData);
 
-      console.log("Creating server with user data:", userData);
-
       const body = {
         name: server.name,
         server_type: server.serverType,
@@ -310,8 +308,6 @@ export async function createSimpleServerSetup(
       };
 
       const userData = dediTemplate(dediData);
-
-      console.log("Creating server with user data:", userData);
 
       const body = {
         name: server.name,
