@@ -716,13 +716,21 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
     });
   }
 
-  scores.players.forEach((player) => {
+  // Sort players by matchpoints
+  scores.players.sort((a, b) => {
+    if (a.matchpoints !== b.matchpoints) {
+      return b.matchpoints - a.matchpoints; // Sort by match points descending
+    }
+    return a.bestracetime - b.bestracetime; // Sort by best time ascending
+  });
+
+  scores.players.forEach((player, i) => {
     const playerRound: PlayerRound = {
       login: player.login,
       accountId: player.accountid,
       name: player.name,
       team: player.team,
-      rank: player.rank,
+      rank: i + 1,
       finalist: isFinalist(
         player.matchpoints,
         manager.info.liveInfo.pointsLimit,
