@@ -200,7 +200,7 @@ export async function createAdvancedServerSetup(
 
       const serverId = res.data.server.id;
 
-      if (server.controller) {
+      if (server.controller && !database?.local) {
         if (!networkId) {
           throw new Error(
             "Network must be created or selected for controller servers.",
