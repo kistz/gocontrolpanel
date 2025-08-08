@@ -3,11 +3,7 @@
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
-import {
-  HetznerImage,
-  HetznerServer,
-  HetznerServerType,
-} from "@/types/api/hetzner/servers";
+import { HetznerServer, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -110,7 +106,7 @@ export default function DatabaseForm({
   const selectedLocation = locations.find(
     (location) => location.name === form.watch("database.location"),
   );
-  
+
   const pricing =
     selectedServerType?.prices.find(
       (price) => price.location === selectedLocation?.name,
@@ -171,125 +167,132 @@ export default function DatabaseForm({
               description="Host the database on the same server instead of a separate one"
             />
 
-            <FormElement
-              name={"database.name"}
-              label="Server Name"
-              placeholder="Enter server name"
-              isRequired
-            />
+            {!form.watch("database.local") && (
+              <>
+                <FormElement
+                  name={"database.name"}
+                  label="Server Name"
+                  placeholder="Enter server name"
+                  isRequired
+                />
 
-            <FormElement
-              name={"database.serverType"}
-              label="Server Type"
-              placeholder="Select server type"
-              type="select"
-              className="w-32"
-              options={serverTypes.map((type) => ({
-                value: type.id.toString(),
-                label: type.name,
-              }))}
-              isRequired
-            />
+                <FormElement
+                  name={"database.serverType"}
+                  label="Server Type"
+                  placeholder="Select server type"
+                  type="select"
+                  className="w-32"
+                  options={serverTypes.map((type) => ({
+                    value: type.id.toString(),
+                    label: type.name,
+                  }))}
+                  isRequired
+                />
 
-            {/* Database Type Info */}
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex flex-col">
-                <span className="font-semibold">Description</span>
-                <span className="truncate">
-                  {selectedServerType?.description || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Cores</span>
-                <span className="truncate">
-                  {selectedServerType?.cores || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Memory</span>
-                <span className="truncate">
-                  {selectedServerType?.memory
-                    ? `${selectedServerType.memory} GB`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Disk</span>
-                <span className="truncate">
-                  {selectedServerType?.disk
-                    ? `${selectedServerType.disk} GB`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">CPU Type</span>
-                <span className="truncate">
-                  {selectedServerType?.cpu_type || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Hourly Price</span>
-                <span className="truncate">
-                  {pricing
-                    ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Monthly Price</span>
-                <span className="truncate">
-                  {pricing
-                    ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Included Traffic</span>
-                <span className="truncate">
-                  {pricing
-                    ? `${Math.floor(
-                        pricing.included_traffic / 1000 / 1000 / 1000 / 1000,
-                      )} TB`
-                    : "-"}
-                </span>
-              </div>
-            </div>
+                {/* Database Type Info */}
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Description</span>
+                    <span className="truncate">
+                      {selectedServerType?.description || "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Cores</span>
+                    <span className="truncate">
+                      {selectedServerType?.cores || "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Memory</span>
+                    <span className="truncate">
+                      {selectedServerType?.memory
+                        ? `${selectedServerType.memory} GB`
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Disk</span>
+                    <span className="truncate">
+                      {selectedServerType?.disk
+                        ? `${selectedServerType.disk} GB`
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">CPU Type</span>
+                    <span className="truncate">
+                      {selectedServerType?.cpu_type || "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Hourly Price</span>
+                    <span className="truncate">
+                      {pricing
+                        ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Monthly Price</span>
+                    <span className="truncate">
+                      {pricing
+                        ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Included Traffic</span>
+                    <span className="truncate">
+                      {pricing
+                        ? `${Math.floor(
+                            pricing.included_traffic /
+                              1000 /
+                              1000 /
+                              1000 /
+                              1000,
+                          )} TB`
+                        : "-"}
+                    </span>
+                  </div>
+                </div>
+                <FormElement
+                  name={"database.location"}
+                  label="Location"
+                  placeholder="Select database location"
+                  type="select"
+                  className="w-64"
+                  options={locations.map((location) => ({
+                    value: location.name,
+                    label: location.description,
+                  }))}
+                  isRequired
+                />
+
+                {/* Location Info */}
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Country</span>
+                    <span className="truncate">
+                      <Flag
+                        className="h-4"
+                        code={selectedLocation?.country}
+                        fallback={selectedLocation?.country || "-"}
+                      />
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">City</span>
+                    <span className="truncate">
+                      {selectedLocation?.city || "-"}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
-            <FormElement
-              name={"database.location"}
-              label="Location"
-              placeholder="Select database location"
-              type="select"
-              className="w-64"
-              options={locations.map((location) => ({
-                value: location.name,
-                label: location.description,
-              }))}
-              isRequired
-            />
-
-            {/* Location Info */}
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex flex-col">
-                <span className="font-semibold">Country</span>
-                <span className="truncate">
-                  <Flag
-                    className="h-4"
-                    code={selectedLocation?.country}
-                    fallback={selectedLocation?.country || "-"}
-                  />
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">City</span>
-                <span className="truncate">
-                  {selectedLocation?.city || "-"}
-                </span>
-              </div>
-            </div>
-
             <FormElement
               name={"database.databaseType"}
               label="Database Type"

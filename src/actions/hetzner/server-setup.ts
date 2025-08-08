@@ -61,8 +61,15 @@ export async function createAdvancedServerSetup(
       let databaseId: number | undefined = undefined;
       let createdDatabase: HetznerServer | undefined = undefined;
       if (server.controller && database?.new && !database.local) {
+        if (!database.name || !database.serverType || !database.location) {
+          throw new Error("Database name, server type and location is required for new databases.");
+        }
+
         const { data, error } = await createHetznerDatabase(projectId, {
           ...database,
+          name: database.name,
+          serverType: database.serverType,
+          location: database.location,
           networkId,
         });
         if (error) {
@@ -130,6 +137,7 @@ export async function createAdvancedServerSetup(
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
+          root_password: database?.databaseRootPassword || generateRandomString(16),
           local: database?.local || false,
         },
         dedi_login: server.dediLogin,
@@ -144,6 +152,8 @@ export async function createAdvancedServerSetup(
       };
 
       const userData = dediTemplate(dediData);
+
+      console.log("Creating server with user data:", userData);
 
       const body = {
         name: server.name,
@@ -259,8 +269,14 @@ export async function createSimpleServerSetup(
 
       let databaseId: number | undefined = undefined;
       if (server.controller && database?.new && !database?.local) {
+        if (!database.name || !database.serverType) {
+          throw new Error("Database name and server type is required for new databases.");
+        }
+
         const { data, error } = await createHetznerDatabase(projectId, {
           ...database,
+          name: database.name,
+          serverType: database.serverType,
           databaseType: database.databaseType || "mysql",
           location: server.location,
         });
@@ -281,6 +297,7 @@ export async function createSimpleServerSetup(
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
+          root_password: database?.databaseRootPassword || generateRandomString(16),
           local: database?.local || false,
         },
         dedi_login: server.dediLogin,
@@ -293,6 +310,8 @@ export async function createSimpleServerSetup(
       };
 
       const userData = dediTemplate(dediData);
+
+      console.log("Creating server with user data:", userData);
 
       const body = {
         name: server.name,
