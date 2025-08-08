@@ -4,6 +4,7 @@ import { AddHetznerDatabaseSchema } from "../../database/add-hetzner-database-sc
 export const DatabaseSchema = AddHetznerDatabaseSchema.extend({
   new: z.boolean().optional(),
   existing: z.string().optional(),
+  local: z.boolean().optional(),
 }).refine(
   (data) => {
     return data.new || (data.existing && data.existing.trim() !== "");

@@ -175,6 +175,14 @@ export default function DatabaseForm({
               type="checkbox"
               description="Create a new database for this server"
             />
+
+            <FormElement
+              name="database.local"
+              label="Local Database"
+              type="checkbox"
+              description="Host the database on the same server instead of a separate one"
+            />
+
             <FormElement
               name={"database.name"}
               label="Server Name"

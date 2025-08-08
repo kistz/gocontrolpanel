@@ -23,7 +23,7 @@ export default function DatabaseForm({
 }) {
   const isFirstRender = useRef(true);
 
-  const [creatingNewDatabase, setCreatingNewDatabase] = useState(false);
+  const [creatingNewDatabase, setCreatingNewDatabase] = useState(form.getValues("database.new") || false);
   const newDatabase = form.watch("database.new");
 
   const existingDatabase = form.watch("database.existing");
@@ -107,6 +107,13 @@ export default function DatabaseForm({
             label="New Database"
             type="checkbox"
             description="Create a new database for this server"
+          />
+
+          <FormElement
+            name="database.local"
+            label="Local Database"
+            type="checkbox"
+            description="Host the database on the same server instead of a separate one"
           />
 
           <FormElement
