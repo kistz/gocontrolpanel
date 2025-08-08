@@ -42,7 +42,7 @@ export async function createAdvancedServerSetup(
       const token = await getApiToken(projectId);
 
       let networkId: number | undefined = undefined;
-      if (server.controller && network?.new) {
+      if (server.controller && network?.new && !database?.local) {
         const { data, error } = await createHetznerNetwork(projectId, network);
         if (error) {
           throw new Error(error);
@@ -52,15 +52,15 @@ export async function createAdvancedServerSetup(
         networkId = parseInt(network.existing);
       }
 
-      if (!networkId && server.controller) {
+      if (!networkId && server.controller && !database?.local) {
         throw new Error(
-          "Network must be created or selected for controller servers.",
+          "Network must be created or selected if the database is not local.",
         );
       }
 
       let databaseId: number | undefined = undefined;
       let createdDatabase: HetznerServer | undefined = undefined;
-      if (server.controller && database?.new) {
+      if (server.controller && database?.new && !database.local) {
         const { data, error } = await createHetznerDatabase(projectId, {
           ...database,
           networkId,
@@ -129,6 +129,7 @@ export async function createAdvancedServerSetup(
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
+          local: database?.local || false,
         },
         dedi_login: server.dediLogin,
         dedi_password: server.dediPassword,
@@ -146,7 +147,7 @@ export async function createAdvancedServerSetup(
       const body = {
         name: server.name,
         server_type: server.serverType,
-        image: server.image,
+        image: "ubuntu-22.04",
         location: server.location,
         user_data: userData,
         labels: {
@@ -235,7 +236,7 @@ export async function createSimpleServerSetup(
       const token = await getApiToken(projectId);
 
       let networkId: number | undefined = undefined;
-      if (server.controller && !database?.networkId) {
+      if (server.controller && !database?.networkId && !database?.local) {
         const { data, error } = await createHetznerNetwork(projectId, {
           name: `${server.name}-network-${generateRandomString(8)}`,
           ipRange: "10.0.0.0/16",
@@ -256,11 +257,10 @@ export async function createSimpleServerSetup(
       }
 
       let databaseId: number | undefined = undefined;
-      if (server.controller && database?.new) {
+      if (server.controller && database?.new && !database?.local) {
         const { data, error } = await createHetznerDatabase(projectId, {
           ...database,
           databaseType: database.databaseType || "mysql",
-          image: "ubuntu-22.04",
           location: server.location,
         });
         if (error) {
@@ -279,6 +279,7 @@ export async function createSimpleServerSetup(
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
+          local: database?.local || false,
         },
         dedi_login: server.dediLogin,
         dedi_password: server.dediPassword,
@@ -336,7 +337,7 @@ export async function createSimpleServerSetup(
 
       const serverId = res.data.server.id;
 
-      if (server.controller && networkId) {
+      if (server.controller && networkId && !database?.local) {
         if (databaseId && !database?.databaseIp) {
           const { error: dbError } = await attachHetznerServerToNetwork(
             projectId,

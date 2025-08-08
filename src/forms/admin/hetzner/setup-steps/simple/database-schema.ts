@@ -2,7 +2,6 @@ import z from "zod";
 import { AddHetznerDatabaseSchema } from "../../database/add-hetzner-database-schema";
 
 export const DatabaseSchema = AddHetznerDatabaseSchema.omit({
-  image: true,
   location: true,
   databaseType: true,
   databaseRootPassword: true,

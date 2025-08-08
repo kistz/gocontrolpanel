@@ -70,6 +70,7 @@ export default function DatabaseForm({
             ...form.getValues(),
             database: {
               new: false,
+              local: false,
               existing: db.id.toString(),
               name: db.name,
               databaseIp: db.private_net[0]?.ip,

@@ -15,7 +15,6 @@ export const hetznerServerNameSchema = z
 export const AddHetznerServerSchema = z.object({
   name: hetznerServerNameSchema,
   serverType: z.string().min(1, { message: "Server type is required" }),
-  image: z.string().min(1, { message: "Image is required" }),
   location: z.string().min(1, { message: "Location is required" }),
   dediLogin: z.string().min(1, { message: "Dedi login is required" }),
   dediPassword: z.string().min(1, { message: "Dedi password is required" }),

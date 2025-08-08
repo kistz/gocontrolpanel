@@ -4,11 +4,7 @@ import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
-import {
-  HetznerImage,
-  HetznerServer,
-  HetznerServerType,
-} from "@/types/api/hetzner/servers";
+import { HetznerServer, HetznerServerType } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,7 +25,6 @@ export default function AdvancedServerSetupForm({
   locations,
   databases,
   serverTypes,
-  images,
   networks,
   callback,
 }: {
@@ -37,7 +32,6 @@ export default function AdvancedServerSetupForm({
   locations: HetznerLocation[];
   databases: HetznerServer[];
   serverTypes: HetznerServerType[];
-  images: HetznerImage[];
   networks: HetznerNetwork[];
   callback?: () => void;
 }) {
@@ -59,12 +53,6 @@ export default function AdvancedServerSetupForm({
                 .find((type) => type.name === "cpx11")
                 ?.id.toString() || serverTypes[0]?.id.toString()
             : "",
-        image:
-          images.length > 0
-            ? images
-                .find((img) => img.name === "ubuntu-22.04")
-                ?.id.toString() || images[0]?.id.toString()
-            : "",
       },
       serverController: undefined,
       database: undefined,
@@ -73,6 +61,7 @@ export default function AdvancedServerSetupForm({
   });
 
   const controllerSelected = form.watch("server.controller");
+  const localDatabase = form.watch("database.local");
 
   useEffect(() => {
     if (!controllerSelected) {
@@ -84,6 +73,15 @@ export default function AdvancedServerSetupForm({
       });
     }
   }, [controllerSelected]);
+
+  useEffect(() => {
+    if (localDatabase) {
+      form.reset({
+        ...form.getValues(),
+        network: undefined,
+      });
+    }
+  }, [localDatabase]);
 
   const nextStep = async () => {
     if (step !== "summary") {
@@ -101,7 +99,7 @@ export default function AdvancedServerSetupForm({
         setStep("database");
         break;
       case "database":
-        setStep("network");
+        setStep(localDatabase ? "summary" : "network");
         break;
       case "network":
         setStep("summary");
@@ -124,7 +122,7 @@ export default function AdvancedServerSetupForm({
         if (!controllerSelected) {
           setStep("server");
         } else {
-          setStep("network");
+          setStep(localDatabase ? "database" : "network");
         }
         break;
       default:
@@ -164,7 +162,6 @@ export default function AdvancedServerSetupForm({
             onNext={nextStep}
             locations={locations}
             serverTypes={serverTypes}
-            images={images}
           />
         </TabsContent>
 
@@ -183,7 +180,6 @@ export default function AdvancedServerSetupForm({
             onBack={previousStep}
             databases={databases}
             serverTypes={serverTypes}
-            images={images}
             locations={locations}
             serverController={form.watch("serverController.type")}
           />

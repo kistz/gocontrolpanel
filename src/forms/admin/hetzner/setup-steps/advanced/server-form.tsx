@@ -3,7 +3,7 @@
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
-import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
+import { HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { UseFormReturn } from "react-hook-form";
 import Flag from "react-world-flags";
@@ -14,13 +14,11 @@ export default function ServerForm({
   onNext,
   locations,
   serverTypes,
-  images,
 }: {
   form: UseFormReturn<AdvancedServerSetupSchemaType>;
   onNext: () => void;
   locations: HetznerLocation[];
   serverTypes: HetznerServerType[];
-  images: HetznerImage[];
 }) {
   const selectedServerType = serverTypes.find(
     (type) => type.id.toString() === form.watch("server.serverType"),
@@ -28,10 +26,6 @@ export default function ServerForm({
 
   const selectedLocation = locations.find(
     (location) => location.name === form.watch("server.location"),
-  );
-
-  const selectedImage = images.find(
-    (image) => image.id.toString() === form.watch("server.image"),
   );
 
   const pricing =
@@ -123,47 +117,6 @@ export default function ServerForm({
         </div>
 
         <FormElement
-          name={"server.image"}
-          label="Image"
-          placeholder="Select image"
-          type="select"
-          className="w-64"
-          options={images.map((image) => ({
-            value: image.id.toString(),
-            label: image.name || image.os_flavor,
-          }))}
-          isRequired
-        />
-
-        {/* Image Info */}
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="flex flex-col">
-            <span className="font-semibold">Description</span>
-            <span className="truncate">
-              {selectedImage?.description || "-"}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold">OS Version</span>
-            <span className="truncate">{selectedImage?.os_version || "-"}</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold">Image Size</span>
-            <span className="truncate">
-              {selectedImage?.disk_size ? `${selectedImage.disk_size} GB` : "-"}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold">Disk Size</span>
-            <span className="truncate">
-              {selectedImage?.image_size
-                ? `${selectedImage.image_size} GB`
-                : "-"}
-            </span>
-          </div>
-        </div>
-
-        <FormElement
           name={"server.location"}
           label="Location"
           placeholder="Select server location"
@@ -193,6 +146,13 @@ export default function ServerForm({
             <span className="truncate">{selectedLocation?.city || "-"}</span>
           </div>
         </div>
+
+        <FormElement
+          name={"server.controller"}
+          label="Add Server Controller"
+          type="checkbox"
+          description="Check this if you want to add a server controller."
+        />
       </div>
       <div className="flex flex-col gap-4">
         <FormElement
@@ -243,13 +203,6 @@ export default function ServerForm({
           placeholder="Enter file manager password"
           type="password"
           description="This password will be used to access the file manager."
-        />
-
-        <FormElement
-          name={"server.controller"}
-          label="Add Server Controller"
-          type="checkbox"
-          description="Check this if you want to add a server controller."
         />
 
         <div className="flex justify-end">

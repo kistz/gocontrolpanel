@@ -20,7 +20,6 @@ export default function DatabaseForm({
   onBack,
   databases,
   serverTypes,
-  images,
   locations,
   serverController,
 }: {
@@ -29,7 +28,6 @@ export default function DatabaseForm({
   onBack: () => void;
   databases: HetznerServer[];
   serverTypes: HetznerServerType[];
-  images: HetznerImage[];
   locations: HetznerLocation[];
   serverController: string | undefined;
 }) {
@@ -51,12 +49,6 @@ export default function DatabaseForm({
         ...form.getValues(),
         database: {
           new: true,
-          image:
-            images.length > 0
-              ? images
-                  .find((img) => img.name === "ubuntu-22.04")
-                  ?.id.toString() || images[0].id.toString()
-              : "",
           serverType:
             serverTypes.length > 0
               ? serverTypes.find((st) => st.name === "cpx11")?.id.toString() ||
@@ -92,10 +84,10 @@ export default function DatabaseForm({
             ...form.getValues(),
             database: {
               new: false,
+              local: false,
               existing: db.id.toString(),
               name: db.name,
               serverType: db.server_type?.id.toString(),
-              image: db.image?.id.toString(),
               location: db.datacenter.location.name,
               databaseType: db.labels["database.type"] || "mysql",
               databaseName: db.labels["authorization.database.name"] || "",
@@ -118,11 +110,7 @@ export default function DatabaseForm({
   const selectedLocation = locations.find(
     (location) => location.name === form.watch("database.location"),
   );
-
-  const selectedImage = images.find(
-    (image) => image.id.toString() === form.watch("database.image"),
-  );
-
+  
   const pricing =
     selectedServerType?.prices.find(
       (price) => price.location === selectedLocation?.name,
@@ -262,51 +250,6 @@ export default function DatabaseForm({
                     ? `${Math.floor(
                         pricing.included_traffic / 1000 / 1000 / 1000 / 1000,
                       )} TB`
-                    : "-"}
-                </span>
-              </div>
-            </div>
-
-            <FormElement
-              name={"database.image"}
-              label="Image"
-              placeholder="Select image"
-              type="select"
-              className="w-64"
-              options={images.map((image) => ({
-                value: image.id.toString(),
-                label: image.name || image.os_flavor,
-              }))}
-              isRequired
-            />
-
-            {/* Image Info */}
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex flex-col">
-                <span className="font-semibold">Description</span>
-                <span className="truncate">
-                  {selectedImage?.description || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">OS Version</span>
-                <span className="truncate">
-                  {selectedImage?.os_version || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Image Size</span>
-                <span className="truncate">
-                  {selectedImage?.disk_size
-                    ? `${selectedImage.disk_size} GB`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold">Disk Size</span>
-                <span className="truncate">
-                  {selectedImage?.image_size
-                    ? `${selectedImage.image_size} GB`
                     : "-"}
                 </span>
               </div>

@@ -1,5 +1,4 @@
 "use client";
-import { getHetznerImages } from "@/actions/hetzner/images";
 import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { getAllNetworks } from "@/actions/hetzner/networks";
 import { getServerTypes } from "@/actions/hetzner/server-types";
@@ -9,11 +8,7 @@ import SimpleServerSetupForm from "@/forms/admin/hetzner/setup-steps/simple/serv
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
-import {
-  HetznerImage,
-  HetznerServer,
-  HetznerServerType,
-} from "@/types/api/hetzner/servers";
+import { HetznerServer, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -38,7 +33,6 @@ export default function AddServerSetupModal({
   const [networks, setNetworks] = useState<HetznerNetwork[]>([]);
   const [locations, setLocations] = useState<HetznerLocation[]>([]);
   const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
-  const [images, setImages] = useState<HetznerImage[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,13 +46,11 @@ export default function AddServerSetupModal({
         databasesResult,
         locationsResult,
         serverTypesResult,
-        imagesResult,
         networksResult,
       ] = await Promise.allSettled([
         getAllDatabases(data),
         getHetznerLocations(data),
         getServerTypes(data),
-        getHetznerImages(data),
         getAllNetworks(data),
       ]);
 
@@ -105,21 +97,6 @@ export default function AddServerSetupModal({
       } else {
         toast.error("Failed to fetch server types", {
           description: getErrorMessage(serverTypesResult.reason),
-        });
-      }
-
-      // Handle images
-      if (imagesResult.status === "fulfilled") {
-        const { data, error } = imagesResult.value;
-        if (!error) {
-          setImages(data);
-        } else {
-          toast.error("Failed to fetch images", { description: error });
-          setError("Failed to get images: " + error);
-        }
-      } else {
-        toast.error("Failed to fetch images", {
-          description: getErrorMessage(imagesResult.reason),
         });
       }
 
@@ -218,7 +195,6 @@ export default function AddServerSetupModal({
               locations={locations}
               databases={databases}
               serverTypes={serverTypes}
-              images={images}
               networks={networks}
             />
           )}
