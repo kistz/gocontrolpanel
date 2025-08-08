@@ -73,21 +73,34 @@ export async function downloadTMXMap(
 ): Promise<File> {
   const url = `${TMX_URL}/mapgbx/${mapId}${mappackId ? `?mappackId=${mappackId}` : ""}`;
 
-  const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/x-gbx",
-      "User-Agent": config.NADEO.CONTACT,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // 30 seconds
 
-  if (!res.ok) {
-    throw new Error(`Failed to download map: ${res.statusText}`);
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/x-gbx",
+        "User-Agent": config.NADEO.CONTACT,
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      throw new Error(`Failed to download map: ${res.statusText}`);
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    return new File([arrayBuffer], `map_${mapId}.Map.Gbx`, {
+      type: "application/x-gbx",
+    });
+  } catch (err) {
+    if ((err as any).name === "AbortError") {
+      throw new Error(`Download for map ${mapId} timed out`);
+    }
+    throw err;
   }
-
-  const arrayBuffer = await res.arrayBuffer();
-  return new File([arrayBuffer], `map_${mapId}.Map.Gbx`, {
-    type: "application/x-gbx",
-  });
 }
 
 async function doRequest<T>(url: string, key: string): Promise<T> {
