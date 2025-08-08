@@ -5,7 +5,6 @@ export const AddHetznerDatabaseSchema = z.object({
   name: hetznerServerNameSchema,
   serverType: z.string().min(1, { message: "Server type is required" }),
   databaseName: z.string().min(1, { message: "Database name is required" }),
-  image: z.string().min(1, { message: "Image is required" }),
   location: z.string().min(1, { message: "Location is required" }),
   databaseType: z.string().min(1, { message: "Database type is required" }),
   databaseRootPassword: z.string().optional(),

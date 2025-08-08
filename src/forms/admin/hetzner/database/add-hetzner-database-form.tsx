@@ -1,6 +1,5 @@
 "use client";
 
-import { getHetznerImages } from "@/actions/hetzner/images";
 import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { getServerTypes } from "@/actions/hetzner/server-types";
 import { createHetznerDatabase } from "@/actions/hetzner/servers";
@@ -9,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerLocation } from "@/types/api/hetzner/locations";
-import { HetznerImage, HetznerServerType } from "@/types/api/hetzner/servers";
+import { HetznerServerType } from "@/types/api/hetzner/servers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -30,7 +29,6 @@ export default function AddHetznerDatabaseForm({
 }) {
   const [locations, setLocations] = useState<HetznerLocation[]>([]);
   const [serverTypes, setServerTypes] = useState<HetznerServerType[]>([]);
-  const [images, setImages] = useState<HetznerImage[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,26 +70,6 @@ export default function AddHetznerDatabaseForm({
       } catch (err) {
         setError("Failed to get server types: " + getErrorMessage(err));
         toast.error("Failed to fetch server types", {
-          description: getErrorMessage(err),
-        });
-      }
-
-      try {
-        const { data, error } = await getHetznerImages(projectId);
-        if (error) {
-          throw new Error(error);
-        }
-        setImages(data);
-        form.setValue(
-          "image",
-          data.length > 0
-            ? data.find((img) => img.name === "ubuntu-20.04")?.id.toString() ||
-                data[0].id.toString()
-            : "",
-        );
-      } catch (err) {
-        setError("Failed to get images: " + getErrorMessage(err));
-        toast.error("Failed to fetch images", {
           description: getErrorMessage(err),
         });
       }
@@ -141,10 +119,6 @@ export default function AddHetznerDatabaseForm({
 
   const selectedLocation = locations.find(
     (location) => location.name === form.watch("location"),
-  );
-
-  const selectedImage = images.find(
-    (image) => image.id.toString() === form.watch("image"),
   );
 
   const pricing =
@@ -242,54 +216,6 @@ export default function AddHetznerDatabaseForm({
               </span>
             </div>
           </div>
-
-          <FormElement
-            name={"image"}
-            label="Image"
-            placeholder="Select image"
-            type="select"
-            className="w-64"
-            options={images.map((image) => ({
-              value: image.id.toString(),
-              label: image.name || image.os_flavor,
-            }))}
-            isRequired
-          />
-
-          {/* Image Info */}
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex flex-col">
-              <span className="font-semibold">Description</span>
-              <span className="truncate">
-                {selectedImage?.description || "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">OS Version</span>
-              <span className="truncate">
-                {selectedImage?.os_version || "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Image Size</span>
-              <span className="truncate">
-                {selectedImage?.disk_size
-                  ? `${selectedImage.disk_size} GB`
-                  : "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Disk Size</span>
-              <span className="truncate">
-                {selectedImage?.image_size
-                  ? `${selectedImage.image_size} GB`
-                  : "-"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
           <FormElement
             name={"location"}
             label="Location"
@@ -317,10 +243,15 @@ export default function AddHetznerDatabaseForm({
             </div>
             <div className="flex flex-col">
               <span className="font-semibold">City</span>
+            </div>
+
+            <div className="flex flex-col gap-4">
               <span className="truncate">{selectedLocation?.city || "-"}</span>
             </div>
           </div>
+        </div>
 
+        <div className="flex flex-col gap-4">
           <FormElement
             name={"databaseType"}
             label="Database Type"

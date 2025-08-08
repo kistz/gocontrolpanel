@@ -189,7 +189,7 @@ export async function createHetznerServer(
       const body = {
         name: data.name,
         server_type: parseInt(data.serverType),
-        image: parseInt(data.image),
+        image: "ubuntu-22.04",
         location: data.location,
         user_data: userData,
         labels: {
@@ -285,7 +285,7 @@ export async function createHetznerDatabase(
       const body = {
         name: data.name,
         server_type: data.serverType,
-        image: data.image,
+        image: "ubuntu-22.04",
         location: data.location,
         user_data: userData,
         networks: data.networkId ? [data.networkId] : [],
