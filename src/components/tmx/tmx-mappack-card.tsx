@@ -40,6 +40,7 @@ export default function TMXMappackCard({
       if (isDownloading) return;
 
       setIsDownloading(true);
+      toast.info("Downloading mappack...");
 
       const { error } = await downloadMappack(
         serverId,
@@ -72,6 +73,7 @@ export default function TMXMappackCard({
       if (isDownloading) return;
 
       setIsDownloading(true);
+      toast.info("Adding mappack to server...");
 
       const { error } = await addMappackToServer(
         serverId,

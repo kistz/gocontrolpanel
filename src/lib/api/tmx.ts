@@ -84,8 +84,8 @@ export async function downloadTMXMap(
     throw new Error(`Failed to download map: ${res.statusText}`);
   }
 
-  const blob = await res.blob();
-  return new File([blob], `map_${mapId}.Map.Gbx`, {
+  const arrayBuffer = await res.arrayBuffer();
+  return new File([arrayBuffer], `map_${mapId}.Map.Gbx`, {
     type: "application/x-gbx",
   });
 }
