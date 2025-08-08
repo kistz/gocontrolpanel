@@ -45,3 +45,8 @@ jobs:
           fi
 
           docker push $IMAGE:${{ env.RELEASE_TAG }}
+
+  send-discord:
+    needs: build-and-push
+    uses: ./.github/workflows/discord-changelog.yml
+    secrets: inherit
