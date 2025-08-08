@@ -8,9 +8,11 @@ apt install -y docker.io docker-compose-v2 curl unzip
 
 # Fetch Docker Compose setup
 cd /root
-curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/master.zip
+curl -sSLf -o gcp.zip https://github.com/MRegterschot/gocontrolpanel/archive/refs/heads/63-add-option-to-create-database-on-the-same-server-as-the-dedicated-server.zip
 unzip gcp.zip
-cd gocontrolpanel-master/hetzner
+cd gocontrolpanel-63-add-option-to-create-database-on-the-same-server-as-the-dedicated-server/hetzner
+
+COMPOSE_FILES="-f docker-compose.yml"
 
 {{#if server_controller.type}}
 export DB_HOST='{{{db.host}}}'
@@ -18,6 +20,11 @@ export DB_PORT='{{{db.port}}}'
 export DB_NAME='{{{db.name}}}'
 export DB_USER='{{{db.user}}}'
 export DB_PASSWORD='{{{db.password}}}'
+
+{{#if db.local}}
+export DB_HOST='{{{db.type}}}'
+COMPOSE_FILES="$COMPOSE_FILES -f ../docker-configs/docker-compose.{{{db.type}}}.yml"
+{{/if}}
 
 cd '{{{server_controller.type}}}'
 {{/if}}
@@ -56,4 +63,4 @@ export TM_AUTHORIZATION_USER_PASSWORD='{{{user_password}}}'
 export FM_PASSWORD='{{{filemanager_password}}}'
 
 # Start server
-docker compose up -d
+docker compose up $COMPOSE_FILES -d

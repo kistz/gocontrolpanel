@@ -119,6 +119,7 @@ export async function createAdvancedServerSetup(
       const dediData = {
         server_controller: server.controller ? serverController : undefined,
         db: {
+          type: database?.databaseType || "mysql",
           host:
             createdDatabase?.private_net.find(
               (net) => net.network === networkId,
@@ -274,6 +275,7 @@ export async function createSimpleServerSetup(
       const dediData = {
         server_controller: server.controller ? serverController : undefined,
         db: {
+          type: database?.databaseType || "mysql",
           host: database?.databaseIp || "10.0.0.2",
           port: database?.databaseType === "postgres" ? 5432 : 3306,
           name: database?.databaseName,
