@@ -23,7 +23,9 @@ export default function DatabaseForm({
 }) {
   const isFirstRender = useRef(true);
 
-  const [creatingNewDatabase, setCreatingNewDatabase] = useState(false);
+  const [creatingNewDatabase, setCreatingNewDatabase] = useState(
+    form.getValues("database.new") || false,
+  );
   const newDatabase = form.watch("database.new");
 
   const existingDatabase = form.watch("database.existing");
@@ -70,6 +72,7 @@ export default function DatabaseForm({
             ...form.getValues(),
             database: {
               new: false,
+              local: false,
               existing: db.id.toString(),
               name: db.name,
               databaseIp: db.private_net[0]?.ip,
@@ -110,72 +113,83 @@ export default function DatabaseForm({
           />
 
           <FormElement
-            name={"database.name"}
-            label="Server Name"
-            placeholder="Enter server name"
-            isRequired
+            name="database.local"
+            label="Local Database"
+            type="checkbox"
+            description="Host the database on the same server instead of a separate one"
           />
 
-          <FormElement
-            name={"database.serverType"}
-            label="Server Type"
-            placeholder="Select server type"
-            type="select"
-            className="w-32"
-            options={serverTypes.map((type) => ({
-              value: type.id.toString(),
-              label: type.name,
-            }))}
-            isRequired
-          />
+          {!form.watch("database.local") && (
+            <>
+              <FormElement
+                name={"database.name"}
+                label="Server Name"
+                placeholder="Enter server name"
+                isRequired
+              />
 
-          {/* Database Type Info */}
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex flex-col">
-              <span className="font-semibold">Description</span>
-              <span className="truncate">
-                {selectedServerType?.description || "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Cores</span>
-              <span className="truncate">
-                {selectedServerType?.cores || "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Memory</span>
-              <span className="truncate">
-                {selectedServerType?.memory
-                  ? `${selectedServerType.memory} GB`
-                  : "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Disk</span>
-              <span className="truncate">
-                {selectedServerType?.disk
-                  ? `${selectedServerType.disk} GB`
-                  : "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Hourly Price</span>
-              <span className="truncate">
-                {pricing
-                  ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
-                  : "-"}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Monthly Price</span>
-              <span className="truncate">
-                {pricing
-                  ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
-                  : "-"}
-              </span>
-            </div>
-          </div>
+              <FormElement
+                name={"database.serverType"}
+                label="Server Type"
+                placeholder="Select server type"
+                type="select"
+                className="w-32"
+                options={serverTypes.map((type) => ({
+                  value: type.id.toString(),
+                  label: type.name,
+                }))}
+                isRequired
+              />
+
+              {/* Database Type Info */}
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex flex-col">
+                  <span className="font-semibold">Description</span>
+                  <span className="truncate">
+                    {selectedServerType?.description || "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Cores</span>
+                  <span className="truncate">
+                    {selectedServerType?.cores || "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Memory</span>
+                  <span className="truncate">
+                    {selectedServerType?.memory
+                      ? `${selectedServerType.memory} GB`
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Disk</span>
+                  <span className="truncate">
+                    {selectedServerType?.disk
+                      ? `${selectedServerType.disk} GB`
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Hourly Price</span>
+                  <span className="truncate">
+                    {pricing
+                      ? `€${parseFloat(pricing.price_hourly.gross).toFixed(4)}`
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold">Monthly Price</span>
+                  <span className="truncate">
+                    {pricing
+                      ? `€${parseFloat(pricing.price_monthly.gross).toFixed(4)}`
+                      : "-"}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           <FormElement
             name={"database.databaseName"}

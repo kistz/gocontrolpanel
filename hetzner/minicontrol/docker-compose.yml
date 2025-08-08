@@ -43,7 +43,7 @@ services:
       CONTACT_INFO: MiniControl / ${MINI_CONTACT_INFO}
       IDENTIFIER: ${MINI_IDENTIFIER}
       SECRET: ${MINI_SECRET}
-      DATABASE: mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+      DATABASE: ${DB_TYPE}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
       ADMINS: ${MINI_ADMINS}
     volumes:
       - user-data:/server/UserData
