@@ -29,6 +29,7 @@ import {
 } from "../database/hetzner-servers";
 import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
+import { encryptHetznerToken } from "@/lib/hetzner";
 
 const root = packageDirectorySync() || process.cwd();
 
@@ -252,7 +253,7 @@ export async function createHetznerDatabase(
       await createDBHetznerServer({
         hetznerId: res.data.server.id,
         publicKey: keys.publicKey,
-        privateKey: Buffer.from(keys.privateKey),
+        privateKey: Buffer.from(encryptHetznerToken(keys.privateKey)),
       });
       await setRateLimit(projectId, res);
 
