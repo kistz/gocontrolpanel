@@ -1,17 +1,20 @@
 import { getClient } from "@/lib/dbclient";
+import { encryptHetznerToken } from "@/lib/hetzner";
 import { HetznerServers } from "@/lib/prisma/generated";
 import "server-only";
 
-export async function createDBHetznerServer(
-  hetznerServer: Omit<
-    HetznerServers,
-    "id" | "createdAt" | "updatedAt" | "deletedAt"
-  >,
-): Promise<HetznerServers> {
+export async function createDBHetznerServer(hetznerServer: {
+  hetznerId: number;
+  publicKey: string;
+  privateKey: string;
+}): Promise<HetznerServers> {
   const db = getClient();
 
   return await db.hetznerServers.create({
-    data: hetznerServer,
+    data: {
+      ...hetznerServer,
+      privateKey: Buffer.from(encryptHetznerToken(hetznerServer.privateKey)),
+    },
   });
 }
 

@@ -20,7 +20,6 @@ import {
 } from "./servers";
 import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServer, setRateLimit } from "./util";
-import { encryptHetznerToken } from "@/lib/hetzner";
 
 export async function createAdvancedServerSetup(
   projectId: string,
@@ -193,7 +192,7 @@ export async function createAdvancedServerSetup(
       await createDBHetznerServer({
         hetznerId: res.data.server.id,
         publicKey: keys.publicKey,
-        privateKey: Buffer.from(encryptHetznerToken(keys.privateKey)),
+        privateKey: keys.privateKey,
       });
 
       const cachedServer: HetznerServerCache = {
@@ -327,11 +326,14 @@ export async function createSimpleServerSetup(
 
       const userData = dediTemplate(dediData);
 
+      const keys = await createHetznerSSHKey(projectId, server.name);
+
       const body = {
         name: server.name,
         server_type: server.serverType,
         image: "ubuntu-22.04",
         location: server.location,
+        ssh_keys: [keys.id],
         user_data: userData,
         labels: {
           type: "dedi",
@@ -353,6 +355,12 @@ export async function createSimpleServerSetup(
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      });
+
+      await createDBHetznerServer({
+        hetznerId: res.data.server.id,
+        publicKey: keys.publicKey,
+        privateKey: keys.privateKey,
       });
 
       const cachedServer: HetznerServerCache = {
