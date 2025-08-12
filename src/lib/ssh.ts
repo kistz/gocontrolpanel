@@ -13,6 +13,8 @@ export function generateSSHKeyPair() {
   // Convert public key to OpenSSH format (ssh-rsa AAAAB3...)
   const pubKeySSH = sshpk.parseKey(publicKey, "pem").toString("ssh");
 
+  console.log(privateKey);
+
   return {
     publicKey: pubKeySSH,
     privateKey,

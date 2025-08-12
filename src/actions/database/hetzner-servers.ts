@@ -3,6 +3,16 @@ import { encryptHetznerToken } from "@/lib/hetzner";
 import { HetznerServers } from "@/lib/prisma/generated";
 import "server-only";
 
+export async function getDBHetznerServer(
+  hetznerId: number,
+): Promise<HetznerServers | null> {
+  const db = getClient();
+
+  return await db.hetznerServers.findUnique({
+    where: { hetznerId },
+  });
+}
+
 export async function createDBHetznerServer(hetznerServer: {
   hetznerId: number;
   publicKey: string;
@@ -13,17 +23,15 @@ export async function createDBHetznerServer(hetznerServer: {
   return await db.hetznerServers.create({
     data: {
       ...hetznerServer,
-      privateKey: Buffer.from(encryptHetznerToken(hetznerServer.privateKey)),
+      privateKey: Buffer.from(encryptHetznerToken(hetznerServer.privateKey), "base64"),
     },
   });
 }
 
-export async function deleteDBHetznerServer(
-  hetznerId: number,
-): Promise<HetznerServers> {
+export async function deleteDBHetznerServer(hetznerId: number): Promise<void> {
   const db = getClient();
 
-  return await db.hetznerServers.delete({
+  await db.hetznerServers.deleteMany({
     where: { hetznerId },
   });
 }

@@ -158,7 +158,8 @@ export async function createAdvancedServerSetup(
 
       const userData = dediTemplate(dediData);
 
-      const keys = await createHetznerSSHKey(projectId, server.name);
+      const keyName = `advanced-${server.name}-${generateRandomString(8)}`;
+      const keys = await createHetznerSSHKey(projectId, keyName);
 
       const body = {
         name: server.name,
@@ -326,7 +327,8 @@ export async function createSimpleServerSetup(
 
       const userData = dediTemplate(dediData);
 
-      const keys = await createHetznerSSHKey(projectId, server.name);
+      const keyName = `simple-${server.name}-${generateRandomString(8)}`;
+      const keys = await createHetznerSSHKey(projectId, keyName);
 
       const body = {
         name: server.name,

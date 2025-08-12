@@ -298,7 +298,7 @@ model Notifications {
 model HetznerServers {
   id         String  @id @default(uuid())
   hetznerId  Int     @unique
-  publicKey  String?
+  publicKey  String? @db.LongText
   privateKey Bytes?
 
   createdAt DateTime  @default(now())
