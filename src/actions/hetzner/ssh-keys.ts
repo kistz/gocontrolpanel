@@ -3,7 +3,6 @@ import { generateSSHKeyPair } from "@/lib/ssh";
 import { HetznerSSHKeyResponse } from "@/types/api/hetzner/ssh-keys";
 import "server-only";
 import { getApiToken } from "./util";
-import { getClient } from "@/lib/dbclient";
 
 export async function createHetznerSSHKey(
   projectId: string,
