@@ -295,7 +295,7 @@ model Notifications {
   @@map("notifications")
 }
 
-model HetznerServer {
+model HetznerServers {
   id         String  @id @default(uuid())
   hetznerId  Int     @unique
   publicKey  String?
@@ -306,5 +306,5 @@ model HetznerServer {
   deletedAt DateTime?
 
   @@index([deletedAt])
-  @@map("hetzner_server")
+  @@map("hetzner_servers")
 }

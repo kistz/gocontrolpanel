@@ -23,6 +23,11 @@ import { PaginationState } from "@tanstack/react-table";
 import { readFileSync } from "fs";
 import path from "path";
 import { packageDirectorySync } from "pkg-dir";
+import {
+  createDBHetznerServer,
+  deleteDBHetznerServer,
+} from "../database/hetzner-servers";
+import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
 
 const root = packageDirectorySync() || process.cwd();
@@ -98,6 +103,8 @@ export async function deleteHetznerServer(
           Authorization: `Bearer ${token}`,
         },
       });
+
+      await deleteDBHetznerServer(serverId);
 
       const client = await getRedisClient();
       const key = getKeyHetznerRecentlyCreatedServers(projectId);
@@ -211,6 +218,8 @@ export async function createHetznerDatabase(
 
       const userData = dbTemplate(dbData);
 
+      const keys = await createHetznerSSHKey(projectId, data.name);
+
       const body = {
         name: data.name,
         server_type: data.serverType,
@@ -218,6 +227,7 @@ export async function createHetznerDatabase(
         location: data.location,
         user_data: userData,
         networks: data.networkId ? [data.networkId] : [],
+        ssh_keys: [keys.id],
         labels: {
           type: "database",
           "database.type": dbData.db_type,
@@ -239,6 +249,11 @@ export async function createHetznerDatabase(
         },
       });
 
+      await createDBHetznerServer({
+        hetznerId: res.data.server.id,
+        publicKey: keys.publicKey,
+        privateKey: Buffer.from(keys.privateKey),
+      });
       await setRateLimit(projectId, res);
 
       return res.data.server;

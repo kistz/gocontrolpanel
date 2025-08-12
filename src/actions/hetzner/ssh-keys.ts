@@ -3,11 +3,13 @@ import { generateSSHKeyPair } from "@/lib/ssh";
 import { HetznerSSHKeyResponse } from "@/types/api/hetzner/ssh-keys";
 import "server-only";
 import { getApiToken } from "./util";
+import { getClient } from "@/lib/dbclient";
 
 export async function createHetznerSSHKey(
   projectId: string,
   name: string,
 ): Promise<{
+  id: number;
   publicKey: string;
   privateKey: string;
 }> {
@@ -15,7 +17,7 @@ export async function createHetznerSSHKey(
 
   const keys = generateSSHKeyPair();
 
-  await axiosHetzner.post<HetznerSSHKeyResponse>(
+  const res = await axiosHetzner.post<HetznerSSHKeyResponse>(
     "/ssh_keys",
     {
       name,
@@ -28,5 +30,9 @@ export async function createHetznerSSHKey(
     },
   );
 
-  return keys;
+  return {
+    id: res.data.ssh_key.id,
+    publicKey: keys.publicKey,
+    privateKey: keys.privateKey,
+  };
 }
