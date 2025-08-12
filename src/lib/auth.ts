@@ -112,19 +112,20 @@ export const authOptions: NextAuthOptions = {
         }
       } catch {
         if (!dbUser) {
-          let ubiUid = "";
-          try {
-            const { data: webidentities, error } = await getWebIdentities([
-              token.accountId,
-            ]);
-            if (error) {
-              throw new Error(error);
+          if (!token.ubiId) {
+            try {
+              const { data: webidentities, error } = await getWebIdentities([
+                token.accountId,
+              ]);
+              if (error) {
+                throw new Error(error);
+              }
+              if (webidentities && webidentities.length > 0) {
+                token.ubiId = webidentities[0].uid;
+              }
+            } catch (error) {
+              console.error("Failed to fetch web identities", error);
             }
-            if (webidentities && webidentities.length > 0) {
-              ubiUid = webidentities[0].uid;
-            }
-          } catch (error) {
-            console.error("Failed to fetch web identities", error);
           }
 
           dbUser = await upsertUserAuth({
@@ -132,7 +133,7 @@ export const authOptions: NextAuthOptions = {
             nickName: token.displayName,
             admin: config.DEFAULT_ADMINS.includes(token.login),
             path: "",
-            ubiUid,
+            ubiUid: token.ubiId ?? "",
             permissions: config.DEFAULT_PERMISSIONS,
             authenticated: true,
           });
