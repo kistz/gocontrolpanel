@@ -26,11 +26,9 @@ import { packageDirectorySync } from "pkg-dir";
 import {
   createDBHetznerServer,
   deleteDBHetznerServer,
-  getDBHetznerServer,
 } from "../database/hetzner-servers";
 import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
-import { decryptHetznerToken } from "@/lib/hetzner";
 
 const root = packageDirectorySync() || process.cwd();
 
