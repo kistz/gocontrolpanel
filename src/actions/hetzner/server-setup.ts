@@ -11,12 +11,14 @@ import {
 import { generateRandomString, sleep } from "@/lib/utils";
 import { HetznerServer, HetznerServerCache } from "@/types/api/hetzner/servers";
 import { ServerResponse } from "@/types/responses";
+import { createDBHetznerServer } from "../database/hetzner-servers";
 import { createHetznerNetwork } from "./networks";
 import {
   attachHetznerServerToNetwork,
   createHetznerDatabase,
   dediTemplate,
 } from "./servers";
+import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServer, setRateLimit } from "./util";
 
 export async function createAdvancedServerSetup(
@@ -62,7 +64,9 @@ export async function createAdvancedServerSetup(
       let createdDatabase: HetznerServer | undefined = undefined;
       if (server.controller && database?.new && !database.local) {
         if (!database.name || !database.serverType || !database.location) {
-          throw new Error("Database name, server type and location is required for new databases.");
+          throw new Error(
+            "Database name, server type and location is required for new databases.",
+          );
         }
 
         const { data, error } = await createHetznerDatabase(projectId, {
@@ -137,7 +141,8 @@ export async function createAdvancedServerSetup(
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
-          root_password: database?.databaseRootPassword || generateRandomString(16),
+          root_password:
+            database?.databaseRootPassword || generateRandomString(16),
           local: database?.local || false,
         },
         dedi_login: server.dediLogin,
@@ -153,11 +158,15 @@ export async function createAdvancedServerSetup(
 
       const userData = dediTemplate(dediData);
 
+      const keyName = `advanced-${server.name}-${generateRandomString(8)}`;
+      const keys = await createHetznerSSHKey(projectId, keyName);
+
       const body = {
         name: server.name,
         server_type: server.serverType,
         image: "ubuntu-22.04",
         location: server.location,
+        ssh_keys: [keys.id],
         user_data: userData,
         labels: {
           type: "dedi",
@@ -179,6 +188,12 @@ export async function createAdvancedServerSetup(
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      });
+
+      await createDBHetznerServer({
+        hetznerId: res.data.server.id,
+        publicKey: keys.publicKey,
+        privateKey: keys.privateKey,
       });
 
       const cachedServer: HetznerServerCache = {
@@ -268,7 +283,9 @@ export async function createSimpleServerSetup(
       let databaseId: number | undefined = undefined;
       if (server.controller && database?.new && !database?.local) {
         if (!database.name || !database.serverType) {
-          throw new Error("Database name and server type is required for new databases.");
+          throw new Error(
+            "Database name and server type is required for new databases.",
+          );
         }
 
         const { data, error } = await createHetznerDatabase(projectId, {
@@ -295,7 +312,8 @@ export async function createSimpleServerSetup(
           name: database?.databaseName,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
-          root_password: database?.databaseRootPassword || generateRandomString(16),
+          root_password:
+            database?.databaseRootPassword || generateRandomString(16),
           local: database?.local || false,
         },
         dedi_login: server.dediLogin,
@@ -309,11 +327,15 @@ export async function createSimpleServerSetup(
 
       const userData = dediTemplate(dediData);
 
+      const keyName = `simple-${server.name}-${generateRandomString(8)}`;
+      const keys = await createHetznerSSHKey(projectId, keyName);
+
       const body = {
         name: server.name,
         server_type: server.serverType,
         image: "ubuntu-22.04",
         location: server.location,
+        ssh_keys: [keys.id],
         user_data: userData,
         labels: {
           type: "dedi",
@@ -335,6 +357,12 @@ export async function createSimpleServerSetup(
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      });
+
+      await createDBHetznerServer({
+        hetznerId: res.data.server.id,
+        publicKey: keys.publicKey,
+        privateKey: keys.privateKey,
       });
 
       const cachedServer: HetznerServerCache = {

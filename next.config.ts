@@ -40,6 +40,17 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "1gb",
     },
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.node$/,
+      use: [
+        {
+          loader: "nextjs-node-loader",
+        },
+      ],
+    });
+    return config;
+  },
 };
 
 export default nextConfig;

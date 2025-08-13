@@ -1,7 +1,6 @@
 "use server";
 
 import { AddHetznerDatabaseSchemaType } from "@/forms/admin/hetzner/database/add-hetzner-database-schema";
-import { AddHetznerServerSchemaType } from "@/forms/admin/hetzner/server/add-hetzner-server-schema";
 import { AttachHetznerServerToNetworkSchemaType } from "@/forms/admin/hetzner/server/attach-hetzner-server-to-network-schema";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { axiosHetzner } from "@/lib/axios/hetzner";
@@ -24,6 +23,11 @@ import { PaginationState } from "@tanstack/react-table";
 import { readFileSync } from "fs";
 import path from "path";
 import { packageDirectorySync } from "pkg-dir";
+import {
+  createDBHetznerServer,
+  deleteDBHetznerServer,
+} from "../database/hetzner-servers";
+import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
 
 const root = packageDirectorySync() || process.cwd();
@@ -100,6 +104,8 @@ export async function deleteHetznerServer(
         },
       });
 
+      await deleteDBHetznerServer(serverId);
+
       const client = await getRedisClient();
       const key = getKeyHetznerRecentlyCreatedServers(projectId);
 
@@ -163,76 +169,6 @@ export async function getRateLimit(
   );
 }
 
-export async function createHetznerServer(
-  projectId: string,
-  data: AddHetznerServerSchemaType,
-): Promise<ServerResponse<HetznerServer>> {
-  return doServerActionWithAuth(
-    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
-      const token = await getApiToken(projectId);
-
-      const dediData = {
-        dedi_login: data.dediLogin,
-        dedi_password: data.dediPassword,
-        room_password: data.roomPassword,
-        superadmin_password:
-          data.superAdminPassword || generateRandomString(16),
-        admin_password: data.adminPassword || generateRandomString(16),
-        user_password: data.userPassword || generateRandomString(16),
-        filemanager_password:
-          data.filemanagerPassword || generateRandomString(16),
-      };
-
-      const userData = dediTemplate(dediData);
-
-      const body = {
-        name: data.name,
-        server_type: parseInt(data.serverType),
-        image: "ubuntu-22.04",
-        location: data.location,
-        user_data: userData,
-        labels: {
-          type: "dedi",
-          "authorization.superadmin.password": dediData.superadmin_password,
-          "authorization.admin.password": dediData.admin_password,
-          "authorization.user.password": dediData.user_password,
-          "filemanager.password": dediData.filemanager_password,
-        },
-        public_net: {
-          enable_ipv4: true,
-          enable_ipv6: false,
-        },
-      };
-
-      const res = await axiosHetzner.post<{
-        server: HetznerServer;
-      }>("/servers", body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const cachedServer: HetznerServerCache = {
-        id: res.data.server.id,
-        projectId,
-        name: res.data.server.name,
-        ip: res.data.server.public_net.ipv4?.ip,
-        labels: res.data.server.labels,
-      };
-
-      const client = await getRedisClient();
-      const key = getKeyHetznerRecentlyCreatedServers(projectId);
-      await client.lpush(key, JSON.stringify(cachedServer));
-      await client.expire(key, 60 * 60 * 2); // Keep for 2 hours
-
-      await setRateLimit(projectId, res);
-
-      return res.data.server;
-    },
-  );
-}
-
 export async function getRecentlyCreatedHetznerServers(): Promise<
   ServerResponse<HetznerServerCache[]>
 > {
@@ -282,6 +218,9 @@ export async function createHetznerDatabase(
 
       const userData = dbTemplate(dbData);
 
+      const keyName = `db-${data.name}-${generateRandomString(8)}`;
+      const keys = await createHetznerSSHKey(projectId, keyName);
+
       const body = {
         name: data.name,
         server_type: data.serverType,
@@ -289,6 +228,7 @@ export async function createHetznerDatabase(
         location: data.location,
         user_data: userData,
         networks: data.networkId ? [data.networkId] : [],
+        ssh_keys: [keys.id],
         labels: {
           type: "database",
           "database.type": dbData.db_type,
@@ -310,6 +250,11 @@ export async function createHetznerDatabase(
         },
       });
 
+      await createDBHetznerServer({
+        hetznerId: res.data.server.id,
+        publicKey: keys.publicKey,
+        privateKey: keys.privateKey,
+      });
       await setRateLimit(projectId, res);
 
       return res.data.server;
