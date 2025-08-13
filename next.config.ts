@@ -40,6 +40,12 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "1gb",
     },
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.externals.push("ssh2");
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
