@@ -724,7 +724,8 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
     return a.bestracetime - b.bestracetime; // Sort by best time ascending
   });
 
-  scores.players.forEach((player, i) => {
+  for (let i = 0; i < scores.players.length; i++) {
+    const player = scores.players[i];
     const playerRound: PlayerRound = {
       login: player.login,
       accountId: player.accountid,
@@ -746,7 +747,7 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
     };
 
     manager.setPlayer(playerRound.login, playerRound);
-  });
+  }
 
   const playerList: SPlayerInfo[] = await manager.client.call(
     "GetPlayerList",
