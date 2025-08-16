@@ -458,6 +458,11 @@ async function onPlayerDisconnect(manager: GbxClientManager, login: string) {
   manager.removeActivePlayer(login);
   manager.emit("playerDisconnect", login);
 
+  manager.setPlayer(login, {
+    ...manager.info.liveInfo.players?.[login],
+    connected: false,
+  });
+
   manager.setActiveRoundPlayer(login, undefined);
   manager.emit("playerDisconnectInfo", manager.info.liveInfo.activeRound);
 }
@@ -744,6 +749,7 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
       bestCheckpoints: player.bestracecheckpoints,
       prevTime: player.prevracetime,
       prevCheckpoints: player.prevracecheckpoints,
+      connected: true,
     };
 
     manager.setPlayer(playerRound.login, playerRound);
