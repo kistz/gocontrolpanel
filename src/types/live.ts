@@ -40,6 +40,7 @@ export interface PlayerRound {
   bestCheckpoints: number[];
   prevTime: number;
   prevCheckpoints: number[];
+  connected: boolean;
 }
 
 export interface ActiveRound {

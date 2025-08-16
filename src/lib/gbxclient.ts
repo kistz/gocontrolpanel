@@ -458,6 +458,11 @@ async function onPlayerDisconnect(manager: GbxClientManager, login: string) {
   manager.removeActivePlayer(login);
   manager.emit("playerDisconnect", login);
 
+  manager.setPlayer(login, {
+    ...manager.info.liveInfo.players?.[login],
+    connected: false,
+  });
+
   manager.setActiveRoundPlayer(login, undefined);
   manager.emit("playerDisconnectInfo", manager.info.liveInfo.activeRound);
 }
@@ -724,7 +729,8 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
     return a.bestracetime - b.bestracetime; // Sort by best time ascending
   });
 
-  scores.players.forEach((player, i) => {
+  for (let i = 0; i < scores.players.length; i++) {
+    const player = scores.players[i];
     const playerRound: PlayerRound = {
       login: player.login,
       accountId: player.accountid,
@@ -743,10 +749,11 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
       bestCheckpoints: player.bestracecheckpoints,
       prevTime: player.prevracetime,
       prevCheckpoints: player.prevracecheckpoints,
+      connected: true,
     };
 
     manager.setPlayer(playerRound.login, playerRound);
-  });
+  }
 
   const playerList: SPlayerInfo[] = await manager.client.call(
     "GetPlayerList",

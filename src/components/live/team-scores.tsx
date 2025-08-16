@@ -44,6 +44,7 @@ export default function TeamScores({ liveInfo }: TeamScoresProps) {
                 <TableBody>
                   {liveInfo.players &&
                     [...Object.values(liveInfo.players)]
+                      .filter((player) => player.connected)
                       .sort((a, b) => {
                         if (a.rank !== b.rank) {
                           return a.rank - b.rank;
