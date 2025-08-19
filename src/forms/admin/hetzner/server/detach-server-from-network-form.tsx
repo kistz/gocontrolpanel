@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -15,7 +16,6 @@ import {
   DetachServerFromNetworkSchema,
   DetachServerFromNetworkSchemaType,
 } from "./detach-server-from-network-schema";
-import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function DetachServerFromNetworkForm({
   projectId,

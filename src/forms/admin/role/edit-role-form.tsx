@@ -6,10 +6,10 @@ import { Form } from "@/components/ui/form";
 import { Roles } from "@/lib/prisma/generated";
 import { getErrorMessage, getList, permissions } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { EditRoleSchema, EditRoleSchemaType } from "./edit-role-schema";
-import { IconDeviceFloppy } from "@tabler/icons-react";
 export default function EditRoleForm({
   role,
   callback,

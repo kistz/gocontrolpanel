@@ -47,10 +47,13 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [internalGlobalFilter, setInternalGlobalFilter] = useState("");
 
-  const isControlled = globalFilterProp !== undefined && onGlobalFilterChange !== undefined;
+  const isControlled =
+    globalFilterProp !== undefined && onGlobalFilterChange !== undefined;
 
   const globalFilter = isControlled ? globalFilterProp : internalGlobalFilter;
-  const setGlobalFilter = isControlled ? onGlobalFilterChange : setInternalGlobalFilter;
+  const setGlobalFilter = isControlled
+    ? onGlobalFilterChange
+    : setInternalGlobalFilter;
 
   const [sorting, setSorting] = useState<SortingState>([]);
 

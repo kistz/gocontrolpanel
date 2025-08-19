@@ -1,7 +1,7 @@
 import { generateKeyPairSync } from "crypto";
-import sshpk from "sshpk";
 import "server-only";
 import { Client } from "ssh2";
+import sshpk from "sshpk";
 
 export function generateSSHKeyPair() {
   const { publicKey, privateKey } = generateKeyPairSync("rsa", {
