@@ -294,3 +294,17 @@ model Notifications {
   @@index([deletedAt])
   @@map("notifications")
 }
+
+model HetznerServers {
+  id         String  @id @default(uuid())
+  hetznerId  Int     @unique
+  publicKey  String? @db.LongText
+  privateKey Bytes?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@map("hetzner_servers")
+}

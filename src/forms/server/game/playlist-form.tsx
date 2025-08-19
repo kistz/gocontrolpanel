@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  IconLayoutDistributeHorizontal,
+  IconPlaylistAdd,
+} from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PlaylistSchema, PlaylistSchemaType } from "./game-schema";
-import { IconLayoutDistributeHorizontal, IconPlaylistAdd } from "@tabler/icons-react";
 
 export default function PlaylistForm({ serverId }: { serverId: string }) {
   const playlistForm = useForm<PlaylistSchemaType>({

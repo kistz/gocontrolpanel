@@ -11,11 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  IconDeviceFloppy,
+  IconFileSettings,
+  IconTrash,
+} from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { blacklistSchema, BlacklistSchemaType } from "./blacklist-schema";
-import { IconDeviceFloppy, IconFileSettings, IconTrash } from "@tabler/icons-react";
 
 export default function BlacklistForm({
   serverId,
