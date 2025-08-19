@@ -1,8 +1,8 @@
 "use client";
 
+import { IconCancel, IconCheck } from "@tabler/icons-react";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
-import { IconCancel, IconCheck } from "@tabler/icons-react";
 
 interface ConfirmModalProps {
   isOpen: boolean;

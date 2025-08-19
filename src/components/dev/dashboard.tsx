@@ -1,9 +1,9 @@
 "use client";
 import { connectFakePlayer } from "@/actions/gbx/player";
 import { getErrorMessage } from "@/lib/utils";
+import { IconUserPlus } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { IconUserPlus } from "@tabler/icons-react";
 
 interface DevDashboardProps {
   serverId: string;

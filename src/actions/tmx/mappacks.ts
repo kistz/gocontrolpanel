@@ -85,9 +85,11 @@ export async function downloadMappack(
         throw new Error(`Failed to download ${errors} maps`);
       }
 
-      return downloadResults.map((result) =>
-        result.status === "fulfilled" ? result.value.name : "",
-      ).filter(r => r !== "");
+      return downloadResults
+        .map((result) =>
+          result.status === "fulfilled" ? result.value.name : "",
+        )
+        .filter((r) => r !== "");
     },
   );
 }

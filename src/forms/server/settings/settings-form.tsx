@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,7 +14,6 @@ import {
   ServerSettingsSchema,
   ServerSettingsSchemaType,
 } from "./settings-schema";
-import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function SettingsForm({ serverId }: { serverId: string }) {
   const [isLoading, setIsLoading] = useState(true);

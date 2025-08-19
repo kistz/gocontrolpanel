@@ -50,6 +50,8 @@ export const createServersColumns = (
           return <span>Dedicated</span>;
         case "database":
           return <span>Database ({labels["database.type"]})</span>;
+        case "servercontroller":
+          return <span>Controller ({labels["servercontroller.type"]})</span>;
         default:
           return <span>Unknown</span>;
       }
