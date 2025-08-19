@@ -47,11 +47,13 @@ export const createServersColumns = (
       const type = labels.type;
       switch (type) {
         case "dedi":
+          const controllerType = labels["servercontroller.type"];
+          if (controllerType) {
+            return <span>Dedicated - Controller ({controllerType})</span>;
+          }
           return <span>Dedicated</span>;
         case "database":
           return <span>Database ({labels["database.type"]})</span>;
-        case "servercontroller":
-          return <span>Controller ({labels["servercontroller.type"]})</span>;
         default:
           return <span>Unknown</span>;
       }
