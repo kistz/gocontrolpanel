@@ -1,25 +1,68 @@
 import { getClient } from "@/lib/dbclient";
-import { Records } from "@/lib/prisma/generated";
+import { Maps } from "@/lib/prisma/generated";
+import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import { Waypoint } from "@/types/gbx/waypoint";
 import "server-only";
 
-export async function saveRecord(
-  record: Omit<Records, "id" | "createdAt" | "updatedAt" | "deletedAt">,
-): Promise<Records> {
-  const db = getClient();
-  const existingRecord = await db.records.findFirst({
-    where: { mapUid: record.mapUid, login: record.login, deletedAt: null },
-  });
+export async function saveMatchRecord(
+  serverId: string,
+  matchId: string | null,
+  waypoint: Waypoint,
+  round: number | null = null,
+): Promise<void> {
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(serverId);
 
-  if (existingRecord) {
-    // Update existing record
-    const updatedRecord = await db.records.update({
-      where: { id: existingRecord.id },
-      data: record,
+  const activeMap = await redis.get(key);
+  if (!activeMap) {
+    throw new Error(`No active map found for server ${serverId}`);
+  }
+
+  const mapData: Maps = JSON.parse(activeMap);
+  if (!mapData) {
+    throw new Error(`Map data is invalid for server ${serverId}`);
+  }
+
+  const db = getClient();
+
+  if (matchId !== null && round !== null) {
+    // Only upsert if both matchId and round are provided
+    await db.records.upsert({
+      where: {
+        matchId_login_round: {
+          login: waypoint.login,
+          matchId,
+          round,
+        },
+      },
+      update: {
+        mapId: mapData.id,
+        mapUid: mapData.uid,
+        time: waypoint.racetime,
+        checkpoints: waypoint.curracecheckpoints || [],
+      },
+      create: {
+        mapId: mapData.id,
+        mapUid: mapData.uid,
+        login: waypoint.login,
+        time: waypoint.racetime,
+        checkpoints: waypoint.curracecheckpoints || [],
+        round,
+        matchId,
+      },
     });
-    return updatedRecord;
   } else {
-    // Create new record
-    const newRecord = await db.records.create({ data: record });
-    return newRecord;
+    // Otherwise, just create a new record
+    await db.records.create({
+      data: {
+        mapId: mapData.id,
+        mapUid: mapData.uid,
+        login: waypoint.login,
+        time: waypoint.racetime,
+        checkpoints: waypoint.curracecheckpoints || [],
+        round,
+        matchId,
+      },
+    });
   }
 }

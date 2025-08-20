@@ -76,6 +76,7 @@ model Records {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  @@unique([matchId, login, round])
   @@index([deletedAt])
   @@index([mapId])
   @@map("records")

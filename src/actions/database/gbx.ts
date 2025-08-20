@@ -1,6 +1,6 @@
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
-import { Maps, Matches, Prisma } from "@/lib/prisma/generated";
+import { Maps, Matches, Prisma, Servers } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
 import { Waypoint } from "@/types/gbx/waypoint";
 import { ServerError } from "@/types/responses";
@@ -196,35 +196,11 @@ export async function createMatch(
   return match;
 }
 
-export async function saveMatchRecord(
-  serverId: string,
-  matchId: string,
-  waypoint: Waypoint,
-  round: number | null = null,
-): Promise<void> {
-  const redis = await getRedisClient();
-  const key = getKeyActiveMap(serverId);
-
-  const activeMap = await redis.get(key);
-  if (!activeMap) {
-    throw new Error(`No active map found for server ${serverId}`);
-  }
-
-  const mapData: Maps = JSON.parse(activeMap);
-  if (!mapData) {
-    throw new Error(`Map data is invalid for server ${serverId}`);
-  }
-
+export async function getAllServers(): Promise<Servers[]> {
   const db = getClient();
-  await db.records.create({
-    data: {
-      mapId: mapData.id,
-      mapUid: mapData.uid,
-      login: waypoint.login,
-      time: waypoint.racetime,
-      checkpoints: waypoint.curracecheckpoints || [],
-      round,
-      matchId,
-    },
+  const servers = await db.servers.findMany({
+    where: { deletedAt: null },
   });
+
+  return servers;
 }

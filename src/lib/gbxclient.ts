@@ -1,5 +1,5 @@
-import { createMatch, saveMatchRecord } from "@/actions/database/gbx";
-import { onPlayerFinish } from "@/actions/gbx/listeners/records";
+import { createMatch } from "@/actions/database/gbx";
+import { saveMatchRecord } from "@/actions/database/records";
 import {
   getPlayerInfo,
   onPodiumStart,
@@ -349,7 +349,8 @@ async function callbackListener(
           break;
         case "Trackmania.Event.WayPoint":
           if (params.isendrace) {
-            onPlayerFinishScript(manager, serverId, params);
+            saveFinishRecord(manager, serverId, params);
+            onPlayerFinishScript(manager, params);
           } else {
             onPlayerCheckpointScript(manager, params);
           }
@@ -529,22 +530,24 @@ function onPodiumStartScript(_: GbxClientManager, serverId: string) {
   onPodiumStart(serverId);
 }
 
-function onPlayerFinishScript(
+function saveFinishRecord(
   manager: GbxClientManager,
   serverId: string,
   waypoint: Waypoint,
 ) {
-  onPlayerFinish(serverId, waypoint);
-  console.log(manager.currentMatchId)
-  if (manager.currentMatchId !== null) {
-    saveMatchRecord(
-      serverId,
-      manager.currentMatchId,
-      waypoint,
-      manager.roundNumber,
-    );
-  }
+  if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
 
+  if (manager.roundNumber === 0) manager.roundNumber = 1;
+
+  saveMatchRecord(
+    serverId,
+    manager.currentMatchId,
+    waypoint,
+    manager.roundNumber,
+  );
+}
+
+function onPlayerFinishScript(manager: GbxClientManager, waypoint: Waypoint) {
   const playerWaypoint = {
     ...manager.info.liveInfo.activeRound?.players?.[waypoint.login],
     login: waypoint.login,
@@ -607,7 +610,8 @@ function onStartMapStartScript(manager: GbxClientManager, startMap: StartMap) {
 }
 
 async function onStartRoundStartScript(manager: GbxClientManager) {
-  if (manager.roundNumber !== null) manager.roundNumber++;
+  if (manager.roundNumber !== null && !manager.info.liveInfo.isWarmUp)
+    manager.roundNumber++;
 
   const playerList: SPlayerInfo[] = await manager.client.call(
     "GetPlayerList",
@@ -694,6 +698,14 @@ async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
 function onPauseStatusScript(manager: GbxClientManager, status: PauseStatus) {
   if (status.responseid !== "gocontrolpanel") return;
 
+  if (
+    manager.info.liveInfo.isPaused !== status.active &&
+    manager.roundNumber !== null &&
+    manager.roundNumber > 0
+  ) {
+    manager.roundNumber--;
+  }
+
   manager.info.liveInfo.pauseAvailable = status.available;
   manager.info.liveInfo.isPaused = status.active;
 }
@@ -710,12 +722,6 @@ function onEndMap(manager: GbxClientManager, mapInfo: SMapInfo) {
 }
 
 async function onBeginMatch(manager: GbxClientManager) {
-  const match = await createMatch(
-    manager.getServerId(),
-    manager.info.liveInfo.mode,
-  );
-  manager.currentMatchId = match.id;
-
   await syncLiveInfo(manager);
 
   await sleep(300);
@@ -836,6 +842,13 @@ async function syncLiveInfo(manager: GbxClientManager) {
 
   const matched = types.find((t) => modeLower.includes(t));
   manager.info.liveInfo.type = matched ?? "rounds";
+
+  const match = await createMatch(
+    manager.getServerId(),
+    manager.info.liveInfo.mode,
+  );
+  manager.currentMatchId = match.id;
+  manager.roundNumber = manager.info.liveInfo.type === "timeattack" ? null : 0;
 
   const mapInfo = await manager.client.call("GetCurrentMapInfo");
 
