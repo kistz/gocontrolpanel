@@ -1,6 +1,8 @@
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
-import { Maps, Prisma } from "@/lib/prisma/generated";
+import { Maps, Matches, Prisma } from "@/lib/prisma/generated";
+import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import { Waypoint } from "@/types/gbx/waypoint";
 import { ServerError } from "@/types/responses";
 import "server-only";
 
@@ -163,4 +165,66 @@ export async function getServerPlugins(
   });
 
   return plugins;
+}
+
+export async function createMatch(
+  serverId: string,
+  mode: string,
+): Promise<Matches> {
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(serverId);
+
+  const activeMap = await redis.get(key);
+  if (!activeMap) {
+    throw new Error(`No active map found for server ${serverId}`);
+  }
+
+  const mapData: Maps = JSON.parse(activeMap);
+  if (!mapData) {
+    throw new Error(`Map data is invalid for server ${serverId}`);
+  }
+
+  const db = getClient();
+  const match = await db.matches.create({
+    data: {
+      mapId: mapData.id,
+      mode,
+      serverId,
+    },
+  });
+
+  return match;
+}
+
+export async function saveMatchRecord(
+  serverId: string,
+  matchId: string,
+  waypoint: Waypoint,
+  round: number | null = null,
+): Promise<void> {
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(serverId);
+
+  const activeMap = await redis.get(key);
+  if (!activeMap) {
+    throw new Error(`No active map found for server ${serverId}`);
+  }
+
+  const mapData: Maps = JSON.parse(activeMap);
+  if (!mapData) {
+    throw new Error(`Map data is invalid for server ${serverId}`);
+  }
+
+  const db = getClient();
+  await db.records.create({
+    data: {
+      mapId: mapData.id,
+      mapUid: mapData.uid,
+      login: waypoint.login,
+      time: waypoint.racetime,
+      checkpoints: waypoint.curracecheckpoints || [],
+      round,
+      matchId,
+    },
+  });
 }

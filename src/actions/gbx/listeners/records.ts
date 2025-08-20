@@ -1,13 +1,10 @@
 import { saveRecord } from "@/actions/database/records";
 import { Maps } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import { Waypoint } from "@/types/gbx/waypoint";
 import "server-only";
 
-export async function onPlayerFinish(
-  serverId: string,
-  login: string,
-  time: number,
-) {
+export async function onPlayerFinish(serverId: string, waypoint: Waypoint) {
   const redis = await getRedisClient();
   const key = getKeyActiveMap(serverId);
 
@@ -24,7 +21,10 @@ export async function onPlayerFinish(
   await saveRecord({
     mapId: mapData.id,
     mapUid: mapData.uid,
-    login,
-    time,
+    login: waypoint.login,
+    time: waypoint.racetime,
+    checkpoints: waypoint.curracecheckpoints || [],
+    round: null,
+    matchId: null,
   });
 }
