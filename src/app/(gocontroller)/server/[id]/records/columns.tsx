@@ -1,20 +1,28 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { MatchesWithMapAndRecords } from "@/actions/database/matches";
+import {
+  deleteMatch,
+  MatchesWithMapAndRecords,
+} from "@/actions/database/matches";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getErrorMessage } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (): ColumnDef<MatchesWithMapAndRecords>[] => [
+export const createColumns = (
+  refetch: () => void,
+): ColumnDef<MatchesWithMapAndRecords>[] => [
   {
     accessorKey: "map.name",
     header: ({ column }) => (
@@ -59,9 +67,26 @@ export const createColumns = (): ColumnDef<MatchesWithMapAndRecords>[] => [
     id: "actions",
     cell: ({ row }) => {
       const match = row.original;
-      const { data: session, update } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
+      const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+      const handleDelete = () => {
+        startTransition(async () => {
+          try {
+            const { error } = await deleteMatch(match.serverId, match.id);
+            if (error) {
+              throw new Error(error);
+            }
+            refetch();
+            toast.success("Match successfully deleted");
+          } catch (error) {
+            toast.error("Error deleting match", {
+              description: getErrorMessage(error),
+            });
+          }
+        });
+      };
 
       return (
         <div className="flex justify-end">
@@ -72,8 +97,25 @@ export const createColumns = (): ColumnDef<MatchesWithMapAndRecords>[] => [
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end"></DropdownMenuContent>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setIsDeleteOpen(true)}
+              >
+                Delete Match
+              </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
+
+          <ConfirmModal
+            isOpen={isDeleteOpen}
+            onClose={() => setIsDeleteOpen(false)}
+            title="Delete Match"
+            description="Are you sure you want to delete this match?"
+            onConfirm={handleDelete}
+            confirmText="Delete"
+            cancelText="Cancel"
+          />
         </div>
       );
     },

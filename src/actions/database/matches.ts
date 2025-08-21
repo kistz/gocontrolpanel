@@ -45,21 +45,32 @@ export async function getMatchesPaginated(
         take: pagination.pageSize,
         orderBy: { [sorting.field]: sorting.order },
         where: {
+          deletedAt: null,
           serverId: fetchArgs.serverId,
-          mode: { contains: filter },
-          map: {
-            name: { contains: filter },
-          },
+          OR: [
+            { mode: { contains: filter } },
+            {
+              map: {
+                name: { contains: filter },
+              },
+            },
+          ],
         },
         include: matchesMapRecordsSchema,
       });
 
       const totalCount = await db.matches.count({
         where: {
-          mode: { contains: filter },
-          map: {
-            name: { contains: filter },
-          },
+          deletedAt: null,
+          serverId: fetchArgs.serverId,
+          OR: [
+            { mode: { contains: filter } },
+            {
+              map: {
+                name: { contains: filter },
+              },
+            },
+          ],
         },
       });
 
@@ -69,4 +80,18 @@ export async function getMatchesPaginated(
       };
     },
   );
+}
+
+export async function deleteMatch(
+  serverId: string,
+  matchId: string,
+): Promise<ServerResponse<void>> {
+  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
+    const db = getClient();
+
+    await db.matches.update({
+      where: { id: matchId },
+      data: { deletedAt: new Date() },
+    });
+  });
 }
