@@ -57,10 +57,7 @@ export PY_ADMINS='{{{server_controller.admins}}}'
 export TM_MASTERSERVER_LOGIN='{{{dedi_login}}}'
 export TM_MASTERSERVER_PASSWORD='{{{dedi_password}}}'
 export TM_SERVER_PASSWORD='{{{room_password}}}'
-export TM_SYSTEM_FORCE_IP_ADDRESS=$(curl -s https://checkip.amazonaws.com)
-if [[ -z "$TM_SYSTEM_FORCE_IP_ADDRESS" ]]; then
-  export TM_SYSTEM_FORCE_IP_ADDRESS=$(dig +short myip.opendns.com @resolver1.opendns.com)
-fi
+export TM_SYSTEM_FORCE_IP_ADDRESS=$(dig +short myip.opendns.com @resolver1.opendns.com)
 export TM_AUTHORIZATION_SUPERADMIN_PASSWORD='{{{superadmin_password}}}'
 export TM_AUTHORIZATION_ADMIN_PASSWORD='{{{admin_password}}}'
 export TM_AUTHORIZATION_USER_PASSWORD='{{{user_password}}}'
