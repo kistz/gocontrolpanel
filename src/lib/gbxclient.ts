@@ -289,6 +289,7 @@ export async function deleteGbxClientManager(serverId: string): Promise<void> {
   const manager = appGlobals.gbxClients?.[serverId];
   if (!manager) return;
 
+  manager.emit("disconnect", manager.getServerId());
   manager.removeAllListeners();
   manager.stopReconnect();
 
