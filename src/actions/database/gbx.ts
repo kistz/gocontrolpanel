@@ -2,7 +2,6 @@ import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { Maps, Matches, Prisma, Servers } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
-import { Waypoint } from "@/types/gbx/waypoint";
 import { ServerError } from "@/types/responses";
 import "server-only";
 

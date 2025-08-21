@@ -712,6 +712,8 @@ function onPauseStatusScript(manager: GbxClientManager, status: PauseStatus) {
 }
 
 function onBeginMap(manager: GbxClientManager, mapInfo: SMapInfo) {
+  syncMap(manager, manager.getServerId());
+
   manager.info.liveInfo.currentMap = mapInfo.UId;
   manager.roundNumber = manager.info.liveInfo.type === "timeattack" ? null : 0;
 

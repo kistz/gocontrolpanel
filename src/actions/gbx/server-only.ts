@@ -7,6 +7,7 @@ import { ServerError } from "@/types/responses";
 import { GbxClient } from "@evotm/gbxclient";
 import "server-only";
 import { createMap, getMapByUid } from "../database/gbx";
+import { Maps } from "@/lib/prisma/generated";
 
 export async function syncPlayerList(manager: GbxClientManager) {
   const playerList = await manager.client.call("GetPlayerList", 1000, 0);
@@ -82,7 +83,7 @@ export async function onPodiumStart(serverId: string) {
 export async function syncMap(
   manager: GbxClientManager,
   serverId: string,
-): Promise<void> {
+): Promise<Maps> {
   const mapInfo: SMapInfo = await manager.client.call("GetCurrentMapInfo");
 
   if (!mapInfo) {
@@ -116,4 +117,6 @@ export async function syncMap(
   const key = getKeyActiveMap(serverId);
 
   await redis.set(key, JSON.stringify(map));
+
+  return map;
 }

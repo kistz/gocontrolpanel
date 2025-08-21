@@ -37,7 +37,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs> {
       field: string;
       order: "asc" | "desc";
     },
-    filter?: string,
+    filter: string,
     fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>;
   args?: TArgs;
