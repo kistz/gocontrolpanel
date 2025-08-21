@@ -14,9 +14,7 @@ import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (
-  refetch: () => void,
-): ColumnDef<MatchesWithMapAndRecords>[] => [
+export const createColumns = (): ColumnDef<MatchesWithMapAndRecords>[] => [
   {
     accessorKey: "map.name",
     header: ({ column }) => (
