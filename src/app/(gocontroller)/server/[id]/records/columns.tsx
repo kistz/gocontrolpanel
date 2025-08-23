@@ -5,12 +5,15 @@ import {
   MatchesWithMapAndRecords,
 } from "@/actions/database/matches";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import Modal from "@/components/modals/modal";
+import MatchDetailsModal from "@/components/modals/records/match-details";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getErrorMessage } from "@/lib/utils";
@@ -98,6 +101,10 @@ export const createColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsOpen(true)}>
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsDeleteOpen(true)}
@@ -116,6 +123,10 @@ export const createColumns = (
             confirmText="Delete"
             cancelText="Cancel"
           />
+
+          <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
+            <MatchDetailsModal data={match} />
+          </Modal>
         </div>
       );
     },

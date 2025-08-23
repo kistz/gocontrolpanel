@@ -1,6 +1,6 @@
 "use client";
 
-import AddHetznerVolumeModal from "@/components/modals/add-hetzner-volume";
+import AddHetznerVolumeModal from "@/components/modals/hetzner/add-hetzner-volume";
 import Modal from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";

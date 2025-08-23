@@ -33,6 +33,7 @@ interface DataTableProps<TData, TValue> {
   actions?: React.ReactNode;
   globalFilter?: string;
   onGlobalFilterChange?: (value: string) => void;
+  className?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +45,7 @@ export function DataTable<TData, TValue>({
   actions,
   globalFilter: globalFilterProp,
   onGlobalFilterChange,
+  className,
 }: DataTableProps<TData, TValue>) {
   const [internalGlobalFilter, setInternalGlobalFilter] = useState("");
 
@@ -77,7 +79,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 overflow-x-auto">
       {(filter || actions) && (
         <div
           className={clsx(
@@ -97,7 +99,7 @@ export function DataTable<TData, TValue>({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-md border flex-1">
+      <div className={clsx("rounded-md border flex-1 [scrollbar-gutter:stable]", className)}>
         <Table>
           <TableHeader className="table-fixed">
             {table.getHeaderGroups().map((headerGroup) => (

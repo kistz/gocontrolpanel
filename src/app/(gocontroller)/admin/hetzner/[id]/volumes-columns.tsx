@@ -3,7 +3,7 @@
 
 import { deleteHetznerVolume } from "@/actions/hetzner/volumes";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import HetznerVolumeDetailsModal from "@/components/modals/hetzner-volume-details";
+import HetznerVolumeDetailsModal from "@/components/modals/hetzner/hetzner-volume-details";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";

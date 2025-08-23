@@ -1,8 +1,8 @@
 import { HetznerVolume } from "@/types/api/hetzner/volumes";
 import { IconX } from "@tabler/icons-react";
 import Flag from "react-world-flags";
-import { Card } from "../ui/card";
-import { DefaultModalProps } from "./default-props";
+import { Card } from "../../ui/card";
+import { DefaultModalProps } from "../default-props";
 
 export default function HetznerVolumeDetailsModal({
   closeModal,

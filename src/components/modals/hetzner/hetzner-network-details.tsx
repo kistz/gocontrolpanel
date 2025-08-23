@@ -1,7 +1,7 @@
 import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { IconX } from "@tabler/icons-react";
-import { Card } from "../ui/card";
-import { DefaultModalProps } from "./default-props";
+import { Card } from "../../ui/card";
+import { DefaultModalProps } from "../default-props";
 
 export default function HetznerNetworkDetailsModal({
   closeModal,

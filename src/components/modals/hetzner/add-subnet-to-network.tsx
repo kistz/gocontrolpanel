@@ -1,16 +1,17 @@
 "use client";
-import AttachHetznerServerToNetworkForm from "@/forms/admin/hetzner/server/attach-hetzner-server-to-network-form";
+import AddSubnetToNetworkForm from "@/forms/admin/hetzner/network/add-subnet-to-network-form";
+import { HetznerNetwork } from "@/types/api/hetzner/networks";
 import { IconX } from "@tabler/icons-react";
-import { Card } from "../ui/card";
-import { DefaultModalProps } from "./default-props";
+import { Card } from "../../ui/card";
+import { DefaultModalProps } from "../default-props";
 
-export default function AttachHetznerServerToNetworkModal({
+export default function AddSubnetToNetworkModal({
   closeModal,
   onSubmit,
   data,
 }: DefaultModalProps<{
   projectId: string;
-  serverId: number;
+  network: HetznerNetwork;
 }>) {
   if (!data) return null;
 
@@ -29,16 +30,16 @@ export default function AttachHetznerServerToNetworkModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Attach Server to Network</h1>
+        <h1 className="text-xl font-bold">Add Subnet to Network</h1>
         <IconX
           className="h-6 w-6 cursor-pointer text-muted-foreground"
           onClick={closeModal}
         />
       </div>
 
-      <AttachHetznerServerToNetworkForm
+      <AddSubnetToNetworkForm
         projectId={data.projectId}
-        serverId={data.serverId}
+        network={data.network}
         callback={handleSubmit}
       />
     </Card>

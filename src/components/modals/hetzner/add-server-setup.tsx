@@ -12,15 +12,15 @@ import { HetznerServer, HetznerServerType } from "@/types/api/hetzner/servers";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Card } from "../ui/card";
+import { Card } from "../../ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { DefaultModalProps } from "./default-props";
+} from "../../ui/select";
+import { DefaultModalProps } from "../default-props";
 
 type Mode = "simple" | "advanced";
 

@@ -6,7 +6,7 @@ import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
-import { Card } from "../ui/card";
+import { Card } from "../../ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -14,16 +14,16 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "../ui/chart";
+} from "../../ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import { DefaultModalProps } from "./default-props";
+} from "../../ui/select";
+import { ToggleGroup, ToggleGroupItem } from "../../ui/toggle-group";
+import { DefaultModalProps } from "../default-props";
 
 type MetricsData = {
   timestamp: number;
