@@ -8,7 +8,11 @@ import { PaginationState } from "@tanstack/react-table";
 
 const matchesMapRecordsSchema = Prisma.validator<Prisma.MatchesInclude>()({
   map: true,
-  records: true,
+  records: {
+    include: {
+      user: true,
+    },
+  },
   _count: {
     select: {
       records: true,
