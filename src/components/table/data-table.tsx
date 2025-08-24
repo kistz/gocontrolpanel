@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
         </div>
       )}
 
-      <div className={clsx("rounded-md border flex-1 [scrollbar-gutter:stable]", className)}>
+      <div className={clsx("rounded-md border flex-1", className)}>
         <Table>
           <TableHeader className="table-fixed">
             {table.getHeaderGroups().map((headerGroup) => (

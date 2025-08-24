@@ -30,12 +30,12 @@ export default function MatchDetailsModal({
         />
       </div>
 
-      <div className="flex gap-4 max-h-4/5 max-w-full">
+      <div className="flex gap-4 flex-1 min-h-0 max-w-full">
         <DataTable
           columns={columns}
           data={data.records}
           pagination
-          className="overflow-y-auto max-h-100"
+          className="overflow-y-auto"
         />
       </div>
     </Card>

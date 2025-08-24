@@ -25,11 +25,13 @@ export const createColumns = (rounds?: boolean): ColumnDef<Records>[] => {
     {
       accessorKey: "checkpoints",
       header: () => <span>Checkpoints</span>,
-      cell: ({ row }) => {
-        row.original.checkpoints.map((cp, i) => (
-          <TimeDisplay key={i} time={cp} />
-        ));
-      },
+      cell: ({ row }) => (
+        <div className="flex gap-2 max-w-32 truncate">
+          {row.original.checkpoints.map((cp, i) => (
+            <TimeDisplay key={i} time={cp} />
+          ))}
+        </div>
+      ),
     },
   ];
 
