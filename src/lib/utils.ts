@@ -167,13 +167,13 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
   return Buffer.from(buffer).toString("base64");
 }
 
-export function getList(list: any): string[] {
+export function getList<T>(list: any): T[] {
   if (Array.isArray(list)) {
-    return list.map(String);
+    return list as T[];
   } else if (typeof list === "string") {
-    return [list];
+    return [list as T];
   } else if (typeof list === "object" && list !== null) {
-    return Object.keys(list);
+    return Object.keys(list) as T[];
   }
   return [];
 }

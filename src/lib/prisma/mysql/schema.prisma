@@ -52,6 +52,7 @@ model Users {
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]
   userServers         UserServers[]
+  records             Records[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,6 +72,9 @@ model Records {
 
   matchId String?
   match   Matches? @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   Users?  @relation(fields: [login], references: [login])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

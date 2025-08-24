@@ -248,3 +248,17 @@ export async function syncPlayers(players: PlayerInfo[]): Promise<void> {
     ),
   );
 }
+
+export async function syncPlayer(player: PlayerInfo): Promise<void> {
+  const db = getClient();
+
+  await db.users.upsert({
+    where: { login: player.login },
+    update: { nickName: player.nickName },
+    create: {
+      login: player.login,
+      nickName: player.nickName,
+      path: "",
+    },
+  });
+}

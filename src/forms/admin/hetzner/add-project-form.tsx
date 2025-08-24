@@ -47,7 +47,7 @@ export default function AddProjectForm({
     try {
       const { error } = await createHetznerProject({
         ...values,
-        apiTokens: getList(values.apiTokens),
+        apiTokens: getList<string>(values.apiTokens),
         hetznerProjectUsers:
           values.hetznerProjectUsers?.map((user) => ({
             userId: user.userId,

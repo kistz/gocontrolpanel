@@ -1,4 +1,4 @@
-import { createMatch } from "@/actions/database/gbx";
+import { createMatch, syncPlayer } from "@/actions/database/gbx";
 import { saveMatchRecord } from "@/actions/database/records";
 import {
   getPlayerInfo,
@@ -410,6 +410,13 @@ async function setupListeners(
 
 async function onPlayerConnect(manager: GbxClientManager, login: string) {
   const playerInfo = await getPlayerInfo(manager.client, login);
+  try {
+    await syncPlayer(playerInfo);
+  } catch (error) {
+    console.error(
+      `Failed to sync player ${playerInfo.login} on connect: ${error}`,
+    );
+  }
   manager.addActivePlayer(playerInfo);
   manager.emit("playerConnect", playerInfo);
 

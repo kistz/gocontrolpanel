@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import TimeDisplay from "@/components/time-display";
 import { Records } from "@/lib/prisma/generated";
+import { getList } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { parseTmTags } from "tmtags";
 
@@ -27,7 +27,7 @@ export const createColumns = (rounds?: boolean): ColumnDef<Records>[] => {
       header: () => <span>Checkpoints</span>,
       cell: ({ row }) => (
         <div className="flex gap-2 max-w-32 truncate">
-          {row.original.checkpoints.map((cp, i) => (
+          {getList<number>(row.original.checkpoints).map((cp, i) => (
             <TimeDisplay key={i} time={cp} />
           ))}
         </div>

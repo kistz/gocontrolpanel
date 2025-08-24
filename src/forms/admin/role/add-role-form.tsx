@@ -20,7 +20,7 @@ export default function AddRoleForm({ callback }: { callback?: () => void }) {
       const { error } = await createRole({
         ...values,
         description: values.description || null,
-        permissions: getList(values.permissions),
+        permissions: getList<string>(values.permissions),
       });
       if (error) {
         throw new Error(error);

@@ -1,4 +1,5 @@
 import { GbxClientManager, getGbxClient } from "@/lib/gbxclient";
+import { Maps } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getKeyJukebox, getRedisClient } from "@/lib/redis";
 import { SMapInfo } from "@/types/gbx/map";
 import { JukeboxMap } from "@/types/map";
@@ -6,8 +7,7 @@ import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
 import { GbxClient } from "@evotm/gbxclient";
 import "server-only";
-import { createMap, getMapByUid } from "../database/gbx";
-import { Maps } from "@/lib/prisma/generated";
+import { createMap, getMapByUid, syncPlayers } from "../database/gbx";
 
 export async function syncPlayerList(manager: GbxClientManager) {
   const playerList = await manager.client.call("GetPlayerList", 1000, 0);
@@ -44,6 +44,7 @@ export async function syncPlayerList(manager: GbxClientManager) {
 
   manager.info.activePlayers = players;
   manager.emit("playerList", players);
+  await syncPlayers(players);
 }
 
 export async function getPlayerInfo(

@@ -2,8 +2,8 @@
 import CreateFileEntryForm from "@/forms/server/files/create-file-entry-form";
 import { FileEntry } from "@/types/filemanager";
 import { IconX } from "@tabler/icons-react";
-import { Card } from "../ui/card";
-import { DefaultModalProps } from "./default-props";
+import { Card } from "../../ui/card";
+import { DefaultModalProps } from "../default-props";
 
 export default function CreateFileEntryModal({
   serverId,

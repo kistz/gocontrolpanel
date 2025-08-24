@@ -2,8 +2,8 @@
 import { ServersWithUsers } from "@/actions/database/servers";
 import EditServerForm from "@/forms/admin/server/edit-server-form";
 import { IconX } from "@tabler/icons-react";
-import { Card } from "../ui/card";
-import { DefaultModalProps } from "./default-props";
+import { Card } from "../../ui/card";
+import { DefaultModalProps } from "../default-props";
 
 export default function EditServerModal({
   closeModal,

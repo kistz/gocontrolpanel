@@ -3,8 +3,8 @@
 import CreateInterfaceForm from "@/forms/server/interface/create-interface-form";
 import { Interfaces } from "@/lib/prisma/generated";
 import { IconX } from "@tabler/icons-react";
-import { Card } from "../ui/card";
-import { DefaultModalProps } from "./default-props";
+import { Card } from "../../ui/card";
+import { DefaultModalProps } from "../default-props";
 
 export default function CreateInterfaceModal({
   serverId,
