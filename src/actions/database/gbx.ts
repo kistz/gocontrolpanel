@@ -2,6 +2,7 @@ import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { Maps, Matches, Prisma, Servers } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
 import "server-only";
 
@@ -202,4 +203,48 @@ export async function getAllServers(): Promise<Servers[]> {
   });
 
   return servers;
+}
+
+export async function syncPlayers(players: PlayerInfo[]): Promise<void> {
+  const db = getClient();
+
+  // Create 2 lists, one with logins that already exist in the database, and one with logins that don't
+  const logins = players.map((p) => p.login);
+  const existingUsers = await db.users.findMany({
+    where: { login: { in: logins } },
+    select: { id: true, login: true, nickName: true },
+  });
+
+  const existingLogins = new Set(existingUsers.map((u) => u.login));
+  const newPlayers = players.filter((p) => !existingLogins.has(p.login));
+
+  // Bulk create new users
+  if (newPlayers.length > 0) {
+    await db.users.createMany({
+      data: newPlayers.map((p) => ({
+        login: p.login,
+        nickName: p.nickName,
+        path: "",
+      })),
+      skipDuplicates: true,
+    });
+  }
+
+  const usersToUpdate = [];
+  // Update nicknames of existing users if they have changed
+  for (const player of players) {
+    const existingUser = existingUsers.find((u) => u.login === player.login);
+    if (existingUser && existingUser.nickName !== player.nickName) {
+      usersToUpdate.push(player);
+    }
+  }
+
+  await Promise.all(
+    usersToUpdate.map((p) =>
+      db.users.update({
+        where: { login: p.login },
+        data: { nickName: p.nickName },
+      }),
+    ),
+  );
 }
