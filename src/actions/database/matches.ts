@@ -10,7 +10,11 @@ const matchesMapRecordsSchema = Prisma.validator<Prisma.MatchesInclude>()({
   map: true,
   records: {
     include: {
-      user: true,
+      user: {
+        select: {
+          nickName: true,
+        },
+      },
     },
   },
   _count: {
@@ -22,6 +26,18 @@ const matchesMapRecordsSchema = Prisma.validator<Prisma.MatchesInclude>()({
 
 export type MatchesWithMapAndRecords = Prisma.MatchesGetPayload<{
   include: typeof matchesMapRecordsSchema;
+}>;
+
+const recordsUsersSchema = Prisma.validator<Prisma.RecordsInclude>()({
+  user: {
+    select: {
+      nickName: true,
+    },
+  },
+});
+
+export type RecordsWithUser = Prisma.RecordsGetPayload<{
+  include: typeof recordsUsersSchema;
 }>;
 
 export async function getMatchesPaginated(

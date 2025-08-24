@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
 
       <div className={clsx("rounded-md border flex-1", className)}>
         <Table>
-          <TableHeader className="table-fixed">
+          <TableHeader className="table-fixed border-b">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
