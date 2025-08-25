@@ -28,6 +28,7 @@ import {
   IconFileDescription,
   IconMap,
   IconServer,
+  IconStopwatch,
   IconUsers,
 } from "@tabler/icons-react";
 import { ChevronRight } from "lucide-react";
@@ -121,6 +122,13 @@ export default function NavGroups() {
                     id: server.id,
                   }),
                   icon: IconActivity,
+                },
+                {
+                  name: "Records",
+                  url: generatePath(routes.servers.records, {
+                    id: server.id,
+                  }),
+                  icon: IconStopwatch,
                 },
                 {
                   name: "Interface",

@@ -33,7 +33,7 @@ export default function EditProjectForm({
     resolver: zodResolver(EditProjectSchema),
     defaultValues: {
       ...project,
-      apiTokens: getList(project.apiTokens),
+      apiTokens: getList<string>(project.apiTokens),
       hetznerProjectUsers: project.hetznerProjectUsers.map((user) => ({
         userId: user.userId,
         role: user.role,
@@ -45,7 +45,7 @@ export default function EditProjectForm({
     try {
       const { error } = await updateHetznerProject(project.id, {
         ...values,
-        apiTokens: getList(values.apiTokens),
+        apiTokens: getList<string>(values.apiTokens),
         hetznerProjectUsers: values.hetznerProjectUsers?.map((user) => ({
           userId: user.userId,
           role: user.role as HetznerProjectRole,

@@ -1,8 +1,13 @@
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
-import { Maps, Prisma } from "@/lib/prisma/generated";
+import { getGbxClient } from "@/lib/gbxclient";
+import { Maps, Matches, Prisma, Servers } from "@/lib/prisma/generated";
+import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import { Waypoint } from "@/types/gbx/waypoint";
+import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
 import "server-only";
+import { getPlayerInfo } from "../gbx/server-only";
 
 const serversPluginsSchema = Prisma.validator<Prisma.ServerPluginsInclude>()({
   plugin: {
@@ -163,4 +168,195 @@ export async function getServerPlugins(
   });
 
   return plugins;
+}
+
+export async function createMatch(
+  serverId: string,
+  mode: string,
+): Promise<Matches> {
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(serverId);
+
+  const activeMap = await redis.get(key);
+  if (!activeMap) {
+    throw new Error(`No active map found for server ${serverId}`);
+  }
+
+  const mapData: Maps = JSON.parse(activeMap);
+  if (!mapData) {
+    throw new Error(`Map data is invalid for server ${serverId}`);
+  }
+
+  const db = getClient();
+  const match = await db.matches.create({
+    data: {
+      mapId: mapData.id,
+      mode,
+      serverId,
+    },
+  });
+
+  return match;
+}
+
+export async function getAllServers(): Promise<Servers[]> {
+  const db = getClient();
+  const servers = await db.servers.findMany({
+    where: { deletedAt: null },
+  });
+
+  return servers;
+}
+
+export async function syncPlayers(players: PlayerInfo[]): Promise<void> {
+  const db = getClient();
+
+  // Create 2 lists, one with logins that already exist in the database, and one with logins that don't
+  const logins = players.map((p) => p.login);
+  const existingUsers = await db.users.findMany({
+    where: { login: { in: logins } },
+    select: { id: true, login: true, nickName: true },
+  });
+
+  const existingLogins = new Set(existingUsers.map((u) => u.login));
+  const newPlayers = players.filter((p) => !existingLogins.has(p.login));
+
+  // Bulk create new users
+  if (newPlayers.length > 0) {
+    await db.users.createMany({
+      data: newPlayers.map((p) => ({
+        login: p.login,
+        nickName: p.nickName,
+        path: "",
+      })),
+      skipDuplicates: true,
+    });
+  }
+
+  const usersToUpdate = [];
+  // Update nicknames of existing users if they have changed
+  for (const player of players) {
+    const existingUser = existingUsers.find((u) => u.login === player.login);
+    if (existingUser && existingUser.nickName !== player.nickName) {
+      usersToUpdate.push(player);
+    }
+  }
+
+  await Promise.all(
+    usersToUpdate.map((p) =>
+      db.users.update({
+        where: { login: p.login },
+        data: { nickName: p.nickName },
+      }),
+    ),
+  );
+}
+
+export async function syncPlayer(player: PlayerInfo): Promise<void> {
+  const db = getClient();
+
+  await db.users.upsert({
+    where: { login: player.login },
+    update: { nickName: player.nickName },
+    create: {
+      login: player.login,
+      nickName: player.nickName,
+      path: "",
+    },
+  });
+}
+
+export async function syncLogin(
+  serverId: string,
+  login: string,
+): Promise<void> {
+  const client = await getGbxClient(serverId);
+  const info = await getPlayerInfo(client, login);
+
+  await syncPlayer(info);
+}
+
+export async function saveMatchRecord(
+  serverId: string,
+  matchId: string | null,
+  waypoint: Waypoint,
+  round: number | null = null,
+): Promise<void> {
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(serverId);
+
+  const activeMap = await redis.get(key);
+  if (!activeMap) {
+    throw new Error(`No active map found for server ${serverId}`);
+  }
+
+  const mapData: Maps = JSON.parse(activeMap);
+  if (!mapData) {
+    throw new Error(`Map data is invalid for server ${serverId}`);
+  }
+
+  const db = getClient();
+
+  const createRecord = async () => {
+    if (matchId !== null && round !== null) {
+      // Only upsert if both matchId and round are provided
+      await db.records.upsert({
+        where: {
+          matchId_login_round: {
+            login: waypoint.login,
+            matchId,
+            round,
+          },
+        },
+        update: {
+          mapId: mapData.id,
+          mapUid: mapData.uid,
+          time: waypoint.racetime,
+          checkpoints: waypoint.curracecheckpoints || [],
+        },
+        create: {
+          mapId: mapData.id,
+          mapUid: mapData.uid,
+          login: waypoint.login,
+          time: waypoint.racetime,
+          checkpoints: waypoint.curracecheckpoints || [],
+          round,
+          matchId,
+          serverId,
+        },
+      });
+    } else {
+      // Otherwise, just create a new record
+      await db.records.create({
+        data: {
+          mapId: mapData.id,
+          mapUid: mapData.uid,
+          login: waypoint.login,
+          time: waypoint.racetime,
+          checkpoints: waypoint.curracecheckpoints || [],
+          round,
+          matchId,
+          serverId,
+        },
+      });
+    }
+  };
+
+  try {
+    await createRecord();
+  } catch (error) {
+    console.error("Error saving record:", error);
+
+    try {
+      await syncLogin(serverId, waypoint.login);
+    } catch (syncError) {
+      console.error("Error syncing login:", syncError);
+
+      await db.users.create({
+        data: { login: waypoint.login, nickName: waypoint.login, path: "" },
+      });
+    }
+  } finally {
+    await createRecord();
+  }
 }

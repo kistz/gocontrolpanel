@@ -6,7 +6,7 @@ import {
 } from "@/actions/database/groups";
 import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditGroupModal from "@/components/modals/edit-group";
+import EditGroupModal from "@/components/modals/groups/edit-group";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";

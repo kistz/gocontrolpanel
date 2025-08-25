@@ -21,7 +21,7 @@ import React, {
   useState,
 } from "react";
 import { toast } from "sonner";
-import CreateInterfaceModal from "../modals/create-interface-modal";
+import CreateInterfaceModal from "../modals/interface/create-interface-modal";
 import Modal from "../modals/modal";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";

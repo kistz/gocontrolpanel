@@ -6,7 +6,7 @@ import { IconPlus, IconTrash, IconUpload } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "../modals/confirm-modal";
-import CreateFileEntryModal from "../modals/create-file-entry";
+import CreateFileEntryModal from "../modals/files/create-file-entry";
 import Modal from "../modals/modal";
 import { Button } from "../ui/button";
 

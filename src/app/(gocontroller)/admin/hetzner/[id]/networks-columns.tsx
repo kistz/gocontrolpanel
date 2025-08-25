@@ -2,11 +2,11 @@
 "use client";
 
 import { deleteHetznerNetwork } from "@/actions/hetzner/networks";
-import AddSubnetToNetworkModal from "@/components/modals/add-subnet-to-network";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import HetznerNetworkDetailsModal from "@/components/modals/hetzner-network-details";
+import AddSubnetToNetworkModal from "@/components/modals/hetzner/add-subnet-to-network";
+import HetznerNetworkDetailsModal from "@/components/modals/hetzner/hetzner-network-details";
+import RemoveSubnetFromNetworkModal from "@/components/modals/hetzner/remove-subnet-from-network";
 import Modal from "@/components/modals/modal";
-import RemoveSubnetFromNetworkModal from "@/components/modals/remove-subnet-from-network";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {

@@ -100,7 +100,7 @@ export async function getHetznerProjectsPaginated(
             ["hetzner:edit", "hetzner:id:admin"],
             project.id,
           )
-            ? getList(project.apiTokens).map((token) =>
+            ? getList<string>(project.apiTokens).map((token) =>
                 decryptHetznerToken(token),
               )
             : Array.from({ length: getList(project.apiTokens).length }, () =>
@@ -125,7 +125,7 @@ export async function createHetznerProject(
     const newProject = await db.hetznerProjects.create({
       data: {
         ...projectData,
-        apiTokens: getList(apiTokens).map((token) =>
+        apiTokens: getList<string>(apiTokens).map((token) =>
           encryptHetznerToken(token),
         ),
         hetznerProjectUsers: {
@@ -140,7 +140,7 @@ export async function createHetznerProject(
 
     return {
       ...newProject,
-      apiTokens: getList(newProject.apiTokens).map((token) =>
+      apiTokens: getList<string>(newProject.apiTokens).map((token) =>
         decryptHetznerToken(token),
       ),
     };
@@ -166,7 +166,7 @@ export async function updateHetznerProject(
         },
         data: {
           ...projectData,
-          apiTokens: getList(apiTokens).map((token) =>
+          apiTokens: getList<string>(apiTokens).map((token) =>
             encryptHetznerToken(token),
           ),
           hetznerProjectUsers: {
@@ -182,7 +182,7 @@ export async function updateHetznerProject(
 
       return {
         ...updatedHetznerProject,
-        apiTokens: getList(updatedHetznerProject.apiTokens).map((token) =>
+        apiTokens: getList<string>(updatedHetznerProject.apiTokens).map((token) =>
           decryptHetznerToken(token),
         ),
       };

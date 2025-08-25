@@ -13,6 +13,7 @@ export const routes = {
     dev: "/server/:id/dev",
     interface: "/server/:id/interface",
     tmx: "/server/:id/tmx",
+    records: "/server/:id/records",
   },
   admin: {
     users: "/admin/users",
@@ -41,6 +42,9 @@ export const routePermissions = {
     files: ["servers:id:admin"],
     interface: ["servers:id:admin"],
     tmx: ["servers:id:moderator", "servers:id:admin"],
+    records: {
+      actions: ["servers:id:moderator", "servers:id:admin"],
+    },
   },
   admin: {
     users: {
@@ -221,6 +225,17 @@ export const breadCrumbs: {
       },
       {
         label: "TMX",
+      },
+    ],
+  },
+  {
+    path: routes.servers.records,
+    breadCrumbs: [
+      {
+        label: "Server",
+      },
+      {
+        label: "Records",
       },
     ],
   },

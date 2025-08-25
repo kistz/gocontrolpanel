@@ -139,7 +139,7 @@ export async function updateUser(
       where: { id: userId },
       data: {
         ...data,
-        permissions: getList(data.permissions),
+        permissions: getList<string>(data.permissions),
       },
     });
   });

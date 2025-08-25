@@ -2,12 +2,12 @@
 "use client";
 
 import { deleteHetznerServer } from "@/actions/hetzner/servers";
-import AttachHetznerServerToNetworkModal from "@/components/modals/attach-hetzner-server-to-network";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import DetachServerFromNetworkModal from "@/components/modals/detach-server-from-network";
-import HetznerDatabaseDetailsModal from "@/components/modals/hetzner-database-details";
-import HetznerServerDetailsModal from "@/components/modals/hetzner-server-details";
-import HetznerServerMetricsModal from "@/components/modals/hetzner-server-metrics";
+import AttachHetznerServerToNetworkModal from "@/components/modals/hetzner/attach-hetzner-server-to-network";
+import DetachServerFromNetworkModal from "@/components/modals/hetzner/detach-server-from-network";
+import HetznerDatabaseDetailsModal from "@/components/modals/hetzner/hetzner-database-details";
+import HetznerServerDetailsModal from "@/components/modals/hetzner/hetzner-server-details";
+import HetznerServerMetricsModal from "@/components/modals/hetzner/hetzner-server-metrics";
 import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";

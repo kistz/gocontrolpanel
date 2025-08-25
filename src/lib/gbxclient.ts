@@ -1,4 +1,8 @@
-import { onPlayerFinish } from "@/actions/gbx/listeners/records";
+import {
+  createMatch,
+  saveMatchRecord,
+  syncPlayer,
+} from "@/actions/database/gbx";
 import {
   getPlayerInfo,
   onPodiumStart,
@@ -36,6 +40,8 @@ export class GbxClientManager extends EventEmitter {
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private listenerMap: Map<string, Record<string, (...args: any[]) => void>> =
     new Map();
+  currentMatchId: string | null = null;
+  roundNumber: number | null = null;
 
   constructor(serverId: string) {
     super();
@@ -63,16 +69,18 @@ export class GbxClientManager extends EventEmitter {
       plugins: [],
     };
 
-    this.client.on("disconnect", () => {
-      if (!this.isConnected) return;
-      console.log(`Disconnected from GBX client for server ${serverId}`);
-      this.isConnected = false;
-      this.emit("disconnect", serverId);
-      this.scheduleReconnect(); // retry on disconnect
-    });
+    this.client.on("disconnect", this.onDisconnect.bind(this));
 
     appGlobals.gbxClients = appGlobals.gbxClients || {};
     appGlobals.gbxClients[serverId] = this;
+  }
+
+  private onDisconnect() {
+    if (!this.isConnected) return;
+    console.log(`Disconnected from GBX client for server ${this.serverId}`);
+    this.isConnected = false;
+    this.emit("disconnect", this.serverId);
+    this.scheduleReconnect(); // retry on disconnect
   }
 
   addListeners(
@@ -97,6 +105,7 @@ export class GbxClientManager extends EventEmitter {
   }
 
   stopReconnect() {
+    this.client.removeListener("disconnect", this.onDisconnect.bind(this));
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = null;
@@ -164,6 +173,10 @@ export class GbxClientManager extends EventEmitter {
     await this.client.call("SetApiVersion", "2023-04-24");
     await this.client.call("EnableCallbacks", true);
     await this.client.callScript("XmlRpc.EnableCallbacks", "true");
+    await this.client.callScript(
+      "Trackmania.Event.SetCurRaceCheckpointsMode",
+      "always",
+    );
 
     await this.client.call("ChatEnableManualRouting", server.manualRouting);
     this.info.chat = {
@@ -279,6 +292,7 @@ export async function deleteGbxClientManager(serverId: string): Promise<void> {
   const manager = appGlobals.gbxClients?.[serverId];
   if (!manager) return;
 
+  manager.emit("disconnect", manager.getServerId());
   manager.removeAllListeners();
   manager.stopReconnect();
 
@@ -339,7 +353,8 @@ async function callbackListener(
           break;
         case "Trackmania.Event.WayPoint":
           if (params.isendrace) {
-            onPlayerFinishScript(manager, serverId, params);
+            saveFinishRecord(manager, serverId, params);
+            onPlayerFinishScript(manager, params);
           } else {
             onPlayerCheckpointScript(manager, params);
           }
@@ -398,6 +413,13 @@ async function setupListeners(
 
 async function onPlayerConnect(manager: GbxClientManager, login: string) {
   const playerInfo = await getPlayerInfo(manager.client, login);
+  try {
+    await syncPlayer(playerInfo);
+  } catch (error) {
+    console.error(
+      `Failed to sync player ${playerInfo.login} on connect: ${error}`,
+    );
+  }
   manager.addActivePlayer(playerInfo);
   manager.emit("playerConnect", playerInfo);
 
@@ -519,13 +541,24 @@ function onPodiumStartScript(_: GbxClientManager, serverId: string) {
   onPodiumStart(serverId);
 }
 
-function onPlayerFinishScript(
+function saveFinishRecord(
   manager: GbxClientManager,
   serverId: string,
   waypoint: Waypoint,
 ) {
-  onPlayerFinish(serverId, waypoint.login, waypoint.racetime);
+  if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
 
+  if (manager.roundNumber === 0) manager.roundNumber = 1;
+
+  saveMatchRecord(
+    serverId,
+    manager.currentMatchId,
+    waypoint,
+    manager.roundNumber,
+  );
+}
+
+function onPlayerFinishScript(manager: GbxClientManager, waypoint: Waypoint) {
   const playerWaypoint = {
     ...manager.info.liveInfo.activeRound?.players?.[waypoint.login],
     login: waypoint.login,
@@ -588,6 +621,9 @@ function onStartMapStartScript(manager: GbxClientManager, startMap: StartMap) {
 }
 
 async function onStartRoundStartScript(manager: GbxClientManager) {
+  if (manager.roundNumber !== null && !manager.info.liveInfo.isWarmUp)
+    manager.roundNumber++;
+
   const playerList: SPlayerInfo[] = await manager.client.call(
     "GetPlayerList",
     1000,
@@ -673,12 +709,23 @@ async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
 function onPauseStatusScript(manager: GbxClientManager, status: PauseStatus) {
   if (status.responseid !== "gocontrolpanel") return;
 
+  if (
+    manager.info.liveInfo.isPaused !== status.active &&
+    manager.roundNumber !== null &&
+    manager.roundNumber > 0
+  ) {
+    manager.roundNumber--;
+  }
+
   manager.info.liveInfo.pauseAvailable = status.available;
   manager.info.liveInfo.isPaused = status.active;
 }
 
 function onBeginMap(manager: GbxClientManager, mapInfo: SMapInfo) {
+  syncMap(manager, manager.getServerId());
+
   manager.info.liveInfo.currentMap = mapInfo.UId;
+  manager.roundNumber = manager.info.liveInfo.type === "timeattack" ? null : 0;
 
   manager.emit("beginMap", mapInfo.UId);
 }
@@ -808,6 +855,13 @@ async function syncLiveInfo(manager: GbxClientManager) {
 
   const matched = types.find((t) => modeLower.includes(t));
   manager.info.liveInfo.type = matched ?? "rounds";
+
+  const match = await createMatch(
+    manager.getServerId(),
+    manager.info.liveInfo.mode,
+  );
+  manager.currentMatchId = match.id;
+  manager.roundNumber = manager.info.liveInfo.type === "timeattack" ? null : 0;
 
   const mapInfo = await manager.client.call("GetCurrentMapInfo");
 

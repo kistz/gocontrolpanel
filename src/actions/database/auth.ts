@@ -118,11 +118,11 @@ export async function upsertUserAuth(
     },
     update: {
       ...user,
-      permissions: getList(user.permissions),
+      permissions: getList<string>(user.permissions),
     },
     create: {
       ...user,
-      permissions: getList(user.permissions),
+      permissions: getList<string>(user.permissions),
     },
     include: includeGroupsWithServers,
   });

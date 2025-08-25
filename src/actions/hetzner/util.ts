@@ -11,7 +11,7 @@ import "server-only";
 
 export async function getApiToken(projectId: string): Promise<string> {
   const project = await getHetznerProject(projectId);
-  const apiTokens = getList(project?.apiTokens);
+  const apiTokens = getList<string>(project?.apiTokens);
 
   if (apiTokens.length === 0) {
     throw new Error("No API tokens found for the Hetzner project.");

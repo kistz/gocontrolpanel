@@ -1,6 +1,6 @@
 "use client";
 
-import AddHetznerNetworkModal from "@/components/modals/add-hetzner-network";
+import AddHetznerNetworkModal from "@/components/modals/hetzner/add-hetzner-network";
 import Modal from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";

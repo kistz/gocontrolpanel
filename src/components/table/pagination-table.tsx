@@ -37,7 +37,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs> {
       field: string;
       order: "asc" | "desc";
     },
-    filter?: string,
+    filter: string,
     fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>;
   args?: TArgs;
@@ -103,7 +103,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
   });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 overflow-x-auto">
       {(filter || actions) && (
         <div
           className={clsx(
@@ -124,7 +124,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-md border flex-1">
+      <div className="rounded-md border flex-1">
         <Table>
           <TableHeader className="table-fixed">
             {table.getHeaderGroups().map((headerGroup) => (

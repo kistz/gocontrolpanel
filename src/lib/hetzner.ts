@@ -69,7 +69,7 @@ export async function getHetznerProject(
 
   return {
     ...hetznerProject,
-    apiTokens: getList(hetznerProject.apiTokens).map((token) =>
+    apiTokens: getList<string>(hetznerProject.apiTokens).map((token) =>
       decryptHetznerToken(token),
     ),
   };

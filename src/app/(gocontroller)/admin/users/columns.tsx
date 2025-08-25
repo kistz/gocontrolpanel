@@ -4,8 +4,8 @@
 import { deleteUserById } from "@/actions/database/users";
 import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditUserModal from "@/components/modals/edit-user";
 import Modal from "@/components/modals/modal";
+import EditUserModal from "@/components/modals/users/edit-user";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {

@@ -50,7 +50,7 @@ export default function EditUserForm({
     resolver: zodResolver(EditUserSchema),
     defaultValues: {
       admin: user.admin,
-      permissions: getList(user.permissions),
+      permissions: getList<string>(user.permissions),
     },
   });
 
@@ -58,7 +58,7 @@ export default function EditUserForm({
     try {
       const { error } = await updateUser(user.id, {
         admin: values.admin,
-        permissions: getList(values.permissions),
+        permissions: getList<string>(values.permissions),
       });
       if (error) {
         throw new Error(error);
@@ -129,7 +129,7 @@ export default function EditUserForm({
             variant="outline"
             className="w-full"
             onClick={() => {
-              form.setValue("permissions", getList(selectedRole?.permissions));
+              form.setValue("permissions", getList<string>(selectedRole?.permissions));
             }}
           >
             <IconClipboardPlus />

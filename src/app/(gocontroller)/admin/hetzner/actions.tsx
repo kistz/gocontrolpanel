@@ -1,7 +1,7 @@
 "use client";
 
-import AddProjectModal from "@/components/modals/add-project";
 import Modal from "@/components/modals/modal";
+import AddProjectModal from "@/components/modals/projects/add-project";
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 
