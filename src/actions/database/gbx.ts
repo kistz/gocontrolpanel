@@ -1,10 +1,12 @@
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
+import { getGbxClient } from "@/lib/gbxclient";
 import { Maps, Matches, Prisma, Servers } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
 import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
 import "server-only";
+import { getPlayerInfo } from "../gbx/server-only";
 
 const serversPluginsSchema = Prisma.validator<Prisma.ServerPluginsInclude>()({
   plugin: {
@@ -261,4 +263,14 @@ export async function syncPlayer(player: PlayerInfo): Promise<void> {
       path: "",
     },
   });
+}
+
+export async function syncLogin(
+  serverId: string,
+  login: string,
+): Promise<void> {
+  const client = await getGbxClient(serverId);
+  const info = await getPlayerInfo(client, login);
+
+  await syncPlayer(info);
 }
