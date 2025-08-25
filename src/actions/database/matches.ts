@@ -28,6 +28,7 @@ export type MatchesWithMapAndRecords = Prisma.MatchesGetPayload<{
   include: typeof matchesMapRecordsSchema;
 }>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const recordsUsersSchema = Prisma.validator<Prisma.RecordsInclude>()({
   user: {
     select: {
