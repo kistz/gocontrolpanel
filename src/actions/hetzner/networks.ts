@@ -118,7 +118,7 @@ export async function getAllNetworks(
   projectId: string,
 ): Promise<ServerResponse<HetznerNetwork[]>> {
   return doServerActionWithAuth(
-    ["hetzner:servers:view", `hetzner:${projectId}:moderator`],
+    ["hetzner:servers:view", `hetzner:${projectId}:moderator`, `hetzner:${projectId}:admin`],
     async () => {
       const token = await getApiToken(projectId);
 
