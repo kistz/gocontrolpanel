@@ -1,6 +1,3 @@
--- DropForeignKey
-ALTER TABLE "records" DROP CONSTRAINT "records_login_fkey";
-
 -- AlterTable
 ALTER TABLE "records" ALTER COLUMN "login" DROP NOT NULL;
 
