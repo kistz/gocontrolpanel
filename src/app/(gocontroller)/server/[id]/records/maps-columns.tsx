@@ -17,9 +17,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { parseTmTags } from "tmtags";
 
-export const createMapsColumns = (
-  refetch: () => void,
-): ColumnDef<MapsWithRecords>[] => [
+export const createMapsColumns = (): ColumnDef<MapsWithRecords>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
