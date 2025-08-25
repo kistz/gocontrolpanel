@@ -50,9 +50,7 @@ export const createMatchesColumns = (
   },
   {
     accessorKey: "_count.records",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Records"} />
-    ),
+    header: () => <span>Records</span>,
   },
   {
     accessorKey: "createdAt",

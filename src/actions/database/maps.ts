@@ -217,11 +217,17 @@ export async function getMapRecordsPaginated(
     async () => {
       const db = getClient();
 
+      const { data: serverMaps, error } = await getMapList(fetchArgs.serverId);
+      if (error) {
+        throw new ServerError(error);
+      }
+
       const maps = await db.maps.findMany({
         skip: pagination.pageIndex * pagination.pageSize,
         take: pagination.pageSize,
         orderBy: { [sorting.field]: sorting.order },
         where: {
+          id: { in: serverMaps.map((m) => m.id) },
           deletedAt: null,
           OR: [
             { name: { contains: filter } },
@@ -235,6 +241,7 @@ export async function getMapRecordsPaginated(
 
       const totalCount = await db.maps.count({
         where: {
+          id: { in: serverMaps.map((m) => m.id) },
           deletedAt: null,
           OR: [
             { name: { contains: filter } },

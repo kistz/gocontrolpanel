@@ -42,16 +42,12 @@ export const createMapsColumns = (
   },
   {
     accessorKey: "records",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Records"} />
-    ),
+    header: () => <span>Records</span>,
     cell: ({ row }) => row.original.records.length,
   },
   {
-    accessorKey: "records.0.time",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Local Record"} />
-    ),
+    accessorKey: "records.time",
+    header: () => <span>Local Record</span>,
     cell: ({ row }) => (
       <TimeDisplay time={row.original.records[0]?.time ?? null} />
     ),
