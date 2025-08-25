@@ -2,7 +2,6 @@
 
 import { RecordsWithUser } from "@/actions/database/matches";
 import TimeDisplay from "@/components/time-display";
-import { getList } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { parseTmTags } from "tmtags";
 

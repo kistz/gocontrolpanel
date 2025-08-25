@@ -1,5 +1,8 @@
-import { createMatch, syncPlayer } from "@/actions/database/gbx";
-import { saveMatchRecord } from "@/actions/database/records";
+import {
+  createMatch,
+  saveMatchRecord,
+  syncPlayer,
+} from "@/actions/database/gbx";
 import {
   getPlayerInfo,
   onPodiumStart,

@@ -129,11 +129,6 @@ export default function NavGroups() {
                     id: server.id,
                   }),
                   icon: IconStopwatch,
-                  auth: hasPermissionSync(
-                    session,
-                    routePermissions.servers.records,
-                    server.id,
-                  ),
                 },
                 {
                   name: "Interface",

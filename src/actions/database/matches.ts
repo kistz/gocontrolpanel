@@ -54,8 +54,12 @@ export async function getMatchesPaginated(
 
   return doServerActionWithAuth(
     [
+      `servers:${fetchArgs.serverId}:member`,
       `servers:${fetchArgs.serverId}:moderator`,
       `servers:${fetchArgs.serverId}:admin`,
+      `group:servers:${fetchArgs.serverId}:member`,
+      `group:servers:${fetchArgs.serverId}:moderator`,
+      `group:servers:${fetchArgs.serverId}:admin`,
     ],
     async () => {
       const db = getClient();
@@ -106,12 +110,15 @@ export async function deleteMatch(
   serverId: string,
   matchId: string,
 ): Promise<ServerResponse<void>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const db = getClient();
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const db = getClient();
 
-    await db.matches.update({
-      where: { id: matchId },
-      data: { deletedAt: new Date() },
-    });
-  });
+      await db.matches.update({
+        where: { id: matchId },
+        data: { deletedAt: new Date() },
+      });
+    },
+  );
 }

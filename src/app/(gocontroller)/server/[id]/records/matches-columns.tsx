@@ -16,14 +16,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { routePermissions } from "@/routes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createColumns = (
+export const createMatchesColumns = (
   refetch: () => void,
 ): ColumnDef<MatchesWithMapAndRecords>[] => [
   {
@@ -70,11 +72,23 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const match = row.original;
+      const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
+      const canActions = hasPermissionSync(
+        session,
+        routePermissions.servers.records.actions,
+        match.serverId,
+      );
+
       const handleDelete = () => {
+        if (!canActions) {
+          toast.error("You do not have permission to delete this match");
+          return;
+        }
+
         startTransition(async () => {
           try {
             const { error } = await deleteMatch(match.serverId, match.id);
@@ -104,25 +118,31 @@ export const createColumns = (
               <DropdownMenuItem onClick={() => setIsOpen(true)}>
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsDeleteOpen(true)}
-              >
-                Delete Match
-              </DropdownMenuItem>
+              {canActions && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setIsDeleteOpen(true)}
+                  >
+                    Delete Match
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ConfirmModal
-            isOpen={isDeleteOpen}
-            onClose={() => setIsDeleteOpen(false)}
-            title="Delete Match"
-            description="Are you sure you want to delete this match?"
-            onConfirm={handleDelete}
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
+          {canActions && (
+            <ConfirmModal
+              isOpen={isDeleteOpen}
+              onClose={() => setIsDeleteOpen(false)}
+              title="Delete Match"
+              description="Are you sure you want to delete this match?"
+              onConfirm={handleDelete}
+              confirmText="Delete"
+              cancelText="Cancel"
+            />
+          )}
 
           <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
             <MatchDetailsModal data={match} />

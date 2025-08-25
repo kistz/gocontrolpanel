@@ -42,7 +42,9 @@ export const routePermissions = {
     files: ["servers:id:admin"],
     interface: ["servers:id:admin"],
     tmx: ["servers:id:moderator", "servers:id:admin"],
-    records: ["servers:id:moderator", "servers:id:admin"],
+    records: {
+      actions: ["servers:id:moderator", "servers:id:admin"],
+    },
   },
   admin: {
     users: {

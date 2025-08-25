@@ -1,10 +1,9 @@
+import { getMapRecordsPaginated } from "@/actions/database/maps";
 import { getMatchesPaginated } from "@/actions/database/matches";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { hasPermission } from "@/lib/auth";
-import { routePermissions, routes } from "@/routes";
-import { redirect } from "next/navigation";
-import { createColumns } from "./columns";
+import { createMapsColumns } from "./maps-columns";
+import { createMatchesColumns } from "./matches-columns";
 
 export default async function ServerRecordsPage({
   params,
@@ -12,11 +11,6 @@ export default async function ServerRecordsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  const canView = await hasPermission(routePermissions.servers.records, id);
-  if (!canView) {
-    redirect(routes.dashboard);
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -30,12 +24,22 @@ export default async function ServerRecordsPage({
       <Tabs defaultValue="matches" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="matches">Matches</TabsTrigger>
+          <TabsTrigger value="maps">Maps</TabsTrigger>
         </TabsList>
 
         <TabsContent value="matches" className="flex flex-col gap-2">
           <PaginationTable
-            createColumns={createColumns}
+            createColumns={createMatchesColumns}
             fetchData={getMatchesPaginated}
+            fetchArgs={{ serverId: id }}
+            filter
+          />
+        </TabsContent>
+
+        <TabsContent value="maps" className="flex flex-col gap-2">
+          <PaginationTable
+            createColumns={createMapsColumns}
+            fetchData={getMapRecordsPaginated}
             fetchArgs={{ serverId: id }}
             filter
           />

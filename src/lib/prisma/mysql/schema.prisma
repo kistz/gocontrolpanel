@@ -61,19 +61,22 @@ model Users {
 }
 
 model Records {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   mapId       String
-  map         Maps   @relation(fields: [mapId], references: [id])
+  map         Maps    @relation(fields: [mapId], references: [id])
   login       String?
   mapUid      String
   time        Int
   round       Int?
-  checkpoints Json   @default("[]")
+  checkpoints Json    @default("[]")
 
   matchId String?
   match   Matches? @relation(fields: [matchId], references: [id], onDelete: Cascade)
 
-  user   Users?  @relation(fields: [login], references: [login])
+  user Users? @relation(fields: [login], references: [login])
+
+  serverId String?
+  server   Servers? @relation(fields: [serverId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -188,6 +191,7 @@ model Servers {
   userServers   UserServers[]
   serverPlugins ServerPlugins[]
   matches       Matches[]
+  records       Records[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
