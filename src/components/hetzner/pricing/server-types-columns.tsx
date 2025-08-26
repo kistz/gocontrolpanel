@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { getCurrencySymbol } from "@/lib/utils";
