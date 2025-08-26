@@ -2,26 +2,46 @@ name: Deploy gocontrolpanel.com
 
 on:
   workflow_call:
-  
+  pull_request:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-    - name: SSH into server and deploy
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          cd /hosted/gocontrolpanel-com &&
-          docker compose pull gocontrolpanel &&
-          docker compose up -d gocontrolpanel
-        "
+      - name: SSH into server, backup DB, and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            set +e  # Don't exit on errors
+
+            # Move into deployment folder first
+            cd /hosted/gocontrolpanel-com || exit 0
+
+            # Variables
+            BACKUP_FILE=db-backup-$(date +%F).sql
+            DB_CONTAINER='${{ secrets.DB_CONTAINER_NAME }}'
+
+            echo 'Starting database backup from container:' \$DB_CONTAINER
+
+            # Run mysqldump if container exists and is running
+            if [ \$(docker ps -q -f name=^/\$DB_CONTAINER\$) ]; then
+              docker exec -i \$DB_CONTAINER mysqldump -u root -p'\$MYSQL_ROOT_PASSWORD' gocontrolpanel > \$BACKUP_FILE
+              echo 'Database backup saved to:' \$BACKUP_FILE
+            else
+              echo 'Database container not running. Skipping backup.'
+            fi
+
+            # Pull new image and restart container
+            docker compose pull gocontrolpanel
+            docker compose up -d gocontrolpanel
+          "
