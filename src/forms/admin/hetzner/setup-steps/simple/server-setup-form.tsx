@@ -56,6 +56,7 @@ export default function SimpleServerSetupForm({
   });
 
   const controllerSelected = form.watch("server.controller");
+  const selectedController = form.watch("serverController.type");
 
   useEffect(() => {
     if (!controllerSelected) {
@@ -108,6 +109,23 @@ export default function SimpleServerSetupForm({
     }
   };
 
+  const filterDatabaseOnControllerType = (db: HetznerServer) => {
+    if (!selectedController) return true;
+
+    switch (selectedController) {
+      case "evosc":
+      case "pyplanet":
+      case "maniacontrol":
+        return ["mariadb", "mysql"].includes(db.labels["database.type"]);
+      case "minicontrol":
+        return ["mariadb", "mysql", "postgres"].includes(
+          db.labels["database.type"],
+        );
+      default:
+        return true;
+    }
+  };
+
   return (
     <Tabs value={step} onValueChange={() => {}} className="w-full gap-3">
       <TabsList className="w-full">
@@ -152,7 +170,7 @@ export default function SimpleServerSetupForm({
             form={form}
             onNext={nextStep}
             onBack={previousStep}
-            databases={databases}
+            databases={databases.filter(filterDatabaseOnControllerType)}
             serverTypes={serverTypes}
           />
         </TabsContent>
