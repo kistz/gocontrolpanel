@@ -39,9 +39,9 @@ export default function ServerTypesPricing({
     <Card className="p-4 gap-4">
       <div className="flex justify-between items-end">
         <div className="flex flex-col">
-          <h2 className="text-lg font-bold">Server Types</h2>
+          <h2 className="text-lg font-bold">Servers</h2>
           <p className="text-sm text-muted-foreground">
-            Overview of all available server types and their pricing.
+            Overview of all available servers and their pricing.
           </p>
         </div>
 
