@@ -73,7 +73,7 @@ export async function createRole(
     const newRole = await db.roles.create({
       data: {
         ...role,
-        permissions: getList(role.permissions),
+        permissions: getList<string>(role.permissions),
       },
     });
 
@@ -92,7 +92,7 @@ export async function updateRole(
       where: { id: roleId },
       data: {
         ...role,
-        permissions: getList(role.permissions),
+        permissions: getList<string>(role.permissions),
       },
     });
 

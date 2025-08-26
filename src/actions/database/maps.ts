@@ -3,11 +3,38 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClient } from "@/lib/gbxclient";
-import { Maps } from "@/lib/prisma/generated";
+import { Maps, Prisma } from "@/lib/prisma/generated";
 import { SMapInfo } from "@/types/gbx/map";
 import { MapInfoMinimal } from "@/types/map";
-import { ServerError, ServerResponse } from "@/types/responses";
+import {
+  PaginationResponse,
+  ServerError,
+  ServerResponse,
+} from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
+
+const mapsRecordsSchema = (serverId?: string) =>
+  Prisma.validator<Prisma.MapsInclude>()({
+    records: {
+      where: {
+        serverId,
+      },
+      distinct: ["login"],
+      orderBy: [{ time: "asc" }, { createdAt: "asc" }],
+      include: {
+        user: {
+          select: {
+            nickName: true,
+          },
+        },
+      },
+    },
+  });
+
+export type MapsWithRecords = Prisma.MapsGetPayload<{
+  include: ReturnType<typeof mapsRecordsSchema>;
+}>;
 
 export async function getMapByUid(
   uid: string,
@@ -162,6 +189,73 @@ export async function getMapList(
         .filter((map: Maps | null): map is Maps => map !== null);
 
       return orderedMaps;
+    },
+  );
+}
+
+export async function getMapRecordsPaginated(
+  pagination: PaginationState,
+  sorting: { field: string; order: "asc" | "desc" },
+  filter: string,
+  fetchArgs?: {
+    serverId: string;
+  },
+): Promise<ServerResponse<PaginationResponse<MapsWithRecords>>> {
+  if (!fetchArgs?.serverId) {
+    throw new ServerError("Server ID is required to fetch maps records.");
+  }
+
+  return doServerActionWithAuth(
+    [
+      `servers:${fetchArgs.serverId}:member`,
+      `servers:${fetchArgs.serverId}:moderator`,
+      `servers:${fetchArgs.serverId}:admin`,
+      `group:servers:${fetchArgs.serverId}:member`,
+      `group:servers:${fetchArgs.serverId}:moderator`,
+      `group:servers:${fetchArgs.serverId}:admin`,
+    ],
+    async () => {
+      const db = getClient();
+
+      const { data: serverMaps, error } = await getMapList(fetchArgs.serverId);
+      if (error) {
+        throw new ServerError(error);
+      }
+
+      const maps = await db.maps.findMany({
+        skip: pagination.pageIndex * pagination.pageSize,
+        take: pagination.pageSize,
+        orderBy: { [sorting.field]: sorting.order },
+        where: {
+          id: { in: serverMaps.map((m) => m.id) },
+          deletedAt: null,
+          OR: [
+            { name: { contains: filter } },
+            {
+              authorNickname: { contains: filter },
+            },
+          ],
+        },
+        include: mapsRecordsSchema(fetchArgs.serverId),
+      });
+
+      const totalCount = await db.maps.count({
+        where: {
+          id: { in: serverMaps.map((m) => m.id) },
+          deletedAt: null,
+          OR: [
+            { name: { contains: filter } },
+            {
+              authorNickname: { contains: filter },
+            },
+          ],
+        },
+      });
+
+      return {
+        data: maps,
+        totalCount,
+      };
     },
   );
 }

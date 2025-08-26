@@ -108,7 +108,7 @@ export default function MapInfo({
           </span>
           <span className="text-sm truncate">{mode}</span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 font-bold text-sm">
             <IconStopwatch size={20} /> Author Time:
           </span>

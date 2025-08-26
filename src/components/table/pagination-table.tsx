@@ -37,7 +37,7 @@ interface PaginationTableProps<TData, TValue, TArgs, TFetch, TActionArgs> {
       field: string;
       order: "asc" | "desc";
     },
-    filter?: string,
+    filter: string,
     fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>;
   args?: TArgs;
@@ -124,7 +124,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-md border flex-1">
+      <div className="rounded-md border flex-1 overflow-x-auto">
         <Table>
           <TableHeader className="table-fixed">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -153,7 +153,7 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="table-fixed min-h-12"
+                  className="table-fixed h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

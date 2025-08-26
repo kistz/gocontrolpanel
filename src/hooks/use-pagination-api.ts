@@ -14,7 +14,7 @@ export const usePaginationAPI = <TData, TFetch>(
   fetchData: (
     pagination: PaginationState,
     sorting: { field: string; order: "asc" | "desc" },
-    filter?: string,
+    filter: string,
     fetchArgs?: TFetch,
   ) => Promise<ServerResponse<PaginationResponse<TData>>>,
   pagination: PaginationState,

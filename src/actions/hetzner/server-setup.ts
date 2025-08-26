@@ -31,6 +31,7 @@ export async function createAdvancedServerSetup(
       if (data.database?.new) {
         data.database = {
           ...data.database,
+          databaseName: data.database.databaseName || data.database.name || data.server.name,
           databaseRootPassword:
             data.database.databaseRootPassword || generateRandomString(16),
           databaseUser: data.database.databaseUser || generateRandomString(16),
@@ -138,7 +139,7 @@ export async function createAdvancedServerSetup(
             network?.databaseIp ||
             "",
           port: database?.databaseType === "postgres" ? 5432 : 3306,
-          name: database?.databaseName,
+          name: database?.databaseName || database?.name || data.server.name,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
           root_password:
@@ -248,6 +249,7 @@ export async function createSimpleServerSetup(
       if (data.database?.new) {
         data.database = {
           ...data.database,
+          databaseName: data.database.databaseName || data.database.name || data.server.name,
           databaseType: "mysql",
           databaseRootPassword: generateRandomString(16),
           databaseUser: generateRandomString(16),
@@ -309,7 +311,7 @@ export async function createSimpleServerSetup(
           type: database?.databaseType || "mysql",
           host: database?.databaseIp || "10.0.0.2",
           port: database?.databaseType === "postgres" ? 5432 : 3306,
-          name: database?.databaseName,
+          name: database?.databaseName || database?.name || data.server.name,
           user: database?.databaseUser || generateRandomString(16),
           password: database?.databasePassword || generateRandomString(16),
           root_password:

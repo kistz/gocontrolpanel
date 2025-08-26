@@ -3,8 +3,8 @@
 
 import { deleteRole } from "@/actions/database/roles";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditRoleModal from "@/components/modals/edit-role";
 import Modal from "@/components/modals/modal";
+import EditRoleModal from "@/components/modals/roles/edit-role";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {

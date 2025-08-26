@@ -22,7 +22,7 @@ export default function EditRoleForm({
     defaultValues: {
       name: role.name,
       description: role.description || "",
-      permissions: getList(role.permissions),
+      permissions: getList<string>(role.permissions),
     },
   });
 
@@ -31,7 +31,7 @@ export default function EditRoleForm({
       const { error } = await updateRole(role.id, {
         ...values,
         description: values.description || null,
-        permissions: getList(values.permissions),
+        permissions: getList<string>(values.permissions),
       });
       if (error) {
         throw new Error(error);

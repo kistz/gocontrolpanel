@@ -5,7 +5,9 @@ import { PrismaClient } from "./prisma/generated";
 export function getClient(): PrismaClient {
   if (!appGlobals.prisma) {
     try {
-      appGlobals.prisma = new PrismaClient();
+      appGlobals.prisma = new PrismaClient({
+        errorFormat: "minimal",
+      });
       console.log("Prisma client initialized");
       return appGlobals.prisma;
     } catch (error) {

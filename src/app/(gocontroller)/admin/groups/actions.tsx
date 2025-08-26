@@ -1,6 +1,6 @@
 "use client";
 
-import AddGroupModal from "@/components/modals/add-group";
+import AddGroupModal from "@/components/modals/groups/add-group";
 import Modal from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";

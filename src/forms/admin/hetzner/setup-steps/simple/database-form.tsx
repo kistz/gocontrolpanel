@@ -195,7 +195,6 @@ export default function DatabaseForm({
             name={"database.databaseName"}
             label="Database Name"
             placeholder="Enter database name"
-            isRequired
           />
         </div>
       ) : (

@@ -5,8 +5,8 @@ import {
   HetznerProjectsWithUsers,
 } from "@/actions/database/hetzner-projects";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditProjectModal from "@/components/modals/edit-project";
 import Modal from "@/components/modals/modal";
+import EditProjectModal from "@/components/modals/projects/edit-project";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {

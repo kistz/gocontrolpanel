@@ -27,6 +27,7 @@ model Maps {
   uploadCheck  DateTime?
 
   records Records[]
+  matches Matches[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -51,6 +52,7 @@ model Users {
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]
   userServers         UserServers[]
+  records             Records[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,17 +61,28 @@ model Users {
 }
 
 model Records {
-  id     String @id @default(uuid())
-  mapId  String
-  map    Maps   @relation(fields: [mapId], references: [id])
-  login  String
-  mapUid String
-  time   Int
+  id          String  @id @default(uuid())
+  mapId       String
+  map         Maps    @relation(fields: [mapId], references: [id])
+  login       String?
+  mapUid      String
+  time        Int
+  round       Int?
+  checkpoints Int[]   @default([])
+
+  matchId String?
+  match   Matches? @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  user Users? @relation(fields: [login], references: [login])
+
+  serverId String?
+  server   Servers? @relation(fields: [serverId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  @@unique([matchId, login, round])
   @@index([deletedAt])
   @@index([mapId])
   @@map("records")
@@ -177,6 +190,8 @@ model Servers {
   groupServers  GroupServers[]
   userServers   UserServers[]
   serverPlugins ServerPlugins[]
+  matches       Matches[]
+  records       Records[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -307,4 +322,24 @@ model HetznerServers {
 
   @@index([deletedAt])
   @@map("hetzner_servers")
+}
+
+model Matches {
+  id    String @id @default(uuid())
+  mapId String
+  map   Maps   @relation(fields: [mapId], references: [id])
+  mode  String
+
+  records Records[]
+
+  serverId String
+  server   Servers @relation(fields: [serverId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@index([mapId])
+  @@map("matches")
 }

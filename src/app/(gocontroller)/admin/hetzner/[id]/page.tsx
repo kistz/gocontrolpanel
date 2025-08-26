@@ -1,9 +1,13 @@
+import { getHetznerLocations } from "@/actions/hetzner/locations";
 import { getHetznerNetworksPaginated } from "@/actions/hetzner/networks";
+import { getHetznerPricing } from "@/actions/hetzner/pricing";
+import { getServerTypes } from "@/actions/hetzner/server-types";
 import {
   getHetznerServersPaginated,
   getRateLimit,
 } from "@/actions/hetzner/servers";
 import { getHetznerVolumesPaginated } from "@/actions/hetzner/volumes";
+import ServerTypesPricing from "@/components/hetzner/pricing/server-types";
 import { PaginationTable } from "@/components/table/pagination-table";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,6 +43,9 @@ export default async function ProjectPage({
   );
 
   const { data: rateLimit } = await getRateLimit(id);
+  const { data: pricing } = await getHetznerPricing(id);
+  const { data: serverTypes } = await getServerTypes(id);
+  const { data: locations } = await getHetznerLocations(id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -74,6 +81,7 @@ export default async function ProjectPage({
           <TabsTrigger value="servers">Servers</TabsTrigger>
           <TabsTrigger value="networks">Networks</TabsTrigger>
           <TabsTrigger value="volumes">Volumes</TabsTrigger>
+          <TabsTrigger value="pricing">Pricing</TabsTrigger>
         </TabsList>
 
         <TabsContent value="servers" className="flex flex-col gap-2">
@@ -115,6 +123,14 @@ export default async function ProjectPage({
             actionsAllowed={canCreate}
             sortingField="id"
             filter
+          />
+        </TabsContent>
+
+        <TabsContent value="pricing" className="flex flex-col gap-4">
+          <ServerTypesPricing
+            serverTypes={serverTypes}
+            currency={pricing.currency}
+            locations={locations}
           />
         </TabsContent>
       </Tabs>

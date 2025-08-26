@@ -1,7 +1,7 @@
 "use client";
 
-import AddRoleModal from "@/components/modals/add-role";
 import Modal from "@/components/modals/modal";
+import AddRoleModal from "@/components/modals/roles/add-role";
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 
