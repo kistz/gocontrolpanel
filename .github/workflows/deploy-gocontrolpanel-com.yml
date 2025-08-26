@@ -34,7 +34,7 @@ jobs:
 
             # Backup if container exists and running
             if [ \$(docker ps -q -f name=^/${{ secrets.DB_CONTAINER_NAME }}\$) ]; then
-              docker exec -i ${{ secrets.DB_CONTAINER_NAME }} mysqldump -u root -p'${{ secrets.MYSQL_ROOT_PASSWORD }}' gocontrolpanel > \$BACKUP_FILE
+              docker exec -i ${{ secrets.DB_CONTAINER_NAME }} mysqldump --column-statistics=0 -u root -p'${{ secrets.MYSQL_ROOT_PASSWORD }}' gocontrolpanel > \$BACKUP_FILE
               echo 'Database backup saved to:' \$BACKUP_FILE
             else
               echo 'Database container not running. Skipping backup.'
