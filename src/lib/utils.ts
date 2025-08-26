@@ -341,3 +341,48 @@ export function hasPermissionsJWTSync(
 
   return permissions.some((permission) => userPermissions.includes(permission));
 }
+
+export function getCurrencySymbol(currency: string): string {
+  switch (currency.toUpperCase()) {
+    case "EUR":
+      return "€";
+    case "USD":
+      return "$";
+    case "GBP":
+      return "£";
+    case "JPY":
+    case "CNY":
+      return "¥";
+    case "INR":
+      return "₹";
+    case "AUD":
+      return "A$";
+    case "CAD":
+      return "C$";
+    case "CHF":
+      return "Fr.";
+    case "KRW":
+      return "₩";
+    case "RUB":
+      return "₽";
+    case "BRL":
+      return "R$";
+    case "ZAR":
+      return "R";
+    case "HKD":
+      return "HK$";
+    case "NZD":
+      return "NZ$";
+    case "SEK":
+    case "NOK":
+      return "kr";
+    case "SGD":
+      return "S$";
+    case "MXN":
+      return "Mex$";
+    case "TRY":
+      return "₺";
+    default:
+      return currency;
+  }
+}
