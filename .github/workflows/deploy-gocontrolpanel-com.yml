@@ -2,7 +2,6 @@ name: Deploy gocontrolpanel.com
 
 on:
   workflow_call:
-  pull_request:
   
 jobs:
   deploy:
@@ -23,6 +22,6 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
           cd /hosted/gocontrolpanel-com &&
-          ls -la &&
-          docker ps
+          docker compose pull gocontrolpanel &&
+          docker compose up -d gocontrolpanel
         "
