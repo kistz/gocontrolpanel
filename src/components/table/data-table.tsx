@@ -63,7 +63,7 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
@@ -123,12 +123,18 @@ export function DataTable<TData, TValue>({
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {(pagination
+              ? table.getRowModel().rows
+              : table.getPrePaginationRowModel().rows
+            )?.length ? (
+              (pagination
+                ? table.getRowModel().rows
+                : table.getPrePaginationRowModel().rows
+              ).map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="table-fixed min-h-12"
+                  className="table-fixed h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

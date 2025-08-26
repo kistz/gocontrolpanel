@@ -14,7 +14,12 @@ export async function getHetznerLocations(
   projectId: string,
 ): Promise<ServerResponse<HetznerLocation[]>> {
   return doServerActionWithAuth(
-    ["hetzner:servers:create", `hetzner:${projectId}:admin`],
+    [
+      "hetzner:servers:view",
+      "hetzner:servers:create",
+      `hetzner:${projectId}:moderator`,
+      `hetzner:${projectId}:admin`,
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyHetznerLocations();
