@@ -2,7 +2,6 @@ name: Deploy gocontrolpanel.com
 
 on:
   workflow_call:
-  pull_request:
 
 jobs:
   deploy:
@@ -41,6 +40,6 @@ jobs:
             fi
 
             # Pull latest image and restart container
-            #docker compose pull gocontrolpanel
-            #docker compose up -d gocontrolpanel
+            docker compose pull gocontrolpanel
+            docker compose up -d gocontrolpanel
           "
