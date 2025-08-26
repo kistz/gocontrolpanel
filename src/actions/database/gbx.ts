@@ -356,7 +356,7 @@ export async function saveMatchRecord(
         data: { login: waypoint.login, nickName: waypoint.login, path: "" },
       });
     }
-  } finally {
+
     await createRecord();
   }
 }
