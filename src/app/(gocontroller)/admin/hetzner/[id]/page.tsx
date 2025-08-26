@@ -127,15 +127,11 @@ export default async function ProjectPage({
         </TabsContent>
 
         <TabsContent value="pricing" className="flex flex-col gap-4">
-          {!pricing ? (
-            <span>Pricing is not available.</span>
-          ) : (
-            <ServerTypesPricing
-              serverTypes={serverTypes}
-              currency={pricing.currency}
-              locations={locations}
-            />
-          )}
+          <ServerTypesPricing
+            serverTypes={serverTypes}
+            currency={pricing.currency}
+            locations={locations}
+          />
         </TabsContent>
       </Tabs>
 
