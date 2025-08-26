@@ -130,13 +130,11 @@ export default async function ProjectPage({
           {!pricing ? (
             <span>Pricing is not available.</span>
           ) : (
-            <>
-              <ServerTypesPricing
-                serverTypes={serverTypes}
-                currency={pricing.currency}
-                locations={locations}
-              />
-            </>
+            <ServerTypesPricing
+              serverTypes={serverTypes}
+              currency={pricing.currency}
+              locations={locations}
+            />
           )}
         </TabsContent>
       </Tabs>
