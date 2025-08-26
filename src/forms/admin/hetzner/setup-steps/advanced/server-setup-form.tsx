@@ -61,6 +61,7 @@ export default function AdvancedServerSetupForm({
   });
 
   const controllerSelected = form.watch("server.controller");
+  const selectedController = form.watch("serverController.type");
   const localDatabase = form.watch("database.local");
 
   useEffect(() => {
@@ -130,6 +131,23 @@ export default function AdvancedServerSetupForm({
     }
   };
 
+  const filterDatabaseOnControllerType = (db: HetznerServer) => {
+    if (!selectedController) return true;
+
+    switch (selectedController) {
+      case "evosc":
+      case "pyplanet":
+      case "maniacontrol":
+        return ["mariadb", "mysql"].includes(db.labels["database.type"]);
+      case "minicontrol":
+        return ["mariadb", "mysql", "postgres"].includes(
+          db.labels["database.type"],
+        );
+      default:
+        return true;
+    }
+  };
+
   return (
     <Tabs value={step} onValueChange={() => {}} className="w-full gap-3">
       <TabsList className="w-full">
@@ -178,7 +196,7 @@ export default function AdvancedServerSetupForm({
             form={form}
             onNext={nextStep}
             onBack={previousStep}
-            databases={databases}
+            databases={databases.filter(filterDatabaseOnControllerType)}
             serverTypes={serverTypes}
             locations={locations}
             serverController={form.watch("serverController.type")}

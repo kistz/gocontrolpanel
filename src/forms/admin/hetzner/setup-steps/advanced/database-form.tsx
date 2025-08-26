@@ -115,12 +115,8 @@ export default function DatabaseForm({
   let databaseOptions = [];
   switch (serverController) {
     case "evosc":
-      databaseOptions = [
-        { value: "mysql", label: "MySQL" },
-        { value: "mariadb", label: "MariaDB" },
-      ];
-      break;
     case "maniacontrol":
+    case "pyplanet":
       databaseOptions = [
         { value: "mysql", label: "MySQL" },
         { value: "mariadb", label: "MariaDB" },
@@ -130,12 +126,6 @@ export default function DatabaseForm({
       databaseOptions = [
         { value: "mysql", label: "MySQL" },
         { value: "postgres", label: "PostgreSQL" },
-        { value: "mariadb", label: "MariaDB" },
-      ];
-      break;
-    case "pyplanet":
-      databaseOptions = [
-        { value: "mysql", label: "MySQL" },
         { value: "mariadb", label: "MariaDB" },
       ];
       break;
@@ -331,7 +321,6 @@ export default function DatabaseForm({
               name={"database.databaseName"}
               label="Database Name"
               placeholder="Enter database name"
-              isRequired
             />
 
             <FormElement

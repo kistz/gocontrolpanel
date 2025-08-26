@@ -1,7 +1,7 @@
 "use client";
 
-import AddServerModal from "@/components/modals/servers/add-server";
 import Modal from "@/components/modals/modal";
+import AddServerModal from "@/components/modals/servers/add-server";
 import { Button } from "@/components/ui/button";
 import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { IconPlus } from "@tabler/icons-react";
