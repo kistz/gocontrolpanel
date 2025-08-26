@@ -134,7 +134,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="table-fixed min-h-12"
+                  className="table-fixed h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
