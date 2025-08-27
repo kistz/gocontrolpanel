@@ -11,10 +11,13 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
     - [Maps Management](#maps-management)
     - [Player Management](#player-management)
     - [Live Match](#live-match)
-    - [Files Management](#files-management)
+    - [Records and Matches](#records-and-matches)
     - [Interface Editor](#interface-editor)
+    - [Trackmania Exchange](#trackmania-exchange)
+    - [Files Management](#files-management)
     - [User Management](#user-management)
     - [Group Management](#group-management)
+    - [Role Management](#role-management)
     - [Server Management](#server-management)
     - [Hetzner Management](#hetzner-management)
 - [Docker Setup](#docker-setup)
@@ -29,82 +32,119 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
 
 # Overview
 
-**GoControlPanel** is a management panel designed for dedicated Trackmania servers. It provides an easy-to-use interface for managing server settings, players andd maps. The panel can be run as a standalone service or integrated with other server controllers like **PyPlanet** or **EvoSC**.
+**GoControlPanel** is a management panel designed for dedicated Trackmania servers. It provides an easy-to-use interface for managing server settings, players and maps. The panel can be run as a standalone service or integrated with other server controllers like **PyPlanet** or **EvoSC**.
 
 ## Features
 
-**Server Settings**
+#### Server Settings
 
 Manage your general server settings like the server name, password, and other configurations.
 
-![Settings Page](https://i.imgur.com/iguu7Az.png "Settings Page")
+![Settings Page](https://i.imgur.com/39jLVUl.png "Settings Page")
 
-**Game Management**
+#### Game Management
 
 Manage your game settings, this includes map management and mode settings.
 
-![Game Page](https://i.imgur.com/23ZazeQ.png "Game Page")
-![Mode Settings Page](https://i.imgur.com/VeDGg0x.png "Mode Settings Page")
+![Game Page](https://i.imgur.com/Njkxu0n.png "Game Page")
+![Mode Settings Page](https://i.imgur.com/wgIn7Cn.png "Mode Settings Page")
 
-**Maps Management**
+#### Maps Management
 
 Manage your maps, including adding local maps, changing map order and a jukebox.
 
-![Maps Page](https://i.imgur.com/ptCwgvj.png "Maps Page")
-![Map Jukebox Page](https://i.imgur.com/lVazn2e.png "Map Jukebox Page")
+![Maps Page](https://i.imgur.com/5f1zr3E.png "Maps Page")
+![Local Maps Page](https://i.imgur.com/9HLf64R.png "Local Maps Page")
+![Map Jukebox Page](https://i.imgur.com/5jgNjiD.png "Map Jukebox Page")
 
-**Player Management**
+#### Player Management
 
 Manage your players, including banning players and managing blacklists and guestlists.
 
-![Players Page](https://i.imgur.com/hreZiWz.png "Players Page")
+![Players Page](https://i.imgur.com/A6PDwWd.png "Players Page")
+![Blacklist Page](https://i.imgur.com/9VEFLUB.png "Blacklist Page")
 
-**Live Match**
+#### Live Match
 
 Monitor live matches, including player scores and match status.
 
-![Live Match Page](https://i.imgur.com/YN2o70M.png "Live Match Page")
+![Live Match Page](https://i.imgur.com/huDKrEA.png "Live Match Page")
 
-**Files Management**
+#### Records and Matches
+
+View past matches and records, including player scores and match details.
+
+![Matches Page](https://i.imgur.com/ZoAdmhQ.png "Matches Page")
+![Match Details Page](https://i.imgur.com/aiqEsGw.png "Match Details Page")
+
+#### Interface Editor
+
+Edit the interface of your server, create your own interface (still in development), manage chat message formatting and manage server plugins.
+
+![Interface Editor Page](https://i.imgur.com/yhoEIya.png "Interface Editor Page")
+![Chat Message Editor Page](https://i.imgur.com/atcNlLt.png "Chat Message Editor Page")
+![Plugins Page](https://i.imgur.com/QKagvtZ.png "Plugins Page")
+
+#### Trackmania Exchange
+
+Browse and download maps or mappacks directly from Trackmania Exchange.
+
+![Trackmania Exchange Maps Page](https://i.imgur.com/EVD3CX0.png "Trackmania Exchange Maps Page")
+![Trackmania Exchange Mappacks Page](https://i.imgur.com/n4HLkGV.png "Trackmania Exchange Mappacks Page")
+
+#### Files Management
 
 Manage your server files, including uploading, deleting and editing files.
 
-![Files Page](https://i.imgur.com/gN4Tt0W.png "Files Page")
-![File Editor Page](https://i.imgur.com/TEaogHH.png "File Editor Page")
+![Files Page](https://i.imgur.com/eGqC4Oc.png "Files Page")
+![File Editor Page](https://i.imgur.com/Siday3M.png "File Editor Page")
 
-**Interface Editor**
+#### User Management
 
-Edit the interface of your server, create your own interface (still in development) and manage chat message formatting.
+Manage users by modifying roles and permissions.
 
-![Interface Editor Page](https://i.imgur.com/sqmN4VB.png "Interface Editor Page")
-![Chat Message Editor Page](https://i.imgur.com/NPPVIez.png "Chat Message Editor Page")
+![User Management Page](https://i.imgur.com/eoErrI2.png "User Management Page")
+![User Details Page](https://i.imgur.com/1hG1tUJ.png "User Details Page")
 
-**User Management**
-
-Manage users, including adding new users, managing roles and permissions.
-
-![User Management Page](https://i.imgur.com/aOoWkWl.png "User Management Page")
-
-**Group Management**
+#### Group Management
 
 Manage groups, including adding new groups, managing group permissions and roles.
 
-![Group Management Page](https://i.imgur.com/rbWYZ6a.png "Group Management Page")
+![Group Management Page](https://i.imgur.com/qxyYNV7.png "Group Management Page")
+![Group Details Page](https://i.imgur.com/1WMpo4Y.png "Group Details Page")
 
-**Server Management**
+#### Role Management
+
+Manage roles, including adding new roles and managing role permissions.
+
+![Role Management Page](https://i.imgur.com/NlqVj6P.png "Role Management Page")
+![Role Details Page](https://i.imgur.com/SfCvMNc.png "Role Details Page")
+
+#### Server Management
 
 Manage your servers, add new servers and configure the server settings.
 
-![Server Management Page](https://i.imgur.com/3XMGL6m.png "Server Management Page")
+![Server Management Page](https://i.imgur.com/opiwnKL.png "Server Management Page")
+![Add Server Page](https://i.imgur.com/6XDqmlk.png "Add Server Page")
 
-**Hetzner Management**
+#### Hetzner Management
 
-Manage your Hetzner Cloud servers, including creating, deleting and managing servers.
+Manage your Hetzner Cloud servers, networks and volumes. You can create and delete Trackmania servers directly from the panel.
 
-![Hetzner Management Page](https://i.imgur.com/rJNWz31.png "Hetzner Management Page")
-![Hetzner Servers Page](https://i.imgur.com/iuFuFvQ.png "Hetzner Servers Page")
-![Hetzner Server Details Page](https://i.imgur.com/KAFo9P0.png "Hetzner Server Details Page")
-![Hetzner Server Create Page](https://i.imgur.com/gvI5x4W.png "Hetzner Server Create Page")
+![Hetzner Management Page](https://i.imgur.com/9Joq5dK.png "Hetzner Management Page")
+![Hetzner Details Page](https://i.imgur.com/miUGWWj.png "Hetzner Details Page")
+
+![Hetzner Servers Page](https://i.imgur.com/dWYLLyT.png "Hetzner Servers Page")
+![Hetzner Server Details Page](https://i.imgur.com/N7jfF9f.png "Hetzner Server Details Page")
+![Hetzner Server Metrics Page](https://i.imgur.com/PApEtYb.png "Hetzner Server Metrics Page")
+![Hetzner Server Pricing Page](https://i.imgur.com/u8rflrh.png "Hetzner Server Pricing Page")
+
+![Hetzner Database Create Page](https://i.imgur.com/xB8H67G.png "Hetzner Database Create Page")
+![Hetzner Server Create Page](https://i.imgur.com/o5YPNqL.png "Hetzner Server Create Page")
+![Hetzner Server Create Page Controller Step](https://i.imgur.com/LnS03St.png "Hetzner Server Create Page Controller Step")
+![Hetzner Server Create Page Database Step](https://i.imgur.com/AH4Ixvp.png "Hetzner Server Create Page Database Step")
+![Hetzner Server Create Page Network Step](https://i.imgur.com/f4mEhuJ.png "Hetzner Server Create Page Network Step")
+![Hetzner Server Create Page Summary Step](https://i.imgur.com/oPUo7aC.png "Hetzner Server Create Page Summary Step")
 
 # Docker Setup
 
