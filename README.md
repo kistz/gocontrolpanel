@@ -36,20 +36,20 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
 
 ## Features
 
-**Server Settings**
+#### Server Settings
 
 Manage your general server settings like the server name, password, and other configurations.
 
 ![Settings Page](https://i.imgur.com/39jLVUl.png "Settings Page")
 
-**Game Management**
+#### Game Management
 
 Manage your game settings, this includes map management and mode settings.
 
 ![Game Page](https://i.imgur.com/Njkxu0n.png "Game Page")
 ![Mode Settings Page](https://i.imgur.com/wgIn7Cn.png "Mode Settings Page")
 
-**Maps Management**
+#### Maps Management
 
 Manage your maps, including adding local maps, changing map order and a jukebox.
 
@@ -57,27 +57,27 @@ Manage your maps, including adding local maps, changing map order and a jukebox.
 ![Local Maps Page](https://i.imgur.com/9HLf64R.png "Local Maps Page")
 ![Map Jukebox Page](https://i.imgur.com/5jgNjiD.png "Map Jukebox Page")
 
-**Player Management**
+#### Player Management
 
 Manage your players, including banning players and managing blacklists and guestlists.
 
 ![Players Page](https://i.imgur.com/A6PDwWd.png "Players Page")
 ![Blacklist Page](https://i.imgur.com/9VEFLUB.png "Blacklist Page")
 
-**Live Match**
+#### Live Match
 
 Monitor live matches, including player scores and match status.
 
 ![Live Match Page](https://i.imgur.com/huDKrEA.png "Live Match Page")
 
-**Records and Matches**
+#### Records and Matches
 
 View past matches and records, including player scores and match details.
 
 ![Matches Page](https://i.imgur.com/ZoAdmhQ.png "Matches Page")
 ![Match Details Page](https://i.imgur.com/aiqEsGw.png "Match Details Page")
 
-**Interface Editor**
+#### Interface Editor
 
 Edit the interface of your server, create your own interface (still in development), manage chat message formatting and manage server plugins.
 
@@ -85,49 +85,49 @@ Edit the interface of your server, create your own interface (still in developme
 ![Chat Message Editor Page](https://i.imgur.com/atcNlLt.png "Chat Message Editor Page")
 ![Plugins Page](https://i.imgur.com/QKagvtZ.png "Plugins Page")
 
-**Trackmania Exchange**
+#### Trackmania Exchange
 
 Browse and download maps or mappacks directly from Trackmania Exchange.
 
 ![Trackmania Exchange Maps Page](https://i.imgur.com/EVD3CX0.png "Trackmania Exchange Maps Page")
 ![Trackmania Exchange Mappacks Page](https://i.imgur.com/n4HLkGV.png "Trackmania Exchange Mappacks Page")
 
-**Files Management**
+#### Files Management
 
 Manage your server files, including uploading, deleting and editing files.
 
 ![Files Page](https://i.imgur.com/eGqC4Oc.png "Files Page")
 ![File Editor Page](https://i.imgur.com/Siday3M.png "File Editor Page")
 
-**User Management**
+#### User Management
 
 Manage users by modifying roles and permissions.
 
 ![User Management Page](https://i.imgur.com/eoErrI2.png "User Management Page")
 ![User Details Page](https://i.imgur.com/1hG1tUJ.png "User Details Page")
 
-**Group Management**
+#### Group Management
 
 Manage groups, including adding new groups, managing group permissions and roles.
 
 ![Group Management Page](https://i.imgur.com/qxyYNV7.png "Group Management Page")
 ![Group Details Page](https://i.imgur.com/1WMpo4Y.png "Group Details Page")
 
-**Role Management**
+#### Role Management
 
 Manage roles, including adding new roles and managing role permissions.
 
 ![Role Management Page](https://i.imgur.com/NlqVj6P.png "Role Management Page")
 ![Role Details Page](https://i.imgur.com/SfCvMNc.png "Role Details Page")
 
-**Server Management**
+#### Server Management
 
 Manage your servers, add new servers and configure the server settings.
 
 ![Server Management Page](https://i.imgur.com/opiwnKL.png "Server Management Page")
 ![Add Server Page](https://i.imgur.com/6XDqmlk.png "Add Server Page")
 
-**Hetzner Management**
+#### Hetzner Management
 
 Manage your Hetzner Cloud servers, networks and volumes. You can create and delete Trackmania servers directly from the panel.
 
