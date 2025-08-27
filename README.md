@@ -32,7 +32,7 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
 
 # Overview
 
-**GoControlPanel** is a management panel designed for dedicated Trackmania servers. It provides an easy-to-use interface for managing server settings, players andd maps. The panel can be run as a standalone service or integrated with other server controllers like **PyPlanet** or **EvoSC**.
+**GoControlPanel** is a management panel designed for dedicated Trackmania servers. It provides an easy-to-use interface for managing server settings, players and maps. The panel can be run as a standalone service or integrated with other server controllers like **PyPlanet** or **EvoSC**.
 
 ## Features
 
