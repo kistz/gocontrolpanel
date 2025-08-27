@@ -11,10 +11,13 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
     - [Maps Management](#maps-management)
     - [Player Management](#player-management)
     - [Live Match](#live-match)
-    - [Files Management](#files-management)
+    - [Records and Matches](#records-and-matches)
     - [Interface Editor](#interface-editor)
+    - [Trackmania Exchange](#trackmania-exchange)
+    - [Files Management](#files-management)
     - [User Management](#user-management)
     - [Group Management](#group-management)
+    - [Role Management](#role-management)
     - [Server Management](#server-management)
     - [Hetzner Management](#hetzner-management)
 - [Docker Setup](#docker-setup)
@@ -87,7 +90,7 @@ Edit the interface of your server, create your own interface (still in developme
 Browse and download maps or mappacks directly from Trackmania Exchange.
 
 ![Trackmania Exchange Maps Page](https://i.imgur.com/EVD3CX0.png "Trackmania Exchange Maps Page")
-![Trackmania Exchange Mappacks Page](https://i.imgur.com/XCnW8Dn.png "Trackmania Exchange Mappacks Page")
+![Trackmania Exchange Mappacks Page](https://i.imgur.com/n4HLkGV.png "Trackmania Exchange Mappacks Page")
 
 **Files Management**
 
