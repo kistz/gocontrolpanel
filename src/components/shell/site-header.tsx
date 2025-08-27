@@ -4,6 +4,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { generatePath } from "@/lib/utils";
 import { breadCrumbs } from "@/routes";
 import {
+  IconBook,
   IconBrandDiscord,
   IconBrandGithub,
   IconCoffee,
@@ -69,6 +70,12 @@ export function SiteHeader() {
         <Breadcrumbs crumbs={activeBreadCrumbs} className="min-w-0 flex-1" />
 
         <div className="ml-auto flex gap-2 lg:gap-4">
+          <Link
+            href="https://github.com/MRegterschot/gocontrolpanel/wiki"
+            target="_blank"
+          >
+            <IconBook />
+          </Link>
           <Link href="https://discord.gg/NjbtRvbCY8" target="_blank">
             <IconBrandDiscord />
           </Link>
