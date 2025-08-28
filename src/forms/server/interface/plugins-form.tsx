@@ -3,12 +3,14 @@
 import { ServerPluginsWithPlugin } from "@/actions/database/gbx";
 import { updateServerPlugins } from "@/actions/database/server-plugins";
 import FormElement from "@/components/form/form-element";
+import EcircuitmaniaPluginModal from "@/components/modals/interface/plugins/ecircuitmania-plugin-modal";
+import Modal from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Plugins } from "@/lib/prisma/generated";
 import { getErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconSettings } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PluginsSchema, PluginsSchemaType } from "./plugins-schema";
@@ -65,7 +67,7 @@ export default function PluginsForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-6"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           <FormElement
             name="admin.enabled"
             label="Admin Plugin"
@@ -78,7 +80,15 @@ export default function PluginsForm({
             label="eCircuitMania Plugin"
             type="checkbox"
             description="A plugin to integrate with the eCircuitMania API. This plugin will automatically send match data to eCircuitMania."
-          />
+          >
+            <Modal>
+              <EcircuitmaniaPluginModal />
+              <Button variant={"outline"} type="button">
+                <IconSettings />
+                Configure
+              </Button>
+            </Modal>
+          </FormElement>
         </div>
 
         <Button
