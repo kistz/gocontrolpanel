@@ -65,12 +65,21 @@ export default function PluginsForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-6"
       >
-        <FormElement
-          name="admin.enabled"
-          label="Admin Plugin"
-          type="checkbox"
-          description="Allows players to notify an admin with the /admin command."
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <FormElement
+            name="admin.enabled"
+            label="Admin Plugin"
+            type="checkbox"
+            description="Allows players to notify an admin with the /admin command."
+          />
+
+          <FormElement
+            name="ecm.enabled"
+            label="eCircuitMania Plugin"
+            type="checkbox"
+            description="A plugin to integrate with the eCircuitMania API. This plugin will automatically send match data to eCircuitMania."
+          />
+        </div>
 
         <Button
           type="submit"
