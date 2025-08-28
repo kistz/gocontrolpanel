@@ -1,7 +1,7 @@
 "use client";
 
 import { ServerPluginsWithPlugin } from "@/actions/database/gbx";
-import { updateServerPlugins } from "@/actions/database/servers";
+import { updateServerPlugins } from "@/actions/database/server-plugins";
 import FormElement from "@/components/form/form-element";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -23,8 +23,13 @@ export default function PluginsForm({
   plugins: Plugins[];
 }) {
   const defaultValues: PluginsSchemaType = plugins.reduce((acc, plg) => {
-    acc[plg.name as keyof PluginsSchemaType] =
+    if (!acc[plg.name as keyof PluginsSchemaType]) {
+      acc[plg.name as keyof PluginsSchemaType] = { enabled: false, config: {} };
+    }
+
+    acc[plg.name as keyof PluginsSchemaType].enabled =
       serverPlugins.find((sp) => sp.pluginId === plg.id)?.enabled ?? false;
+
     return acc;
   }, {} as PluginsSchemaType);
 
@@ -39,7 +44,8 @@ export default function PluginsForm({
         serverId,
         plugins.map((p) => ({
           pluginId: p.id,
-          enabled: values[p.name as keyof PluginsSchemaType] ?? false,
+          enabled: values[p.name as keyof PluginsSchemaType].enabled ?? false,
+          config: values[p.name as keyof PluginsSchemaType].config,
         })),
       );
       if (error) {
@@ -60,7 +66,7 @@ export default function PluginsForm({
         className="flex flex-col gap-6"
       >
         <FormElement
-          name="admin"
+          name="admin.enabled"
           label="Admin Plugin"
           type="checkbox"
           description="Allows players to notify an admin with the /admin command."
