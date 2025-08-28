@@ -1,4 +1,4 @@
-export interface DriverFinishArgs {
+export interface ECMDriverFinishArgs {
   finishTime: number; // In milliseconds, -1 if DNF
   ubisoftUid: string; // Account ID
   roundNum: number;
@@ -6,7 +6,7 @@ export interface DriverFinishArgs {
   matchId: string;
 }
 
-export interface RoundEndArgs {
+export interface ECMRoundEndArgs {
   players: {
     finishTime: number; // In milliseconds, -1 if DNF
     ubisoftUid: string; // Account ID
