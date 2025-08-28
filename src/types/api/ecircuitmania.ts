@@ -3,7 +3,6 @@ export interface ECMDriverFinishArgs {
   ubisoftUid: string; // Account ID
   roundNum: number;
   mapId: string; // Map UID
-  matchId: string;
 }
 
 export interface ECMRoundEndArgs {
@@ -14,5 +13,4 @@ export interface ECMRoundEndArgs {
   }[];
   roundNum: number;
   mapId: string; // Map UID
-  matchId: string;
 }

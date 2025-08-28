@@ -6,23 +6,52 @@ import "server-only";
 import { axiosECM } from "../axios/ecircuitmania";
 
 export async function ecmOnDriverFinish(
-  serverId: string,
+  apiKey: string,
   body: ECMDriverFinishArgs,
 ): Promise<void> {
-  await axiosECM.post("/match-addRoundTime", body, {
-    headers: {
-      Authorization: serverId,
+  const { matchId, authToken } = getMatchIdAndAuthToken(apiKey);
+
+  await axiosECM.post(
+    "/match-addRoundTime",
+    {
+      ...body,
+      matchId,
     },
-  });
+    {
+      headers: {
+        Authorization: authToken,
+      },
+    },
+  );
 }
 
 export async function ecmOnRoundEnd(
-  serverId: string,
+  apiKey: string,
   body: ECMRoundEndArgs,
 ): Promise<void> {
-  await axiosECM.post("/match-addRound", body, {
-    headers: {
-      Authorization: serverId,
+  const { matchId, authToken } = getMatchIdAndAuthToken(apiKey);
+
+  await axiosECM.post(
+    "/match-addRound",
+    {
+      ...body,
+      matchId,
     },
-  });
+    {
+      headers: {
+        Authorization: authToken,
+      },
+    },
+  );
+}
+
+function getMatchIdAndAuthToken(apiKey: string): {
+  matchId: string;
+  authToken: string;
+} {
+  const [matchId, authToken] = apiKey.split("_");
+  if (!matchId || !authToken) {
+    throw new Error("Invalid ECM API key");
+  }
+  return { matchId, authToken };
 }
