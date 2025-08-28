@@ -28,11 +28,11 @@ export async function updateServerPlugins(
           serverId,
           pluginId: p.pluginId,
           enabled: p.enabled,
-          config: p.config ? JSON.stringify(p.config) : undefined,
+          config: p.config,
         },
         update: {
           enabled: p.enabled,
-          config: p.config ? JSON.stringify(p.config) : undefined,
+          config: p.config,
         },
       }),
     );

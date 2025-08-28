@@ -25,12 +25,17 @@ export default function PluginsForm({
   plugins: Plugins[];
 }) {
   const defaultValues: PluginsSchemaType = plugins.reduce((acc, plg) => {
-    if (!acc[plg.name as keyof PluginsSchemaType]) {
-      acc[plg.name as keyof PluginsSchemaType] = { enabled: false, config: {} };
-    }
+    const sp = serverPlugins.find((sp) => sp.pluginId === plg.id);
 
-    acc[plg.name as keyof PluginsSchemaType].enabled =
-      serverPlugins.find((sp) => sp.pluginId === plg.id)?.enabled ?? false;
+    acc[plg.name as keyof PluginsSchemaType] = sp
+      ? {
+          ...sp,
+          config: sp.config || {},
+        }
+      : {
+          enabled: false,
+          config: {},
+        };
 
     return acc;
   }, {} as PluginsSchemaType);

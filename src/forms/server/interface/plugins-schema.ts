@@ -12,8 +12,8 @@ export const PluginsSchema = z.object({
         .string()
         .optional()
         .refine(
-          (val) => !val || (val.match(/_/g)?.length ?? 0) <= 1,
-          "apiKey may contain at most one underscore",
+          (val) => !val || (val.match(/_/g)?.length ?? 0) === 1,
+          "API key must contain one underscore",
         ),
     }),
   }),
