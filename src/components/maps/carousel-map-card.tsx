@@ -21,6 +21,7 @@ import { Card } from "../ui/card";
 interface CarouselMapCardProps {
   map: Maps;
   index: number;
+  currentIndex?: number;
   isCurrent?: boolean;
   isSwitching?: boolean;
   total: number;
@@ -32,6 +33,7 @@ interface CarouselMapCardProps {
 export default function CarouselMapCard({
   map,
   index,
+  currentIndex = 0,
   isCurrent = false,
   isSwitching = false,
   total,
@@ -129,6 +131,14 @@ export default function CarouselMapCard({
             fill
             alt={map.name}
             className="static! rounded-t-lg h-40! object-cover"
+            loading={
+              isCurrent ||
+              (index > currentIndex && index <= currentIndex + 5) ||
+              (currentIndex + 5 >= total && index <= (currentIndex + 5) % total)
+                ? "eager"
+                : "lazy"
+            }
+            priority={isCurrent}
           />
         ) : (
           <div className="w-full h-40 rounded-t-lg flex items-center justify-center">
