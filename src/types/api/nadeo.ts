@@ -202,3 +202,80 @@ export interface ClubActivitiesResponse {
   maxPage: number;
   itemCount: number;
 }
+
+export interface Club {
+  id: number;
+  name: string;
+  tag: string;
+  description: string;
+  authorAccountId: string;
+  latestEditorAccountId: string;
+  iconUrl: string;
+  iconUrlPngLarge: string;
+  iconUrlPngMedium: string;
+  iconUrlPngSmall: string;
+  iconUrlDds: string;
+  logoUrl: string;
+  decalUrl: string;
+  decalUrlPngLarge: string;
+  decalUrlPngMedium: string;
+  decalUrlPngSmall: string;
+  decalUrlDds: string;
+  screen16x9Url: string;
+  screen16x9UrlPngLarge: string;
+  screen16x9UrlPngMedium: string;
+  screen16x9UrlPngSmall: string;
+  screen16x9UrlDds: string;
+  screen64x41Url: string;
+  screen64x41UrlPngLarge: string;
+  screen64x41UrlPngMedium: string;
+  screen64x41UrlPngSmall: string;
+  screen64x41UrlDds: string;
+  decalSponsor4x1Url: string;
+  decalSponsor4x1UrlPngLarge: string;
+  decalSponsor4x1UrlPngMedium: string;
+  decalSponsor4x1UrlPngSmall: string;
+  decalSponsor4x1UrlDds: string;
+  screen8x1Url: string;
+  screen8x1UrlPngLarge: string;
+  screen8x1UrlPngMedium: string;
+  screen8x1UrlPngSmall: string;
+  screen8x1UrlDds: string;
+  screen16x1Url: string;
+  screen16x1UrlPngLarge: string;
+  screen16x1UrlPngMedium: string;
+  screen16x1UrlPngSmall: string;
+  screen16x1UrlDds: string;
+  verticalUrl: string;
+  verticalUrlPngLarge: string;
+  verticalUrlPngMedium: string;
+  verticalUrlPngSmall: string;
+  verticalUrlDds: string;
+  backgroundUrl: string;
+  backgroundUrlPngLarge: string;
+  backgroundUrlPngMedium: string;
+  backgroundUrlPngSmall: string;
+  backgroundUrlDds: string;
+  creationTimestamp: number;
+  popularityLevel: number;
+  state: string;
+  featured: boolean;
+  walletUid: string;
+  metadata: string;
+  editionTimestamp: number;
+  iconTheme: string;
+  decalTheme: string;
+  screen16x9Theme: string;
+  screen64x41Theme: string;
+  screen8x1Theme: string;
+  screen16x1Theme: string;
+  verticalTheme: string;
+  backgroundTheme: string;
+  verified: boolean;
+}
+
+export interface ClubListResponse {
+  clubList: Club[];
+  maxPage: number;
+  clubCount: number;
+}

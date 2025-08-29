@@ -4,6 +4,7 @@ import {
   ClubActivitiesResponse,
   ClubCampaign,
   ClubCampaignsResponse,
+  ClubListResponse,
   MapInfo,
   MonthMapListResponse,
   NadeoTokens,
@@ -202,6 +203,17 @@ export async function getClubCampaign(
 ): Promise<ClubCampaign> {
   const url = `${LIVE_URL}/api/token/club/${clubId}/campaign/${campaignId}`;
   return await doRequest<ClubCampaign>(url, "NadeoLiveServices");
+}
+
+export async function getClubs(
+  length: number = 1,
+  offset: number = 0,
+  name: string = "",
+): Promise<ClubListResponse> {
+  const url = `${LIVE_URL}/api/token/club?length=${length}&offset=${offset}&name=${encodeURIComponent(
+    name,
+  )}`;
+  return await doRequest<ClubListResponse>(url, "NadeoLiveServices");
 }
 
 export async function doRequest<T>(
