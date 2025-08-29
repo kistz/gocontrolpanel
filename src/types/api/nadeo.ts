@@ -76,7 +76,7 @@ export interface MonthMapListResponse {
   relativeNextRequest: number;
 }
 
-export interface SeasonalCampaign {
+export interface Campaign {
   id: number;
   seasonUid: string;
   name: string;
@@ -101,7 +101,14 @@ export interface SeasonalCampaign {
 
 export interface SeasonalCampaignsResponse {
   itemCount: number;
-  campaignList: SeasonalCampaign[];
+  campaignList: Campaign[];
+  nextRequestTimestamp: number;
+  relativeNextRequest: number;
+}
+
+export interface ShortsCampaignsResponse {
+  itemCount: number;
+  campaignList: Campaign[];
   nextRequestTimestamp: number;
   relativeNextRequest: number;
 }

@@ -1,12 +1,13 @@
 import config from "@/lib/config";
 import {
   AccountNames,
+  Campaign,
   MapInfo,
   MonthMapList,
   MonthMapListResponse,
   NadeoTokens,
-  SeasonalCampaign,
   SeasonalCampaignsResponse,
+  ShortsCampaignsResponse,
   TrackmaniaCredentials,
   WebIdentity,
 } from "@/types/api/nadeo";
@@ -16,7 +17,7 @@ import { doServerAction } from "../actions";
 import { withRateLimit } from "../ratelimiter";
 import { getRedisClient } from "../redis";
 
-const TOKEN_KEY = "nadeo:tokens";
+const getTokenKey = (audience: string) => `nadeo:tokens:${audience}`;
 const CREDENTIALS_TOKEN_KEY = "nadeo:credentials_token";
 
 const PROD_URL = "https://prod.trackmania.core.nadeo.online";
@@ -55,7 +56,7 @@ export async function authenticate(
   const redis = await getRedisClient();
 
   const tokens: NadeoTokens = await response.json();
-  await redis.set(TOKEN_KEY, JSON.stringify(tokens), "EX", 3600); // Store tokens for 1 hour
+  await redis.set(getTokenKey(audience), JSON.stringify(tokens), "EX", 3600); // Store tokens for 1 hour
   return tokens;
 }
 
@@ -103,9 +104,11 @@ export async function authenticateCredentials(): Promise<string> {
   return credentials.access_token;
 }
 
-export async function getTokens(): Promise<NadeoTokens | null> {
+export async function getTokens(
+  audience: string = "NadeoServices",
+): Promise<NadeoTokens | null> {
   const redis = await getRedisClient();
-  const raw = await redis.get(TOKEN_KEY);
+  const raw = await redis.get(getTokenKey(audience));
   return raw ? JSON.parse(raw) : null;
 }
 
@@ -153,40 +156,56 @@ export async function getTotdRoyalMaps(
   royal: boolean = false,
 ): Promise<MonthMapList[]> {
   const url = `${LIVE_URL}/api/token/campaign/month?length=${length}&offset=${offset}&royal=${royal}`;
-  const res = await doRequest<MonthMapListResponse>(url);
+  const res = await doRequest<MonthMapListResponse>(url, "NadeoLiveServices");
   return res.monthList;
 }
 
 export async function getSeasonalCampaigns(
   length: number = 1,
   offset: number = 0,
-): Promise<SeasonalCampaign[]> {
+): Promise<Campaign[]> {
   const url = `${LIVE_URL}/api/campaign/official?length=${length}&offset=${offset}`;
-  const res = await doRequest<SeasonalCampaignsResponse>(url);
+  const res = await doRequest<SeasonalCampaignsResponse>(
+    url,
+    "NadeoLiveServices",
+  );
+  return res.campaignList;
+}
+
+export async function getShortsCampaigns(
+  length: number = 1,
+  offset: number = 0,
+): Promise<Campaign[]> {
+  const url = `${LIVE_URL}/api/campaign/weekly-shorts?length=${length}&offset=${offset}`;
+  const res = await doRequest<ShortsCampaignsResponse>(
+    url,
+    "NadeoLiveServices",
+  );
   return res.campaignList;
 }
 
 export async function doRequest<T>(
   url: string,
+  audience: string = "NadeoServices",
   init: RequestInit = {},
 ): Promise<T> {
   return withRateLimit("nadeo:doRequest", async () => {
-    let tokens = await getTokens();
+    let tokens = await getTokens(audience);
     if (!tokens) {
-      tokens = await authenticate();
+      tokens = await authenticate(audience);
     }
 
     const headers = new Headers(init.headers);
-    headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
+    headers.set("Authorization", `nadeo_v1 t=${tokens.accessToken}`);
     headers.set("User-Agent", config.NADEO.CONTACT);
 
     console.log("Requesting Nadeo API:", url);
     let res = await fetch(url, { ...init, headers });
 
     if (res.status === 401) {
-      tokens = await authenticate();
+      tokens = await authenticate(audience);
       console.log("Retrying Nadeo API request with new tokens");
-      headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
+      headers.set("Authorization", `nadeo_v1 t=${tokens.accessToken}`);
       res = await fetch(url, { ...init, headers });
     }
 
