@@ -10,13 +10,10 @@ export async function ecmOnDriverFinish(
   body: ECMDriverFinishArgs,
 ): Promise<void> {
   const { matchId, authToken } = getMatchIdAndAuthToken(apiKey);
-
+  
   await axiosECM.post(
-    "/match-addRoundTime",
-    {
-      ...body,
-      matchId,
-    },
+    "/match-addRoundTime?matchId=" + matchId,
+    body,
     {
       headers: {
         Authorization: authToken,
@@ -32,11 +29,8 @@ export async function ecmOnRoundEnd(
   const { matchId, authToken } = getMatchIdAndAuthToken(apiKey);
 
   await axiosECM.post(
-    "/match-addRound",
-    {
-      ...body,
-      matchId,
-    },
+    "/match-addRound?matchId=" + matchId,
+    body,
     {
       headers: {
         Authorization: authToken,

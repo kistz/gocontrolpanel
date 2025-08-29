@@ -372,11 +372,11 @@ async function callbackListener(
           await onStartRoundStartScript(manager);
           break;
         case "Trackmania.Scores":
-          await onScoresScript(manager, params);
           if (params.section === "EndRound") {
             ecmEndRound(manager, params);
             await onEndRoundScript(manager, params);
           }
+          await onScoresScript(manager, params);
           break;
         case "Trackmania.WarmUp.Status":
           onWarmUpStatusScript(manager, params);
@@ -550,8 +550,6 @@ function ecmPlayerFinish(manager: GbxClientManager, waypoint: Waypoint) {
 
   if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
 
-  if (manager.roundNumber === 0) manager.roundNumber = 1;
-
   const ecmPlugin = manager.info.plugins.find((p) => p.plugin.name === "ecm");
   if (!ecmPlugin || !ecmPlugin.enabled) return;
 
@@ -685,11 +683,11 @@ async function onStartRoundStartScript(manager: GbxClientManager) {
 }
 
 function ecmEndRound(manager: GbxClientManager, scores: Scores) {
+  const roundNum = manager.roundNumber || 1;
+
   if (!manager.info.activeMap) return;
 
   if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
-
-  if (manager.roundNumber === 0) manager.roundNumber = 1;
 
   const ecmPlugin = manager.info.plugins.find((p) => p.plugin.name === "ecm");
   if (!ecmPlugin || !ecmPlugin.enabled) return;
@@ -697,19 +695,23 @@ function ecmEndRound(manager: GbxClientManager, scores: Scores) {
   const pluginConfig = ecmPlugin.config as ECMPluginConfig;
   if (!pluginConfig.apiKey) return;
 
-  const rankedPlayers = rankPlayers(scores.players);
-
-  console.log(rankedPlayers);
+  const rankedPlayers = rankPlayers(
+    scores.players,
+    manager.info.liveInfo.type === "timeattack",
+  );
 
   const players = rankedPlayers.map((p) => ({
-    finishTime: p.prevracetime,
+    finishTime:
+      manager.info.liveInfo.type === "timeattack"
+        ? p.bestracetime
+        : p.prevracetime,
     ubisoftUid: p.accountid,
     position: p.position,
   }));
 
   ecmOnRoundEnd(pluginConfig.apiKey, {
     players,
-    roundNum: manager.roundNumber || 1,
+    roundNum,
     mapId: manager.info.activeMap,
   });
 }
@@ -1157,20 +1159,25 @@ async function onPlayerChat(manager: GbxClientManager, chat: PlayerChat) {
   manager.client.call("ChatSendServerMessage", message);
 }
 
-function rankPlayers(players: Player[]): (Player & { position: number })[] {
+function rankPlayers(
+  players: Player[],
+  ta?: boolean,
+): (Player & { position: number })[] {
   return [...players]
     .sort((a, b) => {
-      if (a.prevracetime === -1 && b.prevracetime === -1) return 0; // order doesn't matter
-      if (a.prevracetime === -1) return 1; // a goes last
-      if (b.prevracetime === -1) return -1; // b goes last
+      const racetimeA = ta ? a.bestracetime : a.prevracetime;
+      const racetimeB = ta ? b.bestracetime : b.prevracetime;
+
+      if (racetimeA === -1 && racetimeB === -1) return 0; // order doesn't matter
+      if (racetimeA === -1) return 1; // a goes last
+      if (racetimeB === -1) return -1; // b goes last
 
       // 1️⃣ Compare total prevracetime
-      if (a.prevracetime !== b.prevracetime)
-        return a.prevracetime - b.prevracetime;
+      if (racetimeA !== racetimeB) return racetimeA - racetimeB;
 
       // 2️⃣ Tie-break: compare checkpoints from last to first (excluding first checkpoint if needed)
-      const cpA = a.prevracecheckpoints;
-      const cpB = b.prevracecheckpoints;
+      const cpA = ta ? a.bestracecheckpoints : a.prevracecheckpoints;
+      const cpB = ta ? b.bestracecheckpoints : b.prevracecheckpoints;
       const len = Math.min(cpA.length, cpB.length);
 
       for (let i = len - 1; i >= 0; i--) {
