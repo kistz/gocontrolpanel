@@ -112,3 +112,61 @@ export interface ShortsCampaignsResponse {
   nextRequestTimestamp: number;
   relativeNextRequest: number;
 }
+
+export interface ClubCampaign extends Campaign {
+  clubDecalUrl: string;
+  campaignId: number;
+  activityId: number;
+  campaign: {
+    color: string;
+    leaderboardGroupUid: string;
+    publicationTimestamp: number;
+    published: boolean;
+    latestSeasons: {
+      uid: string;
+      name: string;
+      startTimestamp: number;
+      endTimestamp: number;
+      relativeStart: number;
+      relativeEnd: number;
+      campaignId: number;
+      active: boolean;
+    }[];
+    categories: {
+      position: number;
+      length: number;
+      name: string;
+    }[];
+    media: {
+      buttonBackgroundUrl: string;
+      buttonForegroundUrl: string;
+      decalUrl: string;
+      popUpBackgroundUrl: string;
+      popUpImageUrl: string;
+      liveButtonBackgroundUrl: string;
+      liveButtonForegroundUrl: string;
+    };
+  } & Campaign;
+  popularityLevel: number;
+  publicationTimestamp: number;
+  creationTimestamp: number;
+  creatorAccountId: string;
+  latestEditorAccountId: string;
+  id: number;
+  clubId: number;
+  clubName: string;
+  name: string;
+  mapsCount: number;
+  mediaUrl: string;
+  mediaUrlPngLarge: string;
+  mediaUrlPngMedium: string;
+  mediaUrlPngSmall: string;
+  mediaUrlDds: string;
+  mediaTheme: string;
+}
+
+export interface ClubCampaignsResponse {
+  clubCampaignList: ClubCampaign[];
+  maxPage: number;
+  itemCount: number;
+}

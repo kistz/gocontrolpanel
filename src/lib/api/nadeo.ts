@@ -1,9 +1,8 @@
 import config from "@/lib/config";
 import {
   AccountNames,
-  Campaign,
+  ClubCampaignsResponse,
   MapInfo,
-  MonthMapList,
   MonthMapListResponse,
   NadeoTokens,
   SeasonalCampaignsResponse,
@@ -154,34 +153,36 @@ export async function getTotdRoyalMaps(
   length: number = 1,
   offset: number = 0,
   royal: boolean = false,
-): Promise<MonthMapList[]> {
+): Promise<MonthMapListResponse> {
   const url = `${LIVE_URL}/api/token/campaign/month?length=${length}&offset=${offset}&royal=${royal}`;
-  const res = await doRequest<MonthMapListResponse>(url, "NadeoLiveServices");
-  return res.monthList;
+  return await doRequest<MonthMapListResponse>(url, "NadeoLiveServices");
 }
 
 export async function getSeasonalCampaigns(
   length: number = 1,
   offset: number = 0,
-): Promise<Campaign[]> {
+): Promise<SeasonalCampaignsResponse> {
   const url = `${LIVE_URL}/api/campaign/official?length=${length}&offset=${offset}`;
-  const res = await doRequest<SeasonalCampaignsResponse>(
-    url,
-    "NadeoLiveServices",
-  );
-  return res.campaignList;
+  return await doRequest<SeasonalCampaignsResponse>(url, "NadeoLiveServices");
 }
 
 export async function getShortsCampaigns(
   length: number = 1,
   offset: number = 0,
-): Promise<Campaign[]> {
+): Promise<ShortsCampaignsResponse> {
   const url = `${LIVE_URL}/api/campaign/weekly-shorts?length=${length}&offset=${offset}`;
-  const res = await doRequest<ShortsCampaignsResponse>(
-    url,
-    "NadeoLiveServices",
-  );
-  return res.campaignList;
+  return await doRequest<ShortsCampaignsResponse>(url, "NadeoLiveServices");
+}
+
+export async function getClubCampaigns(
+  length: number = 1,
+  offset: number = 0,
+  name: string = "",
+): Promise<ClubCampaignsResponse> {
+  const url = `${LIVE_URL}/api/token/club/campaign?length=${length}&offset=${offset}&name=${encodeURIComponent(
+    name,
+  )}`;
+  return await doRequest<ClubCampaignsResponse>(url, "NadeoLiveServices");
 }
 
 export async function doRequest<T>(
