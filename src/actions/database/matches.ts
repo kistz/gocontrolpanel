@@ -69,7 +69,9 @@ export async function getMatchesPaginated(
         deletedAt: null,
         serverId: fetchArgs.serverId,
         records: {
-          some: {},
+          some: {
+            time: { not: -1 },
+          },
         },
         OR: [
           { mode: { contains: filter } },
