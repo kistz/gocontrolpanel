@@ -27,6 +27,7 @@ import {
   IconDeviceGamepad,
   IconFileDescription,
   IconMap,
+  IconPoo,
   IconServer,
   IconStopwatch,
   IconUsers,
@@ -154,13 +155,18 @@ export default function NavGroups() {
                     server.id,
                   ),
                 },
-                // {
-                //   name: "Dev",
-                //   url: generatePath(routes.servers.dev, {
-                //     uuid: server.uuid,
-                //   }),
-                //   icon: IconCode,
-                // }
+                {
+                  name: "Nadeo",
+                  url: generatePath(routes.servers.nadeo, {
+                    id: server.id,
+                  }),
+                  icon: IconPoo,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.nadeo,
+                    server.id,
+                  ),
+                },
               ],
             };
 
