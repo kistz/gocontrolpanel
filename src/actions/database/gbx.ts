@@ -421,7 +421,7 @@ export async function saveRoundRecords(
           mapUid: mapData.uid,
           login: player.login,
           time: player.prevracetime,
-          checkpoints: player.prevracetime || [],
+          checkpoints: player.prevracecheckpoints || [],
           round,
           points: player.roundpoints,
           matchId,
