@@ -2,6 +2,8 @@ import config from "@/lib/config";
 import {
   AccountNames,
   MapInfo,
+  MonthMapList,
+  MonthMapListResponse,
   NadeoTokens,
   TrackmaniaCredentials,
   WebIdentity,
@@ -17,6 +19,7 @@ const CREDENTIALS_TOKEN_KEY = "nadeo:credentials_token";
 
 const PROD_URL = "https://prod.trackmania.core.nadeo.online";
 const API_URL = "https://api.trackmania.com/api";
+const LIVE_URL = "https://live-services.trackmania.nadeo.live";
 
 // This function is used to authenticate with the Nadeo API and store the tokens in Redis.
 export async function authenticate(
@@ -140,6 +143,16 @@ export async function searchAccountNames(
       `${url}?${params.toString()}`,
     );
   });
+}
+
+export async function getTotdRoyalMaps(
+  length: number = 1,
+  offset: number = 0,
+  royal: boolean = false,
+): Promise<MonthMapList[]> {
+  const url = `${LIVE_URL}/api/token/campaign/month?length=${length}&offset=${offset}&royal=${royal}`;
+  const res = await doRequest<MonthMapListResponse>(url);
+  return res.monthList;
 }
 
 export async function doRequest<T>(

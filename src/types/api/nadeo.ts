@@ -41,3 +41,37 @@ export interface WebIdentity {
 export interface AccountNames {
   [key: string]: string;
 }
+
+export interface MonthMapList {
+  year: number;
+  month: number;
+  lastday: number;
+  days: {
+    campaignId: number;
+    mapUid: string;
+    day: number;
+    monthDay: number;
+    seasonUid: string;
+    leaderboardGroup: null;
+    startTimestamp: number;
+    endTimestamp: number;
+    relativeStart: number;
+    relativeEnd: number;
+  }[];
+  media: {
+    buttonBackgroundUrl: string;
+    buttonForegroundUrl: string;
+    decalUrl: string;
+    popUpBackgroundUrl: string;
+    popUpImageUrl: string;
+    liveButtonBackgroundUrl: string;
+    liveButtonForegroundUrl: string;
+  };
+}
+
+export interface MonthMapListResponse {
+  monthList: MonthMapList[];
+  itemCount: number;
+  nextRequestTimestamp: number;
+  relativeNextRequest: number;
+}
