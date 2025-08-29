@@ -1,5 +1,5 @@
 "use client";
-import { triggerModeScriptEventArray } from "@/actions/gbx/game";
+import { pauseMatch, triggerModeScriptEventArray } from "@/actions/gbx/game";
 import { getErrorMessage } from "@/lib/utils";
 import {
   IconChevronRight,
@@ -26,11 +26,7 @@ export default function LiveActions({
 }: LiveActionsProps) {
   const handlePause = async () => {
     try {
-      const { error } = await triggerModeScriptEventArray(
-        serverId,
-        "Maniaplanet.Pause.SetActive",
-        [isPaused ? "false" : "true"],
-      );
+      const { error } = await pauseMatch(serverId, !isPaused);
       if (error) {
         throw new Error(error);
       }

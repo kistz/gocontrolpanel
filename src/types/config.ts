@@ -4,6 +4,9 @@ export interface Config {
     URL: string;
     KEY: string;
   };
+  ECM: {
+    URL: string;
+  };
   DEFAULT_ADMINS: string[];
   DEFAULT_PERMISSIONS: string[];
   NADEO: {

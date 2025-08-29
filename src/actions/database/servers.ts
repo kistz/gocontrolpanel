@@ -12,7 +12,6 @@ import {
 import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { ServerPluginsWithPlugin } from "./gbx";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editServer = Prisma.validator<Prisma.ServersInclude>()({
@@ -340,71 +339,4 @@ export async function deleteServer(serverId: string): Promise<ServerResponse> {
       await deleteGbxClientManager(serverId);
     },
   );
-}
-
-export async function updateServerPlugins(
-  serverId: string,
-  plugins: {
-    pluginId: string;
-    enabled: boolean;
-  }[],
-): Promise<ServerResponse> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const db = getClient();
-    const pluginUpdates = plugins.map((p) =>
-      db.serverPlugins.upsert({
-        where: {
-          serverId_pluginId: {
-            serverId,
-            pluginId: p.pluginId,
-          },
-        },
-        create: {
-          serverId,
-          pluginId: p.pluginId,
-          enabled: p.enabled,
-        },
-        update: {
-          enabled: p.enabled,
-        },
-      }),
-    );
-
-    await db.$transaction(pluginUpdates);
-
-    const updatedPlugins = await db.serverPlugins.findMany({
-      where: { serverId },
-      include: {
-        plugin: {
-          include: {
-            commands: true,
-          },
-        },
-      },
-    });
-
-    const manager = await getGbxClientManager(serverId);
-
-    manager.info.plugins = updatedPlugins;
-  });
-}
-
-export async function getServerPlugins(
-  serverId: string,
-): Promise<ServerResponse<ServerPluginsWithPlugin[]>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const db = getClient();
-    const plugins = await db.serverPlugins.findMany({
-      where: { serverId },
-      include: {
-        plugin: {
-          include: {
-            commands: true,
-          },
-        },
-      },
-    });
-
-    return plugins;
-  });
 }

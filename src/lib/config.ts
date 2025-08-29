@@ -7,6 +7,9 @@ const config: Config = {
     URL: "https://api.hetzner.cloud/v1",
     KEY: process.env.HETZNER_KEY || "",
   },
+  ECM: {
+    URL: "https://us-central1-fantasy-trackmania.cloudfunctions.net",
+  },
   DEFAULT_ADMINS: process.env.DEFAULT_ADMINS
     ? process.env.DEFAULT_ADMINS.split(",")
     : [],
