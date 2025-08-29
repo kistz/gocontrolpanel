@@ -191,9 +191,7 @@ export class GbxClientManager extends EventEmitter {
     this.info.plugins = server.serverPlugins;
 
     await setupListeners(this, server.id);
-    await syncPlayerList(this);
     await syncMap(this, server.id);
-
     await syncLiveInfo(this);
 
     return this.client;
@@ -841,7 +839,7 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
       accountId: player.accountid,
       name: player.name,
       team: player.team,
-      rank: i + 1,
+      rank: player.rank,
       finalist: isFinalist(
         player.matchpoints,
         manager.info.liveInfo.pointsLimit,
@@ -890,6 +888,8 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
 }
 
 async function syncLiveInfo(manager: GbxClientManager) {
+  await syncPlayerList(manager);
+
   await manager.client.callScript(
     "Trackmania.WarmUp.GetStatus",
     "gocontrolpanel",
