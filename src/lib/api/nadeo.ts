@@ -5,6 +5,8 @@ import {
   MonthMapList,
   MonthMapListResponse,
   NadeoTokens,
+  SeasonalCampaign,
+  SeasonalCampaignsResponse,
   TrackmaniaCredentials,
   WebIdentity,
 } from "@/types/api/nadeo";
@@ -153,6 +155,15 @@ export async function getTotdRoyalMaps(
   const url = `${LIVE_URL}/api/token/campaign/month?length=${length}&offset=${offset}&royal=${royal}`;
   const res = await doRequest<MonthMapListResponse>(url);
   return res.monthList;
+}
+
+export async function getSeasonalCampaigns(
+  length: number = 1,
+  offset: number = 0,
+): Promise<SeasonalCampaign[]> {
+  const url = `${LIVE_URL}/api/campaign/official?length=${length}&offset=${offset}`;
+  const res = await doRequest<SeasonalCampaignsResponse>(url);
+  return res.campaignList;
 }
 
 export async function doRequest<T>(

@@ -75,3 +75,33 @@ export interface MonthMapListResponse {
   nextRequestTimestamp: number;
   relativeNextRequest: number;
 }
+
+export interface SeasonalCampaign {
+  id: number;
+  seasonUid: string;
+  name: string;
+  useCase: number;
+  clubId: number;
+  startTimestamp: number;
+  endTimestamp: number;
+  rankingSentTimestamp: number | null;
+  year: number;
+  week: number;
+  day: number;
+  monthYear: number;
+  month: number;
+  monthDay: number;
+  playlist: {
+    id: number;
+    position: number;
+    mapUid: string;
+  }[];
+  editionTimestamp: number;
+}
+
+export interface SeasonalCampaignsResponse {
+  itemCount: number;
+  campaignList: SeasonalCampaign[];
+  nextRequestTimestamp: number;
+  relativeNextRequest: number;
+}
