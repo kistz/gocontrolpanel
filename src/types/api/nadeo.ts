@@ -170,3 +170,35 @@ export interface ClubCampaignsResponse {
   maxPage: number;
   itemCount: number;
 }
+
+export interface ClubActivity {
+  id: number;
+  name: string;
+  activityType: string;
+  activityId: number;
+  targetActivityId: number;
+  campaignId: number;
+  position: number;
+  public: boolean;
+  active: boolean;
+  externalId: number;
+  featured: boolean;
+  password: boolean;
+  itemsCount: number;
+  clubId: number;
+  editionTimestamp: number;
+  creatorAccountId: string;
+  latestEditorAccountId: string;
+  mediaUrl: string;
+  mediaUrlPngLarge: string;
+  mediaUrlPngMedium: string;
+  mediaUrlPngSmall: string;
+  mediaUrlDds: string;
+  mediaTheme: string;
+}
+
+export interface ClubActivitiesResponse {
+  acitivityList: ClubActivity[];
+  maxPage: number;
+  itemCount: number;
+}

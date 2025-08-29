@@ -1,6 +1,7 @@
 import config from "@/lib/config";
 import {
   AccountNames,
+  ClubActivitiesResponse,
   ClubCampaignsResponse,
   MapInfo,
   MonthMapListResponse,
@@ -183,6 +184,15 @@ export async function getClubCampaigns(
     name,
   )}`;
   return await doRequest<ClubCampaignsResponse>(url, "NadeoLiveServices");
+}
+
+export async function getClubActivities(
+  clubId: number,
+  length: number = 1,
+  offset: number = 0,
+): Promise<ClubActivitiesResponse> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/activity?length=${length}&offset=${offset}&active=true`;
+  return await doRequest<ClubActivitiesResponse>(url, "NadeoLiveServices");
 }
 
 export async function doRequest<T>(
