@@ -841,7 +841,7 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
       accountId: player.accountid,
       name: player.name,
       team: player.team,
-      rank: i + 1,
+      rank: player.rank,
       finalist: isFinalist(
         player.matchpoints,
         manager.info.liveInfo.pointsLimit,
