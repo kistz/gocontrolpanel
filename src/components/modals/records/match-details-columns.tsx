@@ -7,6 +7,7 @@ import { parseTmTags } from "tmtags";
 
 export const createColumns = (
   rounds?: boolean,
+  points?: boolean,
 ): ColumnDef<RecordsWithUser>[] => {
   const columns: ColumnDef<RecordsWithUser>[] = [
     {
@@ -31,6 +32,13 @@ export const createColumns = (
     columns.push({
       accessorKey: "round",
       header: () => <span>Round</span>,
+    });
+  }
+
+  if (points) {
+    columns.push({
+      accessorKey: "points",
+      header: () => <span>Points</span>,
     });
   }
 

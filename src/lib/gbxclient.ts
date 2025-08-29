@@ -1,6 +1,7 @@
 import {
   createMatch,
   saveMatchRecord,
+  saveRoundRecords,
   syncPlayer,
 } from "@/actions/database/gbx";
 import {
@@ -373,6 +374,8 @@ async function callbackListener(
           if (params.section === "EndRound") {
             ecmEndRound(manager, params);
             await onEndRoundScript(manager, params);
+          } else if (params.section === "PreEndRound") {
+            await onPreEndRoundScript(manager, params);
           }
           await onScoresScript(manager, params);
           break;
@@ -760,6 +763,19 @@ async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
   await sleep(300); // wait for the pause status to be updated
 
   manager.emit("endRound", manager.info.liveInfo);
+}
+
+async function onPreEndRoundScript(manager: GbxClientManager, scores: Scores) {
+  if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
+
+  if (manager.roundNumber === 0) manager.roundNumber = 1;
+
+  saveRoundRecords(
+    manager.getServerId(),
+    manager.currentMatchId,
+    scores,
+    manager.roundNumber,
+  );
 }
 
 function onPauseStatusScript(manager: GbxClientManager, status: PauseStatus) {

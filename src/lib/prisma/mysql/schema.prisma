@@ -68,6 +68,7 @@ model Records {
   mapUid      String
   time        Int
   round       Int?
+  points      Int?
   checkpoints Json    @default("[]")
 
   matchId String?
