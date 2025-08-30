@@ -19,7 +19,7 @@ export default async function TotdMonths({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 justify-between">
-        <h2 className="text-xl font-bold">
+        <h2 className="text-xl font-bold truncate">
           {mapList ? `${monthNumberToName(mapList.month)} ${mapList.year}` : ""}
         </h2>
 
