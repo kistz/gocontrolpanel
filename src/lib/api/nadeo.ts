@@ -228,6 +228,37 @@ export async function getClubs(
   return await doRequest<ClubListResponse>(url, "NadeoLiveServices");
 }
 
+export async function downloadFile(url: string, fileName: string): Promise<File> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // 30 seconds
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/x-gbx",
+        "User-Agent": config.NADEO.CONTACT,
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      throw new Error(`Failed to download map: ${res.statusText}`);
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    return new File([arrayBuffer], fileName, {
+      type: "application/x-gbx",
+    });
+  } catch (err) {
+    if ((err as any).name === "AbortError") {
+      throw new Error(`Download for map ${fileName} timed out`);
+    }
+    throw err;
+  }
+}
+
 export async function doRequest<T>(
   url: string,
   audience: string = "NadeoServices",

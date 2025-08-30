@@ -1,4 +1,5 @@
 "use client";
+import { addMapToServer, downloadMapFromUrl } from "@/actions/nadeo/maps";
 import { cn, getErrorMessage, weekDayNumberToName } from "@/lib/utils";
 import { DayWithMap } from "@/types/api/nadeo";
 import {
@@ -37,14 +38,23 @@ export default function NadeoMapCard({
         return;
       }
 
+      if (!day.map.fileUrl) {
+        toast.error("Map does not have a valid download URL");
+        return;
+      }
+
       if (isDownloading) return;
 
       setIsDownloading(true);
 
-      // const { error } = await downloadMap(serverId, map.MapId);
-      // if (error) {
-      //   throw new Error(error);
-      // }
+      const { error } = await downloadMapFromUrl(
+        serverId,
+        day.map.fileUrl,
+        day.map.fileName,
+      );
+      if (error) {
+        throw new Error(error);
+      }
 
       toast.success("Map successfully downloaded", {
         description: "You can find it in the Maps/Downloaded folder",
@@ -65,14 +75,23 @@ export default function NadeoMapCard({
         return;
       }
 
+      if (!day.map.fileUrl) {
+        toast.error("Map does not have a valid download URL");
+        return;
+      }
+
       if (isDownloading) return;
 
       setIsDownloading(true);
 
-      // const { error } = await addMapToServer(serverId, map.MapId);
-      // if (error) {
-      //   throw new Error(error);
-      // }
+      const { error } = await addMapToServer(
+        serverId,
+        day.map.fileUrl,
+        day.map.fileName,
+      );
+      if (error) {
+        throw new Error(error);
+      }
 
       toast.success("Map successfully added to server");
     } catch (err) {
@@ -126,7 +145,7 @@ export default function NadeoMapCard({
           }}
         />
 
-        {fmHealth && (
+        {fmHealth && day.map.fileUrl && (
           <>
             <Separator />
             <div className="flex gap-2">

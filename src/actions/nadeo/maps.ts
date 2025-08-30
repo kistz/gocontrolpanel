@@ -1,35 +1,16 @@
 "use server";
 
 import { doServerActionWithAuth } from "@/lib/actions";
-import { downloadTMXMap, searchTMXMaps } from "@/lib/api/tmx";
+import { downloadFile } from "@/lib/api/nadeo";
 import { getFileManager } from "@/lib/filemanager";
-import { TMXMapSearch } from "@/types/api/tmx";
 import { ServerResponse } from "@/types/responses";
 import { uploadFiles } from "../filemanager";
 import { addMap } from "../gbx/map";
 
-export async function searchMaps(
+export async function downloadMapFromUrl(
   serverId: string,
-  queryParams: Record<string, string>,
-  after?: number,
-): Promise<ServerResponse<TMXMapSearch>> {
-  return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
-      return searchTMXMaps(
-        {
-          ...queryParams,
-          ...(after ? { after: after.toString() } : {}),
-        },
-        12,
-      );
-    },
-  );
-}
-
-export async function downloadMap(
-  serverId: string,
-  mapId: number,
+  url: string,
+  fileName: string,
 ): Promise<ServerResponse<string>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
@@ -39,7 +20,7 @@ export async function downloadMap(
         throw new Error("File manager is not healthy");
       }
 
-      const file = await downloadTMXMap(mapId);
+      const file = await downloadFile(url, fileName);
       if (!file) {
         throw new Error("Failed to download map");
       }
@@ -60,7 +41,8 @@ export async function downloadMap(
 
 export async function addMapToServer(
   serverId: string,
-  mapId: number,
+  url: string,
+  fileName: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
@@ -70,14 +52,18 @@ export async function addMapToServer(
         throw new Error("File manager is not healthy");
       }
 
-      const { data: fileName, error } = await downloadMap(serverId, mapId);
+      const { data: file, error } = await downloadMapFromUrl(
+        serverId,
+        url,
+        fileName,
+      );
       if (error) {
         throw new Error(error);
       }
-
+      
       const { error: addMapError } = await addMap(
         serverId,
-        `Downloaded/${fileName}`,
+        `Downloaded/${file}`,
       );
       if (addMapError) {
         throw new Error(addMapError);
