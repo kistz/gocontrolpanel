@@ -1,4 +1,6 @@
+import { getAllSeasonalCampaigns } from "@/actions/nadeo/campaigns";
 import { getTotdMonth } from "@/actions/nadeo/totd";
+import SeasonalCampaigns from "@/components/nadeo/seasonal-campaigns";
 import TotdMonths from "@/components/nadeo/totd-months";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
@@ -11,10 +13,10 @@ export default async function ServerNadeoPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string; offset?: string }>;
+  searchParams: Promise<{ page?: string; offset?: string; campaign?: string }>;
 }) {
   const { id } = await params;
-  const { page = "totd", offset = "0" } = await searchParams;
+  const { page = "totd", offset = "0", campaign } = await searchParams;
 
   const offsetInt = parseInt(offset);
 
@@ -31,9 +33,18 @@ export default async function ServerNadeoPage({
   }
 
   let mapList = undefined;
-  if (page === "totd") {
-    const { data } = await getTotdMonth(id, offsetInt);
-    mapList = data;
+  let seasonalCampaignList = undefined;
+  let selectedCampaign = undefined;
+  switch (page) {
+    case "totd":
+      const { data: totdMapList } = await getTotdMonth(id, offsetInt);
+      mapList = totdMapList;
+      break;
+    case "seasonal":
+      const { data: seasonalCampaignResponse } =
+        await getAllSeasonalCampaigns();
+      seasonalCampaignList = seasonalCampaignResponse;
+      break;
   }
 
   return (
@@ -63,10 +74,13 @@ export default async function ServerNadeoPage({
           />
         </TabsContent>
 
-        <TabsContent
-          value="seasonal"
-          className="flex flex-col gap-2"
-        ></TabsContent>
+        <TabsContent value="seasonal" className="flex flex-col gap-2">
+          <SeasonalCampaigns
+            serverId={id}
+            fmHealth={fmHealth}
+            seasonalCampaignList={seasonalCampaignList}
+          />
+        </TabsContent>
 
         <TabsContent
           value="shorts"
