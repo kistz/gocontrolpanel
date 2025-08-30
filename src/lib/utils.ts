@@ -406,3 +406,18 @@ export function monthNumberToName(monthNum: number): string {
   // monthNum should be 1–12
   return months[monthNum - 1] || "Invalid month";
 }
+
+export function weekDayNumberToName(dayNum: number): string {
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  // dayNum should be 0–6
+  return days[dayNum] || "Invalid day";
+}

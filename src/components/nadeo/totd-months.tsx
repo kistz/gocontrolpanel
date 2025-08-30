@@ -58,7 +58,7 @@ export default async function TotdMonths({
               key={day.mapUid}
               serverId={serverId}
               fmHealth={fmHealth}
-              map={day.map}
+              day={day}
             />
           ))}
         </div>

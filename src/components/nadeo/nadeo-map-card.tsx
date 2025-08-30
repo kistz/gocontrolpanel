@@ -1,6 +1,6 @@
 "use client";
-import { Maps } from "@/lib/prisma/generated";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { cn, getErrorMessage, weekDayNumberToName } from "@/lib/utils";
+import { DayWithMap } from "@/types/api/nadeo";
 import {
   IconDownload,
   IconMapPlus,
@@ -12,6 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 import MapMedals from "../maps/map-medals";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
@@ -19,12 +20,12 @@ import { Separator } from "../ui/separator";
 export default function NadeoMapCard({
   serverId,
   fmHealth,
-  map,
+  day,
   className,
 }: {
   serverId: string;
   fmHealth: boolean;
-  map: Maps;
+  day: DayWithMap;
   className?: string;
 }) {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -86,11 +87,11 @@ export default function NadeoMapCard({
   return (
     <Card className={cn("flex flex-col flex-1 relative", className)}>
       <div className="relative">
-        {map.thumbnailUrl ? (
+        {day.map.thumbnailUrl ? (
           <Image
-            src={map.thumbnailUrl}
+            src={day.map.thumbnailUrl}
             fill
-            alt={map.name}
+            alt={day.map.name}
             className="static! rounded-t-lg h-40! object-cover"
           />
         ) : (
@@ -102,7 +103,7 @@ export default function NadeoMapCard({
           <h3
             className="truncate text-lg font-semibold text-white"
             dangerouslySetInnerHTML={{
-              __html: parseTmTags(map.name ?? ""),
+              __html: parseTmTags(day.map.name ?? ""),
             }}
           ></h3>
 
@@ -111,7 +112,7 @@ export default function NadeoMapCard({
             <span
               className="text-sm truncate"
               dangerouslySetInnerHTML={{
-                __html: parseTmTags(map.authorNickname),
+                __html: parseTmTags(day.map.authorNickname),
               }}
             ></span>
           </div>
@@ -119,11 +120,9 @@ export default function NadeoMapCard({
       </div>
 
       <div className="flex flex-col p-2 gap-2">
-        <div className="flex flex-col gap-1"></div>
-
         <MapMedals
           medals={{
-            ...map,
+            ...day.map,
           }}
         />
 
@@ -151,6 +150,13 @@ export default function NadeoMapCard({
           </>
         )}
       </div>
+
+      <Badge
+        variant={"outline"}
+        className="absolute top-2 left-2 z-10 bg-white dark:bg-black flex gap-2 font-bold"
+      >
+        {day.monthDay}, {weekDayNumberToName(day.day)}
+      </Badge>
     </Card>
   );
 }

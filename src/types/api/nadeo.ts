@@ -73,7 +73,7 @@ export interface MonthMapList {
 
 type Day = MonthMapList["days"][number];
 
-type DayWithMap = Day & {
+export type DayWithMap = Day & {
   map: Maps;
 };
 
