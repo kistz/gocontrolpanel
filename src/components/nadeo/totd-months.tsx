@@ -20,14 +20,19 @@ export default async function TotdMonths({
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 justify-between">
         <h2 className="text-xl font-bold">
-          {mapList ? monthNumberToName(mapList.month) : ""}
+          {mapList ? `${monthNumberToName(mapList.month)} ${mapList.year}` : ""}
         </h2>
 
         <div className="flex gap-2">
           <Link
             href={`/server/${serverId}/nadeo?page=totd&offset=${offset + 1}`}
           >
-            <Button variant="outline" disabled={!mapList}>
+            <Button
+              variant="outline"
+              disabled={
+                !mapList || (mapList.month === 7 && mapList.year === 2020)
+              }
+            >
               <IconArrowLeft />
               Previous
             </Button>
