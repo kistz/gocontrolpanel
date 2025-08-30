@@ -1,53 +1,21 @@
-"use client";
-
-import { getTotdMonth } from "@/actions/nadeo/totd";
-import { getErrorMessage, monthNumberToName } from "@/lib/utils";
+import { monthNumberToName } from "@/lib/utils";
 import { MonthMapListWithDayMaps } from "@/types/api/nadeo";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import Link from "next/link";
 import { Button } from "../ui/button";
 import NadeoMapCard from "./nadeo-map-card";
 
-export default function TotdMonths({
+export default async function TotdMonths({
   serverId,
   fmHealth,
-  defaultMapList = null,
+  mapList = null,
+  offset,
 }: {
   serverId: string;
   fmHealth: boolean;
-  defaultMapList?: MonthMapListWithDayMaps | null;
+  mapList?: MonthMapListWithDayMaps | null;
+  offset: number;
 }) {
-  const [mapList, setMapList] = useState<MonthMapListWithDayMaps | null>(
-    defaultMapList,
-  );
-  const [offset, setOffset] = useState(0);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const onGetMonth = async (newOffset: number) => {
-    setOffset(newOffset);
-    setLoading(true);
-
-    try {
-      const { data, error } = await getTotdMonth(serverId, newOffset);
-      if (error) {
-        throw new Error(error);
-      }
-
-      setError(null);
-      setMapList(data);
-    } catch (err) {
-      setError(getErrorMessage(err));
-      toast.error("Failed to fetch month", {
-        description: getErrorMessage(err),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 justify-between">
@@ -56,26 +24,29 @@ export default function TotdMonths({
         </h2>
 
         <div className="flex gap-2">
-          <Button onClick={() => onGetMonth(offset - 1)} variant={"outline"}>
-            <IconArrowLeft />
-            Previous
-          </Button>
-          <Button
-            onClick={() => onGetMonth(offset + 1)}
-            variant={"outline"}
-            disabled={offset === 0}
+          <Link
+            href={`/server/${serverId}/nadeo?page=totd&offset=${offset + 1}`}
           >
-            Next
-            <IconArrowRight />
-          </Button>
+            <Button variant="outline" disabled={!mapList}>
+              <IconArrowLeft />
+              Previous
+            </Button>
+          </Link>
+          <Link
+            href={`/server/${serverId}/nadeo?page=totd&offset=${Math.max(
+              0,
+              offset - 1,
+            )}`}
+          >
+            <Button variant="outline" disabled={offset <= 0 || !mapList}>
+              Next
+              <IconArrowRight />
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {error && <span>{error}</span>}
-
-      {loading && <span>Loading...</span>}
-
-      {mapList && !loading && !error && (
+      {mapList && (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
           {mapList.days.map((day) => (
             <NadeoMapCard

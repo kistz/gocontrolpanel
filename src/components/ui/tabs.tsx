@@ -4,15 +4,41 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function Tabs({
+  withParam = false,
+  value,
+  onValueChange,
   className,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+}: React.ComponentProps<typeof TabsPrimitive.Root> & { withParam?: boolean }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // only add URL syncing if withParam is true
+  const handleValueChange = (newValue: string) => {
+    if (withParam) {
+      const params = new URLSearchParams();
+      params.set("page", newValue);
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+
+    if (onValueChange) {
+      onValueChange(newValue);
+    }
+  };
+
+  const controlledValue = withParam
+    ? (searchParams.get("page") ?? value)
+    : value;
+
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
       className={cn("flex flex-col gap-2", className)}
+      value={controlledValue}
+      onValueChange={handleValueChange}
       {...props}
     />
   );

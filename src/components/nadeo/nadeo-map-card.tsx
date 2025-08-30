@@ -1,11 +1,10 @@
-import { addMapToServer, downloadMap } from "@/actions/tmx/maps";
+"use client";
 import { Maps } from "@/lib/prisma/generated";
 import { cn, getErrorMessage } from "@/lib/utils";
 import {
   IconDownload,
   IconMapPlus,
   IconPhoto,
-  IconTrophyFilled,
   IconUser,
 } from "@tabler/icons-react";
 import Image from "next/image";
@@ -13,7 +12,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 import MapMedals from "../maps/map-medals";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
@@ -121,8 +119,7 @@ export default function NadeoMapCard({
       </div>
 
       <div className="flex flex-col p-2 gap-2">
-        <div className="flex flex-col gap-1">
-        </div>
+        <div className="flex flex-col gap-1"></div>
 
         <MapMedals
           medals={{

@@ -8,10 +8,15 @@ import { redirect } from "next/navigation";
 
 export default async function ServerNadeoPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string; offset?: string }>;
 }) {
   const { id } = await params;
+  const { page = "totd", offset = "0" } = await searchParams;
+
+  const offsetInt = parseInt(offset);
 
   const canView = await hasPermission(routePermissions.servers.nadeo, id);
   if (!canView) {
@@ -25,7 +30,11 @@ export default async function ServerNadeoPage({
     console.error("Failed to fetch file manager:", err);
   }
 
-  const { data: defaultMapList } = await getTotdMonth(id, 0);
+  let mapList = undefined;
+  if (page === "totd") {
+    const { data } = await getTotdMonth(id, offsetInt);
+    mapList = data;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,7 +45,7 @@ export default async function ServerNadeoPage({
         </h4>
       </div>
 
-      <Tabs defaultValue="totd" className="w-full">
+      <Tabs defaultValue="totd" className="w-full" withParam>
         <TabsList className="w-full">
           <TabsTrigger value="totd">Track of the Day</TabsTrigger>
           <TabsTrigger value="seasonal">Seasonal Campaigns</TabsTrigger>
@@ -49,7 +58,8 @@ export default async function ServerNadeoPage({
           <TotdMonths
             serverId={id}
             fmHealth={fmHealth}
-            defaultMapList={defaultMapList}
+            mapList={mapList}
+            offset={offsetInt}
           />
         </TabsContent>
 
