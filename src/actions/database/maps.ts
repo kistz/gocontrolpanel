@@ -292,7 +292,9 @@ export async function getMapsByUids(
             continue;
           }
 
-          const authorAccountIds = apiMapsInfo.map((m) => m.author);
+          const authorAccountIds = [
+            ...new Set(apiMapsInfo.map((m) => m.author)),
+          ];
           const accountNames = await getAccountNames(authorAccountIds);
 
           for (const mapInfo of apiMapsInfo) {

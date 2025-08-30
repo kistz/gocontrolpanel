@@ -111,6 +111,16 @@ export interface Campaign {
   editionTimestamp: number;
 }
 
+type Playlist = Campaign["playlist"][number];
+
+export type PlaylistWithMap = Playlist & {
+  map: Maps;
+};
+
+export interface CampaignWithPlaylistMaps extends Campaign {
+  playlist: PlaylistWithMap[];
+}
+
 export interface SeasonalCampaignsResponse {
   itemCount: number;
   campaignList: Campaign[];

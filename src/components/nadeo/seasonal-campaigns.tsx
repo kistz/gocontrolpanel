@@ -5,11 +5,9 @@ import { createColumns } from "./seasonal-campaigns-columns";
 
 export default function SeasonalCampaigns({
   serverId,
-  fmHealth,
   seasonalCampaignList = null,
 }: {
   serverId: string;
-  fmHealth: boolean;
   seasonalCampaignList?: Campaign[] | null;
 }) {
   if (!seasonalCampaignList) {

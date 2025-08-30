@@ -42,3 +42,4 @@ export const getKeyHetznerRecentlyCreatedServers = (projectId: string) =>
   `hetzner:recently-created-servers:${projectId}`;
 export const getKeyTotdMonth = (offset: number) => `totd:month:${offset}`;
 export const getKeySeasonalCampaigns = () => `nadeo:seasonal-campaigns`;
+export const getKeyCampaign = (campaignId: number) => `nadeo:campaign:${campaignId}`;

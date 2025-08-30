@@ -1,5 +1,9 @@
-import { getAllSeasonalCampaigns } from "@/actions/nadeo/campaigns";
+import {
+  getAllSeasonalCampaigns,
+  getCampaignWithMaps,
+} from "@/actions/nadeo/campaigns";
 import { getTotdMonth } from "@/actions/nadeo/totd";
+import CampaignMaps from "@/components/nadeo/campaign-maps";
 import SeasonalCampaigns from "@/components/nadeo/seasonal-campaigns";
 import TotdMonths from "@/components/nadeo/totd-months";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,6 +48,15 @@ export default async function ServerNadeoPage({
       const { data: seasonalCampaignResponse } =
         await getAllSeasonalCampaigns();
       seasonalCampaignList = seasonalCampaignResponse;
+      if (campaign && seasonalCampaignList) {
+        const sc = seasonalCampaignList.find(
+          (c) => c.id.toString() === campaign,
+        );
+        if (sc) {
+          const { data: campaignWithMaps } = await getCampaignWithMaps(sc);
+          selectedCampaign = campaignWithMaps;
+        }
+      }
       break;
   }
 
@@ -75,11 +88,18 @@ export default async function ServerNadeoPage({
         </TabsContent>
 
         <TabsContent value="seasonal" className="flex flex-col gap-2">
-          <SeasonalCampaigns
-            serverId={id}
-            fmHealth={fmHealth}
-            seasonalCampaignList={seasonalCampaignList}
-          />
+          {campaign ? (
+            <CampaignMaps
+              serverId={id}
+              fmHealth={fmHealth}
+              campaign={selectedCampaign}
+            />
+          ) : (
+            <SeasonalCampaigns
+              serverId={id}
+              seasonalCampaignList={seasonalCampaignList}
+            />
+          )}
         </TabsContent>
 
         <TabsContent
