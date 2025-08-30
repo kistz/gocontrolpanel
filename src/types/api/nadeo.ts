@@ -1,3 +1,5 @@
+import { Maps } from "@/lib/prisma/generated";
+
 export interface NadeoTokens {
   accessToken: string;
   refreshToken: string;
@@ -67,6 +69,16 @@ export interface MonthMapList {
     liveButtonBackgroundUrl: string;
     liveButtonForegroundUrl: string;
   };
+}
+
+type Day = MonthMapList["days"][number];
+
+type DayWithMap = Day & {
+  map: Maps;
+};
+
+export interface MonthMapListWithDayMaps extends MonthMapList {
+  days: DayWithMap[];
 }
 
 export interface MonthMapListResponse {

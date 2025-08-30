@@ -386,3 +386,23 @@ export function getCurrencySymbol(currency: string): string {
       return currency;
   }
 }
+
+export function monthNumberToName(monthNum: number): string {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // monthNum should be 1–12
+  return months[monthNum - 1] || "Invalid month";
+}

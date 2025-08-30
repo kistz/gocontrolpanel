@@ -1,6 +1,6 @@
 "use server";
 import { doServerActionWithAuth } from "@/lib/actions";
-import { getMapsInfo } from "@/lib/api/nadeo";
+import { getAccountNames, getMapsInfo } from "@/lib/api/nadeo";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Maps, Prisma } from "@/lib/prisma/generated";
@@ -165,7 +165,7 @@ export async function getMapList(
                 timestamp: mapInfoFromApi?.timestamp || null,
                 fileUrl: mapInfoFromApi?.fileUrl || null,
                 thumbnailUrl: mapInfoFromApi?.thumbnailUrl || null,
-                uploadCheck: new Date(),
+                uploadCheck: now,
                 createdAt: now,
                 updatedAt: now,
                 deletedAt: null,
@@ -256,6 +256,86 @@ export async function getMapRecordsPaginated(
         data: maps,
         totalCount,
       };
+    },
+  );
+}
+
+export async function getMapsByUids(
+  uids: string[],
+): Promise<ServerResponse<Maps[]>> {
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      const db = getClient();
+
+      const existingMaps = await db.maps.findMany({
+        where: {
+          uid: { in: uids },
+          deletedAt: null,
+        },
+      });
+
+      const existingUids = new Set(existingMaps.map((m) => m.uid));
+      const missingUids = uids.filter((uid) => !existingUids.has(uid));
+
+      if (missingUids.length > 0) {
+        const BATCH_SIZE = 200;
+
+        const now = new Date();
+        const newMaps: Maps[] = [];
+
+        for (let i = 0; i < missingUids.length; i += BATCH_SIZE) {
+          const batch = missingUids.slice(i, i + BATCH_SIZE);
+          const { data: apiMapsInfo, error } = await getMapsInfo(batch);
+          if (error) {
+            console.warn("Failed to fetch map info from Nadeo API:", error);
+            continue;
+          }
+
+          const authorAccountIds = apiMapsInfo.map((m) => m.author);
+          const accountNames = await getAccountNames(authorAccountIds);
+
+          for (const mapInfo of apiMapsInfo) {
+            if (newMaps.some((m) => m.uid === mapInfo.mapUid)) {
+              console.warn(`Duplicate map UID found: ${mapInfo.mapUid}`);
+              continue;
+            }
+
+            newMaps.push({
+              id: crypto.randomUUID(),
+              name: mapInfo.name || "Unknown",
+              uid: mapInfo.mapUid,
+              fileName: mapInfo.filename || "",
+              author: mapInfo.author || "",
+              authorNickname: accountNames[mapInfo.author] || "",
+              authorTime: mapInfo.authorScore || 0,
+              goldTime: mapInfo.goldScore || 0,
+              silverTime: mapInfo.silverScore || 0,
+              bronzeTime: mapInfo.bronzeScore || 0,
+              submitter: mapInfo.submitter || null,
+              timestamp: mapInfo.timestamp || null,
+              fileUrl: mapInfo.fileUrl || null,
+              thumbnailUrl: mapInfo.thumbnailUrl || null,
+              uploadCheck: now,
+              createdAt: now,
+              updatedAt: now,
+              deletedAt: null,
+            });
+          }
+        }
+
+        await db.maps.createMany({ data: newMaps });
+        existingMaps.push(...newMaps);
+      }
+
+      const orderedMaps = uids
+        .map((uid) => {
+          const foundMap = existingMaps.find((m) => m.uid === uid);
+          return foundMap ? foundMap : null;
+        })
+        .filter((map: Maps | null): map is Maps => map !== null);
+
+      return orderedMaps;
     },
   );
 }

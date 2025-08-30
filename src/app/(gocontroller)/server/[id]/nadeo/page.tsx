@@ -1,3 +1,5 @@
+import { getTotdMonth } from "@/actions/nadeo/totd";
+import TotdMonths from "@/components/nadeo/totd-months";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
 import { getFileManagerHealth } from "@/lib/filemanager";
@@ -23,6 +25,8 @@ export default async function ServerNadeoPage({
     console.error("Failed to fetch file manager:", err);
   }
 
+  const { data: defaultMapList } = await getTotdMonth(id, 0);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -41,7 +45,13 @@ export default async function ServerNadeoPage({
           <TabsTrigger value="clubs">Clubs</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="totd" className="flex flex-col gap-2"></TabsContent>
+        <TabsContent value="totd" className="flex flex-col gap-2">
+          <TotdMonths
+            serverId={id}
+            fmHealth={fmHealth}
+            defaultMapList={defaultMapList}
+          />
+        </TabsContent>
 
         <TabsContent
           value="seasonal"

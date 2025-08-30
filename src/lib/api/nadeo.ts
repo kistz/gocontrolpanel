@@ -152,6 +152,18 @@ export async function searchAccountNames(
   });
 }
 
+export async function getAccountNames(
+  accountIds: string[],
+): Promise<AccountNames> {
+  const url = `${API_URL}/display-names`;
+  const params = new URLSearchParams();
+  accountIds.forEach((id) => params.append("accountId[]", id));
+
+  return await doCredentialsRequest<AccountNames>(
+    `${url}?${params.toString()}`,
+  );
+}
+
 export async function getTotdRoyalMaps(
   length: number = 1,
   offset: number = 0,
