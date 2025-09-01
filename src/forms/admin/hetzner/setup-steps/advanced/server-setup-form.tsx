@@ -152,24 +152,19 @@ export default function AdvancedServerSetupForm({
     <Tabs value={step} onValueChange={() => {}} className="w-full gap-3">
       <TabsList className="w-full">
         <TabsTrigger value="server" className="cursor-default">
-          <span className="block sm:hidden">1</span>
-          <span className="hidden sm:block">Server</span>
+          Server
         </TabsTrigger>
         <TabsTrigger value="serverController" className="cursor-default">
-          <span className="block sm:hidden">2</span>
-          <span className="hidden sm:block">Controller</span>
+          Controller
         </TabsTrigger>
         <TabsTrigger value="database" className="cursor-default">
-          <span className="block sm:hidden">3</span>
-          <span className="hidden sm:block">Database</span>
+          Database
         </TabsTrigger>
         <TabsTrigger value="network" className="cursor-default">
-          <span className="block sm:hidden">4</span>
-          <span className="hidden sm:block">Network</span>
+          Network
         </TabsTrigger>
         <TabsTrigger value="summary" className="cursor-default">
-          <span className="block sm:hidden">5</span>
-          <span className="hidden sm:block">Summary</span>
+          Summary
         </TabsTrigger>
       </TabsList>
 

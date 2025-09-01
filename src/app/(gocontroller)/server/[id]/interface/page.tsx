@@ -41,7 +41,7 @@ export default async function ServerInterfacePage({
         </h4>
       </div>
 
-      <Tabs defaultValue="interface" className="w-full h-full">
+      <Tabs defaultValue="interface" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="interface">Interface</TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>

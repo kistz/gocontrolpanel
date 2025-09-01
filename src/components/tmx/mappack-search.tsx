@@ -67,16 +67,14 @@ export default function MappackSearch({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-end">
-        <div className="flex flex-col gap-1">
-          <span className="text-nowrap text-sm">Mappack Name</span>
-          <Input
-            type="text"
-            placeholder="Search mappack name..."
-            value={nameQuery}
-            onChange={(e) => setNameQuery(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
-        </div>
+        <Input
+          type="text"
+          placeholder="Search mappack name..."
+          className="max-w-48"
+          value={nameQuery}
+          onChange={(e) => setNameQuery(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
 
         <Button onClick={() => onSearch()} disabled={loading}>
           <IconSearch />

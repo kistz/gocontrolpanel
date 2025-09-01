@@ -1,8 +1,15 @@
 import config from "@/lib/config";
 import {
   AccountNames,
+  ClubActivitiesResponse,
+  ClubCampaign,
+  ClubCampaignsResponse,
+  ClubListResponse,
   MapInfo,
+  MonthMapListResponse,
   NadeoTokens,
+  SeasonalCampaignsResponse,
+  ShortsCampaignsResponse,
   TrackmaniaCredentials,
   WebIdentity,
 } from "@/types/api/nadeo";
@@ -12,11 +19,12 @@ import { doServerAction } from "../actions";
 import { withRateLimit } from "../ratelimiter";
 import { getRedisClient } from "../redis";
 
-const TOKEN_KEY = "nadeo:tokens";
+const getTokenKey = (audience: string) => `nadeo:tokens:${audience}`;
 const CREDENTIALS_TOKEN_KEY = "nadeo:credentials_token";
 
 const PROD_URL = "https://prod.trackmania.core.nadeo.online";
 const API_URL = "https://api.trackmania.com/api";
+const LIVE_URL = "https://live-services.trackmania.nadeo.live";
 
 // This function is used to authenticate with the Nadeo API and store the tokens in Redis.
 export async function authenticate(
@@ -50,7 +58,7 @@ export async function authenticate(
   const redis = await getRedisClient();
 
   const tokens: NadeoTokens = await response.json();
-  await redis.set(TOKEN_KEY, JSON.stringify(tokens), "EX", 3600); // Store tokens for 1 hour
+  await redis.set(getTokenKey(audience), JSON.stringify(tokens), "EX", 3600); // Store tokens for 1 hour
   return tokens;
 }
 
@@ -98,9 +106,11 @@ export async function authenticateCredentials(): Promise<string> {
   return credentials.access_token;
 }
 
-export async function getTokens(): Promise<NadeoTokens | null> {
+export async function getTokens(
+  audience: string = "NadeoServices",
+): Promise<NadeoTokens | null> {
   const redis = await getRedisClient();
-  const raw = await redis.get(TOKEN_KEY);
+  const raw = await redis.get(getTokenKey(audience));
   return raw ? JSON.parse(raw) : null;
 }
 
@@ -142,27 +152,138 @@ export async function searchAccountNames(
   });
 }
 
+export async function getAccountNames(
+  accountIds: string[],
+): Promise<AccountNames> {
+  const url = `${API_URL}/display-names`;
+  const params = new URLSearchParams();
+  accountIds.forEach((id) => params.append("accountId[]", id));
+
+  return await doCredentialsRequest<AccountNames>(
+    `${url}?${params.toString()}`,
+  );
+}
+
+export async function getTotdRoyalMaps(
+  length: number = 1,
+  offset: number = 0,
+  royal: boolean = false,
+): Promise<MonthMapListResponse> {
+  const url = `${LIVE_URL}/api/token/campaign/month?length=${length}&offset=${offset}&royal=${royal}`;
+  return await doRequest<MonthMapListResponse>(url, "NadeoLiveServices");
+}
+
+export async function getSeasonalCampaigns(
+  length: number = 1,
+  offset: number = 0,
+): Promise<SeasonalCampaignsResponse> {
+  const url = `${LIVE_URL}/api/campaign/official?length=${length}&offset=${offset}`;
+  return await doRequest<SeasonalCampaignsResponse>(url, "NadeoLiveServices");
+}
+
+export async function getShortsCampaigns(
+  length: number = 1,
+  offset: number = 0,
+): Promise<ShortsCampaignsResponse> {
+  const url = `${LIVE_URL}/api/campaign/weekly-shorts?length=${length}&offset=${offset}`;
+  return await doRequest<ShortsCampaignsResponse>(url, "NadeoLiveServices");
+}
+
+export async function getClubCampaigns(
+  offset: number = 0,
+  name: string = "",
+  length: number = 12,
+): Promise<ClubCampaignsResponse> {
+  const url = `${LIVE_URL}/api/token/club/campaign?length=${length}&offset=${offset}&name=${encodeURIComponent(
+    name,
+  )}`;
+  return await doRequest<ClubCampaignsResponse>(url, "NadeoLiveServices");
+}
+
+export async function getClubActivities(
+  clubId: number,
+  offset: number = 0,
+  length: number = 12,
+): Promise<ClubActivitiesResponse> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/activity?length=${length}&offset=${offset}&active=true`;
+  return await doRequest<ClubActivitiesResponse>(url, "NadeoLiveServices");
+}
+
+export async function getClubCampaign(
+  clubId: number,
+  campaignId: number,
+): Promise<ClubCampaign> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/campaign/${campaignId}`;
+  return await doRequest<ClubCampaign>(url, "NadeoLiveServices");
+}
+
+export async function getClubs(
+  offset: number = 0,
+  name: string = "",
+  length: number = 12,
+): Promise<ClubListResponse> {
+  const url = `${LIVE_URL}/api/token/club?length=${length}&offset=${offset}&name=${encodeURIComponent(
+    name,
+  )}`;
+  return await doRequest<ClubListResponse>(url, "NadeoLiveServices");
+}
+
+export async function downloadFile(
+  url: string,
+  fileName: string,
+): Promise<File> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // 30 seconds
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/x-gbx",
+        "User-Agent": config.NADEO.CONTACT,
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      throw new Error(`Failed to download map: ${res.statusText}`);
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    return new File([arrayBuffer], fileName, {
+      type: "application/x-gbx",
+    });
+  } catch (err) {
+    if ((err as any).name === "AbortError") {
+      throw new Error(`Download for map ${fileName} timed out`);
+    }
+    throw err;
+  }
+}
+
 export async function doRequest<T>(
   url: string,
+  audience: string = "NadeoServices",
   init: RequestInit = {},
 ): Promise<T> {
   return withRateLimit("nadeo:doRequest", async () => {
-    let tokens = await getTokens();
+    let tokens = await getTokens(audience);
     if (!tokens) {
-      tokens = await authenticate();
+      tokens = await authenticate(audience);
     }
 
     const headers = new Headers(init.headers);
-    headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
+    headers.set("Authorization", `nadeo_v1 t=${tokens.accessToken}`);
     headers.set("User-Agent", config.NADEO.CONTACT);
 
     console.log("Requesting Nadeo API:", url);
     let res = await fetch(url, { ...init, headers });
 
     if (res.status === 401) {
-      tokens = await authenticate();
+      tokens = await authenticate(audience);
       console.log("Retrying Nadeo API request with new tokens");
-      headers.set("Authorization", `nadeo_v1 t=${tokens!.accessToken}`);
+      headers.set("Authorization", `nadeo_v1 t=${tokens.accessToken}`);
       res = await fetch(url, { ...init, headers });
     }
 

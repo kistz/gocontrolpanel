@@ -1,4 +1,5 @@
 "use client";
+import IconNadeo from "@/components/icons/nadeo";
 import IconTmx from "@/components/icons/tmx-svg";
 import {
   Collapsible,
@@ -154,13 +155,18 @@ export default function NavGroups() {
                     server.id,
                   ),
                 },
-                // {
-                //   name: "Dev",
-                //   url: generatePath(routes.servers.dev, {
-                //     uuid: server.uuid,
-                //   }),
-                //   icon: IconCode,
-                // }
+                {
+                  name: "Nadeo",
+                  url: generatePath(routes.servers.nadeo, {
+                    id: server.id,
+                  }),
+                  icon: IconNadeo,
+                  auth: hasPermissionSync(
+                    session,
+                    routePermissions.servers.nadeo,
+                    server.id,
+                  ),
+                },
               ],
             };
 

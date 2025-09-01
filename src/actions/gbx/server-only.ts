@@ -42,6 +42,7 @@ export async function syncPlayerList(manager: GbxClientManager) {
     }
   }
 
+  manager.info.liveInfo.players = {};
   manager.info.activePlayers = players;
   manager.emit("playerList", players);
   await syncPlayers(players);
