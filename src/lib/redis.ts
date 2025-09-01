@@ -2,6 +2,7 @@ import Redis from "ioredis";
 import "server-only";
 import config from "./config";
 import { appGlobals } from "./global";
+import { PaginationState } from "@tanstack/react-table";
 
 export async function getRedisClient() {
   if (!appGlobals.redis) {
@@ -44,3 +45,10 @@ export const getKeyTotdMonth = (offset: number) => `totd:month:${offset}`;
 export const getKeySeasonalCampaigns = () => `nadeo:seasonal-campaigns`;
 export const getKeyCampaign = (campaignId: number) => `nadeo:campaign:${campaignId}`;
 export const getKeyWeeklyShorts = () => `nadeo:weekly-shorts`;
+export const getKeyClubCampaigns = (pagination: PaginationState, filter?: string) => {
+  let key = `nadeo:club-campaigns:page=${pagination.pageIndex}:size=${pagination.pageSize}`;
+  if (filter) {
+    key += `:filter=${filter}`;
+  }
+  return key;
+}

@@ -8,7 +8,11 @@ import {
   getKeySeasonalCampaigns,
   getRedisClient,
 } from "@/lib/redis";
-import { Campaign, CampaignWithPlaylistMaps } from "@/types/api/nadeo";
+import {
+  Campaign,
+  CampaignWithPlaylistMaps,
+  ClubCampaignWithPlaylistMaps,
+} from "@/types/api/nadeo";
 import { ServerResponse } from "@/types/responses";
 import { getMapsByUids } from "../database/maps";
 import { uploadFiles } from "../filemanager";
@@ -89,7 +93,7 @@ export async function getCampaignWithMaps(
 
 export async function downloadCampaign(
   serverId: string,
-  campaign: CampaignWithPlaylistMaps,
+  campaign: CampaignWithPlaylistMaps | ClubCampaignWithPlaylistMaps["campaign"],
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
@@ -147,7 +151,7 @@ export async function downloadCampaign(
 
 export async function addCampaignToServer(
   serverId: string,
-  campaign: CampaignWithPlaylistMaps,
+  campaign: CampaignWithPlaylistMaps | ClubCampaignWithPlaylistMaps["campaign"],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],

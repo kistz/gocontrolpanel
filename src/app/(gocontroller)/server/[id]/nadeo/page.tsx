@@ -2,12 +2,10 @@ import {
   getAllSeasonalCampaigns,
   getCampaignWithMaps,
 } from "@/actions/nadeo/campaigns";
-import {
-  getClubCampaigns,
-  getClubCampaignWithMaps,
-} from "@/actions/nadeo/clubs";
+import { getClubCampaignWithMaps } from "@/actions/nadeo/clubs";
 import { getAllWeeklyShorts } from "@/actions/nadeo/shorts";
 import { getTotdMonth } from "@/actions/nadeo/totd";
+import ClubCampaignCard from "@/components/nadeo/club-campaign-maps";
 import ClubCampaigns from "@/components/nadeo/club-campaigns";
 import OfficialCampaignMaps from "@/components/nadeo/official-campaign-maps";
 import OfficialCampaigns from "@/components/nadeo/official-campaigns";
@@ -52,7 +50,6 @@ export default async function ServerNadeoPage({
   let selectedCampaign = undefined;
   let weeklyShortsList = undefined;
   let selectedWeeklyShorts = undefined;
-  let clubCampaignList = undefined;
   let selectedClubCampaign = undefined;
   switch (page) {
     case "totd":
@@ -91,9 +88,6 @@ export default async function ServerNadeoPage({
           parseInt(campaign),
         );
         selectedClubCampaign = clubCampaign;
-      } else {
-        const { data: clubCampaigns } = await getClubCampaigns();
-        clubCampaignList = clubCampaigns.clubCampaignList;
       }
       break;
   }
@@ -162,15 +156,13 @@ export default async function ServerNadeoPage({
 
         <TabsContent value="club-campaigns" className="flex flex-col gap-2">
           {campaign && club ? (
-            <></>
+            <ClubCampaignCard
+              serverId={id}
+              fmHealth={fmHealth}
+              campaign={selectedClubCampaign}
+            />
           ) : (
-            clubCampaignList && (
-              <ClubCampaigns
-                serverId={id}
-                fmHealth={fmHealth}
-                defaultCampaigns={clubCampaignList}
-              />
-            )
+            <ClubCampaigns serverId={id} />
           )}
         </TabsContent>
 

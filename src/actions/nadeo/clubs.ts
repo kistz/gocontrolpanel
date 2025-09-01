@@ -1,25 +1,43 @@
 "use server";
 
 import { doServerActionWithAuth } from "@/lib/actions";
-import {
-  getClubCampaign,
-  getClubCampaigns as getClubCampaignsAPI,
-} from "@/lib/api/nadeo";
-import {
-  ClubCampaignsResponse,
-  ClubCampaignWithPlaylistMaps,
-} from "@/types/api/nadeo";
-import { ServerResponse } from "@/types/responses";
+import { getClubCampaign, getClubCampaigns } from "@/lib/api/nadeo";
+import { getKeyClubCampaigns, getRedisClient } from "@/lib/redis";
+import { ClubCampaign, ClubCampaignWithPlaylistMaps } from "@/types/api/nadeo";
+import { PaginationResponse, ServerResponse } from "@/types/responses";
+import { PaginationState } from "@tanstack/react-table";
 import { getMapsByUids } from "../database/maps";
 
-export async function getClubCampaigns(
+export async function getClubCampaignsPaginated(
+  pagination: PaginationState,
+  _: { field: string; order: "asc" | "desc" },
   filter?: string,
-  offset?: number,
-): Promise<ServerResponse<ClubCampaignsResponse>> {
+): Promise<ServerResponse<PaginationResponse<ClubCampaign>>> {
   return doServerActionWithAuth(
     ["servers::moderator", "servers::admin"],
     async () => {
-      return await getClubCampaignsAPI(offset, filter);
+      const redis = await getRedisClient();
+      const key = getKeyClubCampaigns(pagination, filter);
+
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+
+      const response = await getClubCampaigns(
+        pagination.pageIndex * pagination.pageSize,
+        filter,
+        pagination.pageSize,
+      );
+
+      const paginatedResponse = {
+        totalCount: response.itemCount,
+        data: response.clubCampaignList,
+      };
+
+      await redis.set(key, JSON.stringify(paginatedResponse), "EX", 300);
+
+      return paginatedResponse;
     },
   );
 }

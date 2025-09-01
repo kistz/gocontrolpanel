@@ -67,7 +67,10 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
     pageIndex: 0,
   });
   const { sorting, setSorting, field, order } = useSorting(sortingField);
-  const [globalFilter, setGlobalFilter] = useState<string>("");
+
+  const [searchInput, setSearchInput] = useState("");
+  const [globalFilter, setGlobalFilter] = useState("");
+
   const { data, totalCount, loading, refetch } = usePaginationAPI<
     TData,
     TFetch
@@ -79,6 +82,14 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
       pageIndex: 0,
     }));
   }, [globalFilter]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setGlobalFilter(searchInput);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
 
   const columns = createColumns(refetch, args);
 
@@ -114,8 +125,8 @@ export function PaginationTable<TData, TValue, TArgs, TFetch, TActionArgs>({
           {filter && (
             <Input
               placeholder="Search..."
-              value={globalFilter || ""}
-              onChange={(e) => setGlobalFilter(e.target.value)}
+              value={searchInput || ""}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="flex-1 sm:max-w-1/3"
             />
           )}
