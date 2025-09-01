@@ -42,10 +42,11 @@ export default function ClubCampaigns({
       }
 
       setError(null);
-      setCampaigns(
-        more ? [...campaigns, ...data.clubCampaignList] : data.clubCampaignList,
-      );
-      setHasMore(data.itemCount > campaigns.length);
+      const newCampaigns = more
+        ? [...campaigns, ...data.clubCampaignList]
+        : data.clubCampaignList;
+      setCampaigns(newCampaigns);
+      setHasMore(data.itemCount > newCampaigns.length);
     } catch (err) {
       setError("Failed to get campaigns: " + getErrorMessage(err));
       toast.error("Failed to get campaigns", {
