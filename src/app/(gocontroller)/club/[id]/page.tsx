@@ -2,6 +2,7 @@ import { getClub } from "@/actions/nadeo/clubs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { hasPermission } from "@/lib/auth";
+import { capitalizeWords } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { IconPhoto, IconRosetteDiscountCheck } from "@tabler/icons-react";
 import Image from "next/image";
@@ -17,6 +18,9 @@ export default async function ClubPage({
   const canEdit = await hasPermission(routePermissions.clubs.edit);
 
   const { data: club } = await getClub(id);
+
+  const createdAt = new Date(club.creationTimestamp * 1000);
+  const updatedAt = new Date(club.editionTimestamp * 1000);
 
   return (
     <div
@@ -56,14 +60,16 @@ export default async function ClubPage({
                   </div>
                 )}
                 <div className="flex flex-col gap-2">
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center flex-wrap">
                     <h2
-                      className="text-xl font-bold"
+                      className="text-xl font-bold truncate"
                       dangerouslySetInnerHTML={{
                         __html: parseTmTags(club.name),
                       }}
                     ></h2>
+
                     {club.verified && <IconRosetteDiscountCheck />}
+
                     {club.tag && (
                       <Badge
                         variant={"secondary"}
@@ -73,6 +79,8 @@ export default async function ClubPage({
                         }}
                       ></Badge>
                     )}
+
+                    {capitalizeWords(club.state.replaceAll("-", " "))}
                   </div>
 
                   {club.description.trim() && (
@@ -83,14 +91,29 @@ export default async function ClubPage({
                     ></p>
                   )}
 
-                  <div>
-                    <span className="font-semibold">Author</span>:{" "}
-                    {club.authorName}
-                  </div>
-
-                  <div>
-                    <span className="font-semibold">Latest Editor</span>:{" "}
-                    {club.latestEditorName}
+                  <div className="grid grid-cols-2 gap-2 max-w-128">
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Author</span>
+                      <span className="truncate">{club.authorName}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Latest Editor</span>
+                      <span className="truncate">{club.latestEditorName}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Created At</span>
+                      <span className="truncate">
+                        {createdAt.toLocaleDateString()}{" "}
+                        {createdAt.toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Updated At</span>
+                      <span className="truncate">
+                        {updatedAt.toLocaleDateString()}{" "}
+                        {updatedAt.toLocaleTimeString()}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
