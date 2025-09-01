@@ -271,7 +271,6 @@ export async function getMapsByUids(
       const existingMaps = await db.maps.findMany({
         where: {
           uid: { in: uids },
-          deletedAt: null,
         },
       });
 

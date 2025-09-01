@@ -24,9 +24,7 @@ export default async function TotdMonths({
         </h2>
 
         <div className="flex gap-2">
-          <Link
-            href={`/server/${serverId}/nadeo?page=totd&offset=${offset + 1}`}
-          >
+          <Link href={`/server/${serverId}/nadeo?offset=${offset + 1}`}>
             <Button
               variant="outline"
               disabled={
@@ -38,10 +36,7 @@ export default async function TotdMonths({
             </Button>
           </Link>
           <Link
-            href={`/server/${serverId}/nadeo?page=totd&offset=${Math.max(
-              0,
-              offset - 1,
-            )}`}
+            href={`/server/${serverId}/nadeo?offset=${Math.max(0, offset - 1)}`}
           >
             <Button variant="outline" disabled={offset <= 0 || !mapList}>
               Next

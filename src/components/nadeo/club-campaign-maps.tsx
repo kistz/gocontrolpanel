@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import PlaylistMapCard from "./playlist-map-card";
 
-export default function ClubCampaignCard({
+export default function ClubCampaignMaps({
   serverId,
   fmHealth,
   campaign,
@@ -103,7 +103,7 @@ export default function ClubCampaignCard({
     <div className="flex flex-col gap-4">
       <div className="flex gap-4 justify-between flex-col sm:flex-row">
         <div className="flex gap-4 items-center">
-          <Link href={`/server/${serverId}/nadeo?page=club-campaigns`}>
+          <Link href={`/server/${serverId}/nadeo`}>
             <Button variant="outline">
               <IconArrowLeft />
               Back

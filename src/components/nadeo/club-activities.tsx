@@ -14,7 +14,7 @@ export default function ClubActivities({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <Link href={`/server/${serverId}/nadeo?page=clubs?club=${clubId}`}>
+      <Link href={`/server/${serverId}/nadeo?club=${clubId}`}>
         <Button variant="outline">
           <IconArrowLeft />
           Back

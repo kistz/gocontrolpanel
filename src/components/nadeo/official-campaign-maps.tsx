@@ -103,7 +103,7 @@ export default function OfficialCampaignMaps({
     <div className="flex flex-col gap-4">
       <div className="flex gap-4 justify-between flex-col sm:flex-row">
         <div className="flex gap-4 items-center">
-          <Link href={`/server/${serverId}/nadeo?page=seasonal`}>
+          <Link href={`/server/${serverId}/nadeo`}>
             <Button variant="outline">
               <IconArrowLeft />
               Back
