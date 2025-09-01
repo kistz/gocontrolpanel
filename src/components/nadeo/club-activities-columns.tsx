@@ -38,7 +38,7 @@ export const createColumns = (
       <div className="flex justify-end">
         {row.original.activityType === "campaign" && (
           <Link
-            href={`/server/${serverId}/nadeo?campaign=${row.original.campaignId}&club=${row.original.clubId}`}
+            href={`/server/${serverId}/nadeo?club=${row.original.clubId}&campaign=${row.original.campaignId}`}
           >
             <IconArrowRight />
           </Link>

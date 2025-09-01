@@ -8,6 +8,7 @@ import { hasPermission } from "@/lib/auth";
 import { getFileManagerHealth } from "@/lib/filemanager";
 import { routePermissions, routes } from "@/routes";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function ServerNadeoPage({
   params,
@@ -62,11 +63,13 @@ export default async function ServerNadeoPage({
         </TabsContent>
 
         <TabsContent value="seasonal" className="flex flex-col gap-2">
-          <SeasonalTab
-            serverId={id}
-            fmHealth={fmHealth}
-            campaign={campaignInt}
-          />
+          <Suspense fallback={<p>Loading Seasonal Campaigns...</p>}>
+            <SeasonalTab
+              serverId={id}
+              fmHealth={fmHealth}
+              campaign={campaignInt}
+            />
+          </Suspense>
         </TabsContent>
 
         <TabsContent value="shorts" className="flex flex-col gap-2">
