@@ -52,44 +52,46 @@ export default async function ClubPage({
                     src={club.iconUrl}
                     fill
                     alt={club.name}
-                    className="static! rounded-lg h-40! max-w-92 object-cover"
+                    className="static! rounded-lg max-w-92 object-cover"
                   />
                 ) : (
-                  <div className="w-full h-40 rounded-lg flex items-center justify-center max-w-92">
+                  <div className="w-full rounded-lg flex items-center justify-center max-w-92">
                     <IconPhoto className="text-gray-500" size={48} />
                   </div>
                 )}
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-2 items-center flex-wrap">
-                    <h2
-                      className="text-xl font-bold truncate"
-                      dangerouslySetInnerHTML={{
-                        __html: parseTmTags(club.name),
-                      }}
-                    ></h2>
-
-                    {club.verified && <IconRosetteDiscountCheck />}
-
-                    {club.tag && (
-                      <Badge
-                        variant={"secondary"}
-                        className="text-md"
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <h2
+                        className="text-xl font-bold truncate"
                         dangerouslySetInnerHTML={{
-                          __html: parseTmTags(club.tag),
+                          __html: parseTmTags(club.name),
                         }}
-                      ></Badge>
+                      ></h2>
+
+                      {club.verified && <IconRosetteDiscountCheck />}
+
+                      {club.tag && (
+                        <Badge
+                          variant={"secondary"}
+                          className="text-md"
+                          dangerouslySetInnerHTML={{
+                            __html: parseTmTags(club.tag),
+                          }}
+                        ></Badge>
+                      )}
+
+                      {capitalizeWords(club.state.replaceAll("-", " "))}
+                    </div>
+
+                    {club.description.trim() && (
+                      <p
+                        dangerouslySetInnerHTML={{
+                          __html: parseTmTags(club.description.trim()),
+                        }}
+                      ></p>
                     )}
-
-                    {capitalizeWords(club.state.replaceAll("-", " "))}
                   </div>
-
-                  {club.description.trim() && (
-                    <p
-                      dangerouslySetInnerHTML={{
-                        __html: parseTmTags(club.description.trim()),
-                      }}
-                    ></p>
-                  )}
 
                   <div className="grid grid-cols-2 gap-2 max-w-128">
                     <div className="flex flex-col">
