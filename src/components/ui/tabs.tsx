@@ -18,11 +18,9 @@ function Tabs({
 
   // only add URL syncing if withParam is true
   const handleValueChange = (newValue: string) => {
-    if (withParam) {
-      const params = new URLSearchParams();
-      params.set("page", newValue);
-      router.replace(`?${params.toString()}`, { scroll: false });
-    }
+    const params = new URLSearchParams();
+    if (withParam) params.set("page", newValue);
+    router.replace(`?${params.toString()}`, { scroll: false });
 
     if (onValueChange) {
       onValueChange(newValue);

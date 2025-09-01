@@ -5,8 +5,8 @@ import {
 } from "@/actions/nadeo/campaigns";
 import { getErrorMessage } from "@/lib/utils";
 import { CampaignWithPlaylistMaps } from "@/types/api/nadeo";
-import { IconArrowLeft, IconDownload, IconMapPlus, IconPlus } from "@tabler/icons-react";
-import Link from "next/link";
+import { IconArrowLeft, IconDownload, IconMapPlus } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -21,6 +21,8 @@ export default function OfficialCampaignMaps({
   fmHealth: boolean;
   campaign?: CampaignWithPlaylistMaps | null;
 }) {
+  const router = useRouter();
+
   const [isDownloading, setIsDownloading] = useState(false);
 
   const onDownloadCampaign = async () => {
@@ -103,12 +105,10 @@ export default function OfficialCampaignMaps({
     <div className="flex flex-col gap-4">
       <div className="flex gap-4 justify-between flex-col sm:flex-row">
         <div className="flex gap-4 items-center">
-          <Link href={`/server/${serverId}/nadeo`}>
-            <Button variant="outline">
-              <IconArrowLeft />
-              Back
-            </Button>
-          </Link>
+          <Button variant="outline" onClick={() => router.back()}>
+            <IconArrowLeft />
+            Back
+          </Button>
 
           <h2 className="text-xl font-bold">
             {campaign ? `${campaign.name}` : "Campaign not found"}

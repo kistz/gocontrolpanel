@@ -1,6 +1,8 @@
+"use client";
+
 import { getClubActivitiesPaginated } from "@/actions/nadeo/clubs";
 import { IconArrowLeft } from "@tabler/icons-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PaginationTable } from "../table/pagination-table";
 import { Button } from "../ui/button";
 import { createColumns } from "./club-activities-columns";
@@ -12,14 +14,14 @@ export default function ClubActivities({
   serverId: string;
   clubId: number;
 }) {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col gap-4">
-      <Link href={`/server/${serverId}/nadeo?club=${clubId}`}>
-        <Button variant="outline">
-          <IconArrowLeft />
-          Back
-        </Button>
-      </Link>
+      <Button variant="outline" onClick={() => router.back()} className="w-fit">
+        <IconArrowLeft />
+        Back
+      </Button>
 
       <PaginationTable
         createColumns={createColumns}
