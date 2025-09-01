@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/nadeo";
 import {
   getKeyClubActivities,
+  getKeyClubCampaign,
   getKeyClubCampaigns,
   getKeyClubs,
   getRedisClient,
@@ -136,6 +137,14 @@ export async function getClubCampaignWithMaps(
   return doServerActionWithAuth(
     ["servers::moderator", "servers::admin"],
     async () => {
+      const redis = await getRedisClient();
+      const key = getKeyClubCampaign(clubId, campaignId);
+
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+
       const campaign = await getClubCampaign(clubId, campaignId);
 
       const mapUids = campaign.campaign.playlist.map((m) => m.mapUid);
@@ -144,7 +153,7 @@ export async function getClubCampaignWithMaps(
         throw new Error(error);
       }
 
-      return {
+      const response = {
         ...campaign,
         campaign: {
           ...campaign.campaign,
@@ -156,6 +165,10 @@ export async function getClubCampaignWithMaps(
             .filter((p) => p.map !== undefined),
         },
       } as ClubCampaignWithPlaylistMaps;
+
+      await redis.set(key, JSON.stringify(response), "EX", 300);
+
+      return response;
     },
   );
 }

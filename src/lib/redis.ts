@@ -61,3 +61,5 @@ export const getKeyClubs = (pagination: PaginationState, filter?: string) => {
 }
 export const getKeyClubActivities = (clubId: number, pagination: PaginationState) =>
   `nadeo:club:${clubId}:activities:page=${pagination.pageIndex}:size=${pagination.pageSize}`;
+export const getKeyClubCampaign = (clubId: number, campaignId: number) =>
+  `nadeo:club:${clubId}:campaign:${campaignId}`;

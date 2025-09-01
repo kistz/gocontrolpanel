@@ -94,6 +94,15 @@ export default async function ServerNadeoPage({
         selectedClubCampaign = clubCampaign;
       }
       break;
+    case "clubs":
+      if (clubInt && campaignInt) {
+        const { data: clubCampaign } = await getClubCampaignWithMaps(
+          clubInt,
+          campaignInt,
+        );
+        selectedClubCampaign = clubCampaign;
+      }
+      break;
   }
 
   return (
@@ -173,7 +182,11 @@ export default async function ServerNadeoPage({
         <TabsContent value="clubs" className="flex flex-col gap-2">
           {clubInt ? (
             campaignInt ? (
-              <></>
+              <ClubCampaignCard
+                serverId={id}
+                fmHealth={fmHealth}
+                campaign={selectedClubCampaign}
+              />
             ) : (
               <ClubActivities serverId={id} clubId={clubInt} />
             )
