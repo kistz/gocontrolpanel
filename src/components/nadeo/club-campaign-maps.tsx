@@ -110,7 +110,7 @@ export default function ClubCampaignMaps({
             Back
           </Button>
 
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold truncate">
             {campaign ? `${campaign.name}` : "Campaign not found"}
           </h2>
         </div>
