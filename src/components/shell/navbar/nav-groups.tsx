@@ -1,4 +1,5 @@
 "use client";
+import IconNadeo from "@/components/icons/nadeo";
 import IconTmx from "@/components/icons/tmx-svg";
 import {
   Collapsible,
@@ -27,7 +28,6 @@ import {
   IconDeviceGamepad,
   IconFileDescription,
   IconMap,
-  IconPoo,
   IconServer,
   IconStopwatch,
   IconUsers,
@@ -160,7 +160,7 @@ export default function NavGroups() {
                   url: generatePath(routes.servers.nadeo, {
                     id: server.id,
                   }),
-                  icon: IconPoo,
+                  icon: IconNadeo,
                   auth: hasPermissionSync(
                     session,
                     routePermissions.servers.nadeo,
