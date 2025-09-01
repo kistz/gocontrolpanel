@@ -218,9 +218,9 @@ export async function getClubCampaign(
 }
 
 export async function getClubs(
-  length: number = 1,
   offset: number = 0,
   name: string = "",
+  length: number = 12,
 ): Promise<ClubListResponse> {
   const url = `${LIVE_URL}/api/token/club?length=${length}&offset=${offset}&name=${encodeURIComponent(
     name,

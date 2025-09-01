@@ -7,6 +7,7 @@ import { getAllWeeklyShorts } from "@/actions/nadeo/shorts";
 import { getTotdMonth } from "@/actions/nadeo/totd";
 import ClubCampaignCard from "@/components/nadeo/club-campaign-maps";
 import ClubCampaigns from "@/components/nadeo/club-campaigns";
+import Clubs from "@/components/nadeo/clubs";
 import OfficialCampaignMaps from "@/components/nadeo/official-campaign-maps";
 import OfficialCampaigns from "@/components/nadeo/official-campaigns";
 import TotdMonths from "@/components/nadeo/totd-months";
@@ -166,10 +167,9 @@ export default async function ServerNadeoPage({
           )}
         </TabsContent>
 
-        <TabsContent
-          value="clubs"
-          className="flex flex-col gap-2"
-        ></TabsContent>
+        <TabsContent value="clubs" className="flex flex-col gap-2">
+          {club ? <></> : <Clubs serverId={id} />}
+        </TabsContent>
       </Tabs>
     </div>
   );
