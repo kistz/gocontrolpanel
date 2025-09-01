@@ -20,6 +20,7 @@ declare module "next-auth" {
       groups: UserGroup[];
       projects: UserProject[];
       servers: UserServer[];
+      adminClubs: { id: number; name: string }[];
     };
     expires: ISODateString;
   }
@@ -42,5 +43,6 @@ declare module "next-auth/jwt" {
     groups: UserGroup[];
     projects: UserProject[];
     servers: UserServer[];
+    adminClubs: { id: number; name: string }[];
   }
 }

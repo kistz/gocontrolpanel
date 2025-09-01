@@ -31,7 +31,7 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
       response_type: "code",
       client_id: config.NADEO.CLIENT_ID,
       redirect_uri: config.NADEO.REDIRECT_URI,
-      scope: "",
+      scope: "clubs",
     },
   },
   token: {
@@ -92,11 +92,34 @@ export const authOptions: NextAuthOptions = {
         groups: token.groups,
         projects: token.projects,
         servers: token.servers,
+        adminClubs: token.adminClubs,
       };
 
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account && account.access_token) {
+        try {
+          const res = await fetch(
+            "https://api.trackmania.com/api/user/clubs/admin",
+            {
+              headers: {
+                Authorization: `Bearer ${account.access_token}`,
+              },
+            },
+          );
+
+          if (res.ok) {
+            const data: { clubs: { id: number; name: string }[] } =
+              await res.json();
+            token.adminClubs = data.clubs;
+          }
+        } catch (error) {
+          token.adminClubs = [];
+          console.error("Failed to fetch admin clubs", error);
+        }
+      }
+
       let dbUser: UsersWithGroupsWithServers | null = null;
       try {
         if (user) {
@@ -148,6 +171,7 @@ export const authOptions: NextAuthOptions = {
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid || undefined;
       token.permissions = getList<string>(dbUser.permissions);
+      token.adminClubs = token.adminClubs || [];
       token.groups = dbUser.groupMembers.map((g) => ({
         id: g.group.id,
         name: g.group.name,
