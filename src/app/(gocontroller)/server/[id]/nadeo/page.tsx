@@ -2,9 +2,10 @@ import {
   getAllSeasonalCampaigns,
   getCampaignWithMaps,
 } from "@/actions/nadeo/campaigns";
+import { getAllWeeklyShorts } from "@/actions/nadeo/shorts";
 import { getTotdMonth } from "@/actions/nadeo/totd";
 import CampaignMaps from "@/components/nadeo/campaign-maps";
-import SeasonalCampaigns from "@/components/nadeo/seasonal-campaigns";
+import OfficialCampaigns from "@/components/nadeo/official-campaigns";
 import TotdMonths from "@/components/nadeo/totd-months";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
@@ -39,6 +40,8 @@ export default async function ServerNadeoPage({
   let mapList = undefined;
   let seasonalCampaignList = undefined;
   let selectedCampaign = undefined;
+  let weeklyShortsList = undefined;
+  let selectedWeeklyShorts = undefined;
   switch (page) {
     case "totd":
       const { data: totdMapList } = await getTotdMonth(id, offsetInt);
@@ -55,6 +58,17 @@ export default async function ServerNadeoPage({
         if (sc) {
           const { data: campaignWithMaps } = await getCampaignWithMaps(sc);
           selectedCampaign = campaignWithMaps;
+        }
+      }
+      break;
+    case "shorts":
+      const { data: weeklyShortsResponse } = await getAllWeeklyShorts();
+      weeklyShortsList = weeklyShortsResponse;
+      if (campaign && weeklyShortsList) {
+        const wc = weeklyShortsList.find((c) => c.id.toString() === campaign);
+        if (wc) {
+          const { data: shortsWithMaps } = await getCampaignWithMaps(wc);
+          selectedWeeklyShorts = shortsWithMaps;
         }
       }
       break;
@@ -96,18 +110,31 @@ export default async function ServerNadeoPage({
             />
           ) : (
             seasonalCampaignList && (
-              <SeasonalCampaigns
+              <OfficialCampaigns
                 serverId={id}
-                seasonalCampaignList={seasonalCampaignList}
+                campaigns={seasonalCampaignList}
               />
             )
           )}
         </TabsContent>
 
-        <TabsContent
-          value="shorts"
-          className="flex flex-col gap-2"
-        ></TabsContent>
+        <TabsContent value="shorts" className="flex flex-col gap-2">
+          {campaign ? (
+            <CampaignMaps
+              serverId={id}
+              fmHealth={fmHealth}
+              campaign={selectedWeeklyShorts}
+            />
+          ) : (
+            weeklyShortsList && (
+              <OfficialCampaigns
+                serverId={id}
+                campaigns={weeklyShortsList}
+                type="shorts"
+              />
+            )
+          )}
+        </TabsContent>
 
         <TabsContent
           value="club-campaigns"

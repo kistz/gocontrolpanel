@@ -4,7 +4,10 @@ import { IconArrowRight } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 
-export const createColumns = (serverId: string): ColumnDef<Campaign>[] => [
+export const createColumns = (
+  serverId: string,
+  type: "seasonal" | "shorts",
+): ColumnDef<Campaign>[] => [
   {
     accessorKey: "name",
     header: () => <span>Name</span>,
@@ -38,7 +41,7 @@ export const createColumns = (serverId: string): ColumnDef<Campaign>[] => [
     cell: ({ row }) => (
       <div className="flex justify-end">
         <Link
-          href={`/server/${serverId}/nadeo?page=seasonal&campaign=${row.original.id}`}
+          href={`/server/${serverId}/nadeo?page=${type}&campaign=${row.original.id}`}
         >
           <IconArrowRight />
         </Link>
