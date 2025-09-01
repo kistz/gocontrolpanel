@@ -28,11 +28,7 @@ export default async function ShortsTab({
     }
   } else {
     return (
-      <OfficialCampaigns
-        serverId={serverId}
-        campaigns={weeklyShortsList}
-        type="shorts"
-      />
+      <OfficialCampaigns serverId={serverId} campaigns={weeklyShortsList} />
     );
   }
 }

@@ -6,7 +6,6 @@ import Link from "next/link";
 
 export const createColumns = (
   serverId: string,
-  type: "seasonal" | "shorts",
 ): ColumnDef<Campaign>[] => [
   {
     accessorKey: "name",
