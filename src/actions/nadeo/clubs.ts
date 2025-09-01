@@ -11,13 +11,15 @@ import {
 } from "@/lib/api/nadeo";
 import {
   getKeyClubActivities,
+  getKeyClubActivitiesPaginated,
   getKeyClubCampaign,
-  getKeyClubCampaigns,
-  getKeyClubs,
+  getKeyClubCampaignsPaginated,
+  getKeyClubsPaginated,
   getRedisClient,
 } from "@/lib/redis";
 import {
   Club,
+  ClubActivitiesResponse,
   ClubActivity,
   ClubCampaign,
   ClubCampaignWithPlaylistMaps,
@@ -36,7 +38,7 @@ export async function getClubCampaignsPaginated(
     ["servers::moderator", "servers::admin"],
     async () => {
       const redis = await getRedisClient();
-      const key = getKeyClubCampaigns(pagination, filter);
+      const key = getKeyClubCampaignsPaginated(pagination, filter);
 
       const cached = await redis.get(key);
       if (cached) {
@@ -70,7 +72,7 @@ export async function getClubsPaginated(
     ["servers::moderator", "servers::admin"],
     async () => {
       const redis = await getRedisClient();
-      const key = getKeyClubs(pagination, filter);
+      const key = getKeyClubsPaginated(pagination, filter);
 
       const cached = await redis.get(key);
       if (cached) {
@@ -109,7 +111,7 @@ export async function getClubActivitiesPaginated(
       }
 
       const redis = await getRedisClient();
-      const key = getKeyClubActivities(fetchArgs, pagination);
+      const key = getKeyClubActivitiesPaginated(fetchArgs, pagination);
 
       const cached = await redis.get(key);
       if (cached) {
@@ -131,6 +133,28 @@ export async function getClubActivitiesPaginated(
       return paginatedResponse;
     },
   );
+}
+
+export async function getClubActivitiesList(
+  clubId: number,
+  offset = 0,
+  length = 12,
+): Promise<ServerResponse<ClubActivitiesResponse>> {
+  return doServerActionWithAuth(["clubs:view", "clubs:edit"], async () => {
+    const redis = await getRedisClient();
+    const key = getKeyClubActivities(clubId, offset);
+
+    const cached = await redis.get(key);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const response = await getClubActivities(clubId, offset, length);
+
+    await redis.set(key, JSON.stringify(response), "EX", 300);
+
+    return response;
+  });
 }
 
 export async function getClubCampaignWithMaps(

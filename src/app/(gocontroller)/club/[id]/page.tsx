@@ -1,8 +1,8 @@
 import { getClub } from "@/actions/nadeo/clubs";
+import ClubActivities from "@/components/clubs/club-activities";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { hasPermission } from "@/lib/auth";
-import { capitalizeWords } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { IconPhoto, IconRosetteDiscountCheck } from "@tabler/icons-react";
 import Image from "next/image";
@@ -20,7 +20,6 @@ export default async function ClubPage({
   const { data: club } = await getClub(id);
 
   const createdAt = new Date(club.creationTimestamp * 1000);
-  const updatedAt = new Date(club.editionTimestamp * 1000);
 
   return (
     <div
@@ -80,8 +79,6 @@ export default async function ClubPage({
                           }}
                         ></Badge>
                       )}
-
-                      {capitalizeWords(club.state.replaceAll("-", " "))}
                     </div>
 
                     {club.description.trim() && (
@@ -115,6 +112,8 @@ export default async function ClubPage({
             </Card>
           </div>
         )}
+        
+        <ClubActivities clubId={id} />
       </div>
     </div>
   );
