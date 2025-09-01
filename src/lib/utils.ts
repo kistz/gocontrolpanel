@@ -285,6 +285,8 @@ export const permissions: string[] = [
   "servers:create",
   "servers:edit",
   "servers:delete",
+  "clubs:view",
+  "clubs:edit",
   "hetzner:view",
   "hetzner:create",
   "hetzner:edit",

@@ -2,6 +2,7 @@ import { auth, hasPermission } from "@/lib/auth";
 import { routePermissions } from "@/routes";
 import { Icon } from "@tabler/icons-react";
 import NavAdmin from "./nav-admin";
+import NavClubs from "./nav-clubs";
 import NavFooter from "./nav-footer";
 import NavGroups from "./nav-groups";
 
@@ -32,6 +33,7 @@ export default async function Navbar() {
   const canViewHetzner = await hasPermission(
     routePermissions.admin.hetzner.view,
   );
+  const canViewClubs = await hasPermission(routePermissions.clubs);
 
   const canViewAdmin =
     canViewUsers ||
@@ -43,6 +45,7 @@ export default async function Navbar() {
   return (
     <>
       {session && <NavGroups />}
+      {session && canViewClubs && <NavClubs />}
       {session && canViewAdmin && (
         <NavAdmin
           canViewUsers={canViewUsers}
