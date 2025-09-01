@@ -3,7 +3,7 @@ import { MonthMapListWithDayMaps } from "@/types/api/nadeo";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import NadeoMapCard from "./nadeo-map-card";
+import DayMapCard from "./day-map-card";
 
 export default async function TotdMonths({
   serverId,
@@ -54,7 +54,7 @@ export default async function TotdMonths({
       {mapList && (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
           {mapList.days.map((day) => (
-            <NadeoMapCard
+            <DayMapCard
               key={day.mapUid}
               serverId={serverId}
               fmHealth={fmHealth}

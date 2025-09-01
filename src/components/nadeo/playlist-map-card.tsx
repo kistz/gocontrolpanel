@@ -1,7 +1,7 @@
 "use client";
 import { addMapToServer, downloadMapFromUrl } from "@/actions/nadeo/maps";
-import { cn, getErrorMessage, weekDayNumberToName } from "@/lib/utils";
-import { DayWithMap } from "@/types/api/nadeo";
+import { cn, getErrorMessage } from "@/lib/utils";
+import { PlaylistWithMap } from "@/types/api/nadeo";
 import {
   IconDownload,
   IconMapPlus,
@@ -13,20 +13,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 import MapMedals from "../maps/map-medals";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
 
-export default function NadeoMapCard({
+export default function PlaylistMapCard({
   serverId,
   fmHealth,
-  day,
+  playlist,
   className,
 }: {
   serverId: string;
   fmHealth: boolean;
-  day: DayWithMap;
+  playlist: PlaylistWithMap;
   className?: string;
 }) {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -38,7 +37,7 @@ export default function NadeoMapCard({
         return;
       }
 
-      if (!day.map.fileUrl) {
+      if (!playlist.map.fileUrl) {
         toast.error("Map does not have a valid download URL");
         return;
       }
@@ -49,8 +48,8 @@ export default function NadeoMapCard({
 
       const { error } = await downloadMapFromUrl(
         serverId,
-        day.map.fileUrl,
-        day.map.fileName,
+        playlist.map.fileUrl,
+        playlist.map.fileName,
       );
       if (error) {
         throw new Error(error);
@@ -75,7 +74,7 @@ export default function NadeoMapCard({
         return;
       }
 
-      if (!day.map.fileUrl) {
+      if (!playlist.map.fileUrl) {
         toast.error("Map does not have a valid download URL");
         return;
       }
@@ -86,8 +85,8 @@ export default function NadeoMapCard({
 
       const { error } = await addMapToServer(
         serverId,
-        day.map.fileUrl,
-        day.map.fileName,
+        playlist.map.fileUrl,
+        playlist.map.fileName,
       );
       if (error) {
         throw new Error(error);
@@ -106,11 +105,11 @@ export default function NadeoMapCard({
   return (
     <Card className={cn("flex flex-col flex-1 relative", className)}>
       <div className="relative">
-        {day.map.thumbnailUrl ? (
+        {playlist.map.thumbnailUrl ? (
           <Image
-            src={day.map.thumbnailUrl}
+            src={playlist.map.thumbnailUrl}
             fill
-            alt={day.map.name}
+            alt={playlist.map.name}
             className="static! rounded-t-lg h-40! object-cover"
           />
         ) : (
@@ -122,7 +121,7 @@ export default function NadeoMapCard({
           <h3
             className="truncate text-lg font-semibold text-white"
             dangerouslySetInnerHTML={{
-              __html: parseTmTags(day.map.name ?? ""),
+              __html: parseTmTags(playlist.map.name ?? ""),
             }}
           ></h3>
 
@@ -131,7 +130,7 @@ export default function NadeoMapCard({
             <span
               className="text-sm truncate"
               dangerouslySetInnerHTML={{
-                __html: parseTmTags(day.map.authorNickname),
+                __html: parseTmTags(playlist.map.authorNickname),
               }}
             ></span>
           </div>
@@ -141,11 +140,11 @@ export default function NadeoMapCard({
       <div className="flex flex-col p-2 gap-2">
         <MapMedals
           medals={{
-            ...day.map,
+            ...playlist.map,
           }}
         />
 
-        {fmHealth && day.map.fileUrl && (
+        {fmHealth && playlist.map.fileUrl && (
           <>
             <Separator />
             <div className="flex gap-2">
@@ -169,13 +168,6 @@ export default function NadeoMapCard({
           </>
         )}
       </div>
-
-      <Badge
-        variant={"outline"}
-        className="absolute top-2 left-2 z-10 bg-white dark:bg-black flex gap-2 font-bold"
-      >
-        {day.monthDay}, {weekDayNumberToName(day.day)}
-      </Badge>
     </Card>
   );
 }
