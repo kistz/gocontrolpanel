@@ -190,9 +190,9 @@ export async function getShortsCampaigns(
 }
 
 export async function getClubCampaigns(
-  length: number = 1,
   offset: number = 0,
   name: string = "",
+  length: number = 12,
 ): Promise<ClubCampaignsResponse> {
   const url = `${LIVE_URL}/api/token/club/campaign?length=${length}&offset=${offset}&name=${encodeURIComponent(
     name,
@@ -228,7 +228,10 @@ export async function getClubs(
   return await doRequest<ClubListResponse>(url, "NadeoLiveServices");
 }
 
-export async function downloadFile(url: string, fileName: string): Promise<File> {
+export async function downloadFile(
+  url: string,
+  fileName: string,
+): Promise<File> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000); // 30 seconds
 

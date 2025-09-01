@@ -2,9 +2,14 @@ import {
   getAllSeasonalCampaigns,
   getCampaignWithMaps,
 } from "@/actions/nadeo/campaigns";
+import {
+  getClubCampaigns,
+  getClubCampaignWithMaps,
+} from "@/actions/nadeo/clubs";
 import { getAllWeeklyShorts } from "@/actions/nadeo/shorts";
 import { getTotdMonth } from "@/actions/nadeo/totd";
-import CampaignMaps from "@/components/nadeo/campaign-maps";
+import ClubCampaigns from "@/components/nadeo/club-campaigns";
+import OfficialCampaignMaps from "@/components/nadeo/official-campaign-maps";
 import OfficialCampaigns from "@/components/nadeo/official-campaigns";
 import TotdMonths from "@/components/nadeo/totd-months";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,10 +23,15 @@ export default async function ServerNadeoPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string; offset?: string; campaign?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    offset?: string;
+    campaign?: string;
+    club?: string;
+  }>;
 }) {
   const { id } = await params;
-  const { page = "totd", offset = "0", campaign } = await searchParams;
+  const { page = "totd", offset = "0", campaign, club } = await searchParams;
 
   const offsetInt = parseInt(offset);
 
@@ -42,6 +52,8 @@ export default async function ServerNadeoPage({
   let selectedCampaign = undefined;
   let weeklyShortsList = undefined;
   let selectedWeeklyShorts = undefined;
+  let clubCampaignList = undefined;
+  let selectedClubCampaign = undefined;
   switch (page) {
     case "totd":
       const { data: totdMapList } = await getTotdMonth(id, offsetInt);
@@ -70,6 +82,18 @@ export default async function ServerNadeoPage({
           const { data: shortsWithMaps } = await getCampaignWithMaps(wc);
           selectedWeeklyShorts = shortsWithMaps;
         }
+      }
+      break;
+    case "club-campaigns":
+      if (campaign && club) {
+        const { data: clubCampaign } = await getClubCampaignWithMaps(
+          parseInt(club),
+          parseInt(campaign),
+        );
+        selectedClubCampaign = clubCampaign;
+      } else {
+        const { data: clubCampaigns } = await getClubCampaigns();
+        clubCampaignList = clubCampaigns.clubCampaignList;
       }
       break;
   }
@@ -103,7 +127,7 @@ export default async function ServerNadeoPage({
 
         <TabsContent value="seasonal" className="flex flex-col gap-2">
           {campaign ? (
-            <CampaignMaps
+            <OfficialCampaignMaps
               serverId={id}
               fmHealth={fmHealth}
               campaign={selectedCampaign}
@@ -120,7 +144,7 @@ export default async function ServerNadeoPage({
 
         <TabsContent value="shorts" className="flex flex-col gap-2">
           {campaign ? (
-            <CampaignMaps
+            <OfficialCampaignMaps
               serverId={id}
               fmHealth={fmHealth}
               campaign={selectedWeeklyShorts}
@@ -136,10 +160,19 @@ export default async function ServerNadeoPage({
           )}
         </TabsContent>
 
-        <TabsContent
-          value="club-campaigns"
-          className="flex flex-col gap-2"
-        ></TabsContent>
+        <TabsContent value="club-campaigns" className="flex flex-col gap-2">
+          {campaign && club ? (
+            <></>
+          ) : (
+            clubCampaignList && (
+              <ClubCampaigns
+                serverId={id}
+                fmHealth={fmHealth}
+                defaultCampaigns={clubCampaignList}
+              />
+            )
+          )}
+        </TabsContent>
 
         <TabsContent
           value="clubs"

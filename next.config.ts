@@ -9,29 +9,31 @@ const nextConfig: NextConfig = {
         hostname: "core.trackmania.nadeo.live",
         port: "",
         pathname: "/maps/**",
-        search: "",
       },
       {
         protocol: "https",
         hostname: "avatars.ubisoft.com",
         port: "",
         pathname: "/**",
-        search: "",
       },
       {
         protocol: "https",
         hostname: "trackmania.exchange",
         port: "",
         pathname: "/mapimage/**",
-        search: "",
       },
       {
         protocol: "https",
         hostname: "trackmania.exchange",
         port: "",
         pathname: "/mappackthumb/**",
-        search: "",
       },
+      {
+        protocol: "https",
+        hostname: "trackmania-prod-media-s3.cdn.ubi.com",
+        port: "",
+        pathname: "/media/image/live-api/**",
+      }
     ],
     minimumCacheTTL: 60 * 60 * 24, // 1 day
   },

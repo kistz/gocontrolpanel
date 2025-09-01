@@ -135,7 +135,7 @@ export interface ShortsCampaignsResponse {
   relativeNextRequest: number;
 }
 
-export interface ClubCampaign extends Campaign {
+export interface ClubCampaign {
   clubDecalUrl: string;
   campaignId: number;
   activityId: number;
@@ -185,6 +185,39 @@ export interface ClubCampaign extends Campaign {
   mediaUrlPngSmall: string;
   mediaUrlDds: string;
   mediaTheme: string;
+}
+
+export interface ClubCampaignWithPlaylistMaps extends ClubCampaign {
+  campaign: {
+    color: string;
+    leaderboardGroupUid: string;
+    publicationTimestamp: number;
+    published: boolean;
+    latestSeasons: {
+      uid: string;
+      name: string;
+      startTimestamp: number;
+      endTimestamp: number;
+      relativeStart: number;
+      relativeEnd: number;
+      campaignId: number;
+      active: boolean;
+    }[];
+    categories: {
+      position: number;
+      length: number;
+      name: string;
+    }[];
+    media: {
+      buttonBackgroundUrl: string;
+      buttonForegroundUrl: string;
+      decalUrl: string;
+      popUpBackgroundUrl: string;
+      popUpImageUrl: string;
+      liveButtonBackgroundUrl: string;
+      liveButtonForegroundUrl: string;
+    };
+  } & CampaignWithPlaylistMaps;
 }
 
 export interface ClubCampaignsResponse {

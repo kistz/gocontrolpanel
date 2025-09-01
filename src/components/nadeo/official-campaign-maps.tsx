@@ -5,14 +5,14 @@ import {
 } from "@/actions/nadeo/campaigns";
 import { getErrorMessage } from "@/lib/utils";
 import { CampaignWithPlaylistMaps } from "@/types/api/nadeo";
-import { IconArrowLeft, IconDownload, IconPlus } from "@tabler/icons-react";
+import { IconArrowLeft, IconDownload, IconMapPlus, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import PlaylistMapCard from "./playlist-map-card";
 
-export default function CampaignMaps({
+export default function OfficialCampaignMaps({
   serverId,
   fmHealth,
   campaign,
@@ -32,6 +32,11 @@ export default function CampaignMaps({
 
       if (!campaign) {
         toast.error("Campaign not found");
+        return;
+      }
+
+      if (campaign.playlist.length === 0) {
+        toast.error("Campaign has no maps to download");
         return;
       }
 
@@ -66,6 +71,11 @@ export default function CampaignMaps({
 
       if (!campaign) {
         toast.error("Campaign not found");
+        return;
+      }
+
+      if (campaign.playlist.length === 0) {
+        toast.error("Campaign has no maps to download");
         return;
       }
 
@@ -113,14 +123,14 @@ export default function CampaignMaps({
               disabled={isDownloading}
             >
               <IconDownload />
-              Download Campaign
+              Download
             </Button>
             <Button
               variant={"outline"}
               onClick={onAddCampaignToServer}
               disabled={isDownloading}
             >
-              <IconPlus />
+              <IconMapPlus />
               Add to Server
             </Button>
           </div>

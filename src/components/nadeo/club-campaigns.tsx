@@ -1,61 +1,54 @@
 "use client";
 
-import { searchMaps } from "@/actions/tmx/maps";
+import { getClubCampaigns } from "@/actions/nadeo/clubs";
 import { getErrorMessage } from "@/lib/utils";
-import { TMXMap } from "@/types/api/tmx";
+import { ClubCampaign } from "@/types/api/nadeo";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import TMXMapCard from "./tmx-map-card";
+import ClubCampaignCard from "./club-campaign-card";
 
-export default function MapSearch({
+export default function ClubCampaigns({
   serverId,
   fmHealth,
+  defaultCampaigns = [],
 }: {
   serverId: string;
   fmHealth: boolean;
+  defaultCampaigns?: ClubCampaign[];
 }) {
   const [nameQuery, setNameQuery] = useState("");
-  const [authorQuery, setAuthorQuery] = useState("");
 
-  const [searchResults, setSearchResults] = useState<TMXMap[]>([]);
-  const [hasMoreResults, setHasMoreResults] = useState(false);
+  const [campaigns, setCampaigns] = useState<ClubCampaign[]>(defaultCampaigns);
+  const [hasMore, setHasMore] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const onSearch = async (more?: boolean) => {
+    if (!hasMore && more) return;
+
     setLoading(true);
 
     try {
-      const params: Record<string, string> = {
-        name: nameQuery,
-      };
-
-      if (authorQuery) {
-        params.author = authorQuery;
-      }
-
-      if (more) {
-        params.after =
-          searchResults[searchResults.length - 1]?.MapId.toString();
-      }
-
-      const { data, error } = await searchMaps(serverId, params);
+      const { data, error } = await getClubCampaigns(
+        nameQuery,
+        more ? campaigns.length : 0,
+      );
       if (error) {
         throw new Error(error);
       }
 
       setError(null);
-      setSearchResults(
-        more ? [...searchResults, ...data.Results] : data.Results,
+      setCampaigns(
+        more ? [...campaigns, ...data.clubCampaignList] : data.clubCampaignList,
       );
-      setHasMoreResults(data.More);
+      setHasMore(data.itemCount > campaigns.length);
     } catch (err) {
-      setError("Failed to search maps: " + getErrorMessage(err));
-      toast.error("Failed to search maps", {
+      setError("Failed to get campaigns: " + getErrorMessage(err));
+      toast.error("Failed to get campaigns", {
         description: getErrorMessage(err),
       });
     } finally {
@@ -72,23 +65,16 @@ export default function MapSearch({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-end">
-        <Input
-          type="text"
-          placeholder="Search map name..."
-          className="max-w-48"
-          value={nameQuery}
-          onChange={(e) => setNameQuery(e.target.value)}
-          onKeyDown={onKeyDown}
-        />
+        <div className="flex flex-col gap-1">
+          <Input
+            type="text"
+            placeholder="Search campaign name..."
+            value={nameQuery}
+            onChange={(e) => setNameQuery(e.target.value)}
+            onKeyDown={onKeyDown}
+          />
+        </div>
 
-        <Input
-          type="text"
-          placeholder="Search author..."
-          value={authorQuery}
-          className="max-w-48"
-          onChange={(e) => setAuthorQuery(e.target.value)}
-          onKeyDown={onKeyDown}
-        />
         <Button onClick={() => onSearch()} disabled={loading}>
           <IconSearch />
           Search
@@ -97,20 +83,20 @@ export default function MapSearch({
 
       {error && <span>{error}</span>}
 
-      {searchResults.length > 0 ? (
+      {campaigns.length > 0 ? (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
-            {searchResults.map((map, index) => (
-              <TMXMapCard
+            {campaigns.map((campaign, index) => (
+              <ClubCampaignCard
                 key={index}
                 serverId={serverId}
-                map={map}
+                campaign={campaign}
                 fmHealth={fmHealth}
               />
             ))}
           </div>
 
-          {hasMoreResults && (
+          {hasMore && (
             <Button
               className="max-w-32 mx-auto"
               onClick={() => onSearch(true)}
