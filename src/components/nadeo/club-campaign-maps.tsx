@@ -43,6 +43,7 @@ export default function ClubCampaignCard({
       if (isDownloading) return;
 
       setIsDownloading(true);
+      toast.info("Downloading campaign...");
 
       const { error } = await downloadCampaign(serverId, campaign.campaign);
       if (error) {
@@ -81,6 +82,7 @@ export default function ClubCampaignCard({
       if (isDownloading) return;
 
       setIsDownloading(true);
+      toast.info("Adding campaign to server...");
 
       const { error } = await addCampaignToServer(serverId, campaign.campaign);
       if (error) {
