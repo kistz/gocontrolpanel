@@ -229,7 +229,7 @@ export interface ClubCampaignsResponse {
 export interface ClubActivity {
   id: number;
   name: string;
-  activityType: string;
+  activityType?: string;
   activityId: number;
   targetActivityId: number;
   campaignId: number;
@@ -253,7 +253,7 @@ export interface ClubActivity {
 }
 
 export interface ClubActivitiesResponse {
-  acitivityList: ClubActivity[];
+  activityList: ClubActivity[];
   maxPage: number;
   itemCount: number;
 }

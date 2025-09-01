@@ -5,6 +5,7 @@ import {
 import { getClubCampaignWithMaps } from "@/actions/nadeo/clubs";
 import { getAllWeeklyShorts } from "@/actions/nadeo/shorts";
 import { getTotdMonth } from "@/actions/nadeo/totd";
+import ClubActivities from "@/components/nadeo/club-activities";
 import ClubCampaignCard from "@/components/nadeo/club-campaign-maps";
 import ClubCampaigns from "@/components/nadeo/club-campaigns";
 import Clubs from "@/components/nadeo/clubs";
@@ -33,6 +34,8 @@ export default async function ServerNadeoPage({
   const { page = "totd", offset = "0", campaign, club } = await searchParams;
 
   const offsetInt = parseInt(offset);
+  const campaignInt = campaign ? parseInt(campaign) : undefined;
+  const clubInt = club ? parseInt(club) : undefined;
 
   const canView = await hasPermission(routePermissions.servers.nadeo, id);
   if (!canView) {
@@ -83,10 +86,10 @@ export default async function ServerNadeoPage({
       }
       break;
     case "club-campaigns":
-      if (campaign && club) {
+      if (campaignInt && clubInt) {
         const { data: clubCampaign } = await getClubCampaignWithMaps(
-          parseInt(club),
-          parseInt(campaign),
+          clubInt,
+          campaignInt,
         );
         selectedClubCampaign = clubCampaign;
       }
@@ -156,7 +159,7 @@ export default async function ServerNadeoPage({
         </TabsContent>
 
         <TabsContent value="club-campaigns" className="flex flex-col gap-2">
-          {campaign && club ? (
+          {campaignInt && clubInt ? (
             <ClubCampaignCard
               serverId={id}
               fmHealth={fmHealth}
@@ -168,7 +171,15 @@ export default async function ServerNadeoPage({
         </TabsContent>
 
         <TabsContent value="clubs" className="flex flex-col gap-2">
-          {club ? <></> : <Clubs serverId={id} />}
+          {clubInt ? (
+            campaignInt ? (
+              <></>
+            ) : (
+              <ClubActivities serverId={id} clubId={clubInt} />
+            )
+          ) : (
+            <Clubs serverId={id} />
+          )}
         </TabsContent>
       </Tabs>
     </div>

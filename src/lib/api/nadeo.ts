@@ -202,8 +202,8 @@ export async function getClubCampaigns(
 
 export async function getClubActivities(
   clubId: number,
-  length: number = 1,
   offset: number = 0,
+  length: number = 12,
 ): Promise<ClubActivitiesResponse> {
   const url = `${LIVE_URL}/api/token/club/${clubId}/activity?length=${length}&offset=${offset}&active=true`;
   return await doRequest<ClubActivitiesResponse>(url, "NadeoLiveServices");

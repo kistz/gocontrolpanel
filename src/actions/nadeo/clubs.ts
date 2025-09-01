@@ -1,9 +1,24 @@
 "use server";
 
 import { doServerActionWithAuth } from "@/lib/actions";
-import { getClubCampaign, getClubCampaigns, getClubs } from "@/lib/api/nadeo";
-import { getKeyClubCampaigns, getKeyClubs, getRedisClient } from "@/lib/redis";
-import { Club, ClubCampaign, ClubCampaignWithPlaylistMaps } from "@/types/api/nadeo";
+import {
+  getClubActivities,
+  getClubCampaign,
+  getClubCampaigns,
+  getClubs,
+} from "@/lib/api/nadeo";
+import {
+  getKeyClubActivities,
+  getKeyClubCampaigns,
+  getKeyClubs,
+  getRedisClient,
+} from "@/lib/redis";
+import {
+  Club,
+  ClubActivity,
+  ClubCampaign,
+  ClubCampaignWithPlaylistMaps,
+} from "@/types/api/nadeo";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getMapsByUids } from "../database/maps";
@@ -67,6 +82,44 @@ export async function getClubsPaginated(
       const paginatedResponse = {
         totalCount: response.clubCount,
         data: response.clubList,
+      };
+
+      await redis.set(key, JSON.stringify(paginatedResponse), "EX", 300);
+
+      return paginatedResponse;
+    },
+  );
+}
+
+export async function getClubActivitiesPaginated(
+  pagination: PaginationState,
+  _: { field: string; order: "asc" | "desc" },
+  __?: string,
+  fetchArgs?: number,
+): Promise<ServerResponse<PaginationResponse<ClubActivity>>> {
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      if (!fetchArgs) {
+        throw new Error("No club id provided");
+      }
+
+      const redis = await getRedisClient();
+      const key = getKeyClubActivities(fetchArgs, pagination);
+
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+
+      const response = await getClubActivities(
+        fetchArgs,
+        pagination.pageIndex * pagination.pageSize,
+      );
+
+      const paginatedResponse = {
+        totalCount: response.itemCount,
+        data: response.activityList,
       };
 
       await redis.set(key, JSON.stringify(paginatedResponse), "EX", 300);
