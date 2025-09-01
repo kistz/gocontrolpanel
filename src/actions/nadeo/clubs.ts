@@ -2,7 +2,9 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import {
+  getAccountNames,
   getClubActivities,
+  getClubById,
   getClubCampaign,
   getClubCampaigns,
   getClubs,
@@ -19,6 +21,7 @@ import {
   ClubActivity,
   ClubCampaign,
   ClubCampaignWithPlaylistMaps,
+  ClubWithAccountNames,
 } from "@/types/api/nadeo";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
@@ -171,4 +174,34 @@ export async function getClubCampaignWithMaps(
       return response;
     },
   );
+}
+
+export async function getClub(
+  clubId: number,
+): Promise<ServerResponse<ClubWithAccountNames>> {
+  return doServerActionWithAuth(["clubs:view"], async () => {
+    const redis = await getRedisClient();
+    const key = `club:${clubId}`;
+
+    const cached = await redis.get(key);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const club = await getClubById(clubId);
+    const accountNames = await getAccountNames([
+      club.authorAccountId,
+      club.latestEditorAccountId,
+    ]);
+
+    const clubWithAccountNames = {
+      ...club,
+      authorName: accountNames[club.authorAccountId] || "Unknown",
+      latestEditorName: accountNames[club.latestEditorAccountId] || "Unknown",
+    };
+
+    await redis.set(key, JSON.stringify(clubWithAccountNames), "EX", 60);
+
+    return clubWithAccountNames;
+  });
 }

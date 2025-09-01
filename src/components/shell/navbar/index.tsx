@@ -33,7 +33,7 @@ export default async function Navbar() {
   const canViewHetzner = await hasPermission(
     routePermissions.admin.hetzner.view,
   );
-  const canViewClubs = await hasPermission(routePermissions.clubs);
+  const canViewClubs = await hasPermission(routePermissions.clubs.view);
 
   const canViewAdmin =
     canViewUsers ||

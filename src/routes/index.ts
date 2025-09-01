@@ -48,7 +48,10 @@ export const routePermissions = {
       actions: ["servers:id:moderator", "servers:id:admin"],
     },
   },
-  clubs: ["clubs:view"],
+  clubs: {
+    view: ["clubs:view"],
+    edit: ["clubs:edit"],
+  },
   admin: {
     users: {
       view: ["users:view"],

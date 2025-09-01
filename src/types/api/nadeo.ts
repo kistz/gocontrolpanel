@@ -334,3 +334,8 @@ export interface ClubListResponse {
   maxPage: number;
   clubCount: number;
 }
+
+export interface ClubWithAccountNames extends Club {
+  authorName: string;
+  latestEditorName: string;
+}
