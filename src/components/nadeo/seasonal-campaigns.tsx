@@ -5,15 +5,11 @@ import { createColumns } from "./seasonal-campaigns-columns";
 
 export default function SeasonalCampaigns({
   serverId,
-  seasonalCampaignList = null,
+  seasonalCampaignList,
 }: {
   serverId: string;
-  seasonalCampaignList?: Campaign[] | null;
+  seasonalCampaignList: Campaign[];
 }) {
-  if (!seasonalCampaignList) {
-    return <div>No seasonal campaigns found.</div>;
-  }
-
   const columns = createColumns(serverId);
 
   return <DataTable columns={columns} data={seasonalCampaignList} />;

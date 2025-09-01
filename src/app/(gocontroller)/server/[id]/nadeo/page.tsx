@@ -95,10 +95,12 @@ export default async function ServerNadeoPage({
               campaign={selectedCampaign}
             />
           ) : (
-            <SeasonalCampaigns
-              serverId={id}
-              seasonalCampaignList={seasonalCampaignList}
-            />
+            seasonalCampaignList && (
+              <SeasonalCampaigns
+                serverId={id}
+                seasonalCampaignList={seasonalCampaignList}
+              />
+            )
           )}
         </TabsContent>
 
