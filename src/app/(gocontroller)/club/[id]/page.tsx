@@ -109,13 +109,6 @@ export default async function ClubPage({
                         {createdAt.toLocaleTimeString()}
                       </span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-semibold">Updated At</span>
-                      <span className="truncate">
-                        {updatedAt.toLocaleDateString()}{" "}
-                        {updatedAt.toLocaleTimeString()}
-                      </span>
-                    </div>
                   </div>
                 </div>
               </div>
