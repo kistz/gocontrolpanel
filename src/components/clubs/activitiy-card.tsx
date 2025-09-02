@@ -10,7 +10,13 @@ import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
 
-export default function ActivityCard({ activity }: { activity: ClubActivity }) {
+export default function ActivityCard({
+  activity,
+  canEdit,
+}: {
+  activity: ClubActivity;
+  canEdit: boolean;
+}) {
   return (
     <Card className="flex flex-col flex-1 relative">
       <div className="relative">
@@ -75,16 +81,18 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
             </Button>
           </Modal>
 
-          <Modal>
-            <></>
-            <Button
-              variant={"outline"}
-              disabled={activity.activityType !== "room"}
-            >
-              <IconEdit />
-              Edit Activity
-            </Button>
-          </Modal>
+          {canEdit && (
+            <Modal>
+              <></>
+              <Button
+                variant={"outline"}
+                disabled={activity.activityType !== "room"}
+              >
+                <IconEdit />
+                Edit Activity
+              </Button>
+            </Modal>
+          )}
         </div>
       </div>
     </Card>

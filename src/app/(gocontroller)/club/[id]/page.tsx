@@ -17,7 +17,11 @@ export default async function ClubPage({
 
   const canEdit = await hasPermission(routePermissions.clubs.edit);
 
-  const { data: club } = await getClub(id);
+  const { data: club, error } = await getClub(id);
+
+  if (error) {
+    return <span>{error}</span>;
+  }
 
   const createdAt = new Date(club.creationTimestamp * 1000);
   const updatedAt = new Date(club.editionTimestamp * 1000);
