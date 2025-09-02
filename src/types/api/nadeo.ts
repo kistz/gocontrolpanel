@@ -339,3 +339,19 @@ export interface ClubWithAccountNames extends Club {
   authorName: string;
   latestEditorName: string;
 }
+
+export interface RoomArgs {
+  name?: string;
+  region?: "eu-west";
+  maxPlayersPerServer?: number;
+  script?: string;
+  scalable?: boolean;
+  maps?: string[];
+  settings?: {
+    key: string;
+    value: string;
+    type: string;
+  }[];
+}
+
+export type EditRoomArgs = Partial<RoomArgs>;
