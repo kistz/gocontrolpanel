@@ -75,3 +75,4 @@ export const getKeyClubActivities = (clubId: number, offset: number) =>
   `nadeo:club:${clubId}:activities:offset=${offset}`;
 export const getKeyClubCampaign = (clubId: number, campaignId: number) =>
   `nadeo:club:${clubId}:campaign:${campaignId}`;
+export const getKeyAccountNames = () => `nadeo:account-names`;

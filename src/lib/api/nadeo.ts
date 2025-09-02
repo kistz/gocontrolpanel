@@ -20,7 +20,7 @@ import { ServerError, ServerResponse } from "@/types/responses";
 import "server-only";
 import { doServerAction } from "../actions";
 import { withRateLimit } from "../ratelimiter";
-import { getRedisClient } from "../redis";
+import { getKeyAccountNames, getRedisClient } from "../redis";
 
 const getTokenKey = (audience: string) => `nadeo:tokens:${audience}`;
 const CREDENTIALS_TOKEN_KEY = "nadeo:credentials_token";
@@ -158,13 +158,41 @@ export async function searchAccountNames(
 export async function getAccountNames(
   accountIds: string[],
 ): Promise<AccountNames> {
+  const redis = await getRedisClient();
+  const key = getKeyAccountNames();
+
+  accountIds = [...new Set(accountIds)]; // Remove duplicates
+
+  const cached = await redis.get(key);
+  if (cached) {
+    const allNames: AccountNames = JSON.parse(cached);
+    const foundNames: AccountNames = {};
+    accountIds.forEach((id) => {
+      if (allNames[id]) {
+        foundNames[id] = allNames[id];
+      }
+    });
+
+    if (Object.keys(foundNames).length === accountIds.length) {
+      return foundNames;
+    }
+  }
+
   const url = `${API_URL}/display-names`;
   const params = new URLSearchParams();
   accountIds.forEach((id) => params.append("accountId[]", id));
 
-  return await doCredentialsRequest<AccountNames>(
+  const res = await doCredentialsRequest<AccountNames>(
     `${url}?${params.toString()}`,
   );
+
+  const combined: AccountNames = {
+    ...(cached ? JSON.parse(cached) : {}),
+    ...res,
+  };
+  await redis.set(key, JSON.stringify(combined), "EX", 24 * 60 * 60); // Cache for 24 hours
+
+  return combined;
 }
 
 export async function getTotdRoyalMaps(
