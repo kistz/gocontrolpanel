@@ -6,6 +6,8 @@ import {
   ClubCampaign,
   ClubCampaignsResponse,
   ClubListResponse,
+  ClubRoom,
+  EditRoomArgs,
   MapInfo,
   MonthMapListResponse,
   NadeoTokens,
@@ -266,6 +268,29 @@ export async function downloadFile(
     }
     throw err;
   }
+}
+
+export async function getClubRoom(
+  clubId: number,
+  roomId: number,
+): Promise<ClubRoom> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/room/${roomId}`;
+  return await doRequest<ClubRoom>(url, "NadeoLiveServices");
+}
+
+export async function editClubRoom(
+  clubId: number,
+  roomId: number,
+  data: EditRoomArgs,
+): Promise<ClubRoom> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/room/${roomId}`;
+  return await doRequest<ClubRoom>(url, "NadeoLiveServices", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }
 
 export async function doRequest<T>(

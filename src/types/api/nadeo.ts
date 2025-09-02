@@ -355,3 +355,41 @@ export interface RoomArgs {
 }
 
 export type EditRoomArgs = Partial<RoomArgs>;
+
+export interface Room {
+  id: number;
+  name: string;
+  region: string;
+  serverAccountId: string;
+  maxPlayers: number;
+  playerCount: number;
+  maps: string[];
+  script: string;
+  scalable: boolean;
+  scriptSettings: Record<string, { key: string; value: string; type: string }>;
+  serverInfo: null;
+}
+
+export interface ClubRoom {
+  id: number;
+  clubId: number;
+  clubName: string;
+  nadeo: boolean;
+  roomId: number;
+  campaignId: number | null;
+  playerServerLogin: string | null;
+  activityId: number;
+  name: string;
+  room: Room;
+  popularityLevel: number;
+  creationTimestamp: number;
+  creatorAccountId: string;
+  latestEditorAccountId: string;
+  password: boolean;
+  mediaUrl: string;
+  mediaUrlPngLarge: string;
+  mediaUrlPngMedium: string;
+  mediaUrlPngSmall: string;
+  mediaUrlDds: string;
+  mediaTheme: string;
+}
