@@ -36,7 +36,9 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
 
           <div className="flex items-center gap-2">
             <span className="text-sm truncate text-white">
-              {capitalizeWords(activity.activityType || "Unknown")}
+              {capitalizeWords(
+                activity.activityType?.replaceAll("-", " ") || "Unknown",
+              )}
             </span>
           </div>
         </div>
@@ -64,7 +66,10 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
         <div className="flex gap-2">
           <Modal>
             <ActivityDetailsModal data={activity} />
-            <Button variant={"outline"}>
+            <Button
+              variant={"outline"}
+              disabled={activity.activityType !== "room"}
+            >
               <IconEye />
               View Activity
             </Button>
@@ -72,7 +77,10 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
 
           <Modal>
             <></>
-            <Button variant={"outline"}>
+            <Button
+              variant={"outline"}
+              disabled={activity.activityType !== "room"}
+            >
               <IconEdit />
               Edit Activity
             </Button>
