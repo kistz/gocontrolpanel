@@ -1,6 +1,6 @@
 import { capitalizeWords } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
-import { IconPhoto } from "@tabler/icons-react";
+import { IconMap, IconPhoto } from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
 import { Badge } from "../ui/badge";
@@ -39,13 +39,20 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
       </div>
 
       <div className="flex flex-col p-2 gap-2">
-        <div className="flex flex-col gap-1">
+        <div className="flex justify-between gap-2">
           <div className="flex gap-1 overflow-x-hidden">
             {activity.public && <Badge variant={"outline"}>Public</Badge>}
             {activity.active && <Badge variant={"outline"}>Active</Badge>}
             {activity.featured && <Badge variant={"outline"}>Featured</Badge>}
             {activity.password && <Badge variant={"outline"}>Password</Badge>}
           </div>
+
+          {activity.activityType === "campaign" && (
+            <span className="flex items-center gap-2">
+              <IconMap size={18} />
+              {activity.itemsCount}
+            </span>
+          )}
         </div>
       </div>
     </Card>
