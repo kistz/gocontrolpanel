@@ -1,8 +1,9 @@
 "use client";
 import { getClubRoomWithNames } from "@/actions/nadeo/clubs";
+import { Separator } from "@/components/ui/separator";
 import { getErrorMessage } from "@/lib/utils";
 import { ClubActivity, ClubRoomWithNames } from "@/types/api/nadeo";
-import { IconPhoto, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPhoto, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -71,7 +72,7 @@ export default function ActivityDetailsModal({
       {error && <span>{error}</span>}
 
       {clubRoom && (
-        <div>
+        <div className="flex flex-col gap-4">
           <Card className="p-4 flex flex-col gap-4">
             <div className="flex gap-4 flex-col lg:flex-row lg:min-w-128">
               {clubRoom.mediaUrl ? (
@@ -109,7 +110,7 @@ export default function ActivityDetailsModal({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-semibold">Created At</span>
-                    <span className="text-nowrap">
+                    <span className="truncate">
                       {new Date(
                         clubRoom.creationTimestamp * 1000,
                       ).toLocaleDateString()}{" "}
@@ -118,10 +119,69 @@ export default function ActivityDetailsModal({
                       ).toLocaleTimeString()}
                     </span>
                   </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Type</span>
+                    <span className="text-nowrap">
+                      {clubRoom.nadeo ? "Nadeo" : "Dedicated"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </Card>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
+              <h3 className="text-md font-bold">Room Details</h3>
+              <Separator />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col">
+                <span className="font-semibold">Max Players</span>
+                <span className="truncate">{clubRoom.room.maxPlayers}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Currently Playing</span>
+                <span className="truncate">{clubRoom.room.playerCount}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Scalable</span>
+                <span className="truncate">
+                  {clubRoom.room.scalable ? "Yes" : "No"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold">Script</span>
+                <span className="truncate">{clubRoom.room.script}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
+              <h3 className="text-md font-bold">Script Settings</h3>
+              <Separator />
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {Object.values(clubRoom.room.scriptSettings).map((setting) => (
+                <div key={setting.key} className="flex flex-col gap-1">
+                  <span className="font-semibold truncate">{setting.key}</span>
+                  <span className="truncate max-w-64">
+                    {setting.type === "boolean" ? (
+                      setting.value === "true" ? (
+                        <IconCheck />
+                      ) : (
+                        <IconX />
+                      )
+                    ) : (
+                      setting.value
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </Card>
