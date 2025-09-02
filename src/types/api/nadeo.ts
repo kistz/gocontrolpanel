@@ -394,7 +394,12 @@ export interface ClubRoom {
   mediaTheme: string;
 }
 
-export interface ClubRoomWithNames extends ClubRoom {
+export interface RoomWithMaps extends Room {
+  mapObjects: Maps[];
+}
+
+export interface ClubRoomWithNamesAndMaps extends ClubRoom {
   creatorName: string;
   latestEditorName: string;
+  room: RoomWithMaps;
 }

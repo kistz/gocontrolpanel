@@ -1,8 +1,8 @@
 "use client";
-import { getClubRoomWithNames } from "@/actions/nadeo/clubs";
+import { getClubRoomWithNamesAndMaps } from "@/actions/nadeo/clubs";
 import { Separator } from "@/components/ui/separator";
 import { getErrorMessage } from "@/lib/utils";
-import { ClubActivity, ClubRoomWithNames } from "@/types/api/nadeo";
+import { ClubActivity, ClubRoomWithNamesAndMaps } from "@/types/api/nadeo";
 import { IconCheck, IconPhoto, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -10,12 +10,15 @@ import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 import { Card } from "../../ui/card";
 import { DefaultModalProps } from "../default-props";
+import ActivityMapCard from "./activity-map-card";
 
 export default function ActivityDetailsModal({
   closeModal,
   data,
 }: DefaultModalProps<ClubActivity>) {
-  const [clubRoom, setClubRoom] = useState<ClubRoomWithNames | null>(null);
+  const [clubRoom, setClubRoom] = useState<ClubRoomWithNamesAndMaps | null>(
+    null,
+  );
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +30,7 @@ export default function ActivityDetailsModal({
       setLoading(true);
 
       const { data: clubRoom, error: getClubRoomError } =
-        await getClubRoomWithNames(data.clubId, data.id);
+        await getClubRoomWithNamesAndMaps(data.clubId, data.id);
       if (getClubRoomError) {
         throw new Error(getClubRoomError);
       }
@@ -179,6 +182,23 @@ export default function ActivityDetailsModal({
                     )}
                   </span>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
+              <h3 className="text-md font-bold">Maps</h3>
+              <Separator />
+            </div>
+
+            {clubRoom.room.maps.length === 0 && (
+              <span>No maps in this room</span>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {clubRoom.room.mapObjects?.map((map, i) => (
+                <ActivityMapCard key={i} map={map} />
               ))}
             </div>
           </div>

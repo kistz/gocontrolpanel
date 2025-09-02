@@ -24,7 +24,7 @@ import {
   ClubActivity,
   ClubCampaign,
   ClubCampaignWithPlaylistMaps,
-  ClubRoomWithNames,
+  ClubRoomWithNamesAndMaps,
   ClubWithAccountNames,
 } from "@/types/api/nadeo";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
@@ -232,10 +232,10 @@ export async function getClub(
   });
 }
 
-export async function getClubRoomWithNames(
+export async function getClubRoomWithNamesAndMaps(
   clubId: number,
   roomId: number,
-): Promise<ServerResponse<ClubRoomWithNames>> {
+): Promise<ServerResponse<ClubRoomWithNamesAndMaps>> {
   return doServerActionWithAuth(["clubs:view"], async () => {
     const clubRoom = await getClubRoom(clubId, roomId);
 
@@ -244,8 +244,17 @@ export async function getClubRoomWithNames(
       clubRoom.latestEditorAccountId,
     ]);
 
+    const { data: maps, error } = await getMapsByUids(clubRoom.room.maps);
+    if (error) {
+      throw new Error(error);
+    }
+
     return {
       ...clubRoom,
+      room: {
+        ...clubRoom.room,
+        mapObjects: maps,
+      },
       creatorName: accountNames[clubRoom.creatorAccountId] || "Unknown",
       latestEditorName:
         accountNames[clubRoom.latestEditorAccountId] || "Unknown",
