@@ -7,6 +7,7 @@ import {
   getClubById,
   getClubCampaign,
   getClubCampaigns,
+  getClubRoom,
   getClubs,
 } from "@/lib/api/nadeo";
 import {
@@ -23,6 +24,7 @@ import {
   ClubActivity,
   ClubCampaign,
   ClubCampaignWithPlaylistMaps,
+  ClubRoomWithNames,
   ClubWithAccountNames,
 } from "@/types/api/nadeo";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
@@ -227,5 +229,26 @@ export async function getClub(
     await redis.set(key, JSON.stringify(clubWithAccountNames), "EX", 60);
 
     return clubWithAccountNames;
+  });
+}
+
+export async function getClubRoomWithNames(
+  clubId: number,
+  roomId: number,
+): Promise<ServerResponse<ClubRoomWithNames>> {
+  return doServerActionWithAuth(["clubs:view"], async () => {
+    const clubRoom = await getClubRoom(clubId, roomId);
+
+    const accountNames = await getAccountNames([
+      clubRoom.creatorAccountId,
+      clubRoom.latestEditorAccountId,
+    ]);
+
+    return {
+      ...clubRoom,
+      creatorName: accountNames[clubRoom.creatorAccountId] || "Unknown",
+      latestEditorName:
+        accountNames[clubRoom.latestEditorAccountId] || "Unknown",
+    };
   });
 }

@@ -1,10 +1,14 @@
 import { capitalizeWords } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
-import { IconMap, IconPhoto } from "@tabler/icons-react";
+import { IconEdit, IconEye, IconMap, IconPhoto } from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
+import ActivityDetailsModal from "../modals/clubs/activity-details";
+import Modal from "../modals/modal";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 export default function ActivityCard({ activity }: { activity: ClubActivity }) {
   return (
@@ -53,6 +57,26 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
               {activity.itemsCount}
             </span>
           )}
+        </div>
+
+        <Separator />
+
+        <div className="flex gap-2">
+          <Modal>
+            <ActivityDetailsModal data={activity} />
+            <Button variant={"outline"}>
+              <IconEye />
+              View Activity
+            </Button>
+          </Modal>
+
+          <Modal>
+            <></>
+            <Button variant={"outline"}>
+              <IconEdit />
+              Edit Activity
+            </Button>
+          </Modal>
         </div>
       </div>
     </Card>

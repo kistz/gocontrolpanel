@@ -393,3 +393,8 @@ export interface ClubRoom {
   mediaUrlDds: string;
   mediaTheme: string;
 }
+
+export interface ClubRoomWithNames extends ClubRoom {
+  creatorName: string;
+  latestEditorName: string;
+}
