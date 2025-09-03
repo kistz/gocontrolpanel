@@ -13,13 +13,16 @@ import TMXMappackCard from "./tmx-mappack-card";
 export default function MappackSearch({
   serverId,
   fmHealth,
+  defaultResults = [],
 }: {
   serverId: string;
   fmHealth: boolean;
+  defaultResults?: TMXMappack[];
 }) {
   const [nameQuery, setNameQuery] = useState("");
 
-  const [searchResults, setSearchResults] = useState<TMXMappack[]>([]);
+  const [searchResults, setSearchResults] =
+    useState<TMXMappack[]>(defaultResults);
   const [hasMoreResults, setHasMoreResults] = useState(false);
 
   const [loading, setLoading] = useState(false);

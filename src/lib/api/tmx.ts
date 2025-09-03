@@ -105,6 +105,8 @@ export async function downloadTMXMap(
 
 async function doRequest<T>(url: string, key: string): Promise<T> {
   return withRateLimit<T>(key, async () => {
+    console.log(`Requesting TMX API: ${url}`);
+
     const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
