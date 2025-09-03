@@ -117,7 +117,13 @@ export default function PlaylistMapCard({
             <IconPhoto className="text-gray-500" size={48} />
           </div>
         )}
-        <div className="flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40">
+        <div
+          className={cn(
+            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40 text-white",
+            !playlist.map.thumbnailUrl &&
+              "bg-gradient-to-t from-black/60 via-black/40 to-transparent",
+          )}
+        >
           <h3
             className="truncate text-lg font-semibold text-white"
             dangerouslySetInnerHTML={{
