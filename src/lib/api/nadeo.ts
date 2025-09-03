@@ -6,6 +6,7 @@ import {
   ClubCampaign,
   ClubCampaignsResponse,
   ClubListResponse,
+  ClubMembersResponse,
   ClubRoom,
   EditRoomArgs,
   MapInfo,
@@ -306,19 +307,13 @@ export async function getClubRoom(
   return await doRequest<ClubRoom>(url, "NadeoLiveServices");
 }
 
-export async function editClubRoom(
+export async function getClubMembers(
   clubId: number,
-  roomId: number,
-  data: EditRoomArgs,
-): Promise<ClubRoom> {
-  const url = `${LIVE_URL}/api/token/club/${clubId}/room/${roomId}`;
-  return await doRequest<ClubRoom>(url, "NadeoLiveServices", {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  offset: number = 0,
+  length: number = 12,
+): Promise<ClubMembersResponse> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/member?length=${length}&offset=${offset}`;
+  return await doRequest<ClubMembersResponse>(url, "NadeoLiveServices");
 }
 
 export async function doRequest<T>(

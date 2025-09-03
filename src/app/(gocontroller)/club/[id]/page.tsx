@@ -1,4 +1,4 @@
-import { getClub } from "@/actions/nadeo/clubs";
+import { getClub, getClubMembersCount } from "@/actions/nadeo/clubs";
 import ClubActivities from "@/components/clubs/club-activities";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -14,9 +14,15 @@ export default async function ClubPage({
   const { id } = await params;
 
   const { data: club, error } = await getClub(id);
+  const { data: clubMembersCount, error: clubMembersError } =
+    await getClubMembersCount(id);
 
   if (error) {
     return <span>{error}</span>;
+  }
+
+  if (clubMembersError) {
+    return <span>{clubMembersError}</span>;
   }
 
   const createdAt = new Date(club.creationTimestamp * 1000);
@@ -91,7 +97,7 @@ export default async function ClubPage({
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 max-w-128">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-128">
                     <div className="flex flex-col">
                       <span className="font-semibold">Author</span>
                       <span className="truncate">{club.authorName}</span>
@@ -99,6 +105,10 @@ export default async function ClubPage({
                     <div className="flex flex-col">
                       <span className="font-semibold">Latest Editor</span>
                       <span className="truncate">{club.latestEditorName}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Members</span>
+                      <span className="truncate">{clubMembersCount}</span>
                     </div>
                     <div className="flex flex-col">
                       <span className="font-semibold">Created At</span>

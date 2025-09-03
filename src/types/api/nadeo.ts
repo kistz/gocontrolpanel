@@ -403,3 +403,25 @@ export interface ClubRoomWithNamesAndMaps extends ClubRoom {
   latestEditorName: string;
   room: RoomWithMaps;
 }
+
+export interface ClubMember {
+  accountId: string;
+  clubId: number;
+  role: string;
+  creationTimestamp: number;
+  vip: boolean;
+  moderator: boolean;
+  hasFeatured: boolean;
+  pin: boolean;
+  useTag: boolean;
+}
+
+export interface ClubMemberWithName {
+  accountName: string;
+}
+
+export interface ClubMembersResponse {
+  clubMemberList: ClubMember[];
+  maxPage: number;
+  itemCount: number;
+}

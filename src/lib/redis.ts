@@ -76,3 +76,9 @@ export const getKeyClubActivities = (clubId: number, offset: number) =>
 export const getKeyClubCampaign = (clubId: number, campaignId: number) =>
   `nadeo:club:${clubId}:campaign:${campaignId}`;
 export const getKeyAccountNames = () => `nadeo:account-names`;
+export const getKeyClubMembersPaginated = (
+  clubId: number,
+  pagination: PaginationState,
+) =>
+  `nadeo:club:${clubId}:members:page=${pagination.pageIndex}:size=${pagination.pageSize}`;
+export const getKeyClubMembersCount = (clubId: number) => `nadeo:club:${clubId}:members:count`;

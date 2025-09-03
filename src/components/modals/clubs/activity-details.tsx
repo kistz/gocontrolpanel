@@ -123,7 +123,7 @@ export default function ActivityDetailsModal({
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-semibold">Type</span>
+                    <span className="font-semibold">Server</span>
                     <span className="text-nowrap">
                       {clubRoom.nadeo ? "Nadeo" : "Dedicated"}
                     </span>

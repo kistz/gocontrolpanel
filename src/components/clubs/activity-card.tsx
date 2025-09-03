@@ -1,6 +1,8 @@
 import { capitalizeWords, cn } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
 import {
+  IconCar,
+  IconChartBar,
   IconDots,
   IconFolder,
   IconMap,
@@ -24,6 +26,10 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
         return <IconServer size={18} />;
       case "folder":
         return <IconFolder size={18} />;
+      case "ranking-club":
+        return <IconChartBar size={18} />;
+      case "skin-upload":
+        return <IconCar size={18} />;
     }
   };
 
@@ -68,24 +74,22 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
         </div>
       </div>
 
-      <div className="flex flex-col p-2 gap-2">
-        <div className="flex justify-between gap-2">
-          <div className="flex gap-1 overflow-x-hidden">
-            {activity.public && <Badge variant={"outline"}>Public</Badge>}
-            {activity.active && <Badge variant={"outline"}>Active</Badge>}
-            {activity.featured && <Badge variant={"outline"}>Featured</Badge>}
-            {activity.password && <Badge variant={"outline"}>Password</Badge>}
-          </div>
-
-          {activity.activityType === "room" && activity.public && (
-            <Modal>
-              <ActivityDetailsModal data={activity} />
-              <Button size={"icon"} className="size-6" variant={"ghost"}>
-                <IconDots />
-              </Button>
-            </Modal>
-          )}
+      <div className="flex justify-between gap-2 p-2 h-10">
+        <div className="flex gap-1 overflow-x-hidden">
+          {activity.public && <Badge variant={"outline"}>Public</Badge>}
+          {activity.active && <Badge variant={"outline"}>Active</Badge>}
+          {activity.featured && <Badge variant={"outline"}>Featured</Badge>}
+          {activity.password && <Badge variant={"outline"}>Password</Badge>}
         </div>
+
+        {activity.activityType === "room" && activity.public && (
+          <Modal>
+            <ActivityDetailsModal data={activity} />
+            <Button size={"icon"} className="size-6" variant={"ghost"}>
+              <IconDots />
+            </Button>
+          </Modal>
+        )}
       </div>
     </Card>
   );

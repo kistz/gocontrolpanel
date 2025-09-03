@@ -7,6 +7,7 @@ import {
   getClubById,
   getClubCampaign,
   getClubCampaigns,
+  getClubMembers,
   getClubRoom,
   getClubs,
 } from "@/lib/api/nadeo";
@@ -15,6 +16,8 @@ import {
   getKeyClubActivitiesPaginated,
   getKeyClubCampaign,
   getKeyClubCampaignsPaginated,
+  getKeyClubMembersCount,
+  getKeyClubMembersPaginated,
   getKeyClubsPaginated,
   getRedisClient,
 } from "@/lib/redis";
@@ -24,6 +27,7 @@ import {
   ClubActivity,
   ClubCampaign,
   ClubCampaignWithPlaylistMaps,
+  ClubMemberWithName,
   ClubRoomWithNamesAndMaps,
   ClubWithAccountNames,
 } from "@/types/api/nadeo";
@@ -226,9 +230,74 @@ export async function getClub(
       latestEditorName: accountNames[club.latestEditorAccountId] || "Unknown",
     };
 
-    await redis.set(key, JSON.stringify(clubWithAccountNames), "EX", 60);
+    await redis.set(key, JSON.stringify(clubWithAccountNames), "EX", 300);
 
     return clubWithAccountNames;
+  });
+}
+
+export async function getClubMembersCount(
+  clubId: number,
+): Promise<ServerResponse<number>> {
+  return doServerActionWithAuth(["clubs:view"], async () => {
+    const redis = await getRedisClient();
+    const key = getKeyClubMembersCount(clubId);
+
+    const cached = await redis.get(key);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const { itemCount } = await getClubMembers(clubId, 0, 1);
+
+    await redis.set(key, JSON.stringify(itemCount), "EX", 300);
+
+    return itemCount;
+  });
+}
+
+export async function getClubMembersWithNamesPaginated(
+  pagination: PaginationState,
+  _: { field: string; order: "asc" | "desc" },
+  __: string,
+  fetchArgs?: number,
+): Promise<ServerResponse<PaginationResponse<ClubMemberWithName>>> {
+  return doServerActionWithAuth(["clubs:view"], async () => {
+    if (!fetchArgs) {
+      throw new Error("No club id provided");
+    }
+
+    const redis = await getRedisClient();
+    const key = getKeyClubMembersPaginated(fetchArgs, pagination);
+
+    const cached = await redis.get(key);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const clubMembers = await getClubMembers(
+      fetchArgs,
+      pagination.pageIndex * pagination.pageSize,
+      pagination.pageSize,
+    );
+
+    const accountIds = clubMembers.clubMemberList.map((m) => m.accountId);
+    const accountNames = await getAccountNames(accountIds);
+
+    const clubMembersWithNames: ClubMemberWithName[] =
+      clubMembers.clubMemberList.map((member) => ({
+        ...member,
+        accountName: accountNames[member.accountId] || "Unknown",
+      }));
+
+    const response = {
+      totalCount: clubMembers.itemCount,
+      data: clubMembersWithNames,
+    };
+
+    await redis.set(key, JSON.stringify(response), "EX", 300);
+
+    return response;
   });
 }
 
