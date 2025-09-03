@@ -6,6 +6,7 @@ import {
   IconDots,
   IconFolder,
   IconMap,
+  IconMapUp,
   IconPhoto,
   IconServer,
 } from "@tabler/icons-react";
@@ -27,9 +28,12 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
       case "folder":
         return <IconFolder size={18} />;
       case "ranking-club":
+      case "ranking-daily":
         return <IconChartBar size={18} />;
       case "skin-upload":
         return <IconCar size={18} />;
+      case "map-upload":
+        return <IconMapUp size={18} />;
     }
   };
 
