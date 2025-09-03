@@ -1,6 +1,12 @@
 import { capitalizeWords, cn } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
-import { IconDots, IconMap, IconPhoto, IconServer } from "@tabler/icons-react";
+import {
+  IconDots,
+  IconFolder,
+  IconMap,
+  IconPhoto,
+  IconServer,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
 import ActivityDetailsModal from "../modals/clubs/activity-details";
@@ -16,6 +22,8 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
         return <IconMap size={18} />;
       case "room":
         return <IconServer size={18} />;
+      case "folder":
+        return <IconFolder size={18} />;
     }
   };
 
@@ -49,10 +57,6 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
           ></h3>
 
           <div className="flex items-center gap-2">
-            {activity.activityType === "campaign" && (
-              <span>{activity.itemsCount}</span>
-            )}
-
             {getActivityIcon(activity.activityType)}
 
             <span className="text-sm truncate">
