@@ -117,7 +117,7 @@ export type PlaylistWithMap = Playlist & {
   map: Maps;
 };
 
-export interface CampaignWithPlaylistMaps extends Campaign {
+export interface CampaignWithNamesAndPlaylistMaps extends Campaign {
   playlist: PlaylistWithMap[];
 }
 
@@ -187,7 +187,7 @@ export interface ClubCampaign {
   mediaTheme: string;
 }
 
-export interface ClubCampaignWithPlaylistMaps extends ClubCampaign {
+export interface ClubCampaignWithNamesAndPlaylistMaps extends ClubCampaign {
   campaign: {
     color: string;
     leaderboardGroupUid: string;
@@ -217,7 +217,9 @@ export interface ClubCampaignWithPlaylistMaps extends ClubCampaign {
       liveButtonBackgroundUrl: string;
       liveButtonForegroundUrl: string;
     };
-  } & CampaignWithPlaylistMaps;
+  } & CampaignWithNamesAndPlaylistMaps;
+  creatorName: string;
+  latestEditorName: string;
 }
 
 export interface ClubCampaignsResponse {
@@ -333,4 +335,95 @@ export interface ClubListResponse {
   clubList: Club[];
   maxPage: number;
   clubCount: number;
+}
+
+export interface ClubWithAccountNames extends Club {
+  authorName: string;
+  latestEditorName: string;
+}
+
+export interface RoomArgs {
+  name?: string;
+  region?: "eu-west";
+  maxPlayersPerServer?: number;
+  script?: string;
+  scalable?: boolean;
+  maps?: string[];
+  settings?: {
+    key: string;
+    value: string;
+    type: string;
+  }[];
+}
+
+export type EditRoomArgs = Partial<RoomArgs>;
+
+export interface Room {
+  id: number;
+  name: string;
+  region: string;
+  serverAccountId: string;
+  maxPlayers: number;
+  playerCount: number;
+  maps: string[];
+  script: string;
+  scalable: boolean;
+  scriptSettings: Record<string, { key: string; value: string; type: string }>;
+  serverInfo: null;
+}
+
+export interface ClubRoom {
+  id: number;
+  clubId: number;
+  clubName: string;
+  nadeo: boolean;
+  roomId: number;
+  campaignId: number | null;
+  playerServerLogin: string | null;
+  activityId: number;
+  name: string;
+  room: Room;
+  popularityLevel: number;
+  creationTimestamp: number;
+  creatorAccountId: string;
+  latestEditorAccountId: string;
+  password: boolean;
+  mediaUrl: string;
+  mediaUrlPngLarge: string;
+  mediaUrlPngMedium: string;
+  mediaUrlPngSmall: string;
+  mediaUrlDds: string;
+  mediaTheme: string;
+}
+
+export interface RoomWithMaps extends Room {
+  mapObjects: Maps[];
+}
+
+export interface ClubRoomWithNamesAndMaps extends ClubRoom {
+  creatorName: string;
+  latestEditorName: string;
+  room: RoomWithMaps;
+}
+
+export interface ClubMember {
+  accountId: string;
+  clubId: number;
+  role: string;
+  creationTimestamp: number;
+  vip: boolean;
+  moderator: boolean;
+  hasFeatured: boolean;
+  pin: boolean;
+  useTag: boolean;
+}
+
+export interface ClubMemberWithName {
+  accountName: string;
+}
+
+export interface ClubMembersResponse {
+  clubMemberList: ClubMember[];
+  maxPage: number;
+  itemCount: number;
 }

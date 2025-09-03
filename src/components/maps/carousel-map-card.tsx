@@ -10,7 +10,6 @@ import {
   IconRotateClockwise,
   IconUser,
 } from "@tabler/icons-react";
-import clsx from "clsx";
 import Image from "next/image";
 import { toast } from "sonner";
 import { parseTmTags, stripTmTags } from "tmtags";
@@ -146,9 +145,11 @@ export default function CarouselMapCard({
           </div>
         )}
         <div
-          className={clsx(
-            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40",
+          className={cn(
+            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40 text-white",
             !canMapActions && "rounded-b-lg",
+            !map.thumbnailUrl &&
+              "bg-gradient-to-t from-black/60 via-black/40 to-transparent",
           )}
         >
           <h3

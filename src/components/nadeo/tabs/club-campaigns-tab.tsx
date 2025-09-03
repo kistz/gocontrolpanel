@@ -20,7 +20,7 @@ export default async function ClubCampaignsTab({
       <ClubCampaignMaps
         serverId={serverId}
         fmHealth={fmHealth}
-        campaign={data}
+        clubCampaign={data}
       />
     );
   } else {

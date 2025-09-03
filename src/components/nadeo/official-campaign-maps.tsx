@@ -4,7 +4,7 @@ import {
   downloadCampaign,
 } from "@/actions/nadeo/campaigns";
 import { getErrorMessage } from "@/lib/utils";
-import { CampaignWithPlaylistMaps } from "@/types/api/nadeo";
+import { CampaignWithNamesAndPlaylistMaps } from "@/types/api/nadeo";
 import { IconArrowLeft, IconDownload, IconMapPlus } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +19,7 @@ export default function OfficialCampaignMaps({
 }: {
   serverId: string;
   fmHealth: boolean;
-  campaign?: CampaignWithPlaylistMaps | null;
+  campaign?: CampaignWithNamesAndPlaylistMaps | null;
 }) {
   const router = useRouter();
 

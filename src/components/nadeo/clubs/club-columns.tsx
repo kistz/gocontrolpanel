@@ -48,9 +48,7 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => (
       <div className="flex justify-end">
-        <Link
-          href={`/server/${serverId}/nadeo?club=${row.original.id}`}
-        >
+        <Link href={`/server/${serverId}/nadeo?club=${row.original.id}`}>
           <IconArrowRight />
         </Link>
       </div>

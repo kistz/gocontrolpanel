@@ -1,10 +1,13 @@
 import config from "@/lib/config";
 import {
   AccountNames,
+  Club,
   ClubActivitiesResponse,
   ClubCampaign,
   ClubCampaignsResponse,
   ClubListResponse,
+  ClubMembersResponse,
+  ClubRoom,
   MapInfo,
   MonthMapListResponse,
   NadeoTokens,
@@ -17,7 +20,7 @@ import { ServerError, ServerResponse } from "@/types/responses";
 import "server-only";
 import { doServerAction } from "../actions";
 import { withRateLimit } from "../ratelimiter";
-import { getRedisClient } from "../redis";
+import { getKeyAccountNames, getRedisClient } from "../redis";
 
 const getTokenKey = (audience: string) => `nadeo:tokens:${audience}`;
 const CREDENTIALS_TOKEN_KEY = "nadeo:credentials_token";
@@ -155,13 +158,41 @@ export async function searchAccountNames(
 export async function getAccountNames(
   accountIds: string[],
 ): Promise<AccountNames> {
+  const redis = await getRedisClient();
+  const key = getKeyAccountNames();
+
+  accountIds = [...new Set(accountIds)]; // Remove duplicates
+
+  const cached = await redis.get(key);
+  if (cached) {
+    const allNames: AccountNames = JSON.parse(cached);
+    const foundNames: AccountNames = {};
+    accountIds.forEach((id) => {
+      if (allNames[id]) {
+        foundNames[id] = allNames[id];
+      }
+    });
+
+    if (Object.keys(foundNames).length === accountIds.length) {
+      return foundNames;
+    }
+  }
+
   const url = `${API_URL}/display-names`;
   const params = new URLSearchParams();
   accountIds.forEach((id) => params.append("accountId[]", id));
 
-  return await doCredentialsRequest<AccountNames>(
+  const res = await doCredentialsRequest<AccountNames>(
     `${url}?${params.toString()}`,
   );
+
+  const combined: AccountNames = {
+    ...(cached ? JSON.parse(cached) : {}),
+    ...res,
+  };
+  await redis.set(key, JSON.stringify(combined), "EX", 24 * 60 * 60); // Cache for 24 hours
+
+  return combined;
 }
 
 export async function getTotdRoyalMaps(
@@ -228,6 +259,11 @@ export async function getClubs(
   return await doRequest<ClubListResponse>(url, "NadeoLiveServices");
 }
 
+export async function getClubById(clubId: number): Promise<Club> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}`;
+  return await doRequest<Club>(url, "NadeoLiveServices");
+}
+
 export async function downloadFile(
   url: string,
   fileName: string,
@@ -260,6 +296,23 @@ export async function downloadFile(
     }
     throw err;
   }
+}
+
+export async function getClubRoom(
+  clubId: number,
+  roomId: number,
+): Promise<ClubRoom> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/room/${roomId}`;
+  return await doRequest<ClubRoom>(url, "NadeoLiveServices");
+}
+
+export async function getClubMembers(
+  clubId: number,
+  offset: number = 0,
+  length: number = 12,
+): Promise<ClubMembersResponse> {
+  const url = `${LIVE_URL}/api/token/club/${clubId}/member?length=${length}&offset=${offset}`;
+  return await doRequest<ClubMembersResponse>(url, "NadeoLiveServices");
 }
 
 export async function doRequest<T>(

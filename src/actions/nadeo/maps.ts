@@ -60,7 +60,7 @@ export async function addMapToServer(
       if (error) {
         throw new Error(error);
       }
-      
+
       const { error: addMapError } = await addMap(
         serverId,
         `Downloaded/${file}`,

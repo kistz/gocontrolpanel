@@ -1,5 +1,5 @@
 import { getClubsPaginated } from "@/actions/nadeo/clubs";
-import { PaginationTable } from "../table/pagination-table";
+import { PaginationTable } from "../../table/pagination-table";
 import { createColumns } from "./club-columns";
 
 export default function Clubs({ serverId }: { serverId: string }) {
