@@ -13,13 +13,16 @@ import TMXMappackCard from "./tmx-mappack-card";
 export default function MappackSearch({
   serverId,
   fmHealth,
+  defaultResults = [],
 }: {
   serverId: string;
   fmHealth: boolean;
+  defaultResults?: TMXMappack[];
 }) {
   const [nameQuery, setNameQuery] = useState("");
 
-  const [searchResults, setSearchResults] = useState<TMXMappack[]>([]);
+  const [searchResults, setSearchResults] =
+    useState<TMXMappack[]>(defaultResults);
   const [hasMoreResults, setHasMoreResults] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -67,16 +70,14 @@ export default function MappackSearch({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-end">
-        <div className="flex flex-col gap-1">
-          <span className="text-nowrap text-sm">Mappack Name</span>
-          <Input
-            type="text"
-            placeholder="Search mappack name..."
-            value={nameQuery}
-            onChange={(e) => setNameQuery(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
-        </div>
+        <Input
+          type="text"
+          placeholder="Search mappack name..."
+          className="max-w-48"
+          value={nameQuery}
+          onChange={(e) => setNameQuery(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
 
         <Button onClick={() => onSearch()} disabled={loading}>
           <IconSearch />

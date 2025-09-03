@@ -1,6 +1,6 @@
 "use server";
 import { doServerActionWithAuth } from "@/lib/actions";
-import { getGbxClient } from "@/lib/gbxclient";
+import { getGbxClient, getGbxClientManager } from "@/lib/gbxclient";
 import { ModeScriptInfo } from "@/types/gbx";
 import { ServerResponse } from "@/types/responses";
 
@@ -184,6 +184,33 @@ export async function triggerModeScriptEventArray(
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("TriggerModeScriptEventArray", method, params);
+    },
+  );
+}
+
+export async function pauseMatch(
+  serverId: string,
+  pause: boolean,
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const { error } = await triggerModeScriptEventArray(
+        serverId,
+        "Maniaplanet.Pause.SetActive",
+        pause ? ["true"] : ["false"],
+      );
+      if (error) {
+        throw new Error(error);
+      }
+
+      if (pause) {
+        const manager = await getGbxClientManager(serverId);
+        manager.info.liveInfo.isPaused = true;
+        if (manager.roundNumber !== null) {
+          manager.roundNumber--;
+        }
+      }
     },
   );
 }

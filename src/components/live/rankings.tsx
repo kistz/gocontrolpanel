@@ -43,9 +43,7 @@ export default function Rankings({ players, teams, type }: RankingsProps) {
           {players &&
             Object.values(players)
               .sort((a, b) => {
-                if (a.rank !== b.rank) {
-                  return a.rank - b.rank;
-                } else if (b.matchPoints !== a.matchPoints) {
+                if (b.matchPoints !== a.matchPoints) {
                   return b.matchPoints - a.matchPoints;
                 }
                 return a.bestTime - b.bestTime;

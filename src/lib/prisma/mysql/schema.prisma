@@ -68,6 +68,7 @@ model Records {
   mapUid      String
   time        Int
   round       Int?
+  points      Int?
   checkpoints Json    @default("[]")
 
   matchId String?
@@ -264,7 +265,7 @@ model Commands {
 
 model Plugins {
   id          String  @id @default(uuid())
-  name        String
+  name        String  @unique
   description String?
 
   commands      Commands[]
@@ -282,6 +283,7 @@ model ServerPlugins {
   serverId String
   pluginId String
   enabled  Boolean
+  config   Json?
 
   server Servers @relation(fields: [serverId], references: [id], onDelete: Cascade)
   plugin Plugins @relation(fields: [pluginId], references: [id], onDelete: Cascade)

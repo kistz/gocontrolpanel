@@ -1,9 +1,7 @@
 import { getInterfaces } from "@/actions/database/interfaces";
 import { getPlugins } from "@/actions/database/plugins";
-import {
-  getServerChatConfig,
-  getServerPlugins,
-} from "@/actions/database/servers";
+import { getServerPlugins } from "@/actions/database/server-plugins";
+import { getServerChatConfig } from "@/actions/database/servers";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,7 +39,7 @@ export default async function ServerInterfacePage({
         </h4>
       </div>
 
-      <Tabs defaultValue="interface" className="w-full h-full">
+      <Tabs defaultValue="interface" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="interface">Interface</TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>

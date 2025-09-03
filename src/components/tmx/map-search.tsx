@@ -13,14 +13,16 @@ import TMXMapCard from "./tmx-map-card";
 export default function MapSearch({
   serverId,
   fmHealth,
+  defaultResults = [],
 }: {
   serverId: string;
   fmHealth: boolean;
+  defaultResults?: TMXMap[];
 }) {
   const [nameQuery, setNameQuery] = useState("");
   const [authorQuery, setAuthorQuery] = useState("");
 
-  const [searchResults, setSearchResults] = useState<TMXMap[]>([]);
+  const [searchResults, setSearchResults] = useState<TMXMap[]>(defaultResults);
   const [hasMoreResults, setHasMoreResults] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -72,27 +74,23 @@ export default function MapSearch({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-end">
-        <div className="flex flex-col gap-1">
-          <span className="text-nowrap text-sm">Map Name</span>
-          <Input
-            type="text"
-            placeholder="Search map name..."
-            value={nameQuery}
-            onChange={(e) => setNameQuery(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
-        </div>
+        <Input
+          type="text"
+          placeholder="Search map name..."
+          className="max-w-48"
+          value={nameQuery}
+          onChange={(e) => setNameQuery(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
 
-        <div className="flex gap-1 flex-col">
-          <span className="text-nowrap text-sm">Author</span>
-          <Input
-            type="text"
-            placeholder="Search author..."
-            value={authorQuery}
-            onChange={(e) => setAuthorQuery(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
-        </div>
+        <Input
+          type="text"
+          placeholder="Search author..."
+          value={authorQuery}
+          className="max-w-48"
+          onChange={(e) => setAuthorQuery(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
         <Button onClick={() => onSearch()} disabled={loading}>
           <IconSearch />
           Search

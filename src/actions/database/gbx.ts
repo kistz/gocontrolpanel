@@ -3,6 +3,7 @@ import { getClient } from "@/lib/dbclient";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Maps, Matches, Prisma, Servers } from "@/lib/prisma/generated";
 import { getKeyActiveMap, getRedisClient } from "@/lib/redis";
+import { Player, Scores } from "@/types/gbx/scores";
 import { Waypoint } from "@/types/gbx/waypoint";
 import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
@@ -358,5 +359,95 @@ export async function saveMatchRecord(
     }
 
     await createRecord();
+  }
+}
+
+export async function saveRoundRecords(
+  serverId: string,
+  matchId: string | null,
+  scores: Scores,
+  round: number | null = null,
+): Promise<void> {
+  const redis = await getRedisClient();
+  const key = getKeyActiveMap(serverId);
+
+  const activeMap = await redis.get(key);
+  if (!activeMap) {
+    throw new Error(`No active map found for server ${serverId}`);
+  }
+
+  const mapData: Maps = JSON.parse(activeMap);
+  if (!mapData) {
+    throw new Error(`Map data is invalid for server ${serverId}`);
+  }
+
+  const db = getClient();
+
+  const createRecord = async (player: Player) => {
+    if (matchId !== null && round !== null) {
+      // Only upsert if both matchId and round are provided
+      await db.records.upsert({
+        where: {
+          matchId_login_round: {
+            login: player.login,
+            matchId,
+            round,
+          },
+        },
+        update: {
+          mapId: mapData.id,
+          mapUid: mapData.uid,
+          time: player.prevracetime,
+          checkpoints: player.prevracecheckpoints || [],
+          points: player.roundpoints,
+        },
+        create: {
+          mapId: mapData.id,
+          mapUid: mapData.uid,
+          login: player.login,
+          time: player.prevracetime,
+          checkpoints: player.prevracecheckpoints || [],
+          round,
+          points: player.roundpoints,
+          matchId,
+          serverId,
+        },
+      });
+    } else {
+      // Otherwise, just create a new record
+      await db.records.create({
+        data: {
+          mapId: mapData.id,
+          mapUid: mapData.uid,
+          login: player.login,
+          time: player.prevracetime,
+          checkpoints: player.prevracecheckpoints || [],
+          round,
+          points: player.roundpoints,
+          matchId,
+          serverId,
+        },
+      });
+    }
+  };
+
+  for (const player of scores.players) {
+    try {
+      await createRecord(player);
+    } catch (error) {
+      console.error("Error saving record:", error);
+
+      try {
+        await syncLogin(serverId, player.login);
+      } catch (syncError) {
+        console.error("Error syncing login:", syncError);
+
+        await db.users.create({
+          data: { login: player.login, nickName: player.login, path: "" },
+        });
+      }
+
+      await createRecord(player);
+    }
   }
 }

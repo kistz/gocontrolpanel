@@ -206,6 +206,7 @@ export function initGbxWebsocketClient(
 }
 
 export function capitalize(str: string): string {
+  if (str.length === 0) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -385,4 +386,39 @@ export function getCurrencySymbol(currency: string): string {
     default:
       return currency;
   }
+}
+
+export function monthNumberToName(monthNum: number): string {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // monthNum should be 1–12
+  return months[monthNum - 1] || "Invalid month";
+}
+
+export function weekDayNumberToName(dayNum: number): string {
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  // dayNum should be 0–6
+  return days[dayNum] || "Invalid day";
 }

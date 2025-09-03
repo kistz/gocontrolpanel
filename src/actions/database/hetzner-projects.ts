@@ -182,8 +182,8 @@ export async function updateHetznerProject(
 
       return {
         ...updatedHetznerProject,
-        apiTokens: getList<string>(updatedHetznerProject.apiTokens).map((token) =>
-          decryptHetznerToken(token),
+        apiTokens: getList<string>(updatedHetznerProject.apiTokens).map(
+          (token) => decryptHetznerToken(token),
         ),
       };
     },

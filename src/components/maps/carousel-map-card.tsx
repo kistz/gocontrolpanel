@@ -10,7 +10,6 @@ import {
   IconRotateClockwise,
   IconUser,
 } from "@tabler/icons-react";
-import clsx from "clsx";
 import Image from "next/image";
 import { toast } from "sonner";
 import { parseTmTags, stripTmTags } from "tmtags";
@@ -21,6 +20,7 @@ import { Card } from "../ui/card";
 interface CarouselMapCardProps {
   map: Maps;
   index: number;
+  currentIndex?: number;
   isCurrent?: boolean;
   isSwitching?: boolean;
   total: number;
@@ -32,6 +32,7 @@ interface CarouselMapCardProps {
 export default function CarouselMapCard({
   map,
   index,
+  currentIndex = 0,
   isCurrent = false,
   isSwitching = false,
   total,
@@ -129,6 +130,14 @@ export default function CarouselMapCard({
             fill
             alt={map.name}
             className="static! rounded-t-lg h-40! object-cover"
+            loading={
+              isCurrent ||
+              (index > currentIndex && index <= currentIndex + 5) ||
+              (currentIndex + 5 >= total && index <= (currentIndex + 5) % total)
+                ? "eager"
+                : "lazy"
+            }
+            priority={isCurrent}
           />
         ) : (
           <div className="w-full h-40 rounded-t-lg flex items-center justify-center">
@@ -136,9 +145,11 @@ export default function CarouselMapCard({
           </div>
         )}
         <div
-          className={clsx(
-            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40",
+          className={cn(
+            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40 text-white",
             !canMapActions && "rounded-b-lg",
+            !map.thumbnailUrl &&
+              "bg-gradient-to-t from-black/60 via-black/40 to-transparent",
           )}
         >
           <h3

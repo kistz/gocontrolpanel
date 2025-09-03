@@ -10,9 +10,9 @@ export const routes = {
     live: "/server/:id/live",
     files: "/server/:id/files",
     editor: "/server/:id/files/editor",
-    dev: "/server/:id/dev",
     interface: "/server/:id/interface",
     tmx: "/server/:id/tmx",
+    nadeo: "/server/:id/nadeo",
     records: "/server/:id/records",
   },
   admin: {
@@ -42,6 +42,7 @@ export const routePermissions = {
     files: ["servers:id:admin"],
     interface: ["servers:id:admin"],
     tmx: ["servers:id:moderator", "servers:id:admin"],
+    nadeo: ["servers:id:moderator", "servers:id:admin"],
     records: {
       actions: ["servers:id:moderator", "servers:id:admin"],
     },
@@ -196,17 +197,6 @@ export const breadCrumbs: {
     ],
   },
   {
-    path: routes.servers.dev,
-    breadCrumbs: [
-      {
-        label: "Server",
-      },
-      {
-        label: "Dev",
-      },
-    ],
-  },
-  {
     path: routes.servers.interface,
     breadCrumbs: [
       {
@@ -225,6 +215,17 @@ export const breadCrumbs: {
       },
       {
         label: "TMX",
+      },
+    ],
+  },
+  {
+    path: routes.servers.nadeo,
+    breadCrumbs: [
+      {
+        label: "Server",
+      },
+      {
+        label: "Nadeo",
       },
     ],
   },

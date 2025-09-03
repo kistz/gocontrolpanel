@@ -1,5 +1,5 @@
-import MapSearch from "@/components/tmx/map-search";
-import MappackSearch from "@/components/tmx/mappack-search";
+import MappacksTab from "@/components/tmx/tabs/mappacks-tab";
+import MapsTab from "@/components/tmx/tabs/maps-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hasPermission } from "@/lib/auth";
 import { getFileManagerHealth } from "@/lib/filemanager";
@@ -40,10 +40,10 @@ export default async function ServerTMXPage({
           <TabsTrigger value="mappacks">Mappacks</TabsTrigger>
         </TabsList>
         <TabsContent value="maps" className="flex flex-col gap-6">
-          <MapSearch serverId={id} fmHealth={fmHealth} />
+          <MapsTab serverId={id} fmHealth={fmHealth} />
         </TabsContent>
         <TabsContent value="mappacks" className="flex flex-col gap-6">
-          <MappackSearch serverId={id} fmHealth={fmHealth} />
+          <MappacksTab serverId={id} fmHealth={fmHealth} />
         </TabsContent>
       </Tabs>
     </div>

@@ -27,5 +27,5 @@ export default async function ServerLayout({
     redirect(routes.dashboard);
   }
 
-  return children;
+  return <div className="p-4 lg:p-6 h-full">{children}</div>;
 }

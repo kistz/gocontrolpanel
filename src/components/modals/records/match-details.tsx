@@ -24,7 +24,10 @@ export default function MatchDetailsModal({
     e.stopPropagation();
   };
 
-  const columns = createColumns(data.records.some((record) => record.round));
+  const columns = createColumns(
+    data.records.some((record) => record.round),
+    data.records.some((record) => record.points),
+  );
 
   return (
     <Card
@@ -42,7 +45,9 @@ export default function MatchDetailsModal({
       <div className="flex flex-col-reverse sm:flex-row gap-4 flex-1 min-h-0 max-w-full">
         <DataTable
           columns={columns}
-          data={data.records}
+          data={data.records.sort(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+          )}
           pagination
           className="overflow-y-auto flex-none"
         />

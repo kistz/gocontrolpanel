@@ -1,6 +1,7 @@
 import {
   createMatch,
   saveMatchRecord,
+  saveRoundRecords,
   syncPlayer,
 } from "@/actions/database/gbx";
 import {
@@ -12,15 +13,17 @@ import {
 import { EndMap, SMapInfo, StartMap } from "@/types/gbx/map";
 import { PauseStatus } from "@/types/gbx/pause";
 import { PlayerChat, SPlayerInfo } from "@/types/gbx/player";
-import { Elmination, Scores } from "@/types/gbx/scores";
+import { Elmination, Player, Scores } from "@/types/gbx/scores";
 import { WarmUp, WarmUpStatus } from "@/types/gbx/warmup";
 import { GiveUp, Waypoint } from "@/types/gbx/waypoint";
 import { PlayerRound, PlayerWaypoint, Team } from "@/types/live";
 import { PlayerInfo } from "@/types/player";
+import { ECMPluginConfig } from "@/types/plugins/ecm";
 import { ServerClientInfo } from "@/types/server";
 import { GbxClient } from "@evotm/gbxclient";
 import EventEmitter from "events";
 import "server-only";
+import { ecmOnDriverFinish, ecmOnRoundEnd } from "./api/ecm";
 import { handleAdminCommand } from "./commands";
 import { getClient } from "./dbclient";
 import { appGlobals } from "./global";
@@ -189,9 +192,7 @@ export class GbxClientManager extends EventEmitter {
     this.info.plugins = server.serverPlugins;
 
     await setupListeners(this, server.id);
-    await syncPlayerList(this);
     await syncMap(this, server.id);
-
     await syncLiveInfo(this);
 
     return this.client;
@@ -355,6 +356,7 @@ async function callbackListener(
           if (params.isendrace) {
             saveFinishRecord(manager, serverId, params);
             onPlayerFinishScript(manager, params);
+            ecmPlayerFinish(manager, params);
           } else {
             onPlayerCheckpointScript(manager, params);
           }
@@ -369,10 +371,13 @@ async function callbackListener(
           await onStartRoundStartScript(manager);
           break;
         case "Trackmania.Scores":
-          await onScoresScript(manager, params);
           if (params.section === "EndRound") {
+            ecmEndRound(manager, params);
             await onEndRoundScript(manager, params);
+          } else if (params.section === "PreEndRound") {
+            await onPreEndRoundScript(manager, params);
           }
+          await onScoresScript(manager, params);
           break;
         case "Trackmania.WarmUp.Status":
           onWarmUpStatusScript(manager, params);
@@ -541,6 +546,26 @@ function onPodiumStartScript(_: GbxClientManager, serverId: string) {
   onPodiumStart(serverId);
 }
 
+function ecmPlayerFinish(manager: GbxClientManager, waypoint: Waypoint) {
+  if (!manager.info.activeMap) return;
+
+  if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
+
+  const ecmPlugin = manager.info.plugins.find((p) => p.plugin.name === "ecm");
+  if (!ecmPlugin || !ecmPlugin.enabled) return;
+
+  const pluginConfig = ecmPlugin.config as ECMPluginConfig;
+  if (!pluginConfig.apiKey) return;
+
+  // Send data to eCircuitMania
+  ecmOnDriverFinish(pluginConfig.apiKey, {
+    finishTime: waypoint.racetime,
+    ubisoftUid: waypoint.accountid,
+    roundNum: manager.roundNumber || 1,
+    mapId: manager.info.activeMap,
+  });
+}
+
 function saveFinishRecord(
   manager: GbxClientManager,
   serverId: string,
@@ -658,6 +683,40 @@ async function onStartRoundStartScript(manager: GbxClientManager) {
   manager.emit("beginRound", manager.info.liveInfo.activeRound);
 }
 
+function ecmEndRound(manager: GbxClientManager, scores: Scores) {
+  const roundNum = manager.roundNumber || 1;
+
+  if (!manager.info.activeMap) return;
+
+  if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
+
+  const ecmPlugin = manager.info.plugins.find((p) => p.plugin.name === "ecm");
+  if (!ecmPlugin || !ecmPlugin.enabled) return;
+
+  const pluginConfig = ecmPlugin.config as ECMPluginConfig;
+  if (!pluginConfig.apiKey) return;
+
+  const rankedPlayers = rankPlayers(
+    scores.players,
+    manager.info.liveInfo.type === "timeattack",
+  );
+
+  const players = rankedPlayers.map((p) => ({
+    finishTime:
+      manager.info.liveInfo.type === "timeattack"
+        ? p.bestracetime
+        : p.prevracetime,
+    ubisoftUid: p.accountid,
+    position: p.position,
+  }));
+
+  ecmOnRoundEnd(pluginConfig.apiKey, {
+    players,
+    roundNum,
+    mapId: manager.info.activeMap,
+  });
+}
+
 async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
   if (scores.useteams) {
     scores.teams.forEach((team) => {
@@ -704,6 +763,19 @@ async function onEndRoundScript(manager: GbxClientManager, scores: Scores) {
   await sleep(300); // wait for the pause status to be updated
 
   manager.emit("endRound", manager.info.liveInfo);
+}
+
+async function onPreEndRoundScript(manager: GbxClientManager, scores: Scores) {
+  if (manager.info.liveInfo.isWarmUp || manager.info.liveInfo.isPaused) return;
+
+  if (manager.roundNumber === 0) manager.roundNumber = 1;
+
+  saveRoundRecords(
+    manager.getServerId(),
+    manager.currentMatchId,
+    scores,
+    manager.roundNumber,
+  );
 }
 
 function onPauseStatusScript(manager: GbxClientManager, status: PauseStatus) {
@@ -783,7 +855,7 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
       accountId: player.accountid,
       name: player.name,
       team: player.team,
-      rank: i + 1,
+      rank: player.rank,
       finalist: isFinalist(
         player.matchpoints,
         manager.info.liveInfo.pointsLimit,
@@ -832,6 +904,8 @@ async function onScoresScript(manager: GbxClientManager, scores: Scores) {
 }
 
 async function syncLiveInfo(manager: GbxClientManager) {
+  await syncPlayerList(manager);
+
   await manager.client.callScript(
     "Trackmania.WarmUp.GetStatus",
     "gocontrolpanel",
@@ -1099,4 +1173,38 @@ async function onPlayerChat(manager: GbxClientManager, chat: PlayerChat) {
   );
 
   manager.client.call("ChatSendServerMessage", message);
+}
+
+function rankPlayers(
+  players: Player[],
+  ta?: boolean,
+): (Player & { position: number })[] {
+  return [...players]
+    .sort((a, b) => {
+      const racetimeA = ta ? a.bestracetime : a.prevracetime;
+      const racetimeB = ta ? b.bestracetime : b.prevracetime;
+
+      if (racetimeA === -1 && racetimeB === -1) return 0; // order doesn't matter
+      if (racetimeA === -1) return 1; // a goes last
+      if (racetimeB === -1) return -1; // b goes last
+
+      // 1️⃣ Compare total prevracetime
+      if (racetimeA !== racetimeB) return racetimeA - racetimeB;
+
+      // 2️⃣ Tie-break: compare checkpoints from last to first (excluding first checkpoint if needed)
+      const cpA = ta ? a.bestracecheckpoints : a.prevracecheckpoints;
+      const cpB = ta ? b.bestracecheckpoints : b.prevracecheckpoints;
+      const len = Math.min(cpA.length, cpB.length);
+
+      for (let i = len - 1; i >= 0; i--) {
+        if (cpA[i] !== cpB[i]) return cpA[i] - cpB[i];
+      }
+
+      // 3️⃣ Fully equal
+      return 0;
+    })
+    .map((player, index) => ({
+      ...player,
+      position: index + 1,
+    }));
 }

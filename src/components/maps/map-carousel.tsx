@@ -115,6 +115,7 @@ export default function MapCarousel({
                 canMapActions={canMapActions}
                 map={map}
                 index={index}
+                currentIndex={currentIndex}
                 isCurrent={index === currentIndex}
                 isSwitching={isSwitching}
                 total={maps.length}

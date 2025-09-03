@@ -129,7 +129,10 @@ export default function EditUserForm({
             variant="outline"
             className="w-full"
             onClick={() => {
-              form.setValue("permissions", getList<string>(selectedRole?.permissions));
+              form.setValue(
+                "permissions",
+                getList<string>(selectedRole?.permissions),
+              );
             }}
           >
             <IconClipboardPlus />

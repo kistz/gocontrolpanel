@@ -65,6 +65,11 @@ export async function addMapToServer(
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
     async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new Error("File manager is not healthy");
+      }
+
       const { data: fileName, error } = await downloadMap(serverId, mapId);
       if (error) {
         throw new Error(error);

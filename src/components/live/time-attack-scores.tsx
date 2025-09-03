@@ -33,14 +33,11 @@ export default function TimeAttackScores({ liveInfo }: TimeAttackScoresProps) {
           <TableBody>
             {liveInfo.players &&
               Object.values(liveInfo.players)
-                .filter((player) => player.connected)
                 .sort((a, b) => {
-                  if (a.rank !== b.rank) {
-                    return a.rank - b.rank;
-                  } else if (b.matchPoints !== a.matchPoints) {
-                    return b.matchPoints - a.matchPoints;
+                  if (a.bestTime !== b.bestTime) {
+                    return a.bestTime - b.bestTime;
                   }
-                  return a.bestTime - b.bestTime;
+                  return a.name.localeCompare(b.name);
                 })
                 .map((player, i) => (
                   <TableRow

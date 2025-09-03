@@ -36,7 +36,11 @@ export default function MapRecordsModal({
       <div className="flex flex-col-reverse sm:flex-row gap-4 flex-1 min-h-0 max-w-full">
         <DataTable
           columns={columns}
-          data={data.records}
+          data={data.records.sort((a, b) =>
+            a.time === b.time
+              ? a.createdAt.getTime() - b.createdAt.getTime()
+              : a.time - b.time,
+          )} // stable sort by time, then by date
           pagination
           className="overflow-y-auto flex-none"
         />

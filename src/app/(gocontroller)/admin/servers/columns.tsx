@@ -3,8 +3,8 @@
 
 import { deleteServer, ServersWithUsers } from "@/actions/database/servers";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import EditServerModal from "@/components/modals/servers/edit-server";
 import Modal from "@/components/modals/modal";
+import EditServerModal from "@/components/modals/servers/edit-server";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
