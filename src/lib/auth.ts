@@ -101,23 +101,11 @@ export const authOptions: NextAuthOptions = {
         adminClubs: token.adminClubs,
       };
 
-      session.accessToken = token.accessToken;
-      session.refreshToken = token.refreshToken;
-      session.accessTokenExpires = token.accessTokenExpires;
-      session.error = token.error;
-
       return session;
     },
     async jwt({ token, user, account }) {
-      token.error = undefined;
-
       if (account && account.access_token) {
         try {
-          token.accessToken = account.access_token;
-          token.refreshToken = account.refresh_token;
-          token.accessTokenExpires =
-            Date.now() + (account.expires_at ?? 3600) * 1000;
-
           const res = await fetch(
             "https://api.trackmania.com/api/user/clubs/admin",
             {
@@ -135,50 +123,6 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           token.adminClubs = [];
           console.error("Failed to fetch admin clubs", error);
-        }
-      }
-
-      if (
-        !token.accessToken ||
-        !token.accessTokenExpires ||
-        !token.refreshToken
-      ) {
-        return {
-          ...token,
-          error: "RefreshAccessTokenError",
-        };
-      }
-
-      // Refresh 30 seconds before expiry
-      if (Date.now() >= token.accessTokenExpires - 30000) {
-        if (token.refreshToken) {
-          try {
-            const refreshedTokens = await refreshAccessToken(
-              token.refreshToken,
-            );
-
-            if (!refreshedTokens.access_token) {
-              throw new Error("No access token in response");
-            }
-
-            token.accessToken = refreshedTokens.access_token;
-            token.refreshToken =
-              refreshedTokens.refresh_token ?? token.refreshToken;
-            token.accessTokenExpires =
-              Date.now() + (refreshedTokens.expires_at ?? 3600) * 1000;
-          } catch (error) {
-            console.error("Error refreshing access token", error);
-            return {
-              ...token,
-              error: "RefreshAccessTokenError",
-            };
-          }
-        } else {
-          console.error("No refresh token available");
-          return {
-            ...token,
-            error: "RefreshAccessTokenError",
-          };
         }
       }
 
@@ -273,25 +217,6 @@ export const authOptions: NextAuthOptions = {
     updateAge: 6 * 3600, // 6 hours
   },
 };
-
-async function refreshAccessToken(token: string): Promise<TokenSet> {
-  const response = await fetch("https://api.trackmania.com/api/access_token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      client_id: process.env.NADEO_CLIENT_ID!,
-      client_secret: process.env.NADEO_CLIENT_SECRET!,
-      refresh_token: token,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to refresh access token");
-  }
-
-  return await response.json();
-}
 
 export function auth(
   ...args:
