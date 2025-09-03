@@ -146,21 +146,24 @@ export async function getClubActivitiesList(
   offset = 0,
   length = 12,
 ): Promise<ServerResponse<ClubActivitiesResponse>> {
-  return doServerActionWithAuth(["clubs:view"], async () => {
-    const redis = await getRedisClient();
-    const key = getKeyClubActivities(clubId, offset);
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      const redis = await getRedisClient();
+      const key = getKeyClubActivities(clubId, offset);
 
-    const cached = await redis.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
 
-    const response = await getClubActivities(clubId, offset, length);
+      const response = await getClubActivities(clubId, offset, length);
 
-    await redis.set(key, JSON.stringify(response), "EX", 300);
+      await redis.set(key, JSON.stringify(response), "EX", 300);
 
-    return response;
-  });
+      return response;
+    },
+  );
 }
 
 export async function getClubCampaignWithMaps(
@@ -209,51 +212,57 @@ export async function getClubCampaignWithMaps(
 export async function getClub(
   clubId: number,
 ): Promise<ServerResponse<ClubWithAccountNames>> {
-  return doServerActionWithAuth(["clubs:view"], async () => {
-    const redis = await getRedisClient();
-    const key = `club:${clubId}`;
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      const redis = await getRedisClient();
+      const key = `club:${clubId}`;
 
-    const cached = await redis.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
 
-    const club = await getClubById(clubId);
-    const accountNames = await getAccountNames([
-      club.authorAccountId,
-      club.latestEditorAccountId,
-    ]);
+      const club = await getClubById(clubId);
+      const accountNames = await getAccountNames([
+        club.authorAccountId,
+        club.latestEditorAccountId,
+      ]);
 
-    const clubWithAccountNames = {
-      ...club,
-      authorName: accountNames[club.authorAccountId] || "Unknown",
-      latestEditorName: accountNames[club.latestEditorAccountId] || "Unknown",
-    };
+      const clubWithAccountNames = {
+        ...club,
+        authorName: accountNames[club.authorAccountId] || "Unknown",
+        latestEditorName: accountNames[club.latestEditorAccountId] || "Unknown",
+      };
 
-    await redis.set(key, JSON.stringify(clubWithAccountNames), "EX", 300);
+      await redis.set(key, JSON.stringify(clubWithAccountNames), "EX", 300);
 
-    return clubWithAccountNames;
-  });
+      return clubWithAccountNames;
+    },
+  );
 }
 
 export async function getClubMembersCount(
   clubId: number,
 ): Promise<ServerResponse<number>> {
-  return doServerActionWithAuth(["clubs:view"], async () => {
-    const redis = await getRedisClient();
-    const key = getKeyClubMembersCount(clubId);
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      const redis = await getRedisClient();
+      const key = getKeyClubMembersCount(clubId);
 
-    const cached = await redis.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
 
-    const { itemCount } = await getClubMembers(clubId, 0, 1);
+      const { itemCount } = await getClubMembers(clubId, 0, 1);
 
-    await redis.set(key, JSON.stringify(itemCount), "EX", 300);
+      await redis.set(key, JSON.stringify(itemCount), "EX", 300);
 
-    return itemCount;
-  });
+      return itemCount;
+    },
+  );
 }
 
 export async function getClubMembersWithNamesPaginated(
@@ -262,71 +271,77 @@ export async function getClubMembersWithNamesPaginated(
   __: string,
   fetchArgs?: number,
 ): Promise<ServerResponse<PaginationResponse<ClubMemberWithName>>> {
-  return doServerActionWithAuth(["clubs:view"], async () => {
-    if (!fetchArgs) {
-      throw new Error("No club id provided");
-    }
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      if (!fetchArgs) {
+        throw new Error("No club id provided");
+      }
 
-    const redis = await getRedisClient();
-    const key = getKeyClubMembersPaginated(fetchArgs, pagination);
+      const redis = await getRedisClient();
+      const key = getKeyClubMembersPaginated(fetchArgs, pagination);
 
-    const cached = await redis.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
 
-    const clubMembers = await getClubMembers(
-      fetchArgs,
-      pagination.pageIndex * pagination.pageSize,
-      pagination.pageSize,
-    );
+      const clubMembers = await getClubMembers(
+        fetchArgs,
+        pagination.pageIndex * pagination.pageSize,
+        pagination.pageSize,
+      );
 
-    const accountIds = clubMembers.clubMemberList.map((m) => m.accountId);
-    const accountNames = await getAccountNames(accountIds);
+      const accountIds = clubMembers.clubMemberList.map((m) => m.accountId);
+      const accountNames = await getAccountNames(accountIds);
 
-    const clubMembersWithNames: ClubMemberWithName[] =
-      clubMembers.clubMemberList.map((member) => ({
-        ...member,
-        accountName: accountNames[member.accountId] || "Unknown",
-      }));
+      const clubMembersWithNames: ClubMemberWithName[] =
+        clubMembers.clubMemberList.map((member) => ({
+          ...member,
+          accountName: accountNames[member.accountId] || "Unknown",
+        }));
 
-    const response = {
-      totalCount: clubMembers.itemCount,
-      data: clubMembersWithNames,
-    };
+      const response = {
+        totalCount: clubMembers.itemCount,
+        data: clubMembersWithNames,
+      };
 
-    await redis.set(key, JSON.stringify(response), "EX", 300);
+      await redis.set(key, JSON.stringify(response), "EX", 300);
 
-    return response;
-  });
+      return response;
+    },
+  );
 }
 
 export async function getClubRoomWithNamesAndMaps(
   clubId: number,
   roomId: number,
 ): Promise<ServerResponse<ClubRoomWithNamesAndMaps>> {
-  return doServerActionWithAuth(["clubs:view"], async () => {
-    const clubRoom = await getClubRoom(clubId, roomId);
+  return doServerActionWithAuth(
+    ["servers::moderator", "servers::admin"],
+    async () => {
+      const clubRoom = await getClubRoom(clubId, roomId);
 
-    const accountNames = await getAccountNames([
-      clubRoom.creatorAccountId,
-      clubRoom.latestEditorAccountId,
-    ]);
+      const accountNames = await getAccountNames([
+        clubRoom.creatorAccountId,
+        clubRoom.latestEditorAccountId,
+      ]);
 
-    const { data: maps, error } = await getMapsByUids(clubRoom.room.maps);
-    if (error) {
-      throw new Error(error);
-    }
+      const { data: maps, error } = await getMapsByUids(clubRoom.room.maps);
+      if (error) {
+        throw new Error(error);
+      }
 
-    return {
-      ...clubRoom,
-      room: {
-        ...clubRoom.room,
-        mapObjects: maps,
-      },
-      creatorName: accountNames[clubRoom.creatorAccountId] || "Unknown",
-      latestEditorName:
-        accountNames[clubRoom.latestEditorAccountId] || "Unknown",
-    };
-  });
+      return {
+        ...clubRoom,
+        room: {
+          ...clubRoom.room,
+          mapObjects: maps,
+        },
+        creatorName: accountNames[clubRoom.creatorAccountId] || "Unknown",
+        latestEditorName:
+          accountNames[clubRoom.latestEditorAccountId] || "Unknown",
+      };
+    },
+  );
 }

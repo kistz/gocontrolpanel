@@ -15,7 +15,6 @@ export const routes = {
     nadeo: "/server/:id/nadeo",
     records: "/server/:id/records",
   },
-  clubs: "/club/:id",
   admin: {
     users: "/admin/users",
     servers: "/admin/servers",
@@ -47,9 +46,6 @@ export const routePermissions = {
     records: {
       actions: ["servers:id:moderator", "servers:id:admin"],
     },
-  },
-  clubs: {
-    view: ["clubs:view"],
   },
   admin: {
     users: {
@@ -241,14 +237,6 @@ export const breadCrumbs: {
       },
       {
         label: "Records",
-      },
-    ],
-  },
-  {
-    path: routes.clubs,
-    breadCrumbs: [
-      {
-        label: "Club",
       },
     ],
   },

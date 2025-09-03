@@ -5,7 +5,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import ActivityCard from "./activity-card";
 
 export default function ClubActivities({ clubId }: { clubId: number }) {

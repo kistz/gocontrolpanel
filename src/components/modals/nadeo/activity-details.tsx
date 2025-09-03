@@ -160,48 +160,56 @@ export default function ActivityDetailsModal({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col">
-              <h3 className="text-md font-bold">Script Settings</h3>
-              <Separator />
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {Object.values(clubRoom.room.scriptSettings).map((setting) => (
-                <div key={setting.key} className="flex flex-col gap-1">
-                  <span className="font-semibold truncate">{setting.key}</span>
-                  <span className="truncate max-w-64">
-                    {setting.type === "boolean" ? (
-                      setting.value === "true" ? (
-                        <IconCheck />
-                      ) : (
-                        <IconX />
-                      )
-                    ) : (
-                      setting.value
-                    )}
-                  </span>
+          {clubRoom.nadeo && (
+            <>
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col">
+                  <h3 className="text-md font-bold">Script Settings</h3>
+                  <Separator />
                 </div>
-              ))}
-            </div>
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col">
-              <h3 className="text-md font-bold">Maps</h3>
-              <Separator />
-            </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {Object.values(clubRoom.room.scriptSettings).map(
+                    (setting) => (
+                      <div key={setting.key} className="flex flex-col gap-1">
+                        <span className="font-semibold truncate">
+                          {setting.key}
+                        </span>
+                        <span className="truncate max-w-64">
+                          {setting.type === "boolean" ? (
+                            setting.value === "true" ? (
+                              <IconCheck />
+                            ) : (
+                              <IconX />
+                            )
+                          ) : (
+                            setting.value
+                          )}
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
 
-            {clubRoom.room.maps.length === 0 && (
-              <span>No maps in this room</span>
-            )}
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col">
+                  <h3 className="text-md font-bold">Maps</h3>
+                  <Separator />
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {clubRoom.room.mapObjects?.map((map, i) => (
-                <ActivityMapCard key={i} map={map} />
-              ))}
-            </div>
-          </div>
+                {clubRoom.room.maps.length === 0 && (
+                  <span>No maps in this room</span>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {clubRoom.room.mapObjects?.map((map, i) => (
+                    <ActivityMapCard key={i} map={map} />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </Card>

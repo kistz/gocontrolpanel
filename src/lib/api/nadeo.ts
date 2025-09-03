@@ -8,7 +8,6 @@ import {
   ClubListResponse,
   ClubMembersResponse,
   ClubRoom,
-  EditRoomArgs,
   MapInfo,
   MonthMapListResponse,
   NadeoTokens,

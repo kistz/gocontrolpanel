@@ -11,11 +11,11 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
-import ActivityDetailsModal from "../modals/clubs/activity-details";
-import Modal from "../modals/modal";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
+import Modal from "../../modals/modal";
+import ActivityDetailsModal from "../../modals/nadeo/activity-details";
+import { Badge } from "../../ui/badge";
+import { Button } from "../../ui/button";
+import { Card } from "../../ui/card";
 
 export default function ActivityCard({ activity }: { activity: ClubActivity }) {
   const getActivityIcon = (type: string | undefined) => {

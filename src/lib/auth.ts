@@ -11,13 +11,7 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import {
-  getServerSession,
-  NextAuthOptions,
-  Profile,
-  Session,
-  TokenSet,
-} from "next-auth";
+import { getServerSession, NextAuthOptions, Profile, Session } from "next-auth";
 import { getToken } from "next-auth/jwt";
 import { OAuthConfig } from "next-auth/providers/oauth";
 import { IncomingMessage } from "node:http";
@@ -98,34 +92,11 @@ export const authOptions: NextAuthOptions = {
         groups: token.groups,
         projects: token.projects,
         servers: token.servers,
-        adminClubs: token.adminClubs,
       };
 
       return session;
     },
-    async jwt({ token, user, account }) {
-      if (account && account.access_token) {
-        try {
-          const res = await fetch(
-            "https://api.trackmania.com/api/user/clubs/admin",
-            {
-              headers: {
-                Authorization: `Bearer ${account.access_token}`,
-              },
-            },
-          );
-
-          if (res.ok) {
-            const data: { clubs: { id: number; name: string }[] } =
-              await res.json();
-            token.adminClubs = data.clubs;
-          }
-        } catch (error) {
-          token.adminClubs = [];
-          console.error("Failed to fetch admin clubs", error);
-        }
-      }
-
+    async jwt({ token, user }) {
       let dbUser: UsersWithGroupsWithServers | null = null;
       try {
         if (user) {

@@ -335,7 +335,6 @@ The **GoControlPanel** supports a permission system that allows you to manage us
 - servers:create
 - servers:edit
 - servers:delete
-- clubs:view
 - hetzner:view
 - hetzner:create
 - hetzner:edit
