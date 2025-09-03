@@ -1,20 +1,14 @@
 "use client";
 
 import { getClubActivitiesList } from "@/actions/nadeo/clubs";
-import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
-import { routePermissions } from "@/routes";
+import { getErrorMessage } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import ActivityCard from "./activity-card";
 
 export default function ClubActivities({ clubId }: { clubId: number }) {
-  const { data: session } = useSession();
-
-  const canEdit = hasPermissionSync(session, routePermissions.clubs.edit);
-
   const [activities, setActivities] = useState<ClubActivity[] | null>(null);
 
   const [hasMore, setHasMore] = useState(true);
@@ -62,7 +56,7 @@ export default function ClubActivities({ clubId }: { clubId: number }) {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
             {activities.map((activity, index) => (
-              <ActivityCard key={index} activity={activity} canEdit={canEdit} />
+              <ActivityCard key={index} activity={activity} />
             ))}
           </div>
 

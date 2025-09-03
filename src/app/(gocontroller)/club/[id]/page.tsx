@@ -2,8 +2,6 @@ import { getClub } from "@/actions/nadeo/clubs";
 import ClubActivities from "@/components/clubs/club-activities";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { hasPermission } from "@/lib/auth";
-import { routePermissions } from "@/routes";
 import { IconPhoto, IconRosetteDiscountCheck } from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
@@ -14,8 +12,6 @@ export default async function ClubPage({
   params: Promise<{ id: number }>;
 }) {
   const { id } = await params;
-
-  const canEdit = await hasPermission(routePermissions.clubs.edit);
 
   const { data: club, error } = await getClub(id);
 

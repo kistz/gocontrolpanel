@@ -50,7 +50,6 @@ export const routePermissions = {
   },
   clubs: {
     view: ["clubs:view"],
-    edit: ["clubs:edit"],
   },
   admin: {
     users: {

@@ -142,7 +142,7 @@ export async function getClubActivitiesList(
   offset = 0,
   length = 12,
 ): Promise<ServerResponse<ClubActivitiesResponse>> {
-  return doServerActionWithAuth(["clubs:view", "clubs:edit"], async () => {
+  return doServerActionWithAuth(["clubs:view"], async () => {
     const redis = await getRedisClient();
     const key = getKeyClubActivities(clubId, offset);
 

@@ -1,6 +1,6 @@
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, cn } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
-import { IconEdit, IconEye, IconMap, IconPhoto } from "@tabler/icons-react";
+import { IconDots, IconMap, IconPhoto, IconServer } from "@tabler/icons-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
 import ActivityDetailsModal from "../modals/clubs/activity-details";
@@ -8,15 +8,17 @@ import Modal from "../modals/modal";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { Separator } from "../ui/separator";
 
-export default function ActivityCard({
-  activity,
-  canEdit,
-}: {
-  activity: ClubActivity;
-  canEdit: boolean;
-}) {
+export default function ActivityCard({ activity }: { activity: ClubActivity }) {
+  const getActivityIcon = (type: string | undefined) => {
+    switch (type) {
+      case "campaign":
+        return <IconMap size={18} />;
+      case "room":
+        return <IconServer size={18} />;
+    }
+  };
+
   return (
     <Card className="flex flex-col flex-1 relative">
       <div className="relative">
@@ -32,16 +34,28 @@ export default function ActivityCard({
             <IconPhoto className="text-gray-500" size={48} />
           </div>
         )}
-        <div className="flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40">
+        <div
+          className={cn(
+            "flex items-center space-x-2 justify-between absolute bottom-0 left-0 right-0 bg-white/20 p-2 backdrop-blur-sm dark:bg-black/40 text-white",
+            !activity.mediaUrl &&
+              "bg-gradient-to-t from-black/60 via-black/40 to-transparent",
+          )}
+        >
           <h3
-            className="truncate text-lg font-semibold text-white"
+            className="truncate text-lg font-semibold"
             dangerouslySetInnerHTML={{
               __html: parseTmTags(activity.name ?? ""),
             }}
           ></h3>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm truncate text-white">
+            {activity.activityType === "campaign" && (
+              <span>{activity.itemsCount}</span>
+            )}
+
+            {getActivityIcon(activity.activityType)}
+
+            <span className="text-sm truncate">
               {capitalizeWords(
                 activity.activityType?.replaceAll("-", " ") || "Unknown",
               )}
@@ -59,37 +73,11 @@ export default function ActivityCard({
             {activity.password && <Badge variant={"outline"}>Password</Badge>}
           </div>
 
-          {activity.activityType === "campaign" && (
-            <span className="flex items-center gap-2">
-              <IconMap size={18} />
-              {activity.itemsCount}
-            </span>
-          )}
-        </div>
-
-        <Separator />
-
-        <div className="flex gap-2">
-          <Modal>
-            <ActivityDetailsModal data={activity} />
-            <Button
-              variant={"outline"}
-              disabled={activity.activityType !== "room"}
-            >
-              <IconEye />
-              View Activity
-            </Button>
-          </Modal>
-
-          {canEdit && (
+          {activity.activityType === "room" && activity.public && (
             <Modal>
-              <></>
-              <Button
-                variant={"outline"}
-                disabled={activity.activityType !== "room"}
-              >
-                <IconEdit />
-                Edit Activity
+              <ActivityDetailsModal data={activity} />
+              <Button size={"icon"} className="size-6" variant={"ghost"}>
+                <IconDots />
               </Button>
             </Modal>
           )}
