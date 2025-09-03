@@ -1,9 +1,20 @@
 "use client";
-import { getClubRoomWithNamesAndMaps } from "@/actions/nadeo/clubs";
+import {
+  addRoomToServer,
+  downloadRoom,
+  getClubRoomWithNamesAndMaps,
+} from "@/actions/nadeo/clubs";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getErrorMessage } from "@/lib/utils";
 import { ClubActivity, ClubRoomWithNamesAndMaps } from "@/types/api/nadeo";
-import { IconCheck, IconPhoto, IconX } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconDownload,
+  IconMapPlus,
+  IconPhoto,
+  IconX,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -15,13 +26,95 @@ import ActivityMapCard from "./activity-map-card";
 export default function RoomDetailsModal({
   closeModal,
   data,
-}: DefaultModalProps<ClubActivity>) {
+}: DefaultModalProps<{
+  activity: ClubActivity;
+  serverId: string;
+  fmHealth: boolean;
+}>) {
   const [clubRoom, setClubRoom] = useState<ClubRoomWithNamesAndMaps | null>(
     null,
   );
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const onDownloadRoom = async () => {
+    try {
+      if (!data?.fmHealth) {
+        toast.error("File manager is not healthy, cannot download room");
+        return;
+      }
+
+      if (!clubRoom) {
+        toast.error("Room not found");
+        return;
+      }
+
+      if (clubRoom.room.mapObjects.length === 0) {
+        toast.error("Room has no maps to download");
+        return;
+      }
+
+      if (isDownloading) return;
+
+      setIsDownloading(true);
+      toast.info("Downloading room...");
+
+      const { error } = await downloadRoom(data.serverId, clubRoom.room);
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast.success("Room successfully downloaded", {
+        description: `You can find the maps in the Maps/Downloaded/${clubRoom.room.name} folder`,
+      });
+    } catch (err) {
+      toast.error("Failed to download room", {
+        description: getErrorMessage(err),
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const onAddRoomToServer = async () => {
+    try {
+      if (!data?.fmHealth) {
+        toast.error("File manager is not healthy, cannot add room");
+        return;
+      }
+
+      if (!clubRoom) {
+        toast.error("Room not found");
+        return;
+      }
+
+      if (clubRoom.room.mapObjects.length === 0) {
+        toast.error("Room has no maps to add");
+        return;
+      }
+
+      if (isDownloading) return;
+
+      setIsDownloading(true);
+      toast.info("Adding room to server...");
+
+      const { error } = await addRoomToServer(data.serverId, clubRoom.room);
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast.success("Room successfully added to server");
+    } catch (err) {
+      toast.error("Failed to add room to server", {
+        description: getErrorMessage(err),
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const getClubRoom = async () => {
     if (!data) return;
@@ -30,7 +123,10 @@ export default function RoomDetailsModal({
       setLoading(true);
 
       const { data: clubRoomRes, error: getClubRoomError } =
-        await getClubRoomWithNamesAndMaps(data.clubId, data.id);
+        await getClubRoomWithNamesAndMaps(
+          data.activity.clubId,
+          data.activity.id,
+        );
       if (getClubRoomError) {
         throw new Error(getClubRoomError);
       }
@@ -56,6 +152,8 @@ export default function RoomDetailsModal({
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+
+  if (!data) return null;
 
   return (
     <Card
@@ -193,8 +291,31 @@ export default function RoomDetailsModal({
               </div>
 
               <div className="flex flex-col gap-2">
-                <div className="flex flex-col">
-                  <h3 className="text-md font-bold">Maps</h3>
+                <div className="flex flex-col gap-1">
+                  <div className="flex gap-2 justify-between sm:items-end flex-col sm:flex-row">
+                    <h3 className="text-md font-bold">Maps</h3>
+
+                    {data.fmHealth && clubRoom && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant={"outline"}
+                          onClick={onDownloadRoom}
+                          disabled={isDownloading}
+                        >
+                          <IconDownload />
+                          Download
+                        </Button>
+                        <Button
+                          variant={"outline"}
+                          onClick={onAddRoomToServer}
+                          disabled={isDownloading}
+                        >
+                          <IconMapPlus />
+                          Add to Server
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <Separator />
                 </div>
 

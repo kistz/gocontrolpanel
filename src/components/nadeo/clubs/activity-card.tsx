@@ -97,7 +97,13 @@ export default function ActivityCard({
 
         {activity.activityType === "room" && activity.public && (
           <Modal>
-            <RoomDetailsModal data={activity} />
+            <RoomDetailsModal
+              data={{
+                activity,
+                serverId,
+                fmHealth,
+              }}
+            />
             <Button variant="ghost" className="size-6 p-0">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />

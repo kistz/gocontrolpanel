@@ -2,6 +2,7 @@
 
 import { doServerActionWithAuth } from "@/lib/actions";
 import {
+  downloadFile,
   getAccountNames,
   getClubActivities,
   getClubById,
@@ -11,6 +12,7 @@ import {
   getClubRoom,
   getClubs,
 } from "@/lib/api/nadeo";
+import { getFileManager } from "@/lib/filemanager";
 import {
   getKeyClubActivities,
   getKeyClubActivitiesPaginated,
@@ -30,10 +32,13 @@ import {
   ClubMemberWithName,
   ClubRoomWithNamesAndMaps,
   ClubWithAccountNames,
+  RoomWithMaps,
 } from "@/types/api/nadeo";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getMapsByUids } from "../database/maps";
+import { uploadFiles } from "../filemanager";
+import { addMapToServer } from "./maps";
 
 export async function getClubCampaignsPaginated(
   pagination: PaginationState,
@@ -350,6 +355,99 @@ export async function getClubRoomWithNamesAndMaps(
         latestEditorName:
           accountNames[clubRoom.latestEditorAccountId] || "Unknown",
       };
+    },
+  );
+}
+
+export async function downloadRoom(
+  serverId: string,
+  room: RoomWithMaps | ClubRoomWithNamesAndMaps["room"],
+): Promise<ServerResponse<string[]>> {
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new Error("File manager is not healthy");
+      }
+
+      const downloadResults = await Promise.allSettled(
+        room.mapObjects.map((map) => {
+          if (!map?.fileUrl) {
+            return Promise.reject(
+              new Error(`Map ${map.uid} does not have a valid download URL`),
+            );
+          }
+          return downloadFile(map.fileUrl, map.fileName);
+        }),
+      );
+
+      const formData = new FormData();
+      let errors = 0;
+
+      downloadResults.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          const file = result.value;
+          formData.append("files", file);
+          formData.append("paths[]", `/UserData/Maps/Downloaded/${room.name}`);
+        } else {
+          errors++;
+          console.error(`Failed to download map ${index + 1}:`, result.reason);
+        }
+      });
+
+      const { error } = await uploadFiles(serverId, formData);
+      if (error) {
+        throw new Error(error);
+      }
+
+      if (errors > 0) {
+        throw new Error(`Failed to download ${errors} maps`);
+      }
+
+      return downloadResults
+        .map((result) =>
+          result.status === "fulfilled" ? result.value.name : "",
+        )
+        .filter((name) => name !== "");
+    },
+  );
+}
+
+export async function addRoomToServer(
+  serverId: string,
+  room: RoomWithMaps | ClubRoomWithNamesAndMaps["room"],
+): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new Error("File manager is not healthy");
+      }
+
+      const addResults = await Promise.allSettled(
+        room.mapObjects.map((map) => {
+          if (!map?.fileUrl) {
+            return Promise.reject(
+              new Error(`Map ${map.uid} does not have a valid download URL`),
+            );
+          }
+          return addMapToServer(serverId, map.fileUrl, map.fileName);
+        }),
+      );
+
+      let errors = 0;
+      addResults.forEach((result, index) => {
+        if (result.status === "rejected") {
+          errors++;
+          console.error(`Failed to add map ${index + 1}:`, result.reason);
+        }
+      });
+
+      if (errors > 0) {
+        throw new Error(`Failed to add ${errors} maps`);
+      }
     },
   );
 }
