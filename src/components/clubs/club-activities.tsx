@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import ActivityCard from "./activitiy-card";
+import ActivityCard from "./activity-card";
 
 export default function ClubActivities({ clubId }: { clubId: number }) {
   const { data: session } = useSession();
