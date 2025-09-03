@@ -1,8 +1,4 @@
-import {
-  getClub,
-  getClubCampaignWithMaps,
-  getClubMembersCount,
-} from "@/actions/nadeo/clubs";
+import { getClub, getClubMembersCount } from "@/actions/nadeo/clubs";
 import ClubActivities from "@/components/nadeo/clubs/club-activities";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +11,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { parseTmTags } from "tmtags";
-import ClubCampaignMaps from "../club-campaign-maps";
 import Clubs from "../clubs/clubs";
 
 export default async function ClubsTab({
@@ -29,17 +24,7 @@ export default async function ClubsTab({
   clubId?: number;
   campaignId?: number;
 }) {
-  if (clubId && campaignId) {
-    const { data } = await getClubCampaignWithMaps(clubId, campaignId);
-
-    return (
-      <ClubCampaignMaps
-        serverId={serverId}
-        fmHealth={fmHealth}
-        campaign={data}
-      />
-    );
-  } else if (clubId) {
+  if (clubId) {
     const { data: club, error } = await getClub(clubId);
     const { data: clubMembersCount, error: clubMembersError } =
       await getClubMembersCount(clubId);
