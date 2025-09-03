@@ -1,9 +1,7 @@
 import { getInterfaces } from "@/actions/database/interfaces";
 import { getPlugins } from "@/actions/database/plugins";
 import { getServerPlugins } from "@/actions/database/server-plugins";
-import {
-  getServerChatConfig,
-} from "@/actions/database/servers";
+import { getServerChatConfig } from "@/actions/database/servers";
 import InterfaceEditor from "@/components/interface/editor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

@@ -64,7 +64,12 @@ export default function ClubActivities({
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
             {activities.map((activity, index) => (
-              <ActivityCard key={index} serverId={serverId} activity={activity} fmHealth={fmHealth} />
+              <ActivityCard
+                key={index}
+                serverId={serverId}
+                activity={activity}
+                fmHealth={fmHealth}
+              />
             ))}
           </div>
 

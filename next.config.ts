@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
         hostname: "trackmania-prod-media-s3.cdn.ubi.com",
         port: "",
         pathname: "/media/image/live-api/**",
-      }
+      },
     ],
     minimumCacheTTL: 60 * 60 * 24, // 1 day
   },

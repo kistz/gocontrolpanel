@@ -1,7 +1,7 @@
 import "next-auth";
+import { ISODateString } from "next-auth";
 import "next-auth/jwt";
 import { UserGroup, UserProject, UserServer } from "./auth";
-import { ISODateString } from "next-auth";
 
 declare module "next-auth" {
   interface User {

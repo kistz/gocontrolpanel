@@ -31,7 +31,10 @@ export async function createAdvancedServerSetup(
       if (data.database?.new) {
         data.database = {
           ...data.database,
-          databaseName: data.database.databaseName || data.database.name || data.server.name,
+          databaseName:
+            data.database.databaseName ||
+            data.database.name ||
+            data.server.name,
           databaseRootPassword:
             data.database.databaseRootPassword || generateRandomString(16),
           databaseUser: data.database.databaseUser || generateRandomString(16),
@@ -249,7 +252,10 @@ export async function createSimpleServerSetup(
       if (data.database?.new) {
         data.database = {
           ...data.database,
-          databaseName: data.database.databaseName || data.database.name || data.server.name,
+          databaseName:
+            data.database.databaseName ||
+            data.database.name ||
+            data.server.name,
           databaseType: "mysql",
           databaseRootPassword: generateRandomString(16),
           databaseUser: generateRandomString(16),

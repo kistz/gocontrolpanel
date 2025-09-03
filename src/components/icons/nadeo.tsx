@@ -11,7 +11,10 @@ export default function IconNadeo({
 }: IconNadeoProps) {
   return (
     <span
-      className={cn("flex items-center justify-center text-center font-semibold", className)}
+      className={cn(
+        "flex items-center justify-center text-center font-semibold",
+        className,
+      )}
       style={{
         width: size / 1.5,
         height: size / 1.5,

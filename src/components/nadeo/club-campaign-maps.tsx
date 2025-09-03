@@ -7,7 +7,6 @@ import { getErrorMessage } from "@/lib/utils";
 import { ClubCampaignWithNamesAndPlaylistMaps } from "@/types/api/nadeo";
 import { IconDownload, IconMapPlus, IconPhoto } from "@tabler/icons-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
@@ -25,8 +24,6 @@ export default function ClubCampaignMaps({
   fmHealth: boolean;
   clubCampaign?: ClubCampaignWithNamesAndPlaylistMaps;
 }) {
-  const router = useRouter();
-
   const [isDownloading, setIsDownloading] = useState(false);
 
   const onDownloadCampaign = async () => {

@@ -86,12 +86,7 @@ export default async function ServerNadeoPage({
         </TabsContent>
 
         <TabsContent value="clubs" className="flex flex-col gap-2">
-          <ClubsTab
-            serverId={id}
-            fmHealth={fmHealth}
-            clubId={clubInt}
-            campaignId={campaignInt}
-          />
+          <ClubsTab serverId={id} fmHealth={fmHealth} clubId={clubInt} />
         </TabsContent>
       </Tabs>
     </div>

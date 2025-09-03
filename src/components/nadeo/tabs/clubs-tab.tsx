@@ -17,12 +17,10 @@ export default async function ClubsTab({
   serverId,
   fmHealth,
   clubId,
-  campaignId,
 }: {
   serverId: string;
   fmHealth: boolean;
   clubId?: number;
-  campaignId?: number;
 }) {
   if (clubId) {
     const { data: club, error } = await getClub(clubId);
