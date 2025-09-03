@@ -13,14 +13,16 @@ import TMXMapCard from "./tmx-map-card";
 export default function MapSearch({
   serverId,
   fmHealth,
+  defaultResults = [],
 }: {
   serverId: string;
   fmHealth: boolean;
+  defaultResults?: TMXMap[];
 }) {
   const [nameQuery, setNameQuery] = useState("");
   const [authorQuery, setAuthorQuery] = useState("");
 
-  const [searchResults, setSearchResults] = useState<TMXMap[]>([]);
+  const [searchResults, setSearchResults] = useState<TMXMap[]>(defaultResults);
   const [hasMoreResults, setHasMoreResults] = useState(false);
 
   const [loading, setLoading] = useState(false);
