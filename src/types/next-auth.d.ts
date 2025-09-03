@@ -1,6 +1,7 @@
 import "next-auth";
 import "next-auth/jwt";
 import { UserGroup, UserProject, UserServer } from "./auth";
+import { ISODateString } from "next-auth";
 
 declare module "next-auth" {
   interface User {
@@ -21,6 +22,9 @@ declare module "next-auth" {
       projects: UserProject[];
       servers: UserServer[];
       adminClubs: { id: number; name: string }[];
+      accessToken: string;
+      refreshToken?: string
+      accessTokenExpires: Date;
     };
     expires: ISODateString;
   }
@@ -44,5 +48,8 @@ declare module "next-auth/jwt" {
     projects: UserProject[];
     servers: UserServer[];
     adminClubs: { id: number; name: string }[];
+    accessToken: string;
+    refreshToken?: string;
+    accessTokenExpires: Date;
   }
 }

@@ -93,6 +93,9 @@ export const authOptions: NextAuthOptions = {
         projects: token.projects,
         servers: token.servers,
         adminClubs: token.adminClubs,
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        accessTokenExpires: token.accessTokenExpires,
       };
 
       return session;
@@ -100,6 +103,12 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (account && account.access_token) {
         try {
+          token.accessToken = account.access_token;
+          token.refreshToken = account.refresh_token;
+          token.accessTokenExpires = new Date(
+            Date.now() + (account.expires_at ?? 3600) * 1000,
+          );
+
           const res = await fetch(
             "https://api.trackmania.com/api/user/clubs/admin",
             {
