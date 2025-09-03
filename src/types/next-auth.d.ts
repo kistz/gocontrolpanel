@@ -22,10 +22,11 @@ declare module "next-auth" {
       projects: UserProject[];
       servers: UserServer[];
       adminClubs: { id: number; name: string }[];
-      accessToken: string;
-      refreshToken?: string
-      accessTokenExpires: Date;
     };
+    accessToken: string;
+    refreshToken?: string
+    accessTokenExpires: number;
+    error?: "RefreshAccessTokenError";
     expires: ISODateString;
   }
 
@@ -50,6 +51,7 @@ declare module "next-auth/jwt" {
     adminClubs: { id: number; name: string }[];
     accessToken: string;
     refreshToken?: string;
-    accessTokenExpires: Date;
+    accessTokenExpires: number;
+    error?: "RefreshAccessTokenError";
   }
 }

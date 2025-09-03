@@ -14,7 +14,7 @@ export default async function GoControllerLayout({
 }) {
   const session = await auth();
 
-  if (!session) {
+  if (!session || session.error === "RefreshAccessTokenError") {
     redirect(routes.login);
   }
 

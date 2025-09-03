@@ -6,14 +6,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { status } = useSession();
+  const { status, data } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (!data?.error && status === "authenticated") {
       router.push(routes.dashboard);
     }
-  }, [status, router]);
+  }, [status, router, data]);
 
   const handleLogin = () => {
     signIn("nadeo");
