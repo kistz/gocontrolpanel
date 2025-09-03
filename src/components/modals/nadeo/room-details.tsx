@@ -12,7 +12,7 @@ import { Card } from "../../ui/card";
 import { DefaultModalProps } from "../default-props";
 import ActivityMapCard from "./activity-map-card";
 
-export default function ActivityDetailsModal({
+export default function RoomDetailsModal({
   closeModal,
   data,
 }: DefaultModalProps<ClubActivity>) {
@@ -29,13 +29,13 @@ export default function ActivityDetailsModal({
     try {
       setLoading(true);
 
-      const { data: clubRoom, error: getClubRoomError } =
+      const { data: clubRoomRes, error: getClubRoomError } =
         await getClubRoomWithNamesAndMaps(data.clubId, data.id);
       if (getClubRoomError) {
         throw new Error(getClubRoomError);
       }
 
-      setClubRoom(clubRoom);
+      setClubRoom(clubRoomRes);
       setError(null);
     } catch (error) {
       if (error instanceof Error) {
@@ -63,7 +63,7 @@ export default function ActivityDetailsModal({
       className="p-6 gap-6 sm:min-w-[400px] max-sm:w-full max-h-[90vh] overflow-y-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Activity Details</h1>
+        <h1 className="text-xl font-bold">Room Details</h1>
         <IconX
           className="h-6 w-6 cursor-pointer text-muted-foreground"
           onClick={closeModal}
@@ -124,7 +124,7 @@ export default function ActivityDetailsModal({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-semibold">Server</span>
-                    <span className="text-nowrap">
+                    <span className="truncate">
                       {clubRoom.nadeo ? "Nadeo" : "Dedicated"}
                     </span>
                   </div>

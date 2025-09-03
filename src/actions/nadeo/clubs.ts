@@ -26,7 +26,7 @@ import {
   ClubActivitiesResponse,
   ClubActivity,
   ClubCampaign,
-  ClubCampaignWithPlaylistMaps,
+  ClubCampaignWithNamesAndPlaylistMaps,
   ClubMemberWithName,
   ClubRoomWithNamesAndMaps,
   ClubWithAccountNames,
@@ -169,7 +169,7 @@ export async function getClubActivitiesList(
 export async function getClubCampaignWithMaps(
   clubId: number,
   campaignId: number,
-): Promise<ServerResponse<ClubCampaignWithPlaylistMaps>> {
+): Promise<ServerResponse<ClubCampaignWithNamesAndPlaylistMaps>> {
   return doServerActionWithAuth(
     ["servers::moderator", "servers::admin"],
     async () => {
@@ -189,8 +189,16 @@ export async function getClubCampaignWithMaps(
         throw new Error(error);
       }
 
+      const accountNames = await getAccountNames([
+        campaign.creatorAccountId,
+        campaign.latestEditorAccountId,
+      ]);
+
       const response = {
         ...campaign,
+        creatorName: accountNames[campaign.creatorAccountId] || "Unknown",
+        latestEditorName:
+          accountNames[campaign.latestEditorAccountId] || "Unknown",
         campaign: {
           ...campaign.campaign,
           playlist: campaign.campaign.playlist
@@ -200,7 +208,7 @@ export async function getClubCampaignWithMaps(
             }))
             .filter((p) => p.map !== undefined),
         },
-      } as ClubCampaignWithPlaylistMaps;
+      } as ClubCampaignWithNamesAndPlaylistMaps;
 
       await redis.set(key, JSON.stringify(response), "EX", 300);
 

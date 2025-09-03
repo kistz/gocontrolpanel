@@ -147,7 +147,11 @@ export default async function ClubsTab({
             </div>
           </Card>
 
-          <ClubActivities clubId={clubId} />
+          <ClubActivities
+            serverId={serverId}
+            fmHealth={fmHealth}
+            clubId={clubId}
+          />
         </div>
       </>
     );

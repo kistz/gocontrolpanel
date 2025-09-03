@@ -8,7 +8,15 @@ import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import ActivityCard from "./activity-card";
 
-export default function ClubActivities({ clubId }: { clubId: number }) {
+export default function ClubActivities({
+  serverId,
+  fmHealth,
+  clubId,
+}: {
+  serverId: string;
+  fmHealth: boolean;
+  clubId: number;
+}) {
   const [activities, setActivities] = useState<ClubActivity[] | null>(null);
 
   const [hasMore, setHasMore] = useState(true);
@@ -56,7 +64,7 @@ export default function ClubActivities({ clubId }: { clubId: number }) {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
             {activities.map((activity, index) => (
-              <ActivityCard key={index} activity={activity} />
+              <ActivityCard key={index} serverId={serverId} activity={activity} fmHealth={fmHealth} />
             ))}
           </div>
 

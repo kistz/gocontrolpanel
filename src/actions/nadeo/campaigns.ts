@@ -10,8 +10,8 @@ import {
 } from "@/lib/redis";
 import {
   Campaign,
-  CampaignWithPlaylistMaps,
-  ClubCampaignWithPlaylistMaps,
+  CampaignWithNamesAndPlaylistMaps,
+  ClubCampaignWithNamesAndPlaylistMaps,
 } from "@/types/api/nadeo";
 import { ServerResponse } from "@/types/responses";
 import { getMapsByUids } from "../database/maps";
@@ -48,7 +48,7 @@ export async function getAllSeasonalCampaigns(): Promise<
 
 export async function getCampaignWithMaps(
   campaign: Campaign,
-): Promise<ServerResponse<CampaignWithPlaylistMaps>> {
+): Promise<ServerResponse<CampaignWithNamesAndPlaylistMaps>> {
   return doServerActionWithAuth(
     ["servers::moderator", "servers::admin"],
     async () => {
@@ -61,7 +61,7 @@ export async function getCampaignWithMaps(
       }
 
       if (campaign.playlist.length === 0)
-        return campaign as CampaignWithPlaylistMaps;
+        return campaign as CampaignWithNamesAndPlaylistMaps;
 
       const mapUids = campaign.playlist.map((p) => p.mapUid);
       const { data: maps, error } = await getMapsByUids(mapUids);
@@ -77,7 +77,7 @@ export async function getCampaignWithMaps(
             map: maps?.find((m) => m.uid === p.mapUid),
           }))
           .filter((p) => p.map !== undefined),
-      } as CampaignWithPlaylistMaps;
+      } as CampaignWithNamesAndPlaylistMaps;
 
       await redis.set(
         key,
@@ -93,7 +93,9 @@ export async function getCampaignWithMaps(
 
 export async function downloadCampaign(
   serverId: string,
-  campaign: CampaignWithPlaylistMaps | ClubCampaignWithPlaylistMaps["campaign"],
+  campaign:
+    | CampaignWithNamesAndPlaylistMaps
+    | ClubCampaignWithNamesAndPlaylistMaps["campaign"],
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
@@ -151,7 +153,9 @@ export async function downloadCampaign(
 
 export async function addCampaignToServer(
   serverId: string,
-  campaign: CampaignWithPlaylistMaps | ClubCampaignWithPlaylistMaps["campaign"],
+  campaign:
+    | CampaignWithNamesAndPlaylistMaps
+    | ClubCampaignWithNamesAndPlaylistMaps["campaign"],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],

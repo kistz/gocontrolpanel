@@ -1,24 +1,33 @@
+import CampaignDetailsModal from "@/components/modals/nadeo/campaign-details";
 import { capitalizeWords, cn } from "@/lib/utils";
 import { ClubActivity } from "@/types/api/nadeo";
 import {
   IconCar,
   IconChartBar,
-  IconDots,
   IconFolder,
   IconMap,
   IconMapUp,
   IconPhoto,
   IconServer,
 } from "@tabler/icons-react";
+import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { parseTmTags } from "tmtags";
 import Modal from "../../modals/modal";
-import ActivityDetailsModal from "../../modals/nadeo/activity-details";
+import { default as RoomDetailsModal } from "../../modals/nadeo/room-details";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Card } from "../../ui/card";
 
-export default function ActivityCard({ activity }: { activity: ClubActivity }) {
+export default function ActivityCard({
+  serverId,
+  fmHealth,
+  activity,
+}: {
+  serverId: string;
+  fmHealth: boolean;
+  activity: ClubActivity;
+}) {
   const getActivityIcon = (type: string | undefined) => {
     switch (type) {
       case "campaign":
@@ -88,9 +97,26 @@ export default function ActivityCard({ activity }: { activity: ClubActivity }) {
 
         {activity.activityType === "room" && activity.public && (
           <Modal>
-            <ActivityDetailsModal data={activity} />
-            <Button size={"icon"} className="size-6" variant={"ghost"}>
-              <IconDots />
+            <RoomDetailsModal data={activity} />
+            <Button variant="ghost" className="size-6 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </Modal>
+        )}
+
+        {activity.activityType === "campaign" && activity.public && (
+          <Modal>
+            <CampaignDetailsModal
+              data={{
+                activity,
+                serverId,
+                fmHealth,
+              }}
+            />
+            <Button variant="ghost" className="size-6 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </Modal>
         )}

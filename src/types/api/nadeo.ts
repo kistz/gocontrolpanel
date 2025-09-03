@@ -117,7 +117,7 @@ export type PlaylistWithMap = Playlist & {
   map: Maps;
 };
 
-export interface CampaignWithPlaylistMaps extends Campaign {
+export interface CampaignWithNamesAndPlaylistMaps extends Campaign {
   playlist: PlaylistWithMap[];
 }
 
@@ -187,7 +187,7 @@ export interface ClubCampaign {
   mediaTheme: string;
 }
 
-export interface ClubCampaignWithPlaylistMaps extends ClubCampaign {
+export interface ClubCampaignWithNamesAndPlaylistMaps extends ClubCampaign {
   campaign: {
     color: string;
     leaderboardGroupUid: string;
@@ -217,7 +217,9 @@ export interface ClubCampaignWithPlaylistMaps extends ClubCampaign {
       liveButtonBackgroundUrl: string;
       liveButtonForegroundUrl: string;
     };
-  } & CampaignWithPlaylistMaps;
+  } & CampaignWithNamesAndPlaylistMaps;
+  creatorName: string;
+  latestEditorName: string;
 }
 
 export interface ClubCampaignsResponse {
