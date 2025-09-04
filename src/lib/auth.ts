@@ -148,7 +148,6 @@ export const authOptions: NextAuthOptions = {
       token.admin = dbUser.admin;
       token.ubiId = dbUser.ubiUid || undefined;
       token.permissions = getList<string>(dbUser.permissions);
-      token.adminClubs = token.adminClubs || [];
       token.groups = dbUser.groupMembers.map((g) => ({
         id: g.group.id,
         name: g.group.name,
