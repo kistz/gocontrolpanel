@@ -31,7 +31,7 @@ const NadeoProvider = (): OAuthConfig<Profile> => ({
       response_type: "code",
       client_id: config.NADEO.CLIENT_ID,
       redirect_uri: config.NADEO.REDIRECT_URI,
-      scope: "clubs",
+      scope: "",
     },
   },
   token: {
