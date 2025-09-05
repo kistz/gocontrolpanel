@@ -1,4 +1,4 @@
-import { getAllServers, syncAllMaps } from "./actions/database/gbx";
+import { getAllServers, syncAllMaps } from "./actions/database/server-only/gbx";
 import {
   authenticate,
   authenticateCredentials,

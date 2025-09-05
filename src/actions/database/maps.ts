@@ -12,7 +12,7 @@ import {
   ServerResponse,
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
+import { checkAndUpdateMapsInfoIfNeeded } from "./server-only/gbx";
 
 const mapsRecordsSchema = (serverId?: string) =>
   Prisma.validator<Prisma.MapsInclude>()({

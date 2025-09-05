@@ -3,7 +3,7 @@ import {
   saveMatchRecord,
   saveRoundRecords,
   syncPlayer,
-} from "@/actions/database/gbx";
+} from "@/actions/database/server-only/gbx";
 import {
   getPlayerInfo,
   onPodiumStart,

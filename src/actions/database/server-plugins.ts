@@ -4,7 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClientManager } from "@/lib/gbxclient";
 import { ServerResponse } from "@/types/responses";
-import { ServerPluginsWithPlugin } from "./gbx";
+import { ServerPluginsWithPlugin } from "./server-only/gbx";
 
 export async function updateServerPlugins(
   serverId: string,

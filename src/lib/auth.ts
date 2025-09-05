@@ -4,7 +4,7 @@ import {
   getUserByLogin,
   upsertUserAuth,
   UsersWithGroupsWithServers,
-} from "@/actions/database/auth";
+} from "@/actions/database/server-only/auth";
 import { parse } from "cookie";
 import {
   GetServerSidePropsContext,
