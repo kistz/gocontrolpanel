@@ -5,6 +5,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getFileManager } from "@/lib/filemanager";
 import { ContentType, File, FileEntry } from "@/types/filemanager";
 import { ServerError, ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 
 export async function getRoute(
   serverId: string,
@@ -101,9 +102,16 @@ export async function saveFileText(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.files.edit",
+          { path, text },
+          "File manager is not healthy",
+        );
         throw new ServerError("Could not connect to file manager");
       }
 
@@ -115,6 +123,14 @@ export async function saveFileText(
         },
         body: JSON.stringify(text),
       });
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.files.edit",
+        { path, text },
+        res.status !== 200 ? "Failed to save file" : undefined,
+      );
 
       if (res.status !== 200) {
         throw new ServerError("Failed to save file");
@@ -129,9 +145,16 @@ export async function deleteEntry(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.files.delete",
+          paths,
+          "File manager is not healthy",
+        );
         throw new ServerError("Could not connect to file manager");
       }
 
@@ -143,6 +166,14 @@ export async function deleteEntry(
         },
         body: JSON.stringify(paths),
       });
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.files.delete",
+        paths,
+        res.status !== 200 ? "Failed to delete item" : undefined,
+      );
 
       if (res.status !== 200) {
         throw new ServerError("Failed to delete item");
@@ -157,9 +188,16 @@ export async function uploadFiles(
 ): Promise<ServerResponse<FileEntry[]>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.files.upload",
+          JSON.parse(JSON.stringify(formData)),
+          "Failed to upload files, file manager is not healthy",
+        );
         throw new ServerError("Could not connect to file manager");
       }
 
@@ -172,10 +210,26 @@ export async function uploadFiles(
       });
 
       if (res.status !== 200) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.files.upload",
+          JSON.parse(JSON.stringify(formData)),
+          `Failed to upload files, status code: ${res.status}`,
+        );
         throw new ServerError("Failed to upload files");
       }
 
       const data = await res.json();
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.files.upload",
+        JSON.parse(JSON.stringify(formData)),
+        !data ? "Failed to upload files" : undefined,
+      );
+
       if (!data) {
         throw new ServerError("Failed to upload files");
       }
@@ -255,9 +309,16 @@ export async function createFileEntry(
 ): Promise<ServerResponse<FileEntry>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.files.create",
+          request,
+          "File manager is not healthy",
+        );
         throw new ServerError("Could not connect to file manager");
       }
 
@@ -271,12 +332,28 @@ export async function createFileEntry(
       });
 
       if (res.status !== 200) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.files.create",
+          request,
+          res.status === 500 ? "Something went wrong" : await res.text(),
+        );
         throw new ServerError(
           res.status === 500 ? "Something went wrong" : await res.text(),
         );
       }
 
       const data = await res.json();
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.files.create",
+        request,
+        !data ? "Failed to create file entry" : undefined,
+      );
+
       if (!data) {
         throw new ServerError("Failed to create file entry");
       }
