@@ -5,6 +5,7 @@ import { downloadTMXMap, searchTMXMaps } from "@/lib/api/tmx";
 import { getFileManager } from "@/lib/filemanager";
 import { TMXMapSearch } from "@/types/api/tmx";
 import { ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 import { uploadFiles } from "../filemanager";
 import { addMap } from "../gbx/map";
 
@@ -20,7 +21,12 @@ export async function searchMaps(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
+      await logAudit(session.user.id, serverId, "server.tmx.maps.search", {
+        queryParams,
+        after,
+      });
+
       return searchTMXMaps(
         {
           ...queryParams,
@@ -43,14 +49,28 @@ export async function downloadMap(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.tmx.maps.download",
+          mapId,
+          "File manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
       const file = await downloadTMXMap(mapId);
       if (!file) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.tmx.maps.download",
+          mapId,
+          "Failed to download map",
+        );
         throw new Error("Failed to download map");
       }
 
@@ -59,6 +79,15 @@ export async function downloadMap(
       formData.append("paths[]", `/UserData/Maps/Downloaded`);
 
       const { error } = await uploadFiles(serverId, formData);
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.tmx.maps.download",
+        mapId,
+        error,
+      );
+
       if (error) {
         throw new Error(error);
       }
@@ -79,14 +108,29 @@ export async function addMapToServer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.tmx.maps.add",
+          mapId,
+          "File manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
       const { data: fileName, error } = await downloadMap(serverId, mapId);
+      
       if (error) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.tmx.maps.add",
+          mapId,
+          error,
+        );
         throw new Error(error);
       }
 
@@ -94,6 +138,15 @@ export async function addMapToServer(
         serverId,
         `Downloaded/${fileName}`,
       );
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.tmx.maps.add",
+        mapId,
+        addMapError,
+      );
+
       if (addMapError) {
         throw new Error(addMapError);
       }
