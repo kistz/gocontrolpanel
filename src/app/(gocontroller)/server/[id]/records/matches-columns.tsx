@@ -114,7 +114,7 @@ export const createMatchesColumns = (
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                View match
+                View details
               </DropdownMenuItem>
               {canActions && (
                 <>
