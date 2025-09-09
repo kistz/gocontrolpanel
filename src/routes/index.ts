@@ -22,6 +22,7 @@ export const routes = {
     roles: "/admin/roles",
     hetzner: "/admin/hetzner",
     hetznerServers: "/admin/hetzner/:id",
+    auditLogs: "/admin/audit-logs",
   },
   login: "/login",
 };
@@ -145,6 +146,22 @@ export const routePermissions = {
         create: ["hetzner:servers:create", "hetzner:id:admin"],
         delete: ["hetzner:servers:delete", "hetzner:id:admin"],
       },
+    },
+    auditLogs: {
+      view: [
+        "audit-logs:view",
+        "servers::admin",
+        "groups::admin",
+        "group:servers::admin",
+        "hetzner::admin",
+      ],
+      delete: [
+        "audit-logs:delete",
+        "servers::admin",
+        "groups::admin",
+        "group:servers::admin",
+        "hetzner::admin",
+      ],
     },
   },
 };
@@ -352,6 +369,17 @@ export const breadCrumbs: {
       },
       {
         label: "Project",
+      },
+    ],
+  },
+  {
+    path: routes.admin.auditLogs,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "Audit Logs",
       },
     ],
   },
