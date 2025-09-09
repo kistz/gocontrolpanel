@@ -37,6 +37,7 @@ import {
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import { getMapsByUids } from "../database/maps";
+import { logAudit } from "../database/server-only/audit-logs";
 import { uploadFiles } from "../filemanager";
 import { addMapToServer } from "./maps";
 
@@ -415,9 +416,16 @@ export async function downloadRoom(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.room.download",
+          JSON.parse(JSON.stringify(room)),
+          "File manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
@@ -448,8 +456,23 @@ export async function downloadRoom(
 
       const { error } = await uploadFiles(serverId, formData);
       if (error) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.room.download",
+          JSON.parse(JSON.stringify(room)),
+          error,
+        );
         throw new Error(error);
       }
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.nadeo.room.download",
+        JSON.parse(JSON.stringify(room)),
+        errors > 0 ? `Failed to download ${errors} maps` : undefined,
+      );
 
       if (errors > 0) {
         throw new Error(`Failed to download ${errors} maps`);
@@ -475,9 +498,16 @@ export async function addRoomToServer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.room.add",
+          JSON.parse(JSON.stringify(room)),
+          "File manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
@@ -499,6 +529,14 @@ export async function addRoomToServer(
           console.error(`Failed to add map ${index + 1}:`, result.reason);
         }
       });
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.nadeo.room.add",
+        JSON.parse(JSON.stringify(room)),
+        errors > 0 ? `Failed to add ${errors} maps` : undefined,
+      );
 
       if (errors > 0) {
         throw new Error(`Failed to add ${errors} maps`);

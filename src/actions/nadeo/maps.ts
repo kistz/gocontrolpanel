@@ -4,6 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { downloadFile } from "@/lib/api/nadeo";
 import { getFileManager } from "@/lib/filemanager";
 import { ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 import { uploadFiles } from "../filemanager";
 import { addMap } from "../gbx/map";
 
@@ -19,14 +20,28 @@ export async function downloadMapFromUrl(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.map.download",
+          { url, fileName },
+          "File manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
       const file = await downloadFile(url, fileName);
       if (!file) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.map.download",
+          { url, fileName },
+          "Failed to download map",
+        );
         throw new Error("Failed to download map");
       }
 
@@ -35,6 +50,15 @@ export async function downloadMapFromUrl(
       formData.append("paths[]", `/UserData/Maps/Downloaded`);
 
       const { error } = await uploadFiles(serverId, formData);
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.nadeo.map.download",
+        { url, fileName },
+        error,
+      );
+
       if (error) {
         throw new Error(error);
       }
@@ -56,9 +80,16 @@ export async function addMapToServer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.map.add",
+          { url, fileName },
+          "File manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
@@ -68,6 +99,13 @@ export async function addMapToServer(
         fileName,
       );
       if (error) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.map.add",
+          { url, fileName },
+          error,
+        );
         throw new Error(error);
       }
 
@@ -75,6 +113,15 @@ export async function addMapToServer(
         serverId,
         `Downloaded/${file}`,
       );
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.nadeo.map.add",
+        { url, fileName },
+        addMapError,
+      );
+
       if (addMapError) {
         throw new Error(addMapError);
       }

@@ -22,7 +22,7 @@ export async function searchMaps(
       `group:servers:${serverId}:admin`,
     ],
     async (session) => {
-      await logAudit(session.user.id, serverId, "server.tmx.maps.search", {
+      await logAudit(session.user.id, serverId, "server.tmx.map.search", {
         queryParams,
         after,
       });
@@ -55,7 +55,7 @@ export async function downloadMap(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.maps.download",
+          "server.tmx.map.download",
           mapId,
           "File manager is not healthy",
         );
@@ -67,7 +67,7 @@ export async function downloadMap(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.maps.download",
+          "server.tmx.map.download",
           mapId,
           "Failed to download map",
         );
@@ -83,7 +83,7 @@ export async function downloadMap(
       await logAudit(
         session.user.id,
         serverId,
-        "server.tmx.maps.download",
+        "server.tmx.map.download",
         mapId,
         error,
       );
@@ -114,7 +114,7 @@ export async function addMapToServer(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.maps.add",
+          "server.tmx.map.add",
           mapId,
           "File manager is not healthy",
         );
@@ -127,7 +127,7 @@ export async function addMapToServer(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.maps.add",
+          "server.tmx.map.add",
           mapId,
           error,
         );
@@ -142,7 +142,7 @@ export async function addMapToServer(
       await logAudit(
         session.user.id,
         serverId,
-        "server.tmx.maps.add",
+        "server.tmx.map.add",
         mapId,
         addMapError,
       );

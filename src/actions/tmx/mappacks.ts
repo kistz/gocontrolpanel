@@ -26,7 +26,7 @@ export async function searchMappacks(
       `group:servers:${serverId}:admin`,
     ],
     async (session) => {
-      await logAudit(session.user.id, serverId, "server.tmx.mappacks.search", {
+      await logAudit(session.user.id, serverId, "server.tmx.mappack.search", {
         queryParams,
         after,
       });
@@ -60,7 +60,7 @@ export async function downloadMappack(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.mappacks.download",
+          "server.tmx.mappack.download",
           mappackId,
           "File manager is not healthy",
         );
@@ -76,7 +76,7 @@ export async function downloadMappack(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.mappacks.download",
+          "server.tmx.mappack.download",
           mappackId,
           "Cannot download mappack with more than 100 maps",
         );
@@ -111,7 +111,7 @@ export async function downloadMappack(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.mappacks.download",
+          "server.tmx.mappack.download",
           mappackId,
           error,
         );
@@ -121,7 +121,7 @@ export async function downloadMappack(
       await logAudit(
         session.user.id,
         serverId,
-        "server.tmx.mappacks.download",
+        "server.tmx.mappack.download",
         mappackId,
         errors > 0 ? `Failed to download ${errors} maps` : undefined,
       );
@@ -161,7 +161,7 @@ export async function addMappackToServer(
         await logAudit(
           session.user.id,
           serverId,
-          "server.tmx.mappacks.add",
+          "server.tmx.mappack.add",
           mappackId,
           error,
         );
@@ -185,7 +185,7 @@ export async function addMappackToServer(
       await logAudit(
         session.user.id,
         serverId,
-        "server.tmx.mappacks.add",
+        "server.tmx.mappack.add",
         mappackId,
         errors > 0 ? `Failed to add ${errors} maps` : undefined,
       );

@@ -15,6 +15,7 @@ import {
 } from "@/types/api/nadeo";
 import { ServerResponse } from "@/types/responses";
 import { getMapsByUids } from "../database/maps";
+import { logAudit } from "../database/server-only/audit-logs";
 import { uploadFiles } from "../filemanager";
 import { addMapToServer } from "./maps";
 
@@ -114,9 +115,16 @@ export async function downloadCampaign(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.campaign.download",
+          JSON.parse(JSON.stringify(campaign)),
+          "Failed to download campaign, file manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
@@ -150,8 +158,23 @@ export async function downloadCampaign(
 
       const { error } = await uploadFiles(serverId, formData);
       if (error) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.campaign.download",
+          JSON.parse(JSON.stringify(campaign)),
+          error,
+        );
         throw new Error(error);
       }
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.nadeo.campaign.download",
+        JSON.parse(JSON.stringify(campaign)),
+        errors > 0 ? `Failed to download ${errors} maps` : undefined,
+      );
 
       if (errors > 0) {
         throw new Error(`Failed to download ${errors} maps`);
@@ -179,9 +202,16 @@ export async function addCampaignToServer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
+        await logAudit(
+          session.user.id,
+          serverId,
+          "server.nadeo.campaign.add",
+          JSON.parse(JSON.stringify(campaign)),
+          "Failed to add campaign, file manager is not healthy",
+        );
         throw new Error("File manager is not healthy");
       }
 
@@ -203,6 +233,14 @@ export async function addCampaignToServer(
           console.error(`Failed to add map ${index + 1}:`, result.reason);
         }
       });
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.nadeo.campaign.add",
+        JSON.parse(JSON.stringify(campaign)),
+        errors > 0 ? `Failed to add ${errors} maps` : undefined,
+      );
 
       if (errors > 0) {
         throw new Error(`Failed to add ${errors} maps`);
