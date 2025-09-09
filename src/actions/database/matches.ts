@@ -5,6 +5,7 @@ import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "./server-only/audit-logs";
 
 const matchesMapRecordsSchema = Prisma.validator<Prisma.MatchesInclude>()({
   map: true,
@@ -114,13 +115,20 @@ export async function deleteMatch(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const db = getClient();
 
       await db.matches.update({
         where: { id: matchId },
         data: { deletedAt: new Date() },
       });
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.records.match.delete",
+        matchId,
+      );
     },
   );
 }
