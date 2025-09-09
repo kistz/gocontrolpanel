@@ -39,7 +39,6 @@ export async function getAuditLogsPaginated(
           {
             OR: [
               { action: { contains: filter } },
-              { targetType: { contains: filter } },
               { targetId: { contains: filter } },
               { user: { nickName: { contains: filter } } },
             ],

@@ -29,12 +29,6 @@ export const createColumns = (
   refetch: () => void,
 ): ColumnDef<AuditLogsWithUsers>[] => [
   {
-    accessorKey: "targetType",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Target"} />
-    ),
-  },
-  {
     accessorKey: "action",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Action"} />
