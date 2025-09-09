@@ -354,6 +354,7 @@ model AuditLogs {
   targetType String
   targetId   String
   details    Json?
+  error      String?
 
   user Users? @relation(fields: [userId], references: [id], onDelete: SetNull)
 

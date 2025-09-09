@@ -38,10 +38,10 @@ export async function getAuditLogsPaginated(
         where.AND = [
           {
             OR: [
-              { userId: { contains: filter } },
               { action: { contains: filter } },
               { targetType: { contains: filter } },
               { targetId: { contains: filter } },
+              { user: { nickName: { contains: filter } } },
             ],
           },
         ];

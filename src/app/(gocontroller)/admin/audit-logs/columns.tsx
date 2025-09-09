@@ -5,6 +5,7 @@ import {
   AuditLogsWithUsers,
   deleteAuditLogById,
 } from "@/actions/database/audit-logs";
+import BooleanDisplay from "@/components/boolean-display";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,13 @@ export const createColumns = (
         </span>
       );
     },
+  },
+  {
+    accessorKey: "error",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Error"} />
+    ),
+    cell: ({ row }) => <BooleanDisplay value={!!row.original.error} />,
   },
   {
     id: "actions",
