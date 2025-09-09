@@ -7,6 +7,7 @@ import { getGbxClient } from "@/lib/gbxclient";
 import { LocalMapInfo } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
 import path from "path";
+import { logAudit } from "../database/server-only/audit-logs";
 
 export async function getServerSettings(
   serverId: string,
@@ -77,7 +78,7 @@ export async function saveServerSettings(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
 
       serverSettings.defaultOptions.NextCallVoteTimeOut *= 1000; // Convert to milliseconds
@@ -103,18 +104,30 @@ export async function saveServerSettings(
           throw new ServerError("Failed to save server settings");
         });
 
+      let error: string | undefined = undefined;
+
       if (!res) {
-        throw new ServerError("Failed to save server settings");
+        error = "Failed to save server settings";
+      } else if (!res[0]) {
+        error = "Failed to save server settings";
+      } else if (!res[1]) {
+        error = "Failed to save connection rates";
+      } else if (!res[2]) {
+        error = "Failed to save profile skins settings";
+      } else if (!res[3]) {
+        error = "Failed to save map download settings";
       }
 
-      if (!res[0]) {
-        throw new ServerError("Failed to save server settings");
-      } else if (!res[1]) {
-        throw new ServerError("Failed to save connection rates");
-      } else if (!res[2]) {
-        throw new ServerError("Failed to save profile skins");
-      } else if (!res[3]) {
-        throw new ServerError("Failed to save map download settings");
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.settings.edit",
+        serverSettings,
+        error,
+      );
+
+      if (error) {
+        throw new ServerError(error);
       }
     },
   );
