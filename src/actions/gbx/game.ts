@@ -296,9 +296,15 @@ export async function triggerModeScriptEventArray(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("TriggerModeScriptEventArray", method, params);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.live.scriptevent",
+        { method, params },
+      );
     },
   );
 }
@@ -314,12 +320,20 @@ export async function pauseMatch(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const { error } = await triggerModeScriptEventArray(
         serverId,
         "Maniaplanet.Pause.SetActive",
         pause ? ["true"] : ["false"],
       );
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.live.pause",
+        pause,
+      );
+
       if (error) {
         throw new Error(error);
       }
