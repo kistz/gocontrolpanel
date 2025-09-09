@@ -4,6 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { PlayerInfo } from "@/types/player";
 import { ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 
 export async function getPlayerList(
   serverId: string,
@@ -63,9 +64,15 @@ export async function banPlayer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("Ban", login, reason);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.banlist.add",
+        { login, reason }
+      );
     },
   );
 }
@@ -81,9 +88,15 @@ export async function unbanPlayer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("UnBan", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.banlist.remove",
+        login
+      );
     },
   );
 }
@@ -137,9 +150,14 @@ export async function cleanBanList(serverId: string): Promise<ServerResponse> {
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("CleanBanList");
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.banlist.clear"
+      );
     },
   );
 }
@@ -155,9 +173,15 @@ export async function blacklistPlayer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("BlackList", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.add",
+        login
+      );
     },
   );
 }
@@ -173,9 +197,15 @@ export async function unblacklistPlayer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("UnBlackList", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.remove",
+        login
+      );
     },
   );
 }
@@ -232,9 +262,15 @@ export async function loadBlacklist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("LoadBlackList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.load",
+        filename,
+      );
     },
   );
 }
@@ -250,9 +286,15 @@ export async function saveBlacklist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SaveBlackList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.save",
+        filename,
+      );
     },
   );
 }
@@ -267,9 +309,14 @@ export async function cleanBlacklist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("CleanBlackList");
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.clear"
+      );
     },
   );
 }
@@ -285,9 +332,15 @@ export async function addGuest(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("AddGuest", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.add",
+        login
+      );
     },
   );
 }
@@ -303,9 +356,15 @@ export async function removeGuest(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("RemoveGuest", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.remove",
+        login
+      );
     },
   );
 }
@@ -362,9 +421,15 @@ export async function loadGuestlist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("LoadGuestList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.load",
+        filename,
+      );
     },
   );
 }
@@ -380,9 +445,15 @@ export async function saveGuestlist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SaveGuestList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.save",
+        filename,
+      );
     },
   );
 }
@@ -397,9 +468,14 @@ export async function cleanGuestlist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("CleanGuestList");
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.clear"
+      );
     },
   );
 }
@@ -416,9 +492,15 @@ export async function kickPlayer(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("Kick", login, reason);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.kick",
+        { login, reason }
+      );
     },
   );
 }
@@ -436,9 +518,15 @@ export async function forceSpectator(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("ForceSpectator", login, status);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.spectator.set",
+        { login, status }
+      );
     },
   );
 }
