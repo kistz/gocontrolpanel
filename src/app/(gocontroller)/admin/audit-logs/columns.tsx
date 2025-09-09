@@ -1,7 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
-import { AuditLogsWithUsers } from "@/actions/database/audit-logs";
+import {
+  AuditLogsWithUsers,
+  deleteAuditLogById,
+} from "@/actions/database/audit-logs";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -85,10 +88,10 @@ export const createColumns = (
 
         startTransition(async () => {
           try {
-            // const { error } = await deleteUserById(user.id);
-            // if (error) {
-            //   throw new Error(error);
-            // }
+            const { error } = await deleteAuditLogById(auditLog.id);
+            if (error) {
+              throw new Error(error);
+            }
             refetch();
             toast.success("Log successfully deleted");
           } catch (error) {

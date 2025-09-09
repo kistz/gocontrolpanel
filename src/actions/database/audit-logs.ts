@@ -74,7 +74,7 @@ export async function getAuditLogsPaginated(
         }
 
         where.AND = [
-          ...((where.AND as Prisma.AuditLogsWhereInput[] ?? [])),
+          ...((where.AND as Prisma.AuditLogsWhereInput[]) ?? []),
           {
             OR: [
               {
@@ -106,6 +106,74 @@ export async function getAuditLogsPaginated(
         data: auditLogs,
         totalCount,
       };
+    },
+  );
+}
+
+export async function deleteAuditLogById(id: string): Promise<ServerResponse> {
+  return doServerActionWithAuth(
+    [
+      "audit-logs:delete",
+      "servers::admin",
+      "groups::admin",
+      "group:servers::admin",
+      "hetzner::admin",
+    ],
+    async (session) => {
+      const db = getClient();
+
+      const where: Prisma.AuditLogsWhereUniqueInput = {
+        id,
+        deletedAt: null,
+      };
+
+      if (
+        !session.user.admin &&
+        !session.user.permissions.includes("audit-logs:delete")
+      ) {
+        const userServerIds = session.user.servers.map((s) => s.id);
+        const userGroupIds = session.user.groups.map((g) => g.id);
+        const userGroupServerIds = session.user.groups
+          .flatMap((g) => g.servers)
+          .map((s) => s.id);
+        const userHetznerIds = session.user.projects.map((p) => p.id);
+
+        const allIds = [
+          ...new Set([
+            ...userServerIds,
+            ...userGroupServerIds,
+            ...userHetznerIds,
+          ]),
+        ];
+
+        if (allIds.length === 0) {
+          throw new Error("Not authorized to delete this log.");
+        }
+
+        where.OR = [
+          {
+            targetType: "server",
+            targetId: { in: [...userServerIds, ...userGroupServerIds] },
+          },
+          { targetType: "group", targetId: { in: userGroupIds } },
+          { targetType: "hetzner", targetId: { in: userHetznerIds } },
+        ];
+      }
+
+      const auditLog = await db.auditLogs.findUnique({
+        where,
+      });
+
+      if (!auditLog) {
+        throw new Error("Audit log not found.");
+      }
+
+      await db.auditLogs.update({
+        where,
+        data: {
+          deletedAt: new Date(),
+        },
+      });
     },
   );
 }
