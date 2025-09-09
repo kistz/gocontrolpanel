@@ -6,7 +6,7 @@ export async function logAudit(
   userId: string,
   targetId: string,
   action: string,
-  details: InputJsonValue,
+  details?: InputJsonValue,
   error?: string,
 ): Promise<void> {
   const db = getClient();

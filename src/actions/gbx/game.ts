@@ -3,6 +3,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient, getGbxClientManager } from "@/lib/gbxclient";
 import { ModeScriptInfo } from "@/types/gbx";
 import { ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 
 export async function restartMap(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
@@ -12,9 +13,10 @@ export async function restartMap(serverId: string): Promise<ServerResponse> {
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("RestartMap");
+      await logAudit(session.user.id, serverId, "server.game.map.restart");
     },
   );
 }
@@ -27,9 +29,10 @@ export async function nextMap(serverId: string): Promise<ServerResponse> {
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("NextMap");
+      await logAudit(session.user.id, serverId, "server.game.map.next");
     },
   );
 }
@@ -45,9 +48,15 @@ export async function setShowOpponents(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SetForceShowAllOpponents", count);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.showopponents.edit",
+        count,
+      );
     },
   );
 }
@@ -83,9 +92,15 @@ export async function setScriptName(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SetScriptName", script);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.script.edit",
+        script,
+      );
     },
   );
 }
@@ -113,7 +128,7 @@ export async function getScriptName(serverId: string): Promise<
 export async function loadMatchSettings(
   serverId: string,
   filename: string,
-): Promise<ServerResponse<number>> {
+): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [
       `servers:${serverId}:moderator`,
@@ -121,9 +136,15 @@ export async function loadMatchSettings(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
-      return await client.call("LoadMatchSettings", filename);
+      await client.call("LoadMatchSettings", filename);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.matchsettings.load",
+        filename,
+      );
     },
   );
 }
@@ -131,7 +152,7 @@ export async function loadMatchSettings(
 export async function appendPlaylist(
   serverId: string,
   filename: string,
-): Promise<ServerResponse<number>> {
+): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [
       `servers:${serverId}:moderator`,
@@ -139,9 +160,15 @@ export async function appendPlaylist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
-      return await client.call("AppendPlaylistFromMatchSettings", filename);
+      await client.call("AppendPlaylistFromMatchSettings", filename);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.playlist.append",
+        filename,
+      );
     },
   );
 }
@@ -149,7 +176,7 @@ export async function appendPlaylist(
 export async function saveMatchSettings(
   serverId: string,
   filename: string,
-): Promise<ServerResponse<number>> {
+): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [
       `servers:${serverId}:moderator`,
@@ -157,9 +184,15 @@ export async function saveMatchSettings(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
-      return await client.call("SaveMatchSettings", filename);
+      await client.call("SaveMatchSettings", filename);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.matchsettings.save",
+        filename,
+      );
     },
   );
 }
@@ -167,7 +200,7 @@ export async function saveMatchSettings(
 export async function insertPlaylist(
   serverId: string,
   filename: string,
-): Promise<ServerResponse<number>> {
+): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [
       `servers:${serverId}:moderator`,
@@ -175,9 +208,15 @@ export async function insertPlaylist(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
-      return await client.call("InsertPlaylistFromMatchSettings", filename);
+      await client.call("InsertPlaylistFromMatchSettings", filename);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.playlist.insert",
+        filename,
+      );
     },
   );
 }
@@ -231,10 +270,16 @@ export async function setModeScriptSettings(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SetModeScriptSettings", settings);
       client.call("Echo", "", "UpdatedSettings");
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.game.scriptsettings.edit",
+        settings,
+      );
     },
   );
 }

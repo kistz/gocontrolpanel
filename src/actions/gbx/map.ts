@@ -5,6 +5,7 @@ import { Maps } from "@/lib/prisma/generated";
 import { getKeyJukebox, getRedisClient } from "@/lib/redis";
 import { JukeboxMap } from "@/types/map";
 import { ServerError, ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 
 export async function getJukebox(
   serverId: string,
@@ -156,9 +157,10 @@ export async function jumpToMap(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("JumpToMapIndex", index);
+      await logAudit(session.user.id, serverId, "server.game.map.jump", index);
     },
   );
 }
