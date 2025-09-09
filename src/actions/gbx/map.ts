@@ -37,13 +37,19 @@ export async function setJukebox(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
       await redis.del(key);
       if (jukebox.length > 0) {
         await redis.rpush(key, ...jukebox.map((map) => JSON.stringify(map)));
       }
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.jukebox.set",
+        JSON.parse(JSON.stringify(jukebox)),
+      );
     },
   );
 }
@@ -56,10 +62,11 @@ export async function clearJukebox(serverId: string): Promise<ServerResponse> {
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
       await redis.del(key);
+      await logAudit(session.user.id, serverId, "server.maps.jukebox.clear");
     },
   );
 }
@@ -86,6 +93,13 @@ export async function addMapToJukebox(
 
       const key = getKeyJukebox(serverId);
       await redis.rpush(key, JSON.stringify(newMap));
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.jukebox.add",
+        JSON.parse(JSON.stringify(newMap)),
+      );
 
       return newMap;
     },
@@ -176,9 +190,15 @@ export async function addMap(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("AddMap", filename);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.maplist.add",
+        filename,
+      );
     },
   );
 }
@@ -194,12 +214,29 @@ export async function addMapList(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       const res = await client.call("AddMapList", filenames);
 
+      let error: string | undefined = undefined;
+
       if (typeof res !== "number") {
-        throw new ServerError("Failed to add map list");
+        error = "Failed to add map list";
+      }
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.maplist.add",
+        {
+          filenames,
+          addedCount: error ? 0 : res,
+        },
+        error,
+      );
+
+      if (error) {
+        throw new ServerError(error);
       }
 
       return res;
@@ -218,13 +255,19 @@ export async function removeMap(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       const mapList = await client.call("GetMapList", 2, 0);
       if (mapList.length < 2) {
         throw new ServerError("Cannot remove the last map from the server");
       }
       await client.call("RemoveMap", filename);
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.maplist.remove",
+        filename,
+      );
     },
   );
 }
@@ -232,7 +275,7 @@ export async function removeMap(
 export async function removeMapList(
   serverId: string,
   filenames: string[],
-): Promise<ServerResponse<number>> {
+): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [
       `servers:${serverId}:moderator`,
@@ -240,15 +283,27 @@ export async function removeMapList(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const client = await getGbxClient(serverId);
       const res = await client.call("RemoveMapList", filenames);
 
+      let error: string | undefined = undefined;
+
       if (typeof res !== "number") {
-        throw new ServerError("Failed to remove map list");
+        error = "Failed to remove map list";
       }
 
-      return res;
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.maplist.remove",
+        filenames,
+        error,
+      );
+
+      if (error) {
+        throw new ServerError(error);
+      }
     },
   );
 }
