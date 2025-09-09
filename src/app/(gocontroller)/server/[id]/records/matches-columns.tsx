@@ -114,7 +114,7 @@ export const createMatchesColumns = (
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                View Details
+                View match
               </DropdownMenuItem>
               {canActions && (
                 <>
@@ -123,7 +123,7 @@ export const createMatchesColumns = (
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}
                   >
-                    Delete Match
+                    Delete match
                   </DropdownMenuItem>
                 </>
               )}
