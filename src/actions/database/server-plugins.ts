@@ -4,6 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { getGbxClientManager } from "@/lib/gbxclient";
 import { ServerResponse } from "@/types/responses";
+import { logAudit } from "./server-only/audit-logs";
 import { ServerPluginsWithPlugin } from "./server-only/gbx";
 
 export async function updateServerPlugins(
@@ -16,7 +17,7 @@ export async function updateServerPlugins(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
       const pluginUpdates = plugins.map((p) =>
         db.serverPlugins.upsert({
@@ -55,6 +56,13 @@ export async function updateServerPlugins(
       const manager = await getGbxClientManager(serverId);
 
       manager.info.plugins = updatedPlugins;
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.interface.plugins.edit",
+        plugins,
+      );
     },
   );
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { logAudit } from "@/actions/database/server-only/audit-logs";
 import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { Handlebars } from "@/lib/handlebars";
@@ -18,7 +19,7 @@ export async function renderInterface(
       `servers:${interfaceData.serverId}:admin`,
       `group:servers:${interfaceData.serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       // Hide any existing Manialink pages before rendering the new interface
       const client = await getGbxClient(interfaceData.serverId);
       await client.call("SendHideManialinkPage");
@@ -60,6 +61,13 @@ export async function renderInterface(
       });
 
       await client.call("SendDisplayManialinkPage", manialink, 0, false);
+
+      await logAudit(
+        session.user.id,
+        interfaceData.serverId,
+        "server.interface.render",
+        { interfaceData },
+      );
     },
   );
 }

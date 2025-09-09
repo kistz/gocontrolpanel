@@ -4,6 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getClient } from "@/lib/dbclient";
 import { Interfaces } from "@/lib/prisma/generated";
 import { ServerError, ServerResponse } from "@/types/responses";
+import { logAudit } from "./server-only/audit-logs";
 
 export async function getInterfaces(
   serverId: string,
@@ -33,7 +34,7 @@ export async function createInterface(
 ): Promise<ServerResponse<Interfaces>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
       const result = await db.interfaces.create({
         data: {
@@ -43,8 +44,16 @@ export async function createInterface(
         },
       });
 
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.interface.create",
+        { name, interfaceString },
+        !result ? "Failed to create interface" : undefined,
+      );
+
       if (!result) {
-        throw new ServerError("Failed to save interface");
+        throw new ServerError("Failed to create interface");
       }
 
       return result;
@@ -59,7 +68,7 @@ export async function saveInterface(
 ): Promise<ServerResponse<Interfaces>> {
   return doServerActionWithAuth(
     [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
       const result = await db.interfaces.update({
         where: {
@@ -70,6 +79,14 @@ export async function saveInterface(
           interfaceString,
         },
       });
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.interface.edit",
+        { interfaceId, interfaceString },
+        !result ? "Failed to save interface" : undefined,
+      );
 
       if (!result) {
         throw new ServerError("Failed to save interface");

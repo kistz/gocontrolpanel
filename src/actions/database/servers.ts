@@ -9,9 +9,11 @@ import {
   getKeyHetznerRecentlyCreatedServers,
   getRedisClient,
 } from "@/lib/redis";
+import { getErrorMessage } from "@/lib/utils";
 import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "./server-only/audit-logs";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editServer = Prisma.validator<Prisma.ServersInclude>()({
@@ -298,33 +300,44 @@ export async function updateServerChatConfig(
     "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
   >,
 ): Promise<ServerResponse<Servers>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const manager = await getGbxClientManager(serverId);
-    let err;
-    try {
-      await manager.client.call(
-        "ChatEnableManualRouting",
-        chatConfig.manualRouting,
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async (session) => {
+      const manager = await getGbxClientManager(serverId);
+      let err;
+      try {
+        await manager.client.call(
+          "ChatEnableManualRouting",
+          chatConfig.manualRouting,
+        );
+      } catch (e) {
+        err = e;
+        chatConfig.manualRouting = false;
+      }
+
+      const db = getClient();
+      const updatedServer = await db.servers.update({
+        where: { id: serverId },
+        data: { ...chatConfig },
+      });
+
+      manager.info.chat = chatConfig;
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.interface.chat.edit",
+        chatConfig,
+        err ? getErrorMessage(err) : undefined,
       );
-    } catch (e) {
-      err = e;
-      chatConfig.manualRouting = false;
-    }
 
-    const db = getClient();
-    const updatedServer = await db.servers.update({
-      where: { id: serverId },
-      data: { ...chatConfig },
-    });
+      if (err) {
+        throw err;
+      }
 
-    manager.info.chat = chatConfig;
-
-    if (err) {
-      throw err;
-    }
-
-    return updatedServer;
-  });
+      return updatedServer;
+    },
+  );
 }
 
 export async function deleteServer(serverId: string): Promise<ServerResponse> {
