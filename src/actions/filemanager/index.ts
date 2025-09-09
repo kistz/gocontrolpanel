@@ -10,82 +10,88 @@ export async function getRoute(
   serverId: string,
   path: string,
 ): Promise<ServerResponse<FileEntry[]>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
+      }
 
-    const res = await fetch(fileManager.url + path, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${fileManager.password}`,
-      },
-    });
+      const res = await fetch(fileManager.url + path, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${fileManager.password}`,
+        },
+      });
 
-    if (res.status !== 200) {
-      throw new ServerError("Failed to get files");
-    }
+      if (res.status !== 200) {
+        throw new ServerError("Failed to get files");
+      }
 
-    let data: FileEntry[] | undefined;
+      let data: FileEntry[] | undefined;
 
-    try {
-      data = await res.json();
-    } catch {
-      throw new ServerError("Route is a file");
-    }
+      try {
+        data = await res.json();
+      } catch {
+        throw new ServerError("Route is a file");
+      }
 
-    if (!data) {
-      throw new ServerError("Failed to get files");
-    }
+      if (!data) {
+        throw new ServerError("Failed to get files");
+      }
 
-    const parsedData = data.map((entry: any) => ({
-      ...entry,
-      lastModified: new Date(entry.lastModified),
-    }));
+      const parsedData = data.map((entry: any) => ({
+        ...entry,
+        lastModified: new Date(entry.lastModified),
+      }));
 
-    return parsedData;
-  });
+      return parsedData;
+    },
+  );
 }
 
 export async function getFile(
   serverId: string,
   path: string,
 ): Promise<ServerResponse<File>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
+      }
 
-    const res = await fetch(fileManager.url + path, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${fileManager.password}`,
-      },
-    });
+      const res = await fetch(fileManager.url + path, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${fileManager.password}`,
+        },
+      });
 
-    if (res.status !== 200) {
-      throw new ServerError("Failed to get files");
-    }
+      if (res.status !== 200) {
+        throw new ServerError("Failed to get files");
+      }
 
-    const contentType = res.headers.get("Content-Type");
-    const fileType: ContentType = contentType
-      ? (contentType.split("/")[0] as ContentType)
-      : "text";
+      const contentType = res.headers.get("Content-Type");
+      const fileType: ContentType = contentType
+        ? (contentType.split("/")[0] as ContentType)
+        : "text";
 
-    const data =
-      fileType === "image" || fileType === "video"
-        ? await res.arrayBuffer()
-        : await res.text();
+      const data =
+        fileType === "image" || fileType === "video"
+          ? await res.arrayBuffer()
+          : await res.text();
 
-    return {
-      value: data,
-      type: fileType,
-    };
-  });
+      return {
+        value: data,
+        type: fileType,
+      };
+    },
+  );
 }
 
 export async function saveFileText(
@@ -93,93 +99,107 @@ export async function saveFileText(
   path: string,
   text: string,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
+      }
 
-    const res = await fetch(fileManager.url + path, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${fileManager.password}`,
-      },
-      body: JSON.stringify(text),
-    });
+      const res = await fetch(fileManager.url + path, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${fileManager.password}`,
+        },
+        body: JSON.stringify(text),
+      });
 
-    if (res.status !== 200) {
-      throw new ServerError("Failed to save file");
-    }
-  });
+      if (res.status !== 200) {
+        throw new ServerError("Failed to save file");
+      }
+    },
+  );
 }
 
 export async function deleteEntry(
   serverId: string,
   paths: string[],
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
+      }
 
-    const res = await fetch(fileManager.url + "/delete", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${fileManager.password}`,
-      },
-      body: JSON.stringify(paths),
-    });
+      const res = await fetch(fileManager.url + "/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${fileManager.password}`,
+        },
+        body: JSON.stringify(paths),
+      });
 
-    if (res.status !== 200) {
-      throw new ServerError("Failed to delete item");
-    }
-  });
+      if (res.status !== 200) {
+        throw new ServerError("Failed to delete item");
+      }
+    },
+  );
 }
 
 export async function uploadFiles(
   serverId: string,
   formData: FormData,
 ): Promise<ServerResponse<FileEntry[]>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
+      }
 
-    const res = await fetch(fileManager.url + "/upload", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${fileManager.password}`,
-      },
-      body: formData,
-    });
+      const res = await fetch(fileManager.url + "/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${fileManager.password}`,
+        },
+        body: formData,
+      });
 
-    if (res.status !== 200) {
-      throw new ServerError("Failed to upload files");
-    }
+      if (res.status !== 200) {
+        throw new ServerError("Failed to upload files");
+      }
 
-    const data = await res.json();
-    if (!data) {
-      throw new ServerError("Failed to upload files");
-    }
+      const data = await res.json();
+      if (!data) {
+        throw new ServerError("Failed to upload files");
+      }
 
-    const parsedData = data.map((entry: any) => ({
-      ...entry,
-      lastModified: new Date(entry.lastModified),
-    }));
+      const parsedData = data.map((entry: any) => ({
+        ...entry,
+        lastModified: new Date(entry.lastModified),
+      }));
 
-    return parsedData;
-  });
+      return parsedData;
+    },
+  );
 }
 
 export async function getScripts(
   serverId: string,
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const defaultScripts = [
         "Trackmania/TM_TimeAttack_Online.Script.txt",
@@ -233,35 +253,38 @@ export async function createFileEntry(
   serverId: string,
   request: CreateFileEntrySchemaType,
 ): Promise<ServerResponse<FileEntry>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const fileManager = await getFileManager(serverId);
-    if (!fileManager?.health) {
-      throw new ServerError("Could not connect to file manager");
-    }
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async () => {
+      const fileManager = await getFileManager(serverId);
+      if (!fileManager?.health) {
+        throw new ServerError("Could not connect to file manager");
+      }
 
-    const res = await fetch(fileManager.url + "/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${fileManager.password}`,
-      },
-      body: JSON.stringify(request),
-    });
+      const res = await fetch(fileManager.url + "/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${fileManager.password}`,
+        },
+        body: JSON.stringify(request),
+      });
 
-    if (res.status !== 200) {
-      throw new ServerError(
-        res.status === 500 ? "Something went wrong" : await res.text(),
-      );
-    }
+      if (res.status !== 200) {
+        throw new ServerError(
+          res.status === 500 ? "Something went wrong" : await res.text(),
+        );
+      }
 
-    const data = await res.json();
-    if (!data) {
-      throw new ServerError("Failed to create file entry");
-    }
+      const data = await res.json();
+      if (!data) {
+        throw new ServerError("Failed to create file entry");
+      }
 
-    return {
-      ...data,
-      lastModified: new Date(data.lastModified),
-    };
-  });
+      return {
+        ...data,
+        lastModified: new Date(data.lastModified),
+      };
+    },
+  );
 }

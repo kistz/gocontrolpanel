@@ -13,7 +13,12 @@ export async function downloadMapFromUrl(
   fileName: string,
 ): Promise<ServerResponse<string>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
@@ -45,7 +50,12 @@ export async function addMapToServer(
   fileName: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {

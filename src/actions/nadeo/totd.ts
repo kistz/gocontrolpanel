@@ -12,7 +12,12 @@ export async function getTotdMonth(
   offset: number,
 ): Promise<ServerResponse<MonthMapListWithDayMaps | null>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyTotdMonth(offset);

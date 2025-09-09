@@ -6,7 +6,12 @@ import { ServerResponse } from "@/types/responses";
 
 export async function restartMap(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("RestartMap");
@@ -16,7 +21,12 @@ export async function restartMap(serverId: string): Promise<ServerResponse> {
 
 export async function nextMap(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("NextMap");
@@ -29,7 +39,12 @@ export async function setShowOpponents(
   count: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("SetForceShowAllOpponents", count);
@@ -44,7 +59,12 @@ export async function getShowOpponents(serverId: string): Promise<
   }>
 > {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("GetForceShowAllOpponents");
@@ -57,7 +77,12 @@ export async function setScriptName(
   script: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("SetScriptName", script);
@@ -72,7 +97,12 @@ export async function getScriptName(serverId: string): Promise<
   }>
 > {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("GetScriptName");
@@ -85,7 +115,12 @@ export async function loadMatchSettings(
   filename: string,
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("LoadMatchSettings", filename);
@@ -98,7 +133,12 @@ export async function appendPlaylist(
   filename: string,
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("AppendPlaylistFromMatchSettings", filename);
@@ -111,7 +151,12 @@ export async function saveMatchSettings(
   filename: string,
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("SaveMatchSettings", filename);
@@ -124,7 +169,12 @@ export async function insertPlaylist(
   filename: string,
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("InsertPlaylistFromMatchSettings", filename);
@@ -136,7 +186,12 @@ export async function getModeScriptInfo(
   serverId: string,
 ): Promise<ServerResponse<ModeScriptInfo>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("GetModeScriptInfo");
@@ -150,7 +205,12 @@ export async function getModeScriptSettings(serverId: string): Promise<
   }>
 > {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       return await client.call("GetModeScriptSettings");
@@ -165,7 +225,12 @@ export async function setModeScriptSettings(
   },
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("SetModeScriptSettings", settings);
@@ -180,7 +245,12 @@ export async function triggerModeScriptEventArray(
   params: string[],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("TriggerModeScriptEventArray", method, params);
@@ -193,7 +263,12 @@ export async function pauseMatch(
   pause: boolean,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const { error } = await triggerModeScriptEventArray(
         serverId,

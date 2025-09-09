@@ -264,7 +264,12 @@ export async function getMapsByUids(
   uids: string[],
 ): Promise<ServerResponse<Maps[]>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const db = getClient();
 

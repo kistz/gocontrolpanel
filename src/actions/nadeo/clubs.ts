@@ -46,7 +46,12 @@ export async function getClubCampaignsPaginated(
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<ClubCampaign>>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyClubCampaignsPaginated(pagination, filter);
@@ -80,7 +85,12 @@ export async function getClubsPaginated(
   filter?: string,
 ): Promise<ServerResponse<PaginationResponse<Club>>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyClubsPaginated(pagination, filter);
@@ -115,7 +125,12 @@ export async function getClubActivitiesPaginated(
   fetchArgs?: number,
 ): Promise<ServerResponse<PaginationResponse<ClubActivity>>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       if (!fetchArgs) {
         throw new Error("No club id provided");
@@ -152,7 +167,12 @@ export async function getClubActivitiesList(
   length = 12,
 ): Promise<ServerResponse<ClubActivitiesResponse>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyClubActivities(clubId, offset);
@@ -176,7 +196,12 @@ export async function getClubCampaignWithMaps(
   campaignId: number,
 ): Promise<ServerResponse<ClubCampaignWithNamesAndPlaylistMaps>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyClubCampaign(clubId, campaignId);
@@ -226,7 +251,12 @@ export async function getClub(
   clubId: number,
 ): Promise<ServerResponse<ClubWithAccountNames>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = `club:${clubId}`;
@@ -259,7 +289,12 @@ export async function getClubMembersCount(
   clubId: number,
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyClubMembersCount(clubId);
@@ -285,7 +320,12 @@ export async function getClubMembersWithNamesPaginated(
   fetchArgs?: number,
 ): Promise<ServerResponse<PaginationResponse<ClubMemberWithName>>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       if (!fetchArgs) {
         throw new Error("No club id provided");
@@ -331,7 +371,12 @@ export async function getClubRoomWithNamesAndMaps(
   roomId: number,
 ): Promise<ServerResponse<ClubRoomWithNamesAndMaps>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const clubRoom = await getClubRoom(clubId, roomId);
 
@@ -364,7 +409,12 @@ export async function downloadRoom(
   room: RoomWithMaps | ClubRoomWithNamesAndMaps["room"],
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
@@ -419,7 +469,12 @@ export async function addRoomToServer(
   room: RoomWithMaps | ClubRoomWithNamesAndMaps["room"],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {

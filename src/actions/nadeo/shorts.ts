@@ -10,7 +10,12 @@ export async function getAllWeeklyShorts(): Promise<
   ServerResponse<Campaign[]>
 > {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyWeeklyShorts();

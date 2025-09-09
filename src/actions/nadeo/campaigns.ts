@@ -22,7 +22,12 @@ export async function getAllSeasonalCampaigns(): Promise<
   ServerResponse<Campaign[]>
 > {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeySeasonalCampaigns();
@@ -50,7 +55,12 @@ export async function getCampaignWithMaps(
   campaign: Campaign,
 ): Promise<ServerResponse<CampaignWithNamesAndPlaylistMaps>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyCampaign(campaign.id);
@@ -98,7 +108,12 @@ export async function downloadCampaign(
     | ClubCampaignWithNamesAndPlaylistMaps["campaign"],
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
@@ -158,7 +173,12 @@ export async function addCampaignToServer(
     | ClubCampaignWithNamesAndPlaylistMaps["campaign"],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {

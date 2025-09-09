@@ -10,7 +10,12 @@ export async function getJukebox(
   serverId: string,
 ): Promise<ServerResponse<JukeboxMap[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
@@ -25,7 +30,12 @@ export async function setJukebox(
   jukebox: JukeboxMap[],
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
@@ -39,7 +49,12 @@ export async function setJukebox(
 
 export async function clearJukebox(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
@@ -53,7 +68,12 @@ export async function addMapToJukebox(
   map: Maps,
 ): Promise<ServerResponse<JukeboxMap>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async (session) => {
       const redis = await getRedisClient();
       const newMap: JukeboxMap = {
@@ -76,7 +96,12 @@ export async function removeMapFromJukebox(
   mapId: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
@@ -125,7 +150,12 @@ export async function jumpToMap(
   index: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("JumpToMapIndex", index);
@@ -138,7 +168,12 @@ export async function addMap(
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       await client.call("AddMap", filename);
@@ -151,7 +186,12 @@ export async function addMapList(
   filenames: string[],
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       const res = await client.call("AddMapList", filenames);
@@ -170,7 +210,12 @@ export async function removeMap(
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       const mapList = await client.call("GetMapList", 2, 0);
@@ -187,7 +232,12 @@ export async function removeMapList(
   filenames: string[],
 ): Promise<ServerResponse<number>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       const res = await client.call("RemoveMapList", filenames);

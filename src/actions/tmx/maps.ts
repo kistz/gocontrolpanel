@@ -14,7 +14,12 @@ export async function searchMaps(
   after?: number,
 ): Promise<ServerResponse<TMXMapSearch>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       return searchTMXMaps(
         {
@@ -32,7 +37,12 @@ export async function downloadMap(
   mapId: number,
 ): Promise<ServerResponse<string>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
@@ -63,7 +73,12 @@ export async function addMapToServer(
   mapId: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {

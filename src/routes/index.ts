@@ -28,23 +28,68 @@ export const routes = {
 
 export const routePermissions = {
   servers: {
-    settings: ["servers:id:admin"],
+    settings: ["servers:id:admin", "group:servers:id:admin"],
     game: {
-      mapActions: ["servers:id:moderator", "servers:id:admin"],
-      gameSettings: ["servers:id:moderator", "servers:id:admin"],
-      scriptSettings: ["servers:id:moderator", "servers:id:admin"],
+      mapActions: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
+      gameSettings: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
+      scriptSettings: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
     },
-    maps: ["servers:id:moderator", "servers:id:admin"],
-    players: ["servers:id:moderator", "servers:id:admin"],
+    maps: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
+    players: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
     live: {
-      actions: ["servers:id:moderator", "servers:id:admin"],
+      actions: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
     },
-    files: ["servers:id:admin"],
-    interface: ["servers:id:admin"],
-    tmx: ["servers:id:moderator", "servers:id:admin"],
-    nadeo: ["servers:id:moderator", "servers:id:admin"],
+    files: ["servers:id:admin", "group:servers:id:admin"],
+    interface: ["servers:id:admin", "group:servers:id:admin"],
+    tmx: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
+    nadeo: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
     records: {
-      actions: ["servers:id:moderator", "servers:id:admin"],
+      actions: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
     },
   },
   admin: {

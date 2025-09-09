@@ -18,7 +18,12 @@ export async function searchMappacks(
   after?: number,
 ): Promise<ServerResponse<TMXMappackSearch>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       return searchTMXMappacks(
         {
@@ -37,7 +42,12 @@ export async function downloadMappack(
   mappackName: string,
 ): Promise<ServerResponse<string[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const fileManager = await getFileManager(serverId);
       if (!fileManager?.health) {
@@ -100,7 +110,12 @@ export async function addMappackToServer(
   mappackName: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const { data: fileNames, error } = await downloadMappack(
         serverId,

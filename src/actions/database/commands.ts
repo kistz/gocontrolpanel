@@ -6,12 +6,15 @@ import { Commands } from "@/lib/prisma/generated";
 import { ServerResponse } from "@/types/responses";
 
 export async function getCommands(): Promise<ServerResponse<Commands[]>> {
-  return doServerActionWithAuth(["servers::admin"], async () => {
-    const db = getClient();
-    return await db.commands.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
-  });
+  return doServerActionWithAuth(
+    ["servers::admin", "group:servers::admin"],
+    async () => {
+      const db = getClient();
+      return await db.commands.findMany({
+        where: {
+          deletedAt: null,
+        },
+      });
+    },
+  );
 }

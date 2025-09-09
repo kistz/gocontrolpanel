@@ -17,15 +17,18 @@ export type PluginsWithCommands = Prisma.PluginsGetPayload<{
 export async function getPlugins(): Promise<
   ServerResponse<PluginsWithCommands[]>
 > {
-  return doServerActionWithAuth(["servers::admin"], async () => {
-    const db = getClient();
-    return await db.plugins.findMany({
-      where: {
-        deletedAt: null,
-      },
-      include: {
-        commands: true,
-      },
-    });
-  });
+  return doServerActionWithAuth(
+    ["servers::admin", "group:servers::admin"],
+    async () => {
+      const db = getClient();
+      return await db.plugins.findMany({
+        where: {
+          deletedAt: null,
+        },
+        include: {
+          commands: true,
+        },
+      });
+    },
+  );
 }

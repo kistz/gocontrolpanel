@@ -14,7 +14,10 @@ export async function renderInterface(
   interfaceData: Interfaces,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${interfaceData.serverId}:admin`],
+    [
+      `servers:${interfaceData.serverId}:admin`,
+      `group:servers:${interfaceData.serverId}:admin`,
+    ],
     async () => {
       // Hide any existing Manialink pages before rendering the new interface
       const client = await getGbxClient(interfaceData.serverId);
