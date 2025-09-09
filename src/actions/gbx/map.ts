@@ -117,7 +117,7 @@ export async function removeMapFromJukebox(
       `group:servers:${serverId}:moderator`,
       `group:servers:${serverId}:admin`,
     ],
-    async () => {
+    async (session) => {
       const redis = await getRedisClient();
       const key = getKeyJukebox(serverId);
       const items = await redis.lrange(key, 0, -1);
@@ -131,6 +131,13 @@ export async function removeMapFromJukebox(
       if (filtered.length > 0) {
         await redis.rpush(key, ...filtered);
       }
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.maps.jukebox.remove",
+        mapId,
+      );
     },
   );
 }
@@ -258,16 +265,19 @@ export async function removeMap(
     async (session) => {
       const client = await getGbxClient(serverId);
       const mapList = await client.call("GetMapList", 2, 0);
-      if (mapList.length < 2) {
-        throw new ServerError("Cannot remove the last map from the server");
-      }
-      await client.call("RemoveMap", filename);
       await logAudit(
         session.user.id,
         serverId,
         "server.maps.maplist.remove",
         filename,
+        mapList.length < 2
+          ? "Cannot remove the last map from the server"
+          : undefined,
       );
+      if (mapList.length < 2) {
+        throw new ServerError("Cannot remove the last map from the server");
+      }
+      await client.call("RemoveMap", filename);
     },
   );
 }
@@ -287,22 +297,16 @@ export async function removeMapList(
       const client = await getGbxClient(serverId);
       const res = await client.call("RemoveMapList", filenames);
 
-      let error: string | undefined = undefined;
-
-      if (typeof res !== "number") {
-        error = "Failed to remove map list";
-      }
-
       await logAudit(
         session.user.id,
         serverId,
         "server.maps.maplist.remove",
         filenames,
-        error,
+        typeof res !== "number" ? "Failed to remove map list" : undefined,
       );
 
-      if (error) {
-        throw new ServerError(error);
+      if (typeof res !== "number") {
+        throw new ServerError("Failed to remove map list");
       }
     },
   );

@@ -530,15 +530,3 @@ export async function forceSpectator(
     },
   );
 }
-
-export async function connectFakePlayer(
-  serverId: string,
-): Promise<ServerResponse> {
-  return doServerActionWithAuth(
-    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
-    async () => {
-      const client = await getGbxClient(serverId);
-      await client.call("ConnectFakePlayer");
-    },
-  );
-}

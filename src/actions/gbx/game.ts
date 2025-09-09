@@ -299,12 +299,10 @@ export async function triggerModeScriptEventArray(
     async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("TriggerModeScriptEventArray", method, params);
-      await logAudit(
-        session.user.id,
-        serverId,
-        "server.live.scriptevent",
-        { method, params },
-      );
+      await logAudit(session.user.id, serverId, "server.live.scriptevent", {
+        method,
+        params,
+      });
     },
   );
 }
@@ -332,6 +330,7 @@ export async function pauseMatch(
         serverId,
         "server.live.pause",
         pause,
+        error,
       );
 
       if (error) {
