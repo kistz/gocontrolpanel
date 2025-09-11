@@ -9,8 +9,8 @@ import {
 } from "@/types/api/hetzner/volumes";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { getApiToken, setRateLimit } from "./util";
 import { logAudit } from "../database/server-only/audit-logs";
+import { getApiToken, setRateLimit } from "./util";
 
 export async function getHetznerVolumesPaginated(
   pagination: PaginationState,
@@ -110,12 +110,10 @@ export async function createHetznerVolume(
         },
       });
 
-      await logAudit(
-        session.user.id,
-        projectId,
-        "hetzner.volume.create",
+      await logAudit(session.user.id, projectId, "hetzner.volume.create", {
+        id: res.data.volume.id,
         data,
-      );
+      });
 
       await setRateLimit(projectId, res);
 

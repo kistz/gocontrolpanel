@@ -61,7 +61,7 @@ export async function downloadMappack(
           session.user.id,
           serverId,
           "server.tmx.mappack.download",
-          mappackId,
+          { mappackId, mappackName },
           "File manager is not healthy",
         );
         throw new Error("File manager is not healthy");
@@ -77,7 +77,7 @@ export async function downloadMappack(
           session.user.id,
           serverId,
           "server.tmx.mappack.download",
-          mappackId,
+          { mappackId, mappackName },
           "Cannot download mappack with more than 100 maps",
         );
         throw new Error("Cannot download mappack with more than 100 maps");
@@ -112,7 +112,7 @@ export async function downloadMappack(
           session.user.id,
           serverId,
           "server.tmx.mappack.download",
-          mappackId,
+          { mappackId, mappackName },
           error,
         );
         throw new Error(error);
@@ -122,7 +122,7 @@ export async function downloadMappack(
         session.user.id,
         serverId,
         "server.tmx.mappack.download",
-        mappackId,
+        { mappackId, mappackName },
         errors > 0 ? `Failed to download ${errors} maps` : undefined,
       );
 
@@ -162,7 +162,7 @@ export async function addMappackToServer(
           session.user.id,
           serverId,
           "server.tmx.mappack.add",
-          mappackId,
+          { mappackId, mappackName },
           error,
         );
         throw new Error(error);
@@ -186,7 +186,7 @@ export async function addMappackToServer(
         session.user.id,
         serverId,
         "server.tmx.mappack.add",
-        mappackId,
+        { mappackId, mappackName },
         errors > 0 ? `Failed to add ${errors} maps` : undefined,
       );
 

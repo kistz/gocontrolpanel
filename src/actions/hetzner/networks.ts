@@ -115,12 +115,10 @@ export async function createHetznerNetwork(
         },
       });
 
-      await logAudit(
-        session.user.id,
-        projectId,
-        "hetzner.network.create",
+      await logAudit(session.user.id, projectId, "hetzner.network.create", {
+        id: res.data.network.id,
         data,
-      );
+      });
 
       await setRateLimit(projectId, res);
 
@@ -195,12 +193,10 @@ export async function addSubnetToNetwork(
         },
       );
 
-      await logAudit(
-        session.user.id,
-        projectId,
-        "hetzner.network.subnet.add",
+      await logAudit(session.user.id, projectId, "hetzner.network.subnet.add", {
         networkId,
-      );
+        data,
+      });
 
       await setRateLimit(projectId, res);
     },
@@ -231,7 +227,7 @@ export async function removeSubnetFromNetwork(
         session.user.id,
         projectId,
         "hetzner.network.subnet.remove",
-        networkId,
+        { networkId, data },
       );
 
       await setRateLimit(projectId, res);
