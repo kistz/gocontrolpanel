@@ -64,9 +64,9 @@ export default function AuditLogDetailsModal({
         {data.error && (
           <div className="flex flex-col gap-2">
             <h4 className="text-muted-foreground">Error</h4>
-            <pre className="whitespace-pre-wrap wrap-break-word">
+            <span className="truncate">
               {data.error}
-            </pre>
+            </span>
           </div>
         )}
       </div>
