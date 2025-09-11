@@ -68,8 +68,8 @@ export async function banPlayer(
       const client = await getGbxClient(serverId);
       await client.call("Ban", login, reason);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.banlist.add",
         { login, reason }
       );
@@ -92,8 +92,8 @@ export async function unbanPlayer(
       const client = await getGbxClient(serverId);
       await client.call("UnBan", login);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.banlist.remove",
         login
       );
@@ -154,8 +154,8 @@ export async function cleanBanList(serverId: string): Promise<ServerResponse> {
       const client = await getGbxClient(serverId);
       await client.call("CleanBanList");
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.banlist.clear"
       );
     },
@@ -177,8 +177,8 @@ export async function blacklistPlayer(
       const client = await getGbxClient(serverId);
       await client.call("BlackList", login);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.blacklist.add",
         login
       );
@@ -201,8 +201,8 @@ export async function unblacklistPlayer(
       const client = await getGbxClient(serverId);
       await client.call("UnBlackList", login);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.blacklist.remove",
         login
       );
@@ -266,8 +266,8 @@ export async function loadBlacklist(
       const client = await getGbxClient(serverId);
       await client.call("LoadBlackList", filename);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.blacklist.load",
         filename,
       );
@@ -290,8 +290,8 @@ export async function saveBlacklist(
       const client = await getGbxClient(serverId);
       await client.call("SaveBlackList", filename);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.blacklist.save",
         filename,
       );
@@ -313,8 +313,8 @@ export async function cleanBlacklist(
       const client = await getGbxClient(serverId);
       await client.call("CleanBlackList");
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.blacklist.clear"
       );
     },
@@ -336,8 +336,8 @@ export async function addGuest(
       const client = await getGbxClient(serverId);
       await client.call("AddGuest", login);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.guestlist.add",
         login
       );
@@ -360,8 +360,8 @@ export async function removeGuest(
       const client = await getGbxClient(serverId);
       await client.call("RemoveGuest", login);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.guestlist.remove",
         login
       );
@@ -425,8 +425,8 @@ export async function loadGuestlist(
       const client = await getGbxClient(serverId);
       await client.call("LoadGuestList", filename);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.guestlist.load",
         filename,
       );
@@ -449,8 +449,8 @@ export async function saveGuestlist(
       const client = await getGbxClient(serverId);
       await client.call("SaveGuestList", filename);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.guestlist.save",
         filename,
       );
@@ -472,8 +472,8 @@ export async function cleanGuestlist(
       const client = await getGbxClient(serverId);
       await client.call("CleanGuestList");
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.guestlist.clear"
       );
     },
@@ -496,8 +496,8 @@ export async function kickPlayer(
       const client = await getGbxClient(serverId);
       await client.call("Kick", login, reason);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.kick",
         { login, reason }
       );
@@ -522,8 +522,8 @@ export async function forceSpectator(
       const client = await getGbxClient(serverId);
       await client.call("ForceSpectator", login, status);
       await logAudit(
-        serverId,
         session.user.id,
+        serverId,
         "server.players.spectator.set",
         { login, status }
       );

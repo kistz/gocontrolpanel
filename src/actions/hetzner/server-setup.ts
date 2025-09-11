@@ -29,12 +29,13 @@ export async function createAdvancedServerSetup(
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
     async (session) => {
-      const la = (error?: string) =>
+      const la = (error?: string, id?: number) =>
         logAudit(
           session.user.id,
           projectId,
           "hetzner.server.create.advanced",
           {
+            id,
             server: {
               ...data.server,
               dediPassword: "*****",
@@ -246,7 +247,7 @@ export async function createAdvancedServerSetup(
         privateKey: keys.privateKey,
       });
 
-      la();
+      la(undefined, res.data.server.id);
 
       const cachedServer: HetznerServerCache = {
         id: res.data.server.id,
@@ -267,7 +268,7 @@ export async function createAdvancedServerSetup(
 
       if (server.controller && !database?.local) {
         if (!networkId) {
-          la("Network must be created or selected for controller servers.");
+          la("Network must be created or selected for controller servers.", serverId);
           throw new Error(
             "Network must be created or selected for controller servers.",
           );
@@ -282,7 +283,7 @@ export async function createAdvancedServerSetup(
         );
 
         if (serverError) {
-          la(serverError);
+          la(serverError, serverId);
           throw new Error(serverError);
         }
       }
@@ -299,12 +300,13 @@ export async function createSimpleServerSetup(
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
     async (session) => {
-      const la = (error?: string) =>
+      const la = (error?: string, id?: number) =>
         logAudit(
           session.user.id,
           projectId,
           "hetzner.server.create.simple",
           {
+            id,
             server: {
               ...data.server,
               dediPassword: "*****",
@@ -456,7 +458,7 @@ export async function createSimpleServerSetup(
         privateKey: keys.privateKey,
       });
 
-      la();
+      la(undefined, res.data.server.id);
 
       const cachedServer: HetznerServerCache = {
         id: res.data.server.id,
@@ -487,7 +489,7 @@ export async function createSimpleServerSetup(
           );
 
           if (dbError) {
-            la(dbError);
+            la(dbError, serverId);
             throw new Error(dbError);
           }
         }
@@ -501,7 +503,7 @@ export async function createSimpleServerSetup(
         );
 
         if (serverError) {
-          la(serverError);
+          la(serverError, serverId);
           throw new Error(serverError);
         }
       }

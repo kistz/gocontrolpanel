@@ -269,6 +269,7 @@ export async function createHetznerDatabase(
         projectId,
         "hetzner.server.create.database",
         {
+          id: res.data.server.id,
           ...data,
           databaseRootPassword: data.databaseRootPassword ? "*****" : undefined,
           databasePassword: data.databasePassword ? "*****" : undefined,
@@ -310,7 +311,7 @@ export async function attachHetznerServerToNetwork(
       await logAudit(
         session.user.id,
         projectId,
-        "hetzner.server.attach_to_network",
+        "hetzner.server.network.attach",
         { serverId, data },
       );
 
@@ -342,7 +343,7 @@ export async function detachHetznerServerFromNetwork(
       await logAudit(
         session.user.id,
         projectId,
-        "hetzner.server.detach_from_network",
+        "hetzner.server.network.detach",
         { serverId, network },
       );
 
