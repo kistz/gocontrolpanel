@@ -66,7 +66,7 @@ export async function renderInterface(
         session.user.id,
         interfaceData.serverId,
         "server.interface.render",
-        { interfaceData },
+        interfaceData,
       );
     },
   );
