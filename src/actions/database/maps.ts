@@ -69,7 +69,7 @@ export async function getMapList(
   serverId: string,
   count?: number,
   start: number = 0,
-): Promise<ServerResponse<Maps[]>> {
+): Promise<ServerResponse<(Maps & { path: string })[]>> {
   return doServerActionWithAuth(
     [
       `servers:${serverId}:member`,
@@ -184,9 +184,14 @@ export async function getMapList(
       const orderedMaps = allMapList
         .map((map) => {
           const foundMap = existingMaps.find((m) => m.uid === map.UId);
-          return foundMap ? foundMap : null;
+          return foundMap
+            ? {
+                ...foundMap,
+                path: map.FileName,
+              }
+            : null;
         })
-        .filter((map: Maps | null): map is Maps => map !== null);
+        .filter((map) => map !== null);
 
       return orderedMaps;
     },
