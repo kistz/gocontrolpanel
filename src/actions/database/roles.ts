@@ -99,7 +99,7 @@ export async function updateRole(
       },
     });
 
-    await logAudit(session.user.id, roleId, "role.update", role);
+    await logAudit(session.user.id, roleId, "role.edit", role);
 
     return updatedRole;
   });

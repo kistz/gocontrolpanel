@@ -176,7 +176,7 @@ export async function updateGroup(
         include: groupUsersServersSchema,
       });
 
-      await logAudit(session.user.id, groupId, "group.update", group);
+      await logAudit(session.user.id, groupId, "group.edit", group);
 
       return updatedGroup;
     },

@@ -149,7 +149,7 @@ export async function createServer(
   >,
   recentlyCreatedProjectId?: string,
 ): Promise<ServerResponse<ServersWithUsers>> {
-  return doServerActionWithAuth(["servers:create"], async () => {
+  return doServerActionWithAuth(["servers:create"], async (session) => {
     const db = getClient();
 
     const { userServers, ...serverData } = server;
@@ -165,6 +165,8 @@ export async function createServer(
       },
       include: serversUsersSchema,
     });
+
+    await logAudit(session.user.id, newServer.id, "server.create", server);
 
     if (recentlyCreatedProjectId) {
       const client = await getRedisClient();
@@ -207,7 +209,7 @@ export async function updateServer(
 ): Promise<ServerResponse<ServersWithUsers>> {
   return doServerActionWithAuth(
     ["servers:edit", `servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
 
       // Get the original server data before the update
@@ -259,6 +261,8 @@ export async function updateServer(
           scalarFields.filemanagerPassword,
         );
       }
+
+      await logAudit(session.user.id, serverId, "server.edit", server);
 
       return updatedServer;
     },
@@ -343,13 +347,15 @@ export async function updateServerChatConfig(
 export async function deleteServer(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["servers:delete", `servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
       await db.servers.update({
         where: { id: serverId },
         data: { deletedAt: new Date() },
       });
       await deleteGbxClientManager(serverId);
+
+      await logAudit(session.user.id, serverId, "server.delete");
     },
   );
 }

@@ -144,7 +144,7 @@ export async function updateUser(
       },
     });
 
-    await logAudit(session.user.id, userId, "user.update", data);
+    await logAudit(session.user.id, userId, "user.edit", data);
   });
 }
 
