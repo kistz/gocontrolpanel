@@ -27,6 +27,7 @@ import {
   createDBHetznerServer,
   deleteDBHetznerServer,
 } from "../database/hetzner-servers";
+import { logAudit } from "../database/server-only/audit-logs";
 import { createHetznerSSHKey } from "./ssh-keys";
 import { getApiToken, getHetznerServers, setRateLimit } from "./util";
 
@@ -95,7 +96,7 @@ export async function deleteHetznerServer(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:delete", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const res = await axiosHetzner.delete(`/servers/${serverId}`, {
@@ -105,6 +106,13 @@ export async function deleteHetznerServer(
       });
 
       await deleteDBHetznerServer(serverId);
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.server.delete",
+        serverId,
+      );
 
       const client = await getRedisClient();
       const key = getKeyHetznerRecentlyCreatedServers(projectId);
@@ -205,7 +213,7 @@ export async function createHetznerDatabase(
 ): Promise<ServerResponse<HetznerServer>> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const dbData = {
@@ -255,6 +263,19 @@ export async function createHetznerDatabase(
         publicKey: keys.publicKey,
         privateKey: keys.privateKey,
       });
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.server.create.database",
+        {
+          id: res.data.server.id,
+          ...data,
+          databaseRootPassword: data.databaseRootPassword ? "*****" : undefined,
+          databasePassword: data.databasePassword ? "*****" : undefined,
+        },
+      );
+
       await setRateLimit(projectId, res);
 
       return res.data.server;
@@ -269,7 +290,7 @@ export async function attachHetznerServerToNetwork(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const body = {
@@ -287,6 +308,13 @@ export async function attachHetznerServerToNetwork(
         },
       );
 
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.server.network.attach",
+        { serverId, data },
+      );
+
       await setRateLimit(projectId, res);
     },
   );
@@ -299,7 +327,7 @@ export async function detachHetznerServerFromNetwork(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const res = await axiosHetzner.post(
@@ -310,6 +338,13 @@ export async function detachHetznerServerFromNetwork(
             Authorization: `Bearer ${token}`,
           },
         },
+      );
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.server.network.detach",
+        { serverId, network },
       );
 
       await setRateLimit(projectId, res);

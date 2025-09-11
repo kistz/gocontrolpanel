@@ -7,7 +7,11 @@ import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
 import { GbxClient } from "@evotm/gbxclient";
 import "server-only";
-import { createMap, getMapByUid, syncPlayers } from "../database/gbx";
+import {
+  createMap,
+  getMapByUid,
+  syncPlayers,
+} from "../database/server-only/gbx";
 
 export async function syncPlayerList(manager: GbxClientManager) {
   const playerList = await manager.client.call("GetPlayerList", 1000, 0);

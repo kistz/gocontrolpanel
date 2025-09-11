@@ -1,4 +1,4 @@
-import { ServerPluginsWithPlugin } from "@/actions/database/gbx";
+import { ServerPluginsWithPlugin } from "@/actions/database/server-only/gbx";
 import { LiveInfo } from "./live";
 import { PlayerInfo } from "./player";
 

@@ -5,6 +5,7 @@ import { getClient } from "@/lib/dbclient";
 import { Prisma } from "@/lib/prisma/generated";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "./server-only/audit-logs";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editGroup = Prisma.validator<Prisma.GroupsInclude>()({
@@ -113,7 +114,7 @@ export async function getGroupsPaginated(
 export async function createGroup(
   group: Omit<EditGroups, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<ServerResponse<GroupsWithUsersWithServers>> {
-  return doServerActionWithAuth(["groups:create"], async () => {
+  return doServerActionWithAuth(["groups:create"], async (session) => {
     const db = getClient();
 
     const { groupMembers, groupServers, ...groupData } = group;
@@ -135,6 +136,8 @@ export async function createGroup(
       include: groupUsersServersSchema,
     });
 
+    await logAudit(session.user.id, newGroup.id, "group.create", group);
+
     return newGroup;
   });
 }
@@ -147,7 +150,7 @@ export async function updateGroup(
 ): Promise<ServerResponse<GroupsWithUsersWithServers>> {
   return doServerActionWithAuth(
     ["groups:edit", `groups:${groupId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
 
       const { groupMembers, groupServers, ...scalarFields } = group;
@@ -173,6 +176,8 @@ export async function updateGroup(
         include: groupUsersServersSchema,
       });
 
+      await logAudit(session.user.id, groupId, "group.edit", group);
+
       return updatedGroup;
     },
   );
@@ -181,7 +186,7 @@ export async function updateGroup(
 export async function deleteGroup(groupId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["groups:delete", `groups:${groupId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
       await db.groups.update({
         where: { id: groupId },
@@ -189,6 +194,8 @@ export async function deleteGroup(groupId: string): Promise<ServerResponse> {
           deletedAt: new Date(),
         },
       });
+
+      await logAudit(session.user.id, groupId, "group.delete");
     },
   );
 }

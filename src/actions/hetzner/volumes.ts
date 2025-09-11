@@ -9,6 +9,7 @@ import {
 } from "@/types/api/hetzner/volumes";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "../database/server-only/audit-logs";
 import { getApiToken, setRateLimit } from "./util";
 
 export async function getHetznerVolumesPaginated(
@@ -64,7 +65,7 @@ export async function deleteHetznerVolume(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:delete", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const res = await axiosHetzner.delete(`/volumes/${volumeId}`, {
@@ -72,6 +73,13 @@ export async function deleteHetznerVolume(
           Authorization: `Bearer ${token}`,
         },
       });
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.volume.delete",
+        volumeId,
+      );
 
       await setRateLimit(projectId, res);
     },
@@ -84,7 +92,7 @@ export async function createHetznerVolume(
 ): Promise<ServerResponse<HetznerVolume>> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const body = {
@@ -100,6 +108,11 @@ export async function createHetznerVolume(
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      });
+
+      await logAudit(session.user.id, projectId, "hetzner.volume.create", {
+        id: res.data.volume.id,
+        data,
       });
 
       await setRateLimit(projectId, res);

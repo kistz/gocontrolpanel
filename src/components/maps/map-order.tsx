@@ -20,20 +20,22 @@ export default function MapOrder({
   mapList,
   serverId,
 }: {
-  mapList: Maps[];
+  mapList: (Maps & { path: string })[];
   serverId: string;
 }) {
   const isMobile = useIsMobile();
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  const [defaultMapList, setDefaultMapList] = useState<Maps[]>(mapList);
-  const [mapOrder, setMapOrder] = useState<Maps[]>(defaultMapList);
+  const [defaultMapList, setDefaultMapList] =
+    useState<(Maps & { path: string })[]>(mapList);
+  const [mapOrder, setMapOrder] =
+    useState<(Maps & { path: string })[]>(defaultMapList);
 
   async function saveMapOrder() {
     try {
       const files = getDivergingList(defaultMapList, mapOrder, "uid")[1].map(
-        (map) => map.fileName,
+        (map) => map.path,
       );
 
       if (!files.length || files.length == 0) return;
@@ -71,7 +73,7 @@ export default function MapOrder({
   async function removeAllMaps() {
     try {
       const filesToRemove = mapOrder
-        .map((m) => m.fileName)
+        .map((m) => m.path)
         .splice(0, mapOrder.length - 1);
 
       const { error } = await removeMapList(serverId, filesToRemove);

@@ -342,6 +342,8 @@ The **GoControlPanel** supports a permission system that allows you to manage us
 - hetzner:servers:view
 - hetzner:servers:create
 - hetzner:servers:delete
+- audit-logs:view
+- audit-logs:delete
 
 ---
 

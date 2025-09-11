@@ -292,6 +292,8 @@ export const permissions: string[] = [
   "hetzner:servers:view",
   "hetzner:servers:create",
   "hetzner:servers:delete",
+  "audit-logs:view",
+  "audit-logs:delete",
 ] as const;
 
 export function hasPermissionSync(

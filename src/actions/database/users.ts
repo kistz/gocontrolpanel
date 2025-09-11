@@ -11,6 +11,7 @@ import {
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
 import slugid from "slugid";
+import { logAudit } from "./server-only/audit-logs";
 
 export type UserMinimal = Pick<Users, "id" | "login" | "nickName">;
 
@@ -132,7 +133,7 @@ export async function updateUser(
     | "deletedAt"
   >,
 ): Promise<ServerResponse> {
-  return doServerActionWithAuth(["users:edit"], async () => {
+  return doServerActionWithAuth(["users:edit"], async (session) => {
     const db = getClient();
 
     await db.users.update({
@@ -142,12 +143,21 @@ export async function updateUser(
         permissions: getList<string>(data.permissions),
       },
     });
+
+    await logAudit(session.user.id, userId, "user.edit", data);
   });
 }
 
 export async function deleteUserById(userId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(["users:delete"], async (session) => {
     if (userId === session.user.id) {
+      await logAudit(
+        session.user.id,
+        userId,
+        "user.delete",
+        undefined,
+        "Cannot delete your own account",
+      );
       throw new ServerError("Cannot delete your own account");
     }
 
@@ -155,6 +165,8 @@ export async function deleteUserById(userId: string): Promise<ServerResponse> {
     await db.users.delete({
       where: { id: userId },
     });
+
+    await logAudit(session.user.id, userId, "user.delete");
   });
 }
 

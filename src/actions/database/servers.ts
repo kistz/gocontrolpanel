@@ -9,9 +9,11 @@ import {
   getKeyHetznerRecentlyCreatedServers,
   getRedisClient,
 } from "@/lib/redis";
+import { getErrorMessage } from "@/lib/utils";
 import { HetznerServerCache } from "@/types/api/hetzner/servers";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "./server-only/audit-logs";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editServer = Prisma.validator<Prisma.ServersInclude>()({
@@ -147,7 +149,7 @@ export async function createServer(
   >,
   recentlyCreatedProjectId?: string,
 ): Promise<ServerResponse<ServersWithUsers>> {
-  return doServerActionWithAuth(["servers:create"], async () => {
+  return doServerActionWithAuth(["servers:create"], async (session) => {
     const db = getClient();
 
     const { userServers, ...serverData } = server;
@@ -163,6 +165,8 @@ export async function createServer(
       },
       include: serversUsersSchema,
     });
+
+    await logAudit(session.user.id, newServer.id, "server.create", server);
 
     if (recentlyCreatedProjectId) {
       const client = await getRedisClient();
@@ -205,7 +209,7 @@ export async function updateServer(
 ): Promise<ServerResponse<ServersWithUsers>> {
   return doServerActionWithAuth(
     ["servers:edit", `servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
 
       // Get the original server data before the update
@@ -258,6 +262,8 @@ export async function updateServer(
         );
       }
 
+      await logAudit(session.user.id, serverId, "server.edit", server);
+
       return updatedServer;
     },
   );
@@ -298,45 +304,58 @@ export async function updateServerChatConfig(
     "manualRouting" | "messageFormat" | "connectMessage" | "disconnectMessage"
   >,
 ): Promise<ServerResponse<Servers>> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const manager = await getGbxClientManager(serverId);
-    let err;
-    try {
-      await manager.client.call(
-        "ChatEnableManualRouting",
-        chatConfig.manualRouting,
+  return doServerActionWithAuth(
+    [`servers:${serverId}:admin`, `group:servers:${serverId}:admin`],
+    async (session) => {
+      const manager = await getGbxClientManager(serverId);
+      let err;
+      try {
+        await manager.client.call(
+          "ChatEnableManualRouting",
+          chatConfig.manualRouting,
+        );
+      } catch (e) {
+        err = e;
+        chatConfig.manualRouting = false;
+      }
+
+      const db = getClient();
+      const updatedServer = await db.servers.update({
+        where: { id: serverId },
+        data: { ...chatConfig },
+      });
+
+      manager.info.chat = chatConfig;
+
+      await logAudit(
+        session.user.id,
+        serverId,
+        "server.interface.chat.edit",
+        chatConfig,
+        err ? getErrorMessage(err) : undefined,
       );
-    } catch (e) {
-      err = e;
-      chatConfig.manualRouting = false;
-    }
 
-    const db = getClient();
-    const updatedServer = await db.servers.update({
-      where: { id: serverId },
-      data: { ...chatConfig },
-    });
+      if (err) {
+        throw err;
+      }
 
-    manager.info.chat = chatConfig;
-
-    if (err) {
-      throw err;
-    }
-
-    return updatedServer;
-  });
+      return updatedServer;
+    },
+  );
 }
 
 export async function deleteServer(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["servers:delete", `servers:${serverId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
       await db.servers.update({
         where: { id: serverId },
         data: { deletedAt: new Date() },
       });
       await deleteGbxClientManager(serverId);
+
+      await logAudit(session.user.id, serverId, "server.delete");
     },
   );
 }

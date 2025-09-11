@@ -91,7 +91,7 @@ export const createColumns = (serverId: string): ColumnDef<LocalMapInfo>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleAddMap}>
-                Add Map
+                Add map
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
