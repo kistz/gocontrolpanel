@@ -82,6 +82,7 @@ export const createColumns = (
       const canDelete = hasPermissionSync(
         session,
         routePermissions.admin.auditLogs.delete,
+        auditLog.targetId,
       );
 
       const handleDelete = () => {
