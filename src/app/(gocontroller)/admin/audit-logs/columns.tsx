@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
+
 import {
-  deleteMatch,
-  MatchesWithMapAndRecords,
-} from "@/actions/database/matches";
+  AuditLogsWithUsers,
+  deleteAuditLogById,
+} from "@/actions/database/audit-logs";
+import BooleanDisplay from "@/components/boolean-display";
+import AuditLogDetailsModal from "@/components/modals/audit-logs/audit-log-details";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import Modal from "@/components/modals/modal";
-import MatchDetailsModal from "@/components/modals/records/match-details";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,37 +27,32 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { parseTmTags } from "tmtags";
 
-export const createMatchesColumns = (
+export const createColumns = (
   refetch: () => void,
-): ColumnDef<MatchesWithMapAndRecords>[] => [
+): ColumnDef<AuditLogsWithUsers>[] => [
   {
-    accessorKey: "map.name",
+    accessorKey: "action",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Map"} />
+      <DataTableColumnHeader column={column} title={"Action"} />
+    ),
+  },
+  {
+    accessorKey: "user.nickName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"User"} />
     ),
     cell: ({ row }) => (
       <span
-        className="truncate"
         dangerouslySetInnerHTML={{
-          __html: parseTmTags(row.original.map.name),
+          __html: parseTmTags(row.original.user?.nickName || "Unknown"),
         }}
       />
     ),
   },
   {
-    accessorKey: "mode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Mode"} />
-    ),
-  },
-  {
-    accessorKey: "_count.records",
-    header: () => <span>Records</span>,
-  },
-  {
     accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Created At"} />
+      <DataTableColumnHeader column={column} title={"Timestamp"} />
     ),
     cell: ({ row }) => {
       const date = row.original.createdAt;
@@ -67,36 +64,43 @@ export const createMatchesColumns = (
     },
   },
   {
+    accessorKey: "error",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Error"} />
+    ),
+    cell: ({ row }) => <BooleanDisplay value={!!row.original.error} />,
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
-      const match = row.original;
+      const auditLog = row.original;
       const { data: session } = useSession();
       const [_, startTransition] = useTransition();
       const [isOpen, setIsOpen] = useState(false);
       const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-      const canActions = hasPermissionSync(
+      const canDelete = hasPermissionSync(
         session,
-        routePermissions.servers.records.actions,
-        match.serverId,
+        routePermissions.admin.auditLogs.delete,
+        auditLog.targetId,
       );
 
       const handleDelete = () => {
-        if (!canActions) {
-          toast.error("You do not have permission to delete this match");
+        if (!canDelete) {
+          toast.error("You do not have permission to delete this log.");
           return;
         }
 
         startTransition(async () => {
           try {
-            const { error } = await deleteMatch(match.serverId, match.id);
+            const { error } = await deleteAuditLogById(auditLog.id);
             if (error) {
               throw new Error(error);
             }
             refetch();
-            toast.success("Match successfully deleted");
+            toast.success("Log successfully deleted");
           } catch (error) {
-            toast.error("Error deleting match", {
+            toast.error("Error deleting log", {
               description: getErrorMessage(error),
             });
           }
@@ -114,36 +118,36 @@ export const createMatchesColumns = (
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                View details
+                View log
               </DropdownMenuItem>
-              {canActions && (
+              {canDelete && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setIsDeleteOpen(true)}
                   >
-                    Delete match
+                    Delete log
                   </DropdownMenuItem>
                 </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {canActions && (
+          {canDelete && (
             <ConfirmModal
               isOpen={isDeleteOpen}
               onClose={() => setIsDeleteOpen(false)}
-              title="Delete Match"
-              description="Are you sure you want to delete this match?"
               onConfirm={handleDelete}
+              title="Delete log"
+              description={`Are you sure you want to delete this log?`}
               confirmText="Delete"
               cancelText="Cancel"
             />
           )}
 
           <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-            <MatchDetailsModal data={match} />
+            <AuditLogDetailsModal data={auditLog} />
           </Modal>
         </div>
       );

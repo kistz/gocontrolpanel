@@ -12,7 +12,7 @@ import {
   ServerResponse,
 } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
-import { checkAndUpdateMapsInfoIfNeeded } from "./gbx";
+import { checkAndUpdateMapsInfoIfNeeded } from "./server-only/gbx";
 
 const mapsRecordsSchema = (serverId?: string) =>
   Prisma.validator<Prisma.MapsInclude>()({
@@ -264,7 +264,12 @@ export async function getMapsByUids(
   uids: string[],
 ): Promise<ServerResponse<Maps[]>> {
   return doServerActionWithAuth(
-    ["servers::moderator", "servers::admin"],
+    [
+      "servers::moderator",
+      "servers::admin",
+      "group:servers::moderator",
+      "group:servers::admin",
+    ],
     async () => {
       const db = getClient();
 

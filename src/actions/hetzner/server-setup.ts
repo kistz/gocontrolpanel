@@ -12,6 +12,7 @@ import { generateRandomString, sleep } from "@/lib/utils";
 import { HetznerServer, HetznerServerCache } from "@/types/api/hetzner/servers";
 import { ServerResponse } from "@/types/responses";
 import { createDBHetznerServer } from "../database/hetzner-servers";
+import { logAudit } from "../database/server-only/audit-logs";
 import { createHetznerNetwork } from "./networks";
 import {
   attachHetznerServerToNetwork,
@@ -27,7 +28,46 @@ export async function createAdvancedServerSetup(
 ): Promise<ServerResponse<HetznerServer>> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
+      const la = (error?: string) =>
+        logAudit(
+          session.user.id,
+          projectId,
+          "hetzner.server.create.advanced",
+          {
+            server: {
+              ...data.server,
+              dediPassword: "*****",
+              superAdminPassword: data.server.superAdminPassword
+                ? "*****"
+                : undefined,
+              adminPassword: data.server.adminPassword ? "*****" : undefined,
+              userPassword: data.server.userPassword ? "*****" : undefined,
+              filemanagerPassword: data.server.filemanagerPassword
+                ? "*****"
+                : undefined,
+            },
+            serverController: {
+              ...data.serverController,
+              secret:
+                data.serverController && "secret" in data.serverController
+                  ? "*****"
+                  : undefined,
+            },
+            database: {
+              ...data.database,
+              databaseRootPassword: data.database?.databaseRootPassword
+                ? "*****"
+                : undefined,
+              databasePassword: data.database?.databasePassword
+                ? "*****"
+                : undefined,
+            },
+            network: data.network,
+          },
+          error,
+        );
+
       if (data.database?.new) {
         data.database = {
           ...data.database,
@@ -51,6 +91,7 @@ export async function createAdvancedServerSetup(
       if (server.controller && network?.new && !database?.local) {
         const { data, error } = await createHetznerNetwork(projectId, network);
         if (error) {
+          la(error);
           throw new Error(error);
         }
         networkId = data.id;
@@ -59,6 +100,7 @@ export async function createAdvancedServerSetup(
       }
 
       if (!networkId && server.controller && !database?.local) {
+        la("Network must be created or selected if the database is not local.");
         throw new Error(
           "Network must be created or selected if the database is not local.",
         );
@@ -68,6 +110,7 @@ export async function createAdvancedServerSetup(
       let createdDatabase: HetznerServer | undefined = undefined;
       if (server.controller && database?.new && !database.local) {
         if (!database.name || !database.serverType || !database.location) {
+          la("Database name, server type and location is required for new databases.");
           throw new Error(
             "Database name, server type and location is required for new databases.",
           );
@@ -81,6 +124,7 @@ export async function createAdvancedServerSetup(
           networkId,
         });
         if (error) {
+          la(error);
           throw new Error(error);
         }
         createdDatabase = data;
@@ -90,6 +134,7 @@ export async function createAdvancedServerSetup(
 
         if (!network?.databaseInNetwork) {
           if (!networkId) {
+            la("Network must be selected for existing databases.");
             throw new Error("Network must be selected for existing databases.");
           }
 
@@ -126,6 +171,7 @@ export async function createAdvancedServerSetup(
           }
 
           if (dbError) {
+            la(dbError);
             throw new Error(dbError);
           }
         }
@@ -200,6 +246,8 @@ export async function createAdvancedServerSetup(
         privateKey: keys.privateKey,
       });
 
+      la();
+
       const cachedServer: HetznerServerCache = {
         id: res.data.server.id,
         projectId,
@@ -219,6 +267,7 @@ export async function createAdvancedServerSetup(
 
       if (server.controller && !database?.local) {
         if (!networkId) {
+          la("Network must be created or selected for controller servers.");
           throw new Error(
             "Network must be created or selected for controller servers.",
           );
@@ -233,6 +282,7 @@ export async function createAdvancedServerSetup(
         );
 
         if (serverError) {
+          la(serverError);
           throw new Error(serverError);
         }
       }
@@ -248,7 +298,37 @@ export async function createSimpleServerSetup(
 ): Promise<ServerResponse<HetznerServer>> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
+      const la = (error?: string) =>
+        logAudit(
+          session.user.id,
+          projectId,
+          "hetzner.server.create.simple",
+          {
+            server: {
+              ...data.server,
+              dediPassword: "*****",
+            },
+            serverController: {
+              ...data.serverController,
+              secret:
+                data.serverController && "secret" in data.serverController
+                  ? "*****"
+                  : undefined,
+            },
+            database: {
+              ...data.database,
+              databaseRootPassword: data.database?.databaseRootPassword
+                ? "*****"
+                : undefined,
+              databasePassword: data.database?.databasePassword
+                ? "*****"
+                : undefined,
+            },
+          },
+          error,
+        );
+
       if (data.database?.new) {
         data.database = {
           ...data.database,
@@ -281,6 +361,7 @@ export async function createSimpleServerSetup(
           ],
         });
         if (error) {
+          la(error);
           throw new Error(error);
         }
         networkId = data.id;
@@ -291,6 +372,7 @@ export async function createSimpleServerSetup(
       let databaseId: number | undefined = undefined;
       if (server.controller && database?.new && !database?.local) {
         if (!database.name || !database.serverType) {
+          la("Database name and server type is required for new databases.");
           throw new Error(
             "Database name and server type is required for new databases.",
           );
@@ -304,6 +386,7 @@ export async function createSimpleServerSetup(
           location: server.location,
         });
         if (error) {
+          la(error);
           throw new Error(error);
         }
         databaseId = data.id;
@@ -373,6 +456,8 @@ export async function createSimpleServerSetup(
         privateKey: keys.privateKey,
       });
 
+      la();
+
       const cachedServer: HetznerServerCache = {
         id: res.data.server.id,
         projectId,
@@ -402,6 +487,7 @@ export async function createSimpleServerSetup(
           );
 
           if (dbError) {
+            la(dbError);
             throw new Error(dbError);
           }
         }
@@ -415,6 +501,7 @@ export async function createSimpleServerSetup(
         );
 
         if (serverError) {
+          la(serverError);
           throw new Error(serverError);
         }
       }

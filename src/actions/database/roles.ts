@@ -6,6 +6,7 @@ import { Prisma, Roles } from "@/lib/prisma/generated";
 import { getList } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "./server-only/audit-logs";
 
 export type RoleMinimal = Pick<Roles, "id" | "name" | "permissions">;
 
@@ -67,7 +68,7 @@ export async function getRolesPaginated(
 export async function createRole(
   role: Omit<Roles, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<ServerResponse<Roles>> {
-  return doServerActionWithAuth(["roles:create"], async () => {
+  return doServerActionWithAuth(["roles:create"], async (session) => {
     const db = getClient();
 
     const newRole = await db.roles.create({
@@ -77,6 +78,8 @@ export async function createRole(
       },
     });
 
+    await logAudit(session.user.id, newRole.id, "role.create", role);
+
     return newRole;
   });
 }
@@ -85,7 +88,7 @@ export async function updateRole(
   roleId: string,
   role: Omit<Roles, "id" | "createdAt" | "updatedAt" | "deletedAt">,
 ): Promise<ServerResponse<Roles>> {
-  return doServerActionWithAuth(["roles:edit"], async () => {
+  return doServerActionWithAuth(["roles:edit"], async (session) => {
     const db = getClient();
 
     const updatedRole = await db.roles.update({
@@ -96,17 +99,21 @@ export async function updateRole(
       },
     });
 
+    await logAudit(session.user.id, roleId, "role.edit", role);
+
     return updatedRole;
   });
 }
 
 export async function deleteRole(roleId: string): Promise<ServerResponse> {
-  return doServerActionWithAuth(["roles:delete"], async () => {
+  return doServerActionWithAuth(["roles:delete"], async (session) => {
     const db = getClient();
 
     await db.roles.update({
       where: { id: roleId },
       data: { deletedAt: new Date() },
     });
+
+    await logAudit(session.user.id, roleId, "role.delete");
   });
 }

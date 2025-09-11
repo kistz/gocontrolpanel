@@ -22,29 +22,75 @@ export const routes = {
     roles: "/admin/roles",
     hetzner: "/admin/hetzner",
     hetznerServers: "/admin/hetzner/:id",
+    auditLogs: "/admin/audit-logs",
   },
   login: "/login",
 };
 
 export const routePermissions = {
   servers: {
-    settings: ["servers:id:admin"],
+    settings: ["servers:id:admin", "group:servers:id:admin"],
     game: {
-      mapActions: ["servers:id:moderator", "servers:id:admin"],
-      gameSettings: ["servers:id:moderator", "servers:id:admin"],
-      scriptSettings: ["servers:id:moderator", "servers:id:admin"],
+      mapActions: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
+      gameSettings: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
+      scriptSettings: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
     },
-    maps: ["servers:id:moderator", "servers:id:admin"],
-    players: ["servers:id:moderator", "servers:id:admin"],
+    maps: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
+    players: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
     live: {
-      actions: ["servers:id:moderator", "servers:id:admin"],
+      actions: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
     },
-    files: ["servers:id:admin"],
-    interface: ["servers:id:admin"],
-    tmx: ["servers:id:moderator", "servers:id:admin"],
-    nadeo: ["servers:id:moderator", "servers:id:admin"],
+    files: ["servers:id:admin", "group:servers:id:admin"],
+    interface: ["servers:id:admin", "group:servers:id:admin"],
+    tmx: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
+    nadeo: [
+      "servers:id:moderator",
+      "servers:id:admin",
+      "group:servers:id:moderator",
+      "group:servers:id:admin",
+    ],
     records: {
-      actions: ["servers:id:moderator", "servers:id:admin"],
+      actions: [
+        "servers:id:moderator",
+        "servers:id:admin",
+        "group:servers:id:moderator",
+        "group:servers:id:admin",
+      ],
     },
   },
   admin: {
@@ -100,6 +146,22 @@ export const routePermissions = {
         create: ["hetzner:servers:create", "hetzner:id:admin"],
         delete: ["hetzner:servers:delete", "hetzner:id:admin"],
       },
+    },
+    auditLogs: {
+      view: [
+        "audit-logs:view",
+        "servers::admin",
+        "groups::admin",
+        "group:servers::admin",
+        "hetzner::admin",
+      ],
+      delete: [
+        "audit-logs:delete",
+        "servers:id:admin",
+        "groups:id:admin",
+        "group:servers:id:admin",
+        "hetzner:id:admin",
+      ],
     },
   },
 };
@@ -307,6 +369,17 @@ export const breadCrumbs: {
       },
       {
         label: "Project",
+      },
+    ],
+  },
+  {
+    path: routes.admin.auditLogs,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "Audit Logs",
       },
     ],
   },

@@ -4,6 +4,7 @@ import { doServerActionWithAuth } from "@/lib/actions";
 import { getGbxClient } from "@/lib/gbxclient";
 import { PlayerInfo } from "@/types/player";
 import { ServerResponse } from "@/types/responses";
+import { logAudit } from "../database/server-only/audit-logs";
 
 export async function getPlayerList(
   serverId: string,
@@ -57,10 +58,21 @@ export async function banPlayer(
   reason: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("Ban", login, reason);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.banlist.add",
+        { login, reason }
+      );
     },
   );
 }
@@ -70,10 +82,21 @@ export async function unbanPlayer(
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("UnBan", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.banlist.remove",
+        login
+      );
     },
   );
 }
@@ -82,7 +105,12 @@ export async function getBanList(
   serverId: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       const banList = await client.call("GetBanList", 1000, 0);
@@ -116,10 +144,20 @@ export async function getBanList(
 
 export async function cleanBanList(serverId: string): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("CleanBanList");
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.banlist.clear"
+      );
     },
   );
 }
@@ -129,10 +167,21 @@ export async function blacklistPlayer(
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("BlackList", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.add",
+        login
+      );
     },
   );
 }
@@ -142,10 +191,21 @@ export async function unblacklistPlayer(
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("UnBlackList", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.remove",
+        login
+      );
     },
   );
 }
@@ -154,7 +214,12 @@ export async function getBlacklist(
   serverId: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       const blacklist = await client.call("GetBlackList", 1000, 0);
@@ -191,10 +256,21 @@ export async function loadBlacklist(
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("LoadBlackList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.load",
+        filename,
+      );
     },
   );
 }
@@ -204,10 +280,21 @@ export async function saveBlacklist(
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SaveBlackList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.save",
+        filename,
+      );
     },
   );
 }
@@ -216,10 +303,20 @@ export async function cleanBlacklist(
   serverId: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("CleanBlackList");
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.blacklist.clear"
+      );
     },
   );
 }
@@ -229,10 +326,21 @@ export async function addGuest(
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("AddGuest", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.add",
+        login
+      );
     },
   );
 }
@@ -242,10 +350,21 @@ export async function removeGuest(
   login: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("RemoveGuest", login);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.remove",
+        login
+      );
     },
   );
 }
@@ -254,7 +373,12 @@ export async function getGuestlist(
   serverId: string,
 ): Promise<ServerResponse<PlayerInfo[]>> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
     async () => {
       const client = await getGbxClient(serverId);
       const guestlist = await client.call("GetGuestList", 1000, 0);
@@ -291,10 +415,21 @@ export async function loadGuestlist(
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("LoadGuestList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.load",
+        filename,
+      );
     },
   );
 }
@@ -304,10 +439,21 @@ export async function saveGuestlist(
   filename: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("SaveGuestList", filename);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.save",
+        filename,
+      );
     },
   );
 }
@@ -316,10 +462,20 @@ export async function cleanGuestlist(
   serverId: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("CleanGuestList");
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.guestlist.clear"
+      );
     },
   );
 }
@@ -330,10 +486,21 @@ export async function kickPlayer(
   reason: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("Kick", login, reason);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.kick",
+        { login, reason }
+      );
     },
   );
 }
@@ -345,19 +512,21 @@ export async function forceSpectator(
   status: number,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
-    [`servers:${serverId}:moderator`, `servers:${serverId}:admin`],
-    async () => {
+    [
+      `servers:${serverId}:moderator`,
+      `servers:${serverId}:admin`,
+      `group:servers:${serverId}:moderator`,
+      `group:servers:${serverId}:admin`,
+    ],
+    async (session) => {
       const client = await getGbxClient(serverId);
       await client.call("ForceSpectator", login, status);
+      await logAudit(
+        serverId,
+        session.user.id,
+        "server.players.spectator.set",
+        { login, status }
+      );
     },
   );
-}
-
-export async function connectFakePlayer(
-  serverId: string,
-): Promise<ServerResponse> {
-  return doServerActionWithAuth([`servers:${serverId}:admin`], async () => {
-    const client = await getGbxClient(serverId);
-    await client.call("ConnectFakePlayer");
-  });
 }

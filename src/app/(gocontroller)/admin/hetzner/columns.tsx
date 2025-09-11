@@ -129,7 +129,7 @@ export const createColumns = (
                   disabled={getList(project.apiTokens).length === 0}
                   onClick={() => router.push(`/admin/hetzner/${project.id}`)}
                 >
-                  View Project
+                  View project
                 </DropdownMenuItem>
               )}
 
@@ -137,7 +137,7 @@ export const createColumns = (
                 <>
                   {canView && <DropdownMenuSeparator />}
                   <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                    Edit Project
+                    Edit project
                   </DropdownMenuItem>
                 </>
               )}
@@ -149,7 +149,7 @@ export const createColumns = (
                     variant="destructive"
                     onClick={() => setIsOpen(true)}
                   >
-                    Delete Project
+                    Delete project
                   </DropdownMenuItem>
                 </>
               )}

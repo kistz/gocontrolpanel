@@ -71,7 +71,7 @@ export const createColumns = (
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleAddMap}>
-                Add Map to Jukebox
+                Add map to jukebox
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

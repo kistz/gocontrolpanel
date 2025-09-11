@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Users } from "@/lib/prisma/generated";
-import { getErrorMessage, hasPermissionSync } from "@/lib/utils";
+import { getErrorMessage, getList, hasPermissionSync } from "@/lib/utils";
 import { routePermissions } from "@/routes";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -35,7 +35,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     cell: ({ row }) => (
       <span
         dangerouslySetInnerHTML={{
-          __html: parseTmTags(row.getValue("nickName")),
+          __html: parseTmTags(row.original.nickName),
         }}
       />
     ),
@@ -53,7 +53,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
     ),
     cell: ({ row }) => (
       <BooleanDisplay
-        value={row.getValue("admin") as boolean}
+        value={row.original.admin}
         falseIcon={IconX}
         trueIcon={IconCheck}
       />
@@ -65,7 +65,7 @@ export const createColumns = (refetch: () => void): ColumnDef<Users>[] => [
       <DataTableColumnHeader column={column} title={"Permissions"} />
     ),
     cell: ({ row }) => {
-      const permissions = row.getValue("permissions") as string[];
+      const permissions = getList<string>(row.original.permissions)
       return (
         <span className="truncate">
           {permissions.map((perm: string, index: number) => (

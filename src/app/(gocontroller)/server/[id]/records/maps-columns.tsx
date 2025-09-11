@@ -67,7 +67,7 @@ export const createMapsColumns = (): ColumnDef<MapsWithRecords>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                View Details
+                View details
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

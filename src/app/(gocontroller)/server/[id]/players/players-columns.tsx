@@ -207,10 +207,10 @@ export const createColumns = (id: string): ColumnDef<PlayerInfo>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setConfirmAddGuest(true)}>
-                Add to Guestlist
+                Add to guestlist
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setConfirmForceSpectator(true)}>
-                Force Spectator
+                Force spectator
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -235,7 +235,7 @@ export const createColumns = (id: string): ColumnDef<PlayerInfo>[] => [
                 variant="destructive"
                 onClick={() => setConfirmRemoveGuest(true)}
               >
-                Remove from Guestlist
+                Remove from guestlist
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

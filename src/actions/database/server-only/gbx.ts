@@ -8,7 +8,7 @@ import { Waypoint } from "@/types/gbx/waypoint";
 import { PlayerInfo } from "@/types/player";
 import { ServerError } from "@/types/responses";
 import "server-only";
-import { getPlayerInfo } from "../gbx/server-only";
+import { getPlayerInfo } from "../../gbx/server-only";
 
 const serversPluginsSchema = Prisma.validator<Prisma.ServerPluginsInclude>()({
   plugin: {

@@ -48,6 +48,7 @@ model Users {
   authenticated Boolean  @default(false)
 
   notifications Notifications[]
+  auditLogs     AuditLogs[]
 
   groupMembers        GroupMember[]
   hetznerProjectUsers HetznerProjectUser[]
@@ -344,4 +345,24 @@ model Matches {
   @@index([deletedAt])
   @@index([mapId])
   @@map("matches")
+}
+
+model AuditLogs {
+  id         String  @id @default(uuid())
+  userId     String?
+  action     String
+  targetType String
+  targetId   String
+  details    Json?
+  error      String?
+
+  user Users? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([targetType, targetId])
+  @@index([deletedAt])
+  @@map("audit_logs")
 }

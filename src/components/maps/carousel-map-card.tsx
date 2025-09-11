@@ -129,7 +129,10 @@ export default function CarouselMapCard({
             src={map.thumbnailUrl}
             fill
             alt={map.name}
-            className="static! rounded-t-lg h-40! object-cover"
+            className={cn(
+              "static! rounded-t-lg h-40! object-cover",
+              !canMapActions && "rounded-b-lg",
+            )}
             loading={
               isCurrent ||
               (index > currentIndex && index <= currentIndex + 5) ||
@@ -140,7 +143,12 @@ export default function CarouselMapCard({
             priority={isCurrent}
           />
         ) : (
-          <div className="w-full h-40 rounded-t-lg flex items-center justify-center">
+          <div
+            className={cn(
+              "w-full h-40 rounded-t-lg flex items-center justify-center",
+              !canMapActions && "rounded-b-lg",
+            )}
+          >
             <IconPhoto className="text-gray-500" size={48} />
           </div>
         )}
