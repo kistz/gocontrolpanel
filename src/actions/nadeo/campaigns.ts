@@ -222,7 +222,12 @@ export async function addCampaignToServer(
               new Error(`Map ${p.mapUid} does not have a valid download URL`),
             );
           }
-          return addMapToServer(serverId, p.map.fileUrl, p.map.fileName);
+          return addMapToServer(
+            serverId,
+            p.map.fileUrl,
+            p.map.fileName,
+            campaign.name,
+          );
         }),
       );
 

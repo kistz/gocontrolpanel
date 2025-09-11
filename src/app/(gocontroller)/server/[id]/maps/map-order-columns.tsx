@@ -22,7 +22,7 @@ const MapActionsCell = memo(function MapActionsCell({
   serverId,
   onRemoveMap,
 }: {
-  data: Maps;
+  data: Maps & { path: string };
   serverId?: string;
   onRemoveMap: (map: Maps) => void;
 }) {
@@ -34,7 +34,7 @@ const MapActionsCell = memo(function MapActionsCell({
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        const { error } = await removeMap(serverId, data.fileName);
+        const { error } = await removeMap(serverId, data.path);
         if (error) {
           throw new Error(error);
         }
@@ -82,7 +82,7 @@ const MapActionsCell = memo(function MapActionsCell({
 
 export const createColumns = (
   onRemoveMap: (map: Maps) => void,
-): DndListColumn<Maps>[] => [
+): DndListColumn<Maps & { path: string }>[] => [
   {
     id: "id",
     cell: () => <></>,

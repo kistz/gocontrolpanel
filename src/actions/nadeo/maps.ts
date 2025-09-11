@@ -12,6 +12,7 @@ export async function downloadMapFromUrl(
   serverId: string,
   url: string,
   fileName: string,
+  path?: string,
 ): Promise<ServerResponse<string>> {
   return doServerActionWithAuth(
     [
@@ -27,7 +28,7 @@ export async function downloadMapFromUrl(
           session.user.id,
           serverId,
           "server.nadeo.map.download",
-          { url, fileName },
+          { url, fileName, path },
           "File manager is not healthy",
         );
         throw new Error("File manager is not healthy");
@@ -39,7 +40,7 @@ export async function downloadMapFromUrl(
           session.user.id,
           serverId,
           "server.nadeo.map.download",
-          { url, fileName },
+          { url, fileName, path },
           "Failed to download map",
         );
         throw new Error("Failed to download map");
@@ -47,7 +48,7 @@ export async function downloadMapFromUrl(
 
       const formData = new FormData();
       formData.append("files", file);
-      formData.append("paths[]", `/UserData/Maps/Downloaded`);
+      formData.append("paths[]", `/UserData/Maps/Downloaded/${path}`);
 
       const { error } = await uploadFiles(serverId, formData);
 
@@ -55,7 +56,7 @@ export async function downloadMapFromUrl(
         session.user.id,
         serverId,
         "server.nadeo.map.download",
-        { url, fileName },
+        { url, fileName, path },
         error,
       );
 
@@ -72,6 +73,7 @@ export async function addMapToServer(
   serverId: string,
   url: string,
   fileName: string,
+  path?: string,
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     [
@@ -87,7 +89,7 @@ export async function addMapToServer(
           session.user.id,
           serverId,
           "server.nadeo.map.add",
-          { url, fileName },
+          { url, fileName, path },
           "File manager is not healthy",
         );
         throw new Error("File manager is not healthy");
@@ -97,6 +99,7 @@ export async function addMapToServer(
         serverId,
         url,
         fileName,
+        path,
       );
       if (error) {
         await logAudit(
@@ -111,14 +114,14 @@ export async function addMapToServer(
 
       const { error: addMapError } = await addMap(
         serverId,
-        `Downloaded/${file}`,
+        `Downloaded/${path ? path + "/" : ""}${file}`,
       );
 
       await logAudit(
         session.user.id,
         serverId,
         "server.nadeo.map.add",
-        { url, fileName },
+        { url, fileName, path },
         addMapError,
       );
 
