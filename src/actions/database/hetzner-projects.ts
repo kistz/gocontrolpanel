@@ -7,6 +7,7 @@ import { Prisma } from "@/lib/prisma/generated";
 import { getList, hasPermissionSync } from "@/lib/utils";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "./server-only/audit-logs";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const editHetznerProject = Prisma.validator<Prisma.HetznerProjectsInclude>()({
@@ -118,7 +119,7 @@ export async function createHetznerProject(
     "id" | "createdAt" | "updatedAt" | "deletedAt"
   >,
 ): Promise<ServerResponse<HetznerProjectsWithUsers>> {
-  return doServerActionWithAuth(["hetzner:create"], async () => {
+  return doServerActionWithAuth(["hetzner:create"], async (session) => {
     const db = getClient();
 
     const { hetznerProjectUsers, apiTokens, ...projectData } = hetznerProject;
@@ -138,6 +139,13 @@ export async function createHetznerProject(
       include: hetznerProjectUsersSchema,
     });
 
+    await logAudit(
+      session.user.id,
+      newProject.id,
+      "hetzner.project.create",
+      hetznerProject,
+    );
+
     return {
       ...newProject,
       apiTokens: getList<string>(newProject.apiTokens).map((token) =>
@@ -155,7 +163,7 @@ export async function updateHetznerProject(
 ): Promise<ServerResponse<HetznerProjectsWithUsers>> {
   return doServerActionWithAuth(
     ["hetzner:edit", `hetzner:${hetznerProjectId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
 
       const { hetznerProjectUsers, apiTokens, ...projectData } = hetznerProject;
@@ -180,6 +188,13 @@ export async function updateHetznerProject(
         include: hetznerProjectUsersSchema,
       });
 
+      await logAudit(
+        session.user.id,
+        hetznerProjectId,
+        "hetzner.project.edit",
+        hetznerProject,
+      );
+
       return {
         ...updatedHetznerProject,
         apiTokens: getList<string>(updatedHetznerProject.apiTokens).map(
@@ -195,7 +210,7 @@ export async function deleteHetznerProject(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:delete", `hetzner:${hetznerProjectId}:admin`],
-    async () => {
+    async (session) => {
       const db = getClient();
 
       await db.hetznerProjects.update({
@@ -204,6 +219,12 @@ export async function deleteHetznerProject(
         },
         data: { deletedAt: new Date() },
       });
+
+      await logAudit(
+        session.user.id,
+        hetznerProjectId,
+        "hetzner.project.delete",
+      );
     },
   );
 }
