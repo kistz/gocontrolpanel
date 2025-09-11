@@ -60,6 +60,15 @@ export default function AuditLogDetailsModal({
             </pre>
           </div>
         )}
+
+        {data.error && (
+          <div className="flex flex-col gap-2">
+            <h4 className="text-muted-foreground">Error</h4>
+            <pre className="whitespace-pre-wrap wrap-break-word">
+              {data.error}
+            </pre>
+          </div>
+        )}
       </div>
     </Card>
   );
