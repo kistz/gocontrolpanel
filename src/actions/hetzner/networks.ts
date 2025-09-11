@@ -11,6 +11,7 @@ import {
 } from "@/types/api/hetzner/networks";
 import { PaginationResponse, ServerResponse } from "@/types/responses";
 import { PaginationState } from "@tanstack/react-table";
+import { logAudit } from "../database/server-only/audit-logs";
 import { getApiToken, setRateLimit } from "./util";
 
 export async function getHetznerNetworksPaginated(
@@ -66,7 +67,7 @@ export async function deleteHetznerNetwork(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:delete", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const res = await axiosHetzner.delete(`/networks/${networkId}`, {
@@ -74,6 +75,13 @@ export async function deleteHetznerNetwork(
           Authorization: `Bearer ${token}`,
         },
       });
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.network.delete",
+        networkId,
+      );
 
       await setRateLimit(projectId, res);
     },
@@ -86,7 +94,7 @@ export async function createHetznerNetwork(
 ): Promise<ServerResponse<HetznerNetwork>> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const body = {
@@ -106,6 +114,13 @@ export async function createHetznerNetwork(
           Authorization: `Bearer ${token}`,
         },
       });
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.network.create",
+        data,
+      );
 
       await setRateLimit(projectId, res);
 
@@ -161,7 +176,7 @@ export async function addSubnetToNetwork(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const body = {
@@ -180,6 +195,13 @@ export async function addSubnetToNetwork(
         },
       );
 
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.network.subnet.add",
+        networkId,
+      );
+
       await setRateLimit(projectId, res);
     },
   );
@@ -192,7 +214,7 @@ export async function removeSubnetFromNetwork(
 ): Promise<ServerResponse> {
   return doServerActionWithAuth(
     ["hetzner:servers:create", `hetzner:${projectId}:admin`],
-    async () => {
+    async (session) => {
       const token = await getApiToken(projectId);
 
       const res = await axiosHetzner.post(
@@ -203,6 +225,13 @@ export async function removeSubnetFromNetwork(
             Authorization: `Bearer ${token}`,
           },
         },
+      );
+
+      await logAudit(
+        session.user.id,
+        projectId,
+        "hetzner.network.subnet.remove",
+        networkId,
       );
 
       await setRateLimit(projectId, res);
