@@ -6,7 +6,9 @@ import {
   deleteAuditLogById,
 } from "@/actions/database/audit-logs";
 import BooleanDisplay from "@/components/boolean-display";
+import AuditLogDetailsModal from "@/components/modals/audit-logs/audit-log-details";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import Modal from "@/components/modals/modal";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -142,6 +144,10 @@ export const createColumns = (
               cancelText="Cancel"
             />
           )}
+
+          <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
+            <AuditLogDetailsModal data={auditLog} />
+          </Modal>
         </div>
       );
     },
