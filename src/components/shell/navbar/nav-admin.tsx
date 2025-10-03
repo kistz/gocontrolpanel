@@ -70,6 +70,12 @@ export default async function NavAdmin({
         auth: canViewServers,
       },
       {
+        name: "Tournaments",
+        url: routes.admin.tournaments,
+        icon: IconServerCog,
+        auth: canViewServers,
+      },
+      {
         name: "Hetzner",
         url: routes.admin.hetzner,
         icon: IconCloud,
