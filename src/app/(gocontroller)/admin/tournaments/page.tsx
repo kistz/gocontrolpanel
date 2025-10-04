@@ -1,8 +1,7 @@
 import { hasPermission } from "@/lib/auth";
 import { routePermissions, routes } from "@/routes";
 import { redirect } from "next/navigation";
-import { useTable } from "spacetimedb/react";
-import { DbConnection, Tournament } from "tm-tourney-manager-api-ts";
+import { DbConnection, Tournament, STDBR } from "tm-tourney-manager-api-ts";
 
 export default async function AdminTounrmantsPage() {
     const canView = await hasPermission(routePermissions.admin.users.view);
@@ -10,7 +9,7 @@ export default async function AdminTounrmantsPage() {
         redirect(routes.dashboard);
     }
 
-    const tournaments = useTable<DbConnection, Tournament>("tournament");
+    const tournaments = STDBR.useTable<DbConnection, Tournament>("tournament");
     console.log(tournaments)
 
     return (
