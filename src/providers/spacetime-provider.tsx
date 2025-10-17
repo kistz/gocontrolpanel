@@ -20,7 +20,7 @@ const onConnectError = (_ctx: ErrorContext, err: Error) => {
 };
 
 const connectionBuilder = DbConnection.builder()
-    .withUri('http://localhost:5678')
+    .withUri('http://localhost:1234')
     .withModuleName('tourney-manager')
     .onConnect(onConnect)
     .onDisconnect(onDisconnect)
