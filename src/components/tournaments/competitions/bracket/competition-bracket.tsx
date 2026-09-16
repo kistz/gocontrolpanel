@@ -127,7 +127,7 @@ export default function CompetitionBracket({
 
   return (
     <>
-      <Card className="w-full h-[50vh]">
+      <Card className="w-full h-[500]">
         <ReactFlow
           nodes={nodes}
           edges={edges}

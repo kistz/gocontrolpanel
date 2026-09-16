@@ -10,12 +10,17 @@ export type MatchNodeType = Node<{
 
 export default function MatchNode(props: NodeProps<MatchNodeType>) {
   return (
+
     <Card>
-      <div className="p-12">
+      <div className="p-1.5 bg-green-300">
         <strong>{props.data.label}</strong>
       </div>
       <Handle type="source" position={Position.Left} />
       <Handle type="target" position={Position.Right} />
+
+      <div>
+        hafhhafahf
+      </div>
     </Card>
   );
 }

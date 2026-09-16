@@ -30,9 +30,9 @@ export default function CompetitionPage({
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-bold">Stage Info</h1>
+                <h1 className="text-2xl font-bold">Competition Info</h1>
                 <h4 className="text-muted-foreground">
-                    Manage the stage info, matches and registrations.
+                    Manage the competition graph as well as available servers and permissions.
                 </h4>
             </div>
 
