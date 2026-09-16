@@ -16,42 +16,6 @@ export default function CompetitionPage({
 }) {
     const { id } = React.use(params);
     const competition = useProcedure(procedures.unstableCompetition)
-    /*const [comp, setComp] = useState<any>(null);
-        const [isLoading, setIsLoading] = useState(true);
-
-      // 4. Fetch the procedure inside useEffect to prevent render loops
-     useEffect(() => {
-         let isMounted = true;
-         setIsLoading(true);
- 
-         async function fetchCompetition() {
-             try {
-                 // Await the procedure execution cleanly here
-                 const result = await competition({ competitionId: id });
- 
-                 if (isMounted) {
-                     setComp(result);
-                 }
-             } catch (error) {
-                 console.error("Failed to fetch competition data:", error);
-             } finally {
-                 if (isMounted) {
-                     setIsLoading(false);
-                 }
-             }
-         }
- 
-         fetchCompetition();
- 
-         return () => {
-             isMounted = false; // Prevents state updates on unmounted component
-         };
-     }, [id, competition]);
- 
-     if (isLoading) {
-         return <div className="p-6 text-muted-foreground">Loading stage info...</div>;
-     } */
-
 
     const { data: comp, isLoading } = useSpacetimeProcedure(competition, { competitionId: id })
 
@@ -59,7 +23,7 @@ export default function CompetitionPage({
         return <div className="p-6 text-muted-foreground">Loading competition info...</div>;
     }
 
-    if (comp === undefined) {
+    if (comp === undefined || comp === null) {
         return <div>Competition not found</div>
     }
 
