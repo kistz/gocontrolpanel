@@ -25,7 +25,8 @@ export default function SpacetimeAuthProvider({
 }) {
   if (
     !process.env.NEXT_PUBLIC_SPACETIME_URI ||
-    !process.env.NEXT_PUBLIC_SPACETIME_MODULE
+    !process.env.NEXT_PUBLIC_SPACETIME_MODULE ||
+    !process.env.NEXT_PUBLIC_SPACETIME_CLIENT_ID
   ) {
     return <>{children}</>;
   }
