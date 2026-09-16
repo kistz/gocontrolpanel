@@ -1,3 +1,5 @@
+'use client'
+
 import TournamentStages from "@/components/tournaments/tournament/tournament-competition-tree";
 import TournamentInfo from "@/components/tournaments/tournament/tournament-info";
 

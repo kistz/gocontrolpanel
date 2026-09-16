@@ -1,7 +1,7 @@
 "use client";
 
 import { AuthProvider, AuthProviderProps } from "react-oidc-context";
-import SpacetimeDBProvider from "./spacetime-provider";
+//import SpacetimeDBProvider from "./spacetime-provider";
 
 const oidcConfig: AuthProviderProps = {
   authority: "https://auth.spacetimedb.com/oidc",
@@ -17,6 +17,13 @@ const oidcConfig: AuthProviderProps = {
 function onSigninCallback() {
   window.history.replaceState({}, document.title, window.location.pathname);
 }
+
+import dynamic from 'next/dynamic';
+
+export const SpacetimeDBProvider = dynamic(
+  () => import('./spacetime-provider'),
+  { ssr: false }
+);
 
 export default function SpacetimeAuthProvider({
   children,
