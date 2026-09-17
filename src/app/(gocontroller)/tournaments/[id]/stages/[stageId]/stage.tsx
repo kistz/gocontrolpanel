@@ -1,6 +1,6 @@
 "use client";
 
-import CompetitionBracket from "@/components/tournaments/competitions/bracket/competition-bracket";
+import CompetitionGraph from "@/components/tournaments/competitions/bracket/competition-graph";
 import CompetitionInfo from "@/components/tournaments/competitions/competition-info";
 import CompetitionRegistrations from "@/components/tournaments/competitions/registrations/competition-registrations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +32,7 @@ export default function StagePage({
         </TabsList>
 
         <TabsContent value="bracket" className="flex flex-col gap-6">
-          <CompetitionBracket competition={competition} />
+          <CompetitionGraph competition={competition} />
         </TabsContent>
 
         <TabsContent value="registrations" className="flex flex-col gap-6">

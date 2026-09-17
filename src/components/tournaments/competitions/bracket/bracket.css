@@ -1,5 +1,6 @@
 .data-edge .react-flow__edge-path {
   stroke: var(--color-green-500);
+  stroke-dasharray: 5, 5;
 }
 
 .data-edge.selected:is(:focus, :not(:focus)) .react-flow__edge-path {
@@ -15,5 +16,5 @@
 }
 
 .wait-edge .react-flow__edge-path {
-  stroke-dasharray: 5,5;
+  stroke-dasharray: 5, 5;
 }

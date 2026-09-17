@@ -1,16 +1,16 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { MatchV1 } from "@/lib/server-manager/types";
-import { Handle, Node, NodeProps, NodeToolbar, Position } from "@xyflow/react";
+import { CompetitionV1 } from "@/lib/server-manager/types";
+import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 
-export type MatchV1NodeType = Node<MatchV1>;
+export type CompetitionV1NodeType = Node<CompetitionV1>;
 
-export default function MatchNode(props: NodeProps<MatchV1NodeType>) {
+export default function CompetitionV1Node(props: NodeProps<CompetitionV1NodeType>) {
   return (
 
     <Card>
-      <div className="p-1.5 bg-green-300">
+      <div className="p-1.5 bg-red-300">
         <strong>{props.data.name}</strong>
       </div>
       <Handle type="source" position={Position.Left} />

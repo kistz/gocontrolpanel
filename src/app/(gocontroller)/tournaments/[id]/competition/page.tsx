@@ -1,5 +1,5 @@
 'use client'
-import CompetitionBracket from "@/components/tournaments/competitions/bracket/competition-bracket";
+import CompetitionGraph from "@/components/tournaments/competitions/bracket/competition-graph";
 import { Button } from "@/components/ui/button";
 import { useSpacetimeProcedure } from "@/hooks/tournaments/use-spacetime-procedure";
 import { procedures, tables } from "@/lib/server-manager";
@@ -43,7 +43,7 @@ export default function CompetitionPage({
                 </Link>
             </Button>
 
-            <CompetitionBracket competition={comp} />
+            <CompetitionGraph competition={comp} />
         </div>
     );
 }

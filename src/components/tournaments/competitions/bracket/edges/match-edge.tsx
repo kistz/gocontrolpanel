@@ -1,7 +1,8 @@
 "use client";
+import { CompetitionConnection } from "@/lib/server-manager/types";
 import { BaseEdge, Edge, getSimpleBezierPath, Position } from "@xyflow/react";
 
-export type MatchEdgeType = Edge<{ type: "Wait" | "Data" | "Action" }>;
+export type MatchEdgeType = Edge<CompetitionConnection>;
 
 interface MatchEdgeProps {
   id: string;
