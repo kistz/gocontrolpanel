@@ -1,17 +1,19 @@
 "use client";
 
 import { AuthProvider, AuthProviderProps } from "react-oidc-context";
-//import SpacetimeDBProvider from "./spacetime-provider";
+//import { WebStorageStateStore } from "oidc-client-ts";
+import config from "@/lib/config";
 
 const oidcConfig: AuthProviderProps = {
   authority: "https://auth.spacetimedb.com/oidc",
-  client_id: process.env.NEXT_PUBLIC_SPACETIME_CLIENT_ID || "",
+  client_id: config.TMSERVERS.CLIENT_ID,
   scope: "openid profile email offline_access",
   response_type: "code",
   redirect_uri: typeof window !== "undefined" ? window.location.origin : "",
   post_logout_redirect_uri:
     typeof window !== "undefined" ? window.location.origin : "",
   automaticSilentRenew: true,
+  //userStore: new WebStorageStateStore({ store: typeof window !== "undefined" ? window.localStorage : undefined }),
 };
 
 function onSigninCallback() {
@@ -31,9 +33,7 @@ export default function SpacetimeAuthProvider({
   children: React.ReactNode;
 }) {
   if (
-    !process.env.NEXT_PUBLIC_SPACETIME_URI ||
-    !process.env.NEXT_PUBLIC_SPACETIME_MODULE ||
-    !process.env.NEXT_PUBLIC_SPACETIME_CLIENT_ID
+    config.TMSERVERS.DISABLED
   ) {
     return <>{children}</>;
   }
