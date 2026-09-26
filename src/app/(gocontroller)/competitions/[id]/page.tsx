@@ -1,9 +1,9 @@
 'use client'
-import CompetitionGraph from "@/components/tournaments/competitions/bracket/competition-graph";
+import CompetitionGraph from "@/components/tournaments/competitions/graph/competition-graph";
 import { Button } from "@/components/ui/button";
 import { useSpacetimeProcedure } from "@/hooks/tournaments/use-spacetime-procedure";
 import { procedures, tables } from "@/lib/server-manager";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { IconAccessible, IconArrowLeft, IconLockAccess, IconPremiumRights, IconServer, IconSettings } from "@tabler/icons-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useProcedure, useTable } from "spacetimedb/react";
@@ -32,16 +32,33 @@ export default function CompetitionPage({
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Competition: {comp.name}</h1>
         <h4 className="text-muted-foreground">
-          Manage the competition graph as well as available servers and permissions.
+          Manage the competition graph as well as available servers, configs and permissions.
         </h4>
       </div>
 
-      <Button variant="outline" asChild className="max-w-44">
-        <Link href={`/tournaments/${id}`}>
-          <IconArrowLeft />
-          Back to tournament
-        </Link>
-      </Button>
+      <div className="flex gap-4">
+
+        <Button variant="outline" asChild className="max-w-44">
+          <Link href={`/tournaments/${id}`}>
+            <IconServer />
+            Servers
+          </Link>
+        </Button>
+
+        <Button variant="outline" asChild className="max-w-44">
+          <Link href={`/tournaments/${id}`}>
+            <IconSettings />
+            Shared Configs
+          </Link>
+        </Button>
+
+        <Button variant="outline" asChild className="max-w-44">
+          <Link href={`/tournaments/${id}`}>
+            <IconLockAccess />
+            Permissions
+          </Link>
+        </Button>
+      </div>
 
       <CompetitionGraph competition={comp} />
     </div>

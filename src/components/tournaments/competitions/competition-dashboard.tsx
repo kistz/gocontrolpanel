@@ -1,7 +1,7 @@
 "use client";
 
 import { useCompetition } from "@/hooks/tournaments/competitions/use-competition";
-import CompetitionGraph from "./bracket/competition-graph";
+import CompetitionGraph from "./graph/competition-graph";
 import CompetitionInfo from "./competition-info";
 
 export default function CompetitionDashboard({

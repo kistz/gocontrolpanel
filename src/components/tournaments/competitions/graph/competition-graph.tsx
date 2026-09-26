@@ -2,7 +2,7 @@
 import Modal from "@/components/modals/modal";
 import CreateConnectionModal from "@/components/modals/tournaments/competition/create-connection";
 import { Card } from "@/components/ui/card";
-import { useCompetitionBracket as useCompetitionGraph } from "@/hooks/tournaments/competitions/use-competition-graph";
+import { useCompetitionGraph as useCompetitionGraph } from "@/hooks/tournaments/competitions/use-competition-graph";
 import { CompetitionV1, NodeHandle } from "@/lib/server-manager/types";
 import {
   addEdge,
@@ -20,7 +20,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
-import "./bracket.css";
+import "./graph.css";
 import MatchEdge, { MatchEdgeType } from "./edges/match-edge";
 import MatchNode, { type MatchV1NodeType } from "./nodes/match-node";
 import AddMatchButton from "./panel/add-match";
@@ -29,10 +29,18 @@ import SaveLayoutButton from "./panel/save-layout";
 import SelectedMatchPanel from "./panel/selected-match";
 import ToggleWaitingEdgesButton from "./panel/toggle-waiting-edges";
 import CompetitionV1Node, { CompetitionV1NodeType } from "./nodes/competition-node";
+import LeaderboardV2Node from "./nodes/leaderboard-node";
+import OutputV1Node from "./nodes/output-node";
+import RegistrationV1Node from "./nodes/registration-node";
+import InputV1Node from "./nodes/input-node";
 
 const nodeTypes = {
   MatchV1: MatchNode,
-  CompetitionV1: CompetitionV1Node
+  CompetitionV1: CompetitionV1Node,
+  LeaderboardV2: LeaderboardV2Node,
+  InputV1: InputV1Node,
+  OutputV1: OutputV1Node,
+  RegistrationV1: RegistrationV1Node
 };
 
 type MasterNodeEnumType = (MatchV1NodeType | CompetitionV1NodeType);
@@ -43,13 +51,13 @@ const edgeTypes = {
   Action: MatchEdge,
 };
 
-interface CompetitionBracketProps {
+interface CompetitionGraphProps {
   competition: CompetitionV1;
 }
 
 export default function CompetitionGraph({
   competition,
-}: CompetitionBracketProps) {
+}: CompetitionGraphProps) {
   const { theme } = useTheme();
 
   const graph = useCompetitionGraph(competition);
@@ -68,8 +76,7 @@ export default function CompetitionGraph({
     const transformedNodes = [
       ...graph.nMatchV1.map((n) => {
         const handle = NodeHandle.MatchV1(n.id);
-        // The setNodes error can be fixed with position! but that breaks other stuff idk.
-        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position;
+        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
         return {
           id: `MatchV1-${n.id}`,
           type: "MatchV1",
@@ -78,17 +85,61 @@ export default function CompetitionGraph({
         }
       }),
 
-      /* ...graph.nCompetitionV1.map((n) => {
+      ...graph.nCompetitionV1.map((n) => {
         const handle = NodeHandle.CompetitionV1(n.id);
-        // The setNodes error can be fixed with position! but that breaks other stuff idk.
-        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position;
+        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
         return {
           id: `CompetitionV1-${n.id}`,
           type: "CompetitionV1",
           data: n,
           position,
         }
-      }) */
+      }),
+
+      ...graph.nRegistrationV1.map((n) => {
+        const handle = NodeHandle.RegistrationV1(n.id);
+        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
+        return {
+          id: `RegistrationV1-${n.id}`,
+          type: "RegistrationV1",
+          data: n,
+          position,
+        }
+      }),
+
+      ...graph.nLeaderboardV2.map((n) => {
+        // This is a fuck up on my (kistz) part because NodeHandle has no LeaderboardV2 xdd
+        const handle = NodeHandle.LeaderboardV1(n.id);
+        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
+        return {
+          id: `LeaderboardV1-${n.id}`,
+          type: "LeaderboardV1",
+          data: n,
+          position,
+        }
+      }),
+
+      ...graph.nOutputV1.map((n) => {
+        const handle = NodeHandle.OutputV1(n.id);
+        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
+        return {
+          id: `OutputV1-${n.id}`,
+          type: "OutputV1",
+          data: n,
+          position,
+        }
+      }),
+
+      ...graph.nInputV1.map((n) => {
+        const handle = NodeHandle.InputV1(n.id);
+        const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
+        return {
+          id: `InputV1-${n.id}`,
+          type: "InputV1",
+          data: n,
+          position,
+        }
+      })
     ]
 
     setNodes(transformedNodes);

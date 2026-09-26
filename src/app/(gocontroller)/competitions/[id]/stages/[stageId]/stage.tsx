@@ -1,6 +1,6 @@
 "use client";
 
-import CompetitionGraph from "@/components/tournaments/competitions/bracket/competition-graph";
+import CompetitionGraph from "@/components/tournaments/competitions/graph/competition-graph";
 import CompetitionInfo from "@/components/tournaments/competitions/competition-info";
 import CompetitionRegistrations from "@/components/tournaments/competitions/registrations/competition-registrations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

@@ -1,4 +1,4 @@
-import { MatchNodeType } from "@/components/tournaments/competitions/bracket/nodes/match-node";
+import { MatchNodeType } from "@/components/tournaments/competitions/graph/nodes/match-node";
 
 export function calculateDoubleEliminationBracketPositions(
   nodes: MatchNodeType[],

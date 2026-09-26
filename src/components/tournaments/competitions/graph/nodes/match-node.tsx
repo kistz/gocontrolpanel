@@ -6,7 +6,7 @@ import { Handle, Node, NodeProps, NodeToolbar, Position } from "@xyflow/react";
 
 export type MatchV1NodeType = Node<MatchV1>;
 
-export default function MatchNode(props: NodeProps<MatchV1NodeType>) {
+export default function MatchV1Node(props: NodeProps<MatchV1NodeType>) {
   return (
 
     <Card>
