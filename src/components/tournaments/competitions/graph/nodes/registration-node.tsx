@@ -13,8 +13,8 @@ export default function RegistrationV1Node(props: NodeProps<RegistrationV1NodeTy
       <div className="p-1.5 bg-blue-300">
         <strong>{props.data.name}</strong>
       </div>
-      <Handle type="source" position={Position.Left} />
-      <Handle type="target" position={Position.Right} />
+      <Handle type="source" position={Position.Right} />
+      <Handle type="target" position={Position.Left} />
 
       <div>
         hafhhafahf

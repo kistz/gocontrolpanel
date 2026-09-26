@@ -13,8 +13,8 @@ export default function LeaderboardV2Node(props: NodeProps<LeaderboardV2NodeType
       <div className="p-1.5 bg-yellow-300">
         <strong>{props.data.name}</strong>
       </div>
-      <Handle type="source" position={Position.Left} />
-      <Handle type="target" position={Position.Right} />
+      <Handle type="source" position={Position.Right} />
+      <Handle type="target" position={Position.Left} />
 
       <div>
         hafhhafahf

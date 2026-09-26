@@ -13,8 +13,8 @@ export default function OutputV1Node(props: NodeProps<OutputV1NodeType>) {
       <div className="p-1.5 bg-pink-300">
         <strong>{props.data.name}</strong>
       </div>
-      <Handle type="source" position={Position.Left} />
-      <Handle type="target" position={Position.Right} />
+      <Handle type="source" position={Position.Right} />
+      <Handle type="target" position={Position.Left} />
 
       <div>
         hafhhafahf
