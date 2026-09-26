@@ -29,10 +29,10 @@ import SaveLayoutButton from "./panel/save-layout";
 import SelectedMatchPanel from "./panel/selected-match";
 import ToggleWaitingEdgesButton from "./panel/toggle-waiting-edges";
 import CompetitionV1Node, { CompetitionV1NodeType } from "./nodes/competition-node";
-import LeaderboardV2Node from "./nodes/leaderboard-node";
-import OutputV1Node from "./nodes/output-node";
-import RegistrationV1Node from "./nodes/registration-node";
-import InputV1Node from "./nodes/input-node";
+import LeaderboardV2Node, { LeaderboardV2NodeType } from "./nodes/leaderboard-node";
+import OutputV1Node, { OutputV1NodeType } from "./nodes/output-node";
+import RegistrationV1Node, { RegistrationV1NodeType } from "./nodes/registration-node";
+import InputV1Node, { InputV1NodeType } from "./nodes/input-node";
 
 const nodeTypes = {
   MatchV1: MatchNode,
@@ -43,7 +43,7 @@ const nodeTypes = {
   RegistrationV1: RegistrationV1Node
 };
 
-type MasterNodeEnumType = (MatchV1NodeType | CompetitionV1NodeType);
+export type MasterNodeEnumType = (MatchV1NodeType | CompetitionV1NodeType | InputV1NodeType | OutputV1NodeType | LeaderboardV2NodeType | RegistrationV1NodeType);
 
 const edgeTypes = {
   Data: MatchEdge,
@@ -108,12 +108,12 @@ export default function CompetitionGraph({
       }),
 
       ...graph.nLeaderboardV2.map((n) => {
-        // This is a fuck up on my (kistz) part because NodeHandle has no LeaderboardV2 xdd
+        // This is a fuck up on my (kistz) part because NodeHandle has no LeaderboardV2 xdd so this is indeed correct.
         const handle = NodeHandle.LeaderboardV1(n.id);
         const position = graph.nodePositions.find((row) => row.node.tag == handle.tag && row.node.value == handle.value)?.position ?? { x: 0, y: 0 };
         return {
           id: `LeaderboardV1-${n.id}`,
-          type: "LeaderboardV1",
+          type: "LeaderboardV2",
           data: n,
           position,
         }
@@ -160,11 +160,13 @@ export default function CompetitionGraph({
     setEdges(transformedEdges);
   }, [graph.connections]);
 
-  /* const onNodesChange: OnNodesChange<MatchNodeType> = useCallback(
+  const onNodesChange: OnNodesChange<MasterNodeEnumType> = useCallback(
     (changes) =>
       setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
     [setNodes],
   );
+
+  /*
    
   const onEdgesChange: OnEdgesChange<MatchEdgeType> = useCallback(
     (changes) =>
@@ -213,7 +215,7 @@ export default function CompetitionGraph({
           edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          //onNodesChange={onNodesChange}
+          onNodesChange={onNodesChange}
           //onEdgesChange={onEdgesChange}
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}

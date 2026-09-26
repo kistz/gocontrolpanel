@@ -6,13 +6,13 @@ import { useReactFlow } from "@xyflow/react";
 import { ComponentProps } from "react";
 import { toast } from "sonner";
 import { useReducer } from "spacetimedb/react";
-import { MatchNodeType } from "../nodes/match-node";
+import { MasterNodeEnumType } from "../competition-graph";
 
 export default function SaveLayoutButton({
   ...props
 }: ComponentProps<"button">) {
   const updateNodePosition = useReducer(reducers.competitionNodePositionUpdate);
-  const { getNodes } = useReactFlow<MatchNodeType>();
+  const { getNodes } = useReactFlow<MasterNodeEnumType>();
 
   const onSaveLayout = () => {
     const nodes = getNodes();
@@ -20,8 +20,8 @@ export default function SaveLayoutButton({
     nodes.forEach((node) => {
       if (
         !node.id ||
-        (node.data.defaultPosition.x === node.position.x &&
-          node.data.defaultPosition.y === node.position.y)
+        (node.position.x === node.position.x &&
+          node.position.y === node.position.y)
       )
         return;
 
