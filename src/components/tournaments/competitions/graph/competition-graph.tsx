@@ -208,8 +208,8 @@ export default function CompetitionGraph({
   // }, []);
 
   return (
-    <>
-      <Card className="w-full h-[500]">
+    <div className="flex-1 min-h-0 w-full h-full flex flex-col">
+      <Card className="w-full flex-1 min-h-0 relative rounded-[calc(var(--radius)+4px)] overflow-hidden">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -228,6 +228,8 @@ export default function CompetitionGraph({
           connectionLineType={ConnectionLineType.SmoothStep}
           style={{
             borderRadius: "calc(var(--radius) + 4px)",
+            width: "100%",
+            height: "100%",
           }}
         >
           <Background />
@@ -257,6 +259,6 @@ export default function CompetitionGraph({
           closeModal={() => setCreatedEdge(null)}
         />
       </Modal>
-    </>
+    </div>
   );
 }

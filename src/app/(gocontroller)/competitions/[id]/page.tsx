@@ -28,7 +28,7 @@ export default function CompetitionPage({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-2 h-full">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Competition: {comp.name}</h1>
         <h4 className="text-muted-foreground">
@@ -58,6 +58,7 @@ export default function CompetitionPage({
             Permissions
           </Link>
         </Button>
+
       </div>
 
       <CompetitionGraph competition={comp} />
