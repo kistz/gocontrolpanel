@@ -1,10 +1,12 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { CompetitionConnection } from "@/lib/server-manager/types";
-import { BaseEdge, Edge, getSimpleBezierPath, Position } from "@xyflow/react";
+import { IconSettings } from "@tabler/icons-react";
+import { BaseEdge, Edge, EdgeToolbar, getSimpleBezierPath, Position, useViewport } from "@xyflow/react";
 
-export type MatchEdgeType = Edge<CompetitionConnection>;
+export type DataEdgeType = Edge<CompetitionConnection>;
 
-interface MatchEdgeProps {
+interface DataEdgeProps {
   id: string;
   sourceX: number;
   sourceY: number;
@@ -12,14 +14,16 @@ interface MatchEdgeProps {
   targetY: number;
 }
 
-export default function MatchEdge({
+export default function DataEdge({
   id,
   sourceX,
   sourceY,
   targetX,
   targetY,
-}: MatchEdgeProps) {
-  const [edgePath] = getSimpleBezierPath({
+}: DataEdgeProps) {
+  //const { zoom } = useViewport();
+
+  const [edgePath, centerX, centerY] = getSimpleBezierPath({
     sourceX,
     sourceY,
     sourcePosition: Position.Right,
@@ -27,10 +31,17 @@ export default function MatchEdge({
     targetY,
     targetPosition: Position.Left,
   });
-
   return (
     <>
       <BaseEdge id={id} path={edgePath} />
+      <EdgeToolbar edgeId={id} x={centerX} y={centerY} isVisible>
+        {/* <div style={{ scale: .5 * zoom }}>
+
+          <Button>
+            <IconSettings />
+          </Button>
+        </div> */}
+      </EdgeToolbar>
     </>
   );
 }

@@ -21,7 +21,7 @@ import "@xyflow/react/dist/style.css";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import "./graph.css";
-import MatchEdge, { MatchEdgeType } from "./edges/match-edge";
+import DataEdge, { DataEdgeType } from "./edges/match-edge";
 import MatchNode, { type MatchV1NodeType } from "./nodes/match-node";
 import AddMatchButton from "./panel/add-match";
 import CalculatePositionsButton from "./panel/calculate-positions";
@@ -33,6 +33,7 @@ import LeaderboardV2Node, { LeaderboardV2NodeType } from "./nodes/leaderboard-no
 import OutputV1Node, { OutputV1NodeType } from "./nodes/output-node";
 import RegistrationV1Node, { RegistrationV1NodeType } from "./nodes/registration-node";
 import InputV1Node, { InputV1NodeType } from "./nodes/input-node";
+import ContextMenu from "./graph-context-menu";
 
 const nodeTypes = {
   MatchV1: MatchNode,
@@ -46,9 +47,9 @@ const nodeTypes = {
 export type MasterNodeEnumType = (MatchV1NodeType | CompetitionV1NodeType | InputV1NodeType | OutputV1NodeType | LeaderboardV2NodeType | RegistrationV1NodeType);
 
 const edgeTypes = {
-  Data: MatchEdge,
-  Wait: MatchEdge,
-  Action: MatchEdge,
+  Data: DataEdge,
+  Wait: DataEdge,
+  Action: DataEdge,
 };
 
 interface CompetitionGraphProps {
@@ -63,7 +64,7 @@ export default function CompetitionGraph({
   const graph = useCompetitionGraph(competition);
 
   const [nodes, setNodes] = useState<MasterNodeEnumType[]>([]);
-  const [edges, setEdges] = useState<MatchEdgeType[]>([]);
+  const [edges, setEdges] = useState<DataEdgeType[]>([]);
 
   const [selectedNode, setSelectedNode] = useState<MasterNodeEnumType | null>(null);
 
@@ -198,7 +199,7 @@ export default function CompetitionGraph({
     setSelectedNode((prev) => (prev?.id === node.id ? null : node));
   }, []);
 
-  const onEdgeClick = useCallback((_: MouseEvent, edge: MatchEdgeType) => {
+  const onEdgeClick = useCallback((_: MouseEvent, edge: DataEdgeType) => {
     if (edge.selected) return;
     console.log("edge clicked", edge);
   }, []);
@@ -206,6 +207,25 @@ export default function CompetitionGraph({
   // const onCreateConnectionCallback = useCallback(() => {
   //   setCreatedEdge(null);
   // }, []);
+
+
+  const [menu, setMenu] = useState<{ x: number, y: number } | null>(null);
+  //const ref = useRef(null);
+  const onContextMenu = useCallback((event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
+    console.log(event)
+    event.preventDefault();
+
+    // Calculate position of the context menu. We want to make sure it
+    // doesn't get positioned off-screen.
+    // const pane = ref.current.getBoundingClientRect();
+    setMenu({
+      //id: 500,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  },
+    [setMenu],
+  );
 
   return (
     <div className="flex-1 min-h-0 w-full h-full flex flex-col">
@@ -223,6 +243,7 @@ export default function CompetitionGraph({
           snapGrid={[10, 10]}
           snapToGrid={true}
           minZoom={0.25}
+          onPaneContextMenu={onContextMenu}
           fitView
           colorMode={theme as ColorMode}
           connectionLineType={ConnectionLineType.SmoothStep}
@@ -231,6 +252,7 @@ export default function CompetitionGraph({
             width: "100%",
             height: "100%",
           }}
+          className="absolute"
         >
           <Background />
           <Panel position="top-left">
@@ -244,6 +266,8 @@ export default function CompetitionGraph({
             <CalculatePositionsButton />
             <AddMatchButton competitionId={competition.id} />
           </Panel>
+
+          {menu && <ContextMenu /* onClick={onPaneClick} */ {...menu} />}
         </ReactFlow>
       </Card>
 
