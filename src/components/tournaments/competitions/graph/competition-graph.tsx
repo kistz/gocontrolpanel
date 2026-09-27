@@ -19,9 +19,9 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useTheme } from "next-themes";
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import "./graph.css";
-import DataEdge, { DataEdgeType } from "./edges/match-edge";
+import DataEdge, { DataEdgeType } from "./edges/data-edge";
 import MatchNode, { type MatchV1NodeType } from "./nodes/match-node";
 import AddMatchButton from "./panel/add-match";
 import CalculatePositionsButton from "./panel/calculate-positions";
@@ -72,8 +72,7 @@ export default function CompetitionGraph({
     from: number;
     to: number;
   } | null>(null);
-  console.log(graph.nodePositions)
-  useEffect(() => {
+  useMemo(() => {
     const transformedNodes = [
       ...graph.nMatchV1.map((n) => {
         const handle = NodeHandle.MatchV1(n.id);
@@ -144,9 +143,9 @@ export default function CompetitionGraph({
     ]
 
     setNodes(transformedNodes);
-  }, [graph.nMatchV1, graph.nCompetitionV1, graph.nodePositions]);
+  }, [graph.nMatchV1, graph.nCompetitionV1, graph.nodePositions, graph.nLeaderboardV2, graph.nInputV1, graph.nOutputV1, graph.nRegistrationV1]);
 
-  useEffect(() => {
+  useMemo(() => {
     const transformedEdges = [
       ...graph.connections.map((e) => ({
         id: `edge-${e.origin.tag}-${e.origin.value}-${e.target.tag}-${e.target.value}`,

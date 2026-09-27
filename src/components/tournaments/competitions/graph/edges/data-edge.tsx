@@ -21,7 +21,7 @@ export default function DataEdge({
   targetX,
   targetY,
 }: DataEdgeProps) {
-  //const { zoom } = useViewport();
+  const { zoom } = useViewport();
 
   const [edgePath, centerX, centerY] = getSimpleBezierPath({
     sourceX,
@@ -35,12 +35,12 @@ export default function DataEdge({
     <>
       <BaseEdge id={id} path={edgePath} />
       <EdgeToolbar edgeId={id} x={centerX} y={centerY} isVisible>
-        {/* <div style={{ scale: .5 * zoom }}>
+        <div style={{ scale: .5 * zoom }}>
 
           <Button>
             <IconSettings />
           </Button>
-        </div> */}
+        </div>
       </EdgeToolbar>
     </>
   );

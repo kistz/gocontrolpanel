@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useReactFlow } from "@xyflow/react";
 import { ComponentProps, useEffect, useState } from "react";
-import { DataEdgeType } from "../edges/match-edge";
+import { DataEdgeType } from "../edges/data-edge";
 import { MatchNodeType } from "../nodes/match-node";
 
 export default function ToggleWaitingEdgesButton({

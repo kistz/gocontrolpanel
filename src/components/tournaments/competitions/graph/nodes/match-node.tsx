@@ -17,9 +17,9 @@ export default function MatchV1Node(props: NodeProps<MatchV1NodeType>) {
     <Card className="">
       <div className=" bg-green-300 rounded-t-lg flex">
         <IconChevronDown className="h-[1em] items-center text-inherit leading-none self-center align-middle bg-none p-0 m-0 " />
-        <strong>
+        <p className="font-bold">
           {props.data.name}
-        </strong>
+        </p>
         <IconSettings className="pl-2 h-[1em] items-center text-inherit leading-none self-center align-middle bg-none p-0 m-0 " />
       </div>
       <Handle type="source" position={Position.Right} className="h-5! rounded-sm!" />
