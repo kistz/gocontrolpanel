@@ -213,10 +213,10 @@ const data = [
             <Handle type="source" position={Position.Right} className="h-5! rounded-sm!" onMouseEnter={handleMouseEnter}
               onMouseLeave={() => handleMouseLeave()} />
           </PopoverAnchor>
-          <PopoverContent side="right" align="center" onPointerDown={(e) => e.stopPropagation()} onMouseEnter={handleMouseEnter}
+          <PopoverContent side="top" align="center" onPointerDown={(e) => e.stopPropagation()} onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}>
             <div>
-              {data.map((thing) => <div>{thing.position}. {thing.userId}, {thing.score} </div>)}
+              {data.map((thing,idx) => <div key={idx}>{thing.position}. {thing.userId}, {thing.score} </div>)}
             </div>
           </PopoverContent>
         </Popover>

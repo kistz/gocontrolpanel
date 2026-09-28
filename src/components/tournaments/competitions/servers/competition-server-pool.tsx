@@ -17,7 +17,7 @@ export default function CompetitionServerPool({
     id,
 }: CompetitionServerPoolProps) {
 
-    const [availableServersIds] = useTable(tables.tabCompetitionRawServer.where((ids) => ids.competitionId.eq(id)))
+    //const [availableServersIds] = useTable(tables.tabCompetitionRawServer.where((ids) => ids.competitionId.eq(id)))
     const [availableServers, isReady] = useTable(tables.tabCompetitionRawServer.where((ids) => ids.competitionId.eq(id)).rightSemijoin(tables.tabRawServer, (l, r) => r.id.eq(l.serverId)))
 
     if (!isReady) {

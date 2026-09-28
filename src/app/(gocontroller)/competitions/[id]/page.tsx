@@ -1,6 +1,8 @@
 'use client'
 import CompetitionGraph from "@/components/tournaments/competitions/graph/competition-graph";
+import CompetitionPermissions from "@/components/tournaments/competitions/servers/competition-permissions";
 import CompetitionServerPool from "@/components/tournaments/competitions/servers/competition-server-pool";
+import CompetitionSharedConfigs from "@/components/tournaments/competitions/servers/competition-shared-configs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useSpacetimeProcedure } from "@/hooks/tournaments/use-spacetime-procedure";
@@ -40,40 +42,66 @@ export default function CompetitionPage({
 
       <div className="flex gap-4">
 
-        <Button variant="outline" asChild className="max-w-44">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <IconServer />
-                Servers</Button>
-            </DialogTrigger>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <IconServer />
+              Servers</Button>
+          </DialogTrigger>
 
-            <DialogContent className="rounded-lg shadow-xl">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold">Competition Server Pool</DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">
-                  The available servers for this competition.
-                </DialogDescription>
-              </DialogHeader>
+          <DialogContent className="rounded-lg shadow-xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">Competition Server Pool</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                The available servers for this competition.
+              </DialogDescription>
+            </DialogHeader>
 
-              <CompetitionServerPool id={id} />
-            </DialogContent>
-          </Dialog>
-        </Button>
+            <CompetitionServerPool id={id} />
+          </DialogContent>
+        </Dialog>
 
-        <Button variant="outline" asChild className="max-w-44">
-          <Link href={`/tournaments/${id}`}>
-            <IconSettings />
-            Shared Configs
-          </Link>
-        </Button>
 
-        <Button variant="outline" asChild className="max-w-44">
-          <Link href={`/tournaments/${id}`}>
-            <IconLockAccess />
-            Permissions
-          </Link>
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <IconSettings />
+              Shared Configs
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent className="rounded-lg shadow-xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">Shared Competition Configs</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                The available shared configs which can be applied to matches and servers in the competition.
+              </DialogDescription>
+            </DialogHeader>
+
+            <CompetitionSharedConfigs id={id} />
+          </DialogContent>
+        </Dialog>
+
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <IconLockAccess />
+              Permissions
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent className="rounded-lg shadow-xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">Competition Permissions</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Permissions for the competition (also is inherited downwards).
+              </DialogDescription>
+            </DialogHeader>
+
+            <CompetitionPermissions id={id} />
+          </DialogContent>
+        </Dialog>
 
       </div>
 
