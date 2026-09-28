@@ -1,6 +1,8 @@
 'use client'
 import CompetitionGraph from "@/components/tournaments/competitions/graph/competition-graph";
+import CompetitionServerPool from "@/components/tournaments/competitions/servers/competition-server-pool";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useSpacetimeProcedure } from "@/hooks/tournaments/use-spacetime-procedure";
 import { procedures, tables } from "@/lib/server-manager";
 import { IconAccessible, IconArrowLeft, IconLockAccess, IconPremiumRights, IconServer, IconSettings } from "@tabler/icons-react";
@@ -39,10 +41,24 @@ export default function CompetitionPage({
       <div className="flex gap-4">
 
         <Button variant="outline" asChild className="max-w-44">
-          <Link href={`/tournaments/${id}`}>
-            <IconServer />
-            Servers
-          </Link>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <IconServer />
+                Servers</Button>
+            </DialogTrigger>
+
+            <DialogContent className="rounded-lg shadow-xl">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold">Competition Server Pool</DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">
+                  The available servers for this competition.
+                </DialogDescription>
+              </DialogHeader>
+
+              <CompetitionServerPool id={id} />
+            </DialogContent>
+          </Dialog>
         </Button>
 
         <Button variant="outline" asChild className="max-w-44">
