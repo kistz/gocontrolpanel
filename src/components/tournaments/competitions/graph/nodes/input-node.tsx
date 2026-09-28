@@ -4,10 +4,11 @@ import { Card } from "@/components/ui/card";
 import { InputV1 } from "@/lib/server-manager/types";
 import { IconChevronDown, IconSettings } from "@tabler/icons-react";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
+import { memo } from "react";
 
 export type InputV1NodeType = Node<InputV1>;
 
-export default function InputV1Node(props: NodeProps<InputV1NodeType>) {
+ function InputV1Node(props: NodeProps<InputV1NodeType>) {
   return (
 
     <Card>
@@ -27,3 +28,5 @@ export default function InputV1Node(props: NodeProps<InputV1NodeType>) {
     </Card>
   );
 }
+
+export default memo(InputV1Node)

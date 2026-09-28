@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CompetitionConnection } from "@/lib/server-manager/types";
 import { IconSettings } from "@tabler/icons-react";
 import { BaseEdge, Edge, EdgeToolbar, getSimpleBezierPath, Position, useViewport } from "@xyflow/react";
+import { memo } from "react";
 
 export type DataEdgeType = Edge<CompetitionConnection>;
 
@@ -14,7 +15,7 @@ interface DataEdgeProps {
   targetY: number;
 }
 
-export default function DataEdge({
+function DataEdge({
   id,
   sourceX,
   sourceY,
@@ -45,3 +46,5 @@ export default function DataEdge({
     </>
   );
 }
+
+export default memo(DataEdge)

@@ -6,10 +6,11 @@ import { CompetitionV1 } from "@/lib/server-manager/types";
 import { IconChevronDown, IconFileSymlink, IconSettings } from "@tabler/icons-react";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import Link from "next/link";
+import { memo } from "react";
 
 export type CompetitionV1NodeType = Node<CompetitionV1>;
 
-export default function CompetitionV1Node(props: NodeProps<CompetitionV1NodeType>) {
+function CompetitionV1Node(props: NodeProps<CompetitionV1NodeType>) {
   return (
 
     <Card>
@@ -29,3 +30,5 @@ export default function CompetitionV1Node(props: NodeProps<CompetitionV1NodeType
     </Card>
   );
 }
+
+export default memo(CompetitionV1Node)

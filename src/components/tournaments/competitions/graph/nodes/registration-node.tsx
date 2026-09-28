@@ -4,10 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Registration } from "@/lib/server-manager/types";
 import { IconChevronDown, IconSettings } from "@tabler/icons-react";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
+import { memo } from "react";
 
 export type RegistrationV1NodeType = Node<Registration>;
 
-export default function RegistrationV1Node(props: NodeProps<RegistrationV1NodeType>) {
+function RegistrationV1Node(props: NodeProps<RegistrationV1NodeType>) {
   return (
 
     <Card>
@@ -28,3 +29,5 @@ export default function RegistrationV1Node(props: NodeProps<RegistrationV1NodeTy
     </Card>
   );
 }
+
+export default memo(RegistrationV1Node)

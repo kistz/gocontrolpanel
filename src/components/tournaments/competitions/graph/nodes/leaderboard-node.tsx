@@ -8,7 +8,7 @@ import { procedures } from "@/lib/server-manager";
 import { LeaderboardV2, NodeHandle } from "@/lib/server-manager/types";
 import { IconArrowAutofitContent, IconChevronDown, IconSettings } from "@tabler/icons-react";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
-import { useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useProcedure } from "spacetimedb/react";
 import { string } from "zod";
 
@@ -167,7 +167,7 @@ const data = [
   }
 ];
 
-export default function LeaderboardV2Node(props: NodeProps<LeaderboardV2NodeType>) {
+ function LeaderboardV2Node(props: NodeProps<LeaderboardV2NodeType>) {
   const [isOutputHovered, setOutputIsHovered] = useState(false);
   const [hasHoveredBefore, setHasHoveredBefore] = useState(false);
 
@@ -181,6 +181,20 @@ export default function LeaderboardV2Node(props: NodeProps<LeaderboardV2NodeType
   if (data === null || typeof data === "string") {
     return <div></div>
   } */
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const handleMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+
+    setOutputIsHovered(true);
+  };
+  const handleMouseLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setOutputIsHovered(false);
+    }, 500);
+  };
 
   return (
     <>
@@ -196,10 +210,11 @@ export default function LeaderboardV2Node(props: NodeProps<LeaderboardV2NodeType
         <Handle type="target" position={Position.Left} className="h-5! rounded-sm!" />
         <Popover open={isOutputHovered}>
           <PopoverAnchor asChild>
-            <Handle type="source" position={Position.Right} className="h-5! rounded-sm!" onMouseEnter={() => { console.log("huh"); setOutputIsHovered(true) }}
-              onMouseLeave={() => setOutputIsHovered(false)} />
+            <Handle type="source" position={Position.Right} className="h-5! rounded-sm!" onMouseEnter={handleMouseEnter}
+              onMouseLeave={() => handleMouseLeave()} />
           </PopoverAnchor>
-          <PopoverContent side="right" align="center">
+          <PopoverContent side="right" align="center" onPointerDown={(e) => e.stopPropagation()} onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}>
             <div>
               {data.map((thing) => <div>{thing.position}. {thing.userId}, {thing.score} </div>)}
             </div>
@@ -239,3 +254,5 @@ export default function LeaderboardV2Node(props: NodeProps<LeaderboardV2NodeType
     </>
   );
 }
+
+export default memo(LeaderboardV2Node)

@@ -27,7 +27,6 @@ export default function CalculatePositionsButton({
 
   const onCalculatePositions = async () => {
     const nodes = getNodes();
-    console.log(nodes)
     const edges = getEdges();
 
     const graph = {
@@ -64,8 +63,6 @@ export default function CalculatePositionsButton({
           },
         } as MasterNodeEnumType;
       });
-
-      console.log(updatedNodes.map((node) => node.position))
 
       setNodes(updatedNodes);
 

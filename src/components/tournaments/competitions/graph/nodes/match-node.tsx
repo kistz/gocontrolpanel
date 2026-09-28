@@ -8,10 +8,11 @@ import { MatchV1 } from "@/lib/server-manager/types";
 import { IconChevronDown, IconExternalLink, IconFileSymlink, IconSettings } from "@tabler/icons-react";
 import { Handle, Node, NodeProps, NodeToolbar, Position } from "@xyflow/react";
 import Link from "next/link";
+import { memo } from "react";
 
 export type MatchV1NodeType = Node<MatchV1>;
 
-export default function MatchV1Node(props: NodeProps<MatchV1NodeType>) {
+function MatchV1Node(props: NodeProps<MatchV1NodeType>) {
   return (
 
     <Card className="">
@@ -34,3 +35,5 @@ export default function MatchV1Node(props: NodeProps<MatchV1NodeType>) {
     </Card>
   );
 }
+
+export default memo(MatchV1Node)
