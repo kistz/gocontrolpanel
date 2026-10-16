@@ -21,3 +21,6 @@
 - hetzner:servers:create
 - hetzner:servers:manage
 - hetzner:servers:delete
+- plugins:upload
+- codriver:view
+- codriver:edit

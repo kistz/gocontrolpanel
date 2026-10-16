@@ -19,6 +19,7 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
     - [Live Match](#live-match)
     - [Records and Matches](#records-and-matches)
     - [Plugin Management](#plugin-management)
+    - [Plugin Marketplace](#plugin-marketplace)
     - [Trackmania Exchange](#trackmania-exchange)
     - [Files Management](#files-management)
     - [User Management](#user-management)
@@ -26,13 +27,17 @@ A Dockerized management panel for dedicated Trackmania servers. Works both stand
     - [Role Management](#role-management)
     - [Server Management](#server-management)
     - [Hetzner Management](#hetzner-management)
+- [Architecture](#architecture)
 - [Docker Setup](#docker-setup)
   - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
     - [New Stack Setup](#new-stack-setup)
     - [PyPlanet/EvoSC Stack Setup](#pyplanetevosc-stack-setup)
   - [Permissions](#permissions)
+  - [Upgrading](#upgrading)
   - [Troubleshooting](#troubleshooting)
+  - [Changelog](#changelog)
+  - [Plugins and the marketplace](#plugins-and-the-marketplace)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -89,6 +94,10 @@ Manage the server plugins and chat settings of the server.
 
 ![Plugins Page](https://i.imgur.com/5LAxOpO.png "Plugins Page")
 ![Chat Message Editor Page](https://i.imgur.com/NpvWT3K.png "Chat Message Editor Page")
+
+#### Plugin Marketplace
+
+Browse the plugin marketplace and install plugins on your servers, or upload your own privately. Plugins run in a sandbox with only the permissions you accept when you install them. Updates, rolling back to an older version and settings are all on the server's Plugins page. See [Plugins and the marketplace](#plugins-and-the-marketplace).
 
 #### Trackmania Exchange
 
@@ -151,6 +160,21 @@ Manage your Hetzner Cloud servers, networks and volumes. You can create and dele
 ![Hetzner Server Create Page Network Step](https://i.imgur.com/f4mEhuJ.png "Hetzner Server Create Page Network Step")
 ![Hetzner Server Create Page Summary Step](https://i.imgur.com/oPUo7aC.png "Hetzner Server Create Page Summary Step")
 
+# Architecture
+
+GoControlPanel runs as two containers next to your database and Redis:
+
+| Container        | Image                                          | What it does                                                                                                                                                       |
+| ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `gocontrolpanel` | `marijnregterschot/gocontrolpanel`             | The web panel: UI, sign in, database, Nadeo, Trackmania Exchange, Hetzner and file manager. Runs the database migrations on start. Port `3000`.                    |
+| `gbx-service`    | `marijnregterschot/gocontrolpanel-gbx-service` | Holds the connections to your dedicated servers, runs the in-game plugins and widgets, records matches and serves the live WebSockets to the browser. Port `3100`. |
+
+Both images come in a MariaDB/MySQL and a PostgreSQL (`-postgres` suffix) flavour. The two containers share the database and Redis, and authenticate to each other with `GBX_SERVICE_TOKEN` and `WS_TICKET_SECRET`.
+
+- **Browsers connect to port 3100** for the live pages, so `GBX_SERVICE_WS_URL` must be reachable from your users' browsers. Behind HTTPS it must be a `wss://` URL, see [Expose the GBX service](docs/migrating-from-dev.md#3-open-port-3100-to-browsers).
+- **Run one `gbx-service` per set of servers.** Only one process may hold the connection to a dedicated server, a second one would record everything twice. `GBX_SERVICE_ENABLED_SERVERS` limits which servers an instance manages.
+- **Keep `/internal/*` private.** Only the web container calls those routes. Don't publish them through a reverse proxy.
+
 # Docker Setup
 
 This repository provides a **Docker Compose** configuration to set up and run **GoControlPanel** and its dependencies using Docker containers.
@@ -178,16 +202,46 @@ First, copy the `docker-compose.yml` file from the repository to your desired di
 
 ### 2. Modify the Configuration
 
-Make sure to update the environment variables for the services in your `docker-compose.yml` file:
+Make sure to update or add the environment variables for the services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
-
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins. Probably your own login, e.g., `v8vgGbx_TuKkBabAyn7nsQ`.
   - `DEFAULT_PERMISSIONS`: Comma-separated list of default permissions for new users. You can find a list of available permissions in the [Permissions](#permissions) section.
-  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be obtained from the [dedicated server manager](https://www.trackmania.com/player/dedicated-servers).
-  - `HETZNER_KEY`: If you are using the Hetzner Cloud API, make sure to set the this environment variable so that your API Tokens will be encrypted and stored securely in the database. This variable can be any random string, e.g., `myhetznerkey`.
-  - `LOG_LEVEL`: Set the log level for the GoControlPanel, this can be `trace`, `debug`, `info`, `warn`, `error` or `fatal`. The default is `info`.
+  - **NADEO Configuration**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). The server login and password can be obtained from the [Dedicated Server Manager](https://www.trackmania.com/player/dedicated-servers).
+  - `HETZNER_KEY`: Required for the Hetzner Cloud integration. Encrypts API tokens and SSH keys before they are stored in the database. Use a random string of at least 32 characters, for example from `openssl rand -hex 32`. When you change it, set the old value as `HETZNER_KEY_PREVIOUS` so stored values can still be decrypted.
+  - **GBX service connection**: `GBX_SERVICE_URL` is the address of the `gbx-service` container (`http://gbx-service:3100`). `GBX_SERVICE_WS_URL` is the address the browser uses to open the live WebSockets, so it must be reachable from your users (for example `ws://<your-host>:3100`, or `wss://...` behind HTTPS). `GBX_SERVICE_TOKEN` and `WS_TICKET_SECRET` are secrets of at least 32 characters (`openssl rand -base64 32`) and must be identical in both containers. The panel refuses to start without them.
+  - **Codriver AI assistant (optional)**: the panel operator enables Codriver and stores the Anthropic API keys on the Codriver admin page. `SECRETS_KEY` (at least 32 characters, shared with the GBX service) encrypts those keys and all stored dedicated/file-manager credentials; keep it stable, because changing it makes stored keys unreadable. `ANTHROPIC_API_KEY` is only a fallback for the shared key while none is stored. Optional Jev routing sends request text to TypeSafe and needs its own key, stored on the same page; `TYPESAFE_API_KEY` is its fallback while none is stored, like `ANTHROPIC_API_KEY`. `PANEL_INTERNAL_TOKEN` (at least 32 characters, the same in both containers) authenticates the GBX service when it forwards `/co` chat commands. Leave it empty to turn `/co` off. The server Codriver page provides chat, usage and request history; operator-wide usage is under Admin → Codriver. Apply pending database migrations during upgrades, including the phase 5 model-call tracking column. See [the Codriver plan and evaluation commands](docs/codriver-plan.md).
+  - `MARKETPLACE_INDEX_URL` (optional): The plugin marketplace the panel browses. Defaults to the official marketplace; set it to an empty value to turn browsing off. Uploading private plugins works either way.
+  - `LOG_LEVEL`: Set the log level for GoControlPanel. Supported values are `trace`, `debug`, `info`, `warn`, `error` and `fatal`. The default is `info`.
+  - `PLAUSIBLE_API_HOST`: Set the Plausible API host for analytics, e.g., `analytics.mywebsite.com`. This is optional and can be left empty if you do not want to use Plausible analytics.
+  - **Sentry Configuration (Optional)**: GoControlPanel can send errors, performance traces, session replays and logs to Sentry. No Sentry configuration is required unless you want to enable telemetry.
+    - `NEXT_PUBLIC_SENTRY_ENABLED`: Set to `true` to enable Sentry.
+    - `NEXT_PUBLIC_SENTRY_DSN`: The Sentry DSN. Required when Sentry is enabled.
+    - `SENTRY_SERVER_DSN` (optional): Server-side DSN. Defaults to `NEXT_PUBLIC_SENTRY_DSN`.
+    - `SENTRY_ENVIRONMENT` (optional): Environment reported to Sentry. Defaults to `NODE_ENV` (production).
+    - `SENTRY_TRACES_SAMPLE_RATE` (optional): Performance trace sampling rate (`0`-`1`). Defaults to `1`.
+    - `SENTRY_PROFILES_SAMPLE_RATE` (optional): Profiling sampling rate (`0`-`1`). Defaults to `1`.
+    - `SENTRY_REPLAYS_SESSION_SAMPLE_RATE` (optional): Session Replay sampling rate (`0`-`1`). Defaults to `1`.
+    - `SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE` (optional): Session Replay sampling rate when an error occurs (`0`-`1`). Defaults to `1`.
+    - `SENTRY_SEND_DEFAULT_PII` (optional): Whether to send personally identifiable information. Defaults to `false`.
+    - `SENTRY_ATTACH_STACKTRACE` (optional): Whether to attach stack traces to supported log messages. Defaults to `true`.
+    - `SENTRY_ENABLE_LOGS` (optional): Whether to send application logs to Sentry. Defaults to `true`.
+    - `NEXT_PUBLIC_SENTRY_TUNNEL_ROUTE` (optional): Optional tunnel route for browser events.
+    - `SENTRY_TUNNEL_ROUTE` (optional): Optional tunnel route for server-side events.
+    - `SENTRY_MAX_BREADCRUMBS` (optional): Maximum number of breadcrumbs attached to each event. Defaults to `100`.
+    - `SENTRY_NORMALIZE_DEPTH` (optional): Maximum object serialization depth. Defaults to `3`.
+    - `SENTRY_IGNORE_ERRORS` (optional): Comma-separated list of error messages that should not be reported.
+
+- **GBX Service Environment Variables** (`gbx-service` container):
+  - `DATABASE_URL`, `REDIS_URI`: The same values as the `gocontrolpanel` container.
+  - `GBX_SERVICE_TOKEN`, `WS_TICKET_SECRET`: The same values as the `gocontrolpanel` container.
+  - `WS_ALLOWED_ORIGINS`: The origin(s) of the panel, comma separated, e.g., `https://panel.example.com`. A browser socket from another origin is refused.
+  - `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD`, `NADEO_CONTACT`, `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`: The same values as the `gocontrolpanel` container.
+  - `GBX_SERVICE_ENABLED_SERVERS` (optional): Comma-separated server ids this instance manages. Empty manages every server in the database.
+  - `PANEL_INTERNAL_URL`, `PANEL_INTERNAL_TOKEN` (optional): The panel address the service uses for Codriver `/co` commands (`http://gocontrolpanel:3000`), and the same token as the `gocontrolpanel` container. Empty turns `/co` off.
+  - `LOG_LEVEL`, `SENTRY_DSN`, `SENTRY_ENVIRONMENT` (optional): Logging and error reporting of the service.
+  - `MARKETPLACE_INDEX_URL`, `MARKETPLACE_CHECK_MINUTES` (optional): The plugin marketplace the service checks for withdrawn plugin versions, and how often (default every 30 minutes). Empty URL turns the check off.
 
 - **Dedicated Server Environment Variables**:
   - `TM_MASTERSERVER_LOGIN`: Login for the dedicated server (same as `NADEO_SERVER_LOGIN` in GoControlPanel).
@@ -239,10 +293,36 @@ gocontrolpanel:
     REDIS_URI: redis://redis:6379
     DATABASE_URL: mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
     HETZNER_KEY:
+    GBX_SERVICE_URL: http://gbx-service:3100
+    GBX_SERVICE_WS_URL: ws://localhost:3100 # Must be reachable from the browser
+    GBX_SERVICE_TOKEN: # Same value as the GBX service, at least 32 characters
+    WS_TICKET_SECRET: # Same value as the GBX service, at least 32 characters
     LOG_LEVEL: info
   depends_on:
     - db
     - redis
+
+gbx-service:
+  image: marijnregterschot/gocontrolpanel-gbx-service:beta # Use marijnregterschot/gocontrolpanel-gbx-service-postgres:beta if you are using PostgreSQL
+  ports:
+    - 3100:3100 # WebSockets for the browser; /internal routes require GBX_SERVICE_TOKEN
+  restart: unless-stopped
+  environment:
+    DATABASE_URL: mysql://gocontrolpanel:VettePanel123@db:3306/gocontrolpanel
+    REDIS_URI: redis://redis:6379
+    GBX_SERVICE_TOKEN: # Same value as the web app, at least 32 characters
+    WS_TICKET_SECRET: # Same value as the web app, at least 32 characters
+    WS_ALLOWED_ORIGINS: http://localhost:3000
+    NADEO_SERVER_LOGIN:
+    NADEO_SERVER_PASSWORD:
+    NADEO_CONTACT: GoControlPanel / <your contact info>
+    NADEO_CLIENT_ID:
+    NADEO_CLIENT_SECRET:
+    LOG_LEVEL: info
+  depends_on:
+    - db
+    - redis
+    - gocontrolpanel # Runs the database migrations
 
 filemanager:
   image: marijnregterschot/trackmania-server-fm:latest
@@ -297,20 +377,41 @@ FLUSH PRIVILEGES;
 
 ### 4. Modify the environment variables
 
-Make sure to update the environment variables for the added services in your `docker-compose.yml` file:
+Make sure to update or add the environment variables for the added services in your `docker-compose.yml` file:
 
 - **GoControlPanel Environment Variables**:
-
   - `NEXTAUTH_URL`, `NEXTAUTH_SECRET`: NextAuth configuration for authentication. `NEXTAUTH_SECRET` can be any random string, e.g., `VettePanel123`.
   - `DEFAULT_ADMINS`: Comma-separated list of default admin logins.
   - `DEFAULT_PERMISSIONS`: Comma-separated list of default permissions for new users. You can find a list of available permissions in the [Permissions](#permissions) section.
-  - **NADEO Configurations**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). And the server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
-  - `HETZNER_KEY`: If you are using the Hetzner Cloud API, make sure to set the this environment variable so that your API Tokens will be encrypted and stored securely in the database. This variable can be any random string, e.g., `myhetznerkey`.
-  - `LOG_LEVEL`: Set the log level for the GoControlPanel, this can be `trace`, `debug`, `info`, `warn`, `error` or `fatal`. The default is `info`.
+  - **NADEO Configuration**: Make sure to update `NADEO_CLIENT_ID`, `NADEO_CLIENT_SECRET`, `NADEO_REDIRECT_URI`, `NADEO_SERVER_LOGIN`, `NADEO_SERVER_PASSWORD` and `NADEO_CONTACT` with your valid NADEO API credentials. Nadeo API credentials can be obtained from the [Nadeo API manager](https://api.trackmania.com/manager). The server login and password can be found in your existing stack configuration under the `dedicated` or `trackmania` service.
+  - `HETZNER_KEY`: Required for the Hetzner Cloud integration. Encrypts API tokens and SSH keys before they are stored in the database. Use a random string of at least 32 characters, for example from `openssl rand -hex 32`. When you change it, set the old value as `HETZNER_KEY_PREVIOUS` so stored values can still be decrypted.
+  - **GBX service connection**: `GBX_SERVICE_URL` is the address of the `gbx-service` container (`http://gbx-service:3100`). `GBX_SERVICE_WS_URL` is the address the browser uses to open the live WebSockets, so it must be reachable from your users (for example `ws://<your-host>:3100`, or `wss://...` behind HTTPS). `GBX_SERVICE_TOKEN` and `WS_TICKET_SECRET` are secrets of at least 32 characters (`openssl rand -base64 32`) and must be identical in both containers. The panel refuses to start without them.
+  - `MARKETPLACE_INDEX_URL` (optional): The plugin marketplace the panel browses. Defaults to the official marketplace; set it to an empty value to turn browsing off. Uploading private plugins works either way.
+  - `LOG_LEVEL`: Set the log level for GoControlPanel. Supported values are `trace`, `debug`, `info`, `warn`, `error` and `fatal`. The default is `info`.
+  - `PLAUSIBLE_API_HOST`: Set the Plausible API host for analytics, e.g., `analytics.mywebsite.com`. This is optional and can be left empty if you do not want to use Plausible analytics.
+  - **Sentry Configuration (Optional)**: GoControlPanel can send errors, performance traces, session replays and logs to Sentry. No Sentry configuration is required unless you want to enable telemetry.
+    - `NEXT_PUBLIC_SENTRY_ENABLED`: Set to `true` to enable Sentry.
+    - `NEXT_PUBLIC_SENTRY_DSN`: The Sentry DSN. Required when Sentry is enabled.
+    - `SENTRY_SERVER_DSN` (optional): Server-side DSN. Defaults to `NEXT_PUBLIC_SENTRY_DSN`.
+    - `SENTRY_ENVIRONMENT` (optional): Environment reported to Sentry. Defaults to `NODE_ENV` (production).
+    - `SENTRY_TRACES_SAMPLE_RATE` (optional): Performance trace sampling rate (`0`-`1`). Defaults to `1`.
+    - `SENTRY_PROFILES_SAMPLE_RATE` (optional): Profiling sampling rate (`0`-`1`). Defaults to `1`.
+    - `SENTRY_REPLAYS_SESSION_SAMPLE_RATE` (optional): Session Replay sampling rate (`0`-`1`). Defaults to `1`.
+    - `SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE` (optional): Session Replay sampling rate when an error occurs (`0`-`1`). Defaults to `1`.
+    - `SENTRY_SEND_DEFAULT_PII` (optional): Whether to send personally identifiable information. Defaults to `false`.
+    - `SENTRY_ATTACH_STACKTRACE` (optional): Whether to attach stack traces to supported log messages. Defaults to `true`.
+    - `SENTRY_ENABLE_LOGS` (optional): Whether to send application logs to Sentry. Defaults to `true`.
+    - `NEXT_PUBLIC_SENTRY_TUNNEL_ROUTE` (optional): Optional tunnel route for browser events.
+    - `SENTRY_TUNNEL_ROUTE` (optional): Optional tunnel route for server-side events.
+    - `SENTRY_MAX_BREADCRUMBS` (optional): Maximum number of breadcrumbs attached to each event. Defaults to `100`.
+    - `SENTRY_NORMALIZE_DEPTH` (optional): Maximum object serialization depth. Defaults to `3`.
+    - `SENTRY_IGNORE_ERRORS` (optional): Comma-separated list of error messages that should not be reported.
+
+- **GBX Service Environment Variables** (`gbx-service`): use the same `DATABASE_URL`, `REDIS_URI`, `GBX_SERVICE_TOKEN`, `WS_TICKET_SECRET` and Nadeo values as the `gocontrolpanel` service, and set `WS_ALLOWED_ORIGINS` to the origin of the panel. See [Architecture](#architecture) for what each variable does.
 
 > **Note:** Make sure you are using the correct service name for the dedicated server. For **PyPlanet**, the service name is usually `dedicated`, and for **EvoSC**, it is `trackmania`.
 
-### 6. Start the Services
+### 5. Start the Services
 
 Run the following command to start the services.
 
@@ -318,7 +419,7 @@ Run the following command to start the services.
 docker compose up -d
 ```
 
-### 7. Access the GoControlPanel
+### 6. Access the GoControlPanel
 
 That's it! You can now access your **GoControlPanel** at `http://localhost:3000` or your own configured url.
 
@@ -354,6 +455,22 @@ The **GoControlPanel** supports a permission system that allows you to manage us
 - hetzner:servers:delete
 - audit-logs:view
 - audit-logs:delete
+- plugins:upload
+- codriver:view
+- codriver:edit
+
+---
+
+## Upgrading
+
+Back up your database first (`mysqldump` or `pg_dump`), then pull the new images and recreate the containers:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+The `gocontrolpanel` container applies database migrations on start. Check the [changelog](CHANGELOG.md) before upgrading across several versions. If you are coming from the single-container setup of the `dev` branch, follow the [migration guide](docs/migrating-from-dev.md).
 
 ---
 
@@ -371,14 +488,68 @@ For example, to view the logs of the **GoControlPanel** service:
 docker compose logs gocontrolpanel
 ```
 
+Players can type `/version` in game to receive the control panel app version in a
+private chat reply. This native command works without plugins, even when `/help`
+is disabled. The version comes from the root `package.json` and is bundled into
+the GBX service build. `/help version` describes the command when help is enabled.
+
+Other native commands also reply privately and work without plugins:
+
+| Command        | Information                                                         | Access        |
+| -------------- | ------------------------------------------------------------------- | ------------- |
+| `/uptime`      | Service uptime and duration of the current server connection        | Everyone      |
+| `/status`      | Connection state, game mode, drivers and spectators                 | Everyone      |
+| `/plugins`     | Installed versions and disabled/running/not-running state           | Everyone      |
+| `/ping`        | Dedicated server XML-RPC round-trip time (not gameplay latency)     | Everyone      |
+| `/sysinfo`     | Node version, platform, process memory, CPU count and host CPU load | Server admins |
+| `/diagnostics` | Database, Redis and GBX connectivity checked separately             | Server admins |
+
+Global panel admins, direct server Admins, and Admins of groups containing the
+server can use the restricted commands. Probes and permission checks time out
+after three seconds. Error details remain in service logs. `/help <command>`
+describes each command when help is enabled. These native command names are
+reserved and cannot be claimed by plugins.
+
+Everything that talks to a dedicated server (connection errors, plugins, chat commands, match recording) is logged by the **GBX service**:
+
+```bash
+docker compose logs gbx-service
+curl http://localhost:3100/health    # {"status":"ok","servers":N,"connected":N}
+```
+
+- **A container exits right after starting:** a missing or too short (< 32 characters) `GBX_SERVICE_TOKEN` or `WS_TICKET_SECRET`, or an invalid value, is listed in its log.
+- **Live pages stay empty or the servers show as offline:** the browser can't reach `GBX_SERVICE_WS_URL`, or the panel's origin is missing from `WS_ALLOWED_ORIGINS` (the socket closes with code `4403`). Behind HTTPS the URL must start with `wss://`.
+- **Everything is recorded or announced twice:** two controllers hold a connection to the same dedicated server, for example two `gbx-service` containers on one database. Run one, or split the servers with `GBX_SERVICE_ENABLED_SERVERS`.
+
+---
+
+## Changelog
+
+The release notes of every version are in [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## Plugins and the marketplace
+
+Admins of a server can install plugins from the marketplace on the **Plugins** page, or upload their own (with the `plugins:upload` permission). Plugins run sandboxed in the GBX service, and a plugin that misbehaves is turned off and its admins are notified.
+
+- `MARKETPLACE_INDEX_URL` on **both** containers selects the marketplace. The default is the official one; leave it empty to turn browsing off.
+- [Plugin marketplace](docs/plugin-marketplace.md): how it works, running your own registry, withdrawing plugins, and the security model.
+- [Plugin SDK](docs/plugin-sdk.md): writing, testing and publishing a plugin.
+- [First-party plugins](docs/first-party-plugins.md): the first-party plugins published in the registry.
+
 ---
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions or improvements, please create a pull request or open an issue. Feel free to fork the repository and make changes as needed.
+Contributions are welcome! If you have suggestions or improvements, please create a pull request or open an issue. Feel free to fork the repository and make changes as needed. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up a local development environment.
 
 ---
 
 ## License
 
 This project is licensed under the MIT License - see the [License](License) file for details.
+
+### Security upgrade: account revocation and server credentials
+
+Upgrades that include `20261011140000_user_revocation_and_credentials` require a coordinated database/credential migration. Follow [the security upgrade instructions](docs/security-upgrade-2026-10-11.md) before restarting the services. Existing plaintext server credentials are intentionally rejected until encrypted with the shared `SECRETS_KEY`.

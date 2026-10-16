@@ -1,0 +1,13 @@
+import z from "zod";
+
+export const TMServerSchema = z.object({
+  dediLogin: z.string().min(1, { message: "Dedi login is required" }),
+  dediPassword: z.string().min(1, { message: "Dedi password is required" }),
+  roomPassword: z.string().optional(),
+  createServer: z.boolean(),
+  groupId: z.string(),
+  updateServer: z.boolean(),
+  serverId: z.string(),
+});
+
+export type TMServerSchemaType = z.infer<typeof TMServerSchema>;
