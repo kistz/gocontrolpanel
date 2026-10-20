@@ -1,4 +1,7 @@
 "use client";
+import Modal from "@/components/modals/modal";
+import CreateMatchModal from "@/components/modals/tournaments/match/create-match";
+import CreateMatchTemplateModal from "@/components/modals/tournaments/match/create-match-template";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,22 +14,31 @@ import { useProcedure, useTable } from "spacetimedb/react";
 
 
 interface CompetitionSharedConfigsProps {
-    id: number;
+    competitionId: number;
 }
 
 export default function CompetitionSharedConfigs({
-    id,
+    competitionId,
 }: CompetitionSharedConfigsProps) {
 
     const proc = useProcedure(procedures.unstableCompetitionRawServerConfigV2);
-    const configs = useSpacetimeProcedure(proc, { competitionId: id }).data
+    const configs = useSpacetimeProcedure(proc, { competitionId }).data
 
     if (configs === null) {
         return <div>Failed</div>
     }
 
     return (
-        <div className="">
+        <div className="flex flex-col">
+            <Modal>
+                <CreateMatchTemplateModal data={competitionId} />
+                <Button
+                    variant="outline"
+                    className="dark:bg-card hover:dark:bg-muted"
+                >
+                    Add Config
+                </Button>
+            </Modal>
             <Table>
                 <TableHeader className="">
                     <TableRow>

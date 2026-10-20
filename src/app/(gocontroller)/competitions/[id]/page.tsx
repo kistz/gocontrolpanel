@@ -78,7 +78,7 @@ export default function CompetitionPage({
               </DialogDescription>
             </DialogHeader>
 
-            <CompetitionSharedConfigs id={id} />
+            <CompetitionSharedConfigs competitionId={id} />
           </DialogContent>
         </Dialog>
 

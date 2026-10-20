@@ -28,7 +28,7 @@ export default function ContextMenu({ x, y, ...props }) {
     console.log("X is" + x + "Y is " + y)
     return (
         <Card className="relative w-30 h-50" style={{ left: x - 300, top: y - 200 }} >
-            What
+            Commands
             <Button variant="outline" className="max-w-44">
                 Add Match
             </Button>
