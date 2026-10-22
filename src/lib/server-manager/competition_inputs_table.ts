@@ -9,21 +9,10 @@ import {
   type AlgebraicTypeType as __AlgebraicTypeType,
   type Infer as __Infer,
 } from "spacetimedb";
-import {
-  RegistrationSettings,
-  RegistrationStatus,
-} from "./types";
-
 
 export default __t.row({
   name: __t.string(),
-  id: __t.u32().primaryKey(),
+  id: __t.u32(),
   parentId: __t.u32().name("parent_id"),
-  get settings() {
-    return RegistrationSettings;
-  },
-  get status() {
-    return RegistrationStatus;
-  },
   template: __t.bool(),
 });

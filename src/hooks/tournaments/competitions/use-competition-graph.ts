@@ -1,4 +1,4 @@
-import { procedures, tables } from "@/lib/server-manager";
+import { tables } from "@/lib/server-manager";
 import {
   CompetitionConnection,
   CompetitionNodePosition,
@@ -10,86 +10,57 @@ import {
   Registration,
 } from "@/lib/server-manager/types";
 import { useMemo } from "react";
-import { useProcedure, useTable } from "spacetimedb/react";
-import { useSpacetimeProcedure } from "../use-spacetime-procedure";
+import { useTable } from "spacetimedb/react";
 
 
 
 export type Graph = {
   nMatchV1: readonly MatchV1[],
-  nCompetitionV1: CompetitionV1[],
+  nCompetitionV1: readonly CompetitionV1[],
   nRegistrationV1: readonly Registration[],
-  nLeaderboardV2: LeaderboardV2[],
-  nInputV1: InputV1[],
-  nOutputV1: OutputV1[],
+  nLeaderboardV2: readonly LeaderboardV2[],
+  nInputV1: readonly InputV1[],
+  nOutputV1: readonly OutputV1[],
   connections: readonly CompetitionConnection[],
   nodePositions: readonly CompetitionNodePosition[]
 };
 
 export function useCompetitionGraph(competition: CompetitionV1) {
-  const [nMatchV1, nMatchV1Ready] = useTable(
-    tables.tabMatch.where((row) => row.parentId.eq(competition.id)),
-  );
-
-
-  const [nRegistrationV1, nRegistrationV1Ready] = useTable(
-    tables.tabRegistration.where((row) => row.parentId.eq(competition.id)),
-  );
-
-
   const [connections, connectionsReady] = useTable(
-    tables.unstableCompetitionConnection.where((row) =>
-      row.competitionId.eq(competition.id),
-    ),
+    tables.competitionConnections({ competitionId: competition.id })
   );
-
 
   const [nodePositions, positionsReady] = useTable(
-    tables.myNodePositions.where((row) =>
-      row.competitionId.eq(competition.id),
-    ),
+    tables.competitionNodePositions({ competitionId: competition.id })
   );
 
 
-  const competition_competitions = useProcedure(procedures.unstableCompetitionCompetitions)
-  const competitionCompetitionsResult = useSpacetimeProcedure(competition_competitions, {
-    competitionId: competition.id
-  }).data;
-  const nCompetitionV1 = useMemo(() => {
-    return competitionCompetitionsResult ? competitionCompetitionsResult : [];
-  }, [competitionCompetitionsResult]);
+  const [nMatchV1, nMatchV1Ready] = useTable(
+    tables.competitionMatches({ competitionId: competition.id })
+  );
 
+  const [nRegistrationV1, nRegistrationV1Ready] = useTable(
+    tables.competitionRegistrations({ competitionId: competition.id })
+  );
 
-  const competition_inputs = useProcedure(procedures.unstableCompetitionInputs)
-  const competitionInputsResult = useSpacetimeProcedure(competition_inputs, {
-    competitionId: competition.id
-  }).data;
-  const nInputV1 = useMemo(() => {
-    return competitionInputsResult ? competitionInputsResult : [];
-  }, [competitionInputsResult]);
+  const [nCompetitionV1, nCompetitionV1Ready] = useTable(
+    tables.competitionCompetitions({ competitionId: competition.id })
+  );
 
+  const [nInputV1, nInputV1Ready] = useTable(
+    tables.competitionInputs({ competitionId: competition.id })
+  );
 
-  const competition_output = useProcedure(procedures.unstableCompetitionOutput)
-  const competitionOutputResult = useSpacetimeProcedure(competition_output, {
-    competitionId: competition.id
-  }).data;
-  const nOutputV1 = useMemo(() => {
-    return competitionOutputResult ? competitionOutputResult : [];
-  }, [competitionOutputResult]);
+  const [nOutputV1, nOutputV1Ready] = useTable(
+    tables.competitionOutput({ competitionId: competition.id })
+  );
 
-
-  const competition_leaderboards = useProcedure(procedures.unstableCompetitionLeaderboards)
-  const competitionLeaderboardsResult = useSpacetimeProcedure(competition_leaderboards, {
-    competitionId: competition.id
-  }).data;
-  const nLeaderboardV2 = useMemo(() => {
-    return competitionLeaderboardsResult ? competitionLeaderboardsResult : [];
-  }, [competitionLeaderboardsResult]);
-
-
+  const [nLeaderboardV2, nLeaderboardV2Ready] = useTable(
+    tables.competitionLeaderboards({ competitionId: competition.id })
+  );
 
   const graph = useMemo<Graph>(() => {
-    const allReady = nMatchV1Ready && connectionsReady && positionsReady && nRegistrationV1Ready;
+    const allReady = nMatchV1Ready && connectionsReady && positionsReady && nRegistrationV1Ready && nCompetitionV1Ready && nInputV1Ready && nOutputV1Ready && nLeaderboardV2Ready;
 
     if (!allReady) {
       return {
@@ -105,7 +76,8 @@ export function useCompetitionGraph(competition: CompetitionV1) {
     }
 
     return { nMatchV1, connections, nodePositions, nCompetitionV1, nRegistrationV1, nLeaderboardV2, nOutputV1, nInputV1 };
-  }, [nMatchV1, connections, nodePositions, nCompetitionV1, nMatchV1Ready, connectionsReady, positionsReady, nRegistrationV1, nRegistrationV1Ready, nLeaderboardV2, nOutputV1, nInputV1]);
+  }, [connections, nodePositions, nMatchV1, nMatchV1Ready, nRegistrationV1, nCompetitionV1, nInputV1, nOutputV1, nLeaderboardV2, nOutputV1, nInputV1,
+    connectionsReady, positionsReady, nMatchV1Ready, nRegistrationV1Ready, nCompetitionV1Ready, nInputV1Ready, nOutputV1Ready, nLeaderboardV2Ready]);
 
   return graph;
 }

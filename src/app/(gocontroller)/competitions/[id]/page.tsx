@@ -14,16 +14,17 @@ import { useProcedure, useTable } from "spacetimedb/react";
 
 
 export default function CompetitionPage({
-  params,
+  params
 }: {
   params: Promise<{ id: number }>;
 }) {
-  const { id } = React.use(params);
-  const competition = useProcedure(procedures.unstableCompetition)
+  const { id: competitionId } = React.use(params);
 
-  const { data: comp, isLoading } = useSpacetimeProcedure(competition, { competitionId: id })
+  const [competitionTable, competitionReady] = useTable(tables.competition({ competitionId }))
+  const comp = competitionTable[0];
 
-  if (isLoading) {
+
+  if (!competitionReady) {
     return <div className="p-6 text-muted-foreground">Loading competition info...</div>;
   }
 
@@ -57,7 +58,7 @@ export default function CompetitionPage({
               </DialogDescription>
             </DialogHeader>
 
-            <CompetitionServerPool id={id} />
+            <CompetitionServerPool id={competitionId} />
           </DialogContent>
         </Dialog>
 
@@ -78,7 +79,7 @@ export default function CompetitionPage({
               </DialogDescription>
             </DialogHeader>
 
-            <CompetitionSharedConfigs competitionId={id} />
+            <CompetitionSharedConfigs competitionId={competitionId} />
           </DialogContent>
         </Dialog>
 
@@ -99,7 +100,7 @@ export default function CompetitionPage({
               </DialogDescription>
             </DialogHeader>
 
-            <CompetitionPermissions id={id} />
+            <CompetitionPermissions id={competitionId} />
           </DialogContent>
         </Dialog>
 

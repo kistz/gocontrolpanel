@@ -10,17 +10,14 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 import {
-  Vec2,
-  NodeHandle,
+  ConnectionDataOption,
 } from "./types";
 
 
 export default __t.row({
   competitionId: __t.u32().name("competition_id"),
-  get node() {
-    return NodeHandle;
-  },
-  get position() {
-    return Vec2;
+  connectionId: __t.u32().name("connection_id"),
+  get options() {
+    return ConnectionDataOption;
   },
 });
