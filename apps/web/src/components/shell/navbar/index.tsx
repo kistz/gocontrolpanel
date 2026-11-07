@@ -65,12 +65,12 @@ export default async function Navbar() {
   return (
     <>
       {session && <NavGroups />}
-      {session && usingSpacetime && <NavTournaments />}
       {session?.user.admin && session?.user.adminGroups.length > 0 && (
         <SidebarSeparator />
       )}
       {session?.user.admin && <NavAdminGroups />}
       {session && canViewPlugins && <NavPlugins />}
+      {session && usingSpacetime && <NavTournaments />}
       {session && canViewAdmin && (
         <NavAdmin
           canViewUsers={canViewUsers}
