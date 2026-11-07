@@ -1,19 +1,33 @@
 "use client";
+import { ModalContent } from "@/components/modals/modal";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useServerAction } from "@/hooks/tournaments/use-server-action";
 import { toNodeId } from "@/lib/node-handle";
 import { reducers, tables } from "@/lib/server-manager";
-import { CompetitionConnection, ConnectionAction, ConnectionDataOption } from "@/lib/server-manager/types";
-import { IconCheck, IconDeviceFloppy, IconTrash, IconX } from "@tabler/icons-react";
+import {
+  CompetitionConnection,
+  ConnectionAction,
+  ConnectionDataOption,
+} from "@/lib/server-manager/types";
+import { IconCheck, IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useReducer, useTable } from "spacetimedb/react";
 import { DefaultModalProps } from "../../default-props";
 
-const ACTIONS = { MatchV1: ["TryStart", "ForceStart"], RegistrationV1: ["Open", "Close"] } as const;
+const ACTIONS = {
+  MatchV1: ["TryStart", "ForceStart"],
+  RegistrationV1: ["Open", "Close"],
+} as const;
 
 const DATA_OPTIONS = {
   All: "All players",
@@ -27,11 +41,15 @@ type DataOptionTag = keyof typeof DATA_OPTIONS;
 
 function defaultOption(tag: DataOptionTag): ConnectionDataOption {
   switch (tag) {
-    case "All": return { tag };
+    case "All":
+      return { tag };
     case "FirstN":
-    case "LastN": return { tag, value: 1 };
-    case "FirstOffsetN": return { tag, value: { offset: 0, take: 1 } };
-    case "Custom": return { tag, value: new Uint8Array() };
+    case "LastN":
+      return { tag, value: 1 };
+    case "FirstOffsetN":
+      return { tag, value: { offset: 0, take: 1 } };
+    case "Custom":
+      return { tag, value: new Uint8Array() };
   }
 }
 
@@ -56,20 +74,21 @@ export default function EdgeSettingsModal({
   const locked = connection.status.tag === "Resolved";
 
   return (
-    <Card
-      onClick={(e) => e.stopPropagation()}
-      className="p-6 gap-4 sm:min-w-100 max-sm:w-full max-h-[90vh] overflow-y-auto"
-    >
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{connection.kind.tag} Connection</h1>
-        <IconX className="h-6 w-6 cursor-pointer text-muted-foreground" onClick={closeModal} />
-      </div>
+    <ModalContent className="gap-4 sm:min-w-100">
+      <DialogHeader className="pr-6">
+        <DialogTitle>{connection.kind.tag} Connection</DialogTitle>
+      </DialogHeader>
       <p className="text-sm text-muted-foreground">
-        {toNodeId(connection.origin)} → {toNodeId(connection.target)} · {connection.status.tag}
+        {toNodeId(connection.origin)} → {toNodeId(connection.target)} ·{" "}
+        {connection.status.tag}
       </p>
 
-      {connection.kind.tag === "Data" && <DataOptionSettings connection={connection} disabled={locked} />}
-      {connection.kind.tag === "Action" && <ActionSettings connection={connection} disabled={locked} />}
+      {connection.kind.tag === "Data" && (
+        <DataOptionSettings connection={connection} disabled={locked} />
+      )}
+      {connection.kind.tag === "Action" && (
+        <ActionSettings connection={connection} disabled={locked} />
+      )}
 
       <div className="flex justify-between gap-2 mt-2">
         <Button
@@ -82,18 +101,26 @@ export default function EdgeSettingsModal({
           Delete
         </Button>
         {connection.status.tag === "Configuring" && (
-          <Button onClick={() => markConfigured({ connectionId: connection.id })}>
+          <Button
+            onClick={() => markConfigured({ connectionId: connection.id })}
+          >
             <IconCheck />
             Mark Configured
           </Button>
         )}
       </div>
-    </Card>
+    </ModalContent>
   );
 }
 
 // The server has no view for the current action yet, so it can only be set.
-function ActionSettings({ connection, disabled }: { connection: CompetitionConnection; disabled: boolean }) {
+function ActionSettings({
+  connection,
+  disabled,
+}: {
+  connection: CompetitionConnection;
+  disabled: boolean;
+}) {
   const update = useServerAction(
     useReducer(reducers.connectionActionUpdate),
     "Failed to update action",
@@ -108,23 +135,48 @@ function ActionSettings({ connection, disabled }: { connection: CompetitionConne
       <Select
         disabled={disabled}
         onValueChange={(tag) =>
-          update({ connectionId: connection.id, action: { tag: target, value: { tag } } as ConnectionAction })
+          update({
+            connectionId: connection.id,
+            action: { tag: target, value: { tag } } as ConnectionAction,
+          })
         }
       >
-        <SelectTrigger className="w-full"><SelectValue placeholder="Select action" /></SelectTrigger>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select action" />
+        </SelectTrigger>
         <SelectContent className="z-[9999]">
-          {ACTIONS[target].map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+          {ACTIONS[target].map((a) => (
+            <SelectItem key={a} value={a}>
+              {a}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
   );
 }
 
-function DataOptionSettings({ connection, disabled }: { connection: CompetitionConnection; disabled: boolean }) {
-  const [rows] = useTable(tables.competitionConnectionsData({ competitionId: connection.competitionId }));
+function DataOptionSettings({
+  connection,
+  disabled,
+}: {
+  connection: CompetitionConnection;
+  disabled: boolean;
+}) {
+  const [rows] = useTable(
+    tables.competitionConnectionsData({
+      competitionId: connection.competitionId,
+    }),
+  );
   const current = rows.find((r) => r.connectionId === connection.id)?.options;
 
-  return current ? <DataOptionForm connectionId={connection.id} initial={current} disabled={disabled} /> : null;
+  return current ? (
+    <DataOptionForm
+      connectionId={connection.id}
+      initial={current}
+      disabled={disabled}
+    />
+  ) : null;
 }
 
 function DataOptionForm({
@@ -151,9 +203,15 @@ function DataOptionForm({
         disabled={disabled}
         onValueChange={(tag) => setOption(defaultOption(tag as DataOptionTag))}
       >
-        <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+        <SelectTrigger className="w-full">
+          <SelectValue />
+        </SelectTrigger>
         <SelectContent className="z-[9999]">
-          {Object.entries(DATA_OPTIONS).map(([tag, label]) => <SelectItem key={tag} value={tag}>{label}</SelectItem>)}
+          {Object.entries(DATA_OPTIONS).map(([tag, label]) => (
+            <SelectItem key={tag} value={tag}>
+              {label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -162,26 +220,42 @@ function DataOptionForm({
           type="number"
           disabled={disabled}
           value={option.value}
-          onChange={(e) => setOption({ tag: option.tag, value: toU8(e.target.value) })}
+          onChange={(e) =>
+            setOption({ tag: option.tag, value: toU8(e.target.value) })
+          }
         />
       )}
       {option.tag === "FirstOffsetN" && (
         <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-          <Label htmlFor="offset" className="text-xs text-muted-foreground">Skip first</Label>
-          <Label htmlFor="take" className="text-xs text-muted-foreground">Then take</Label>
+          <Label htmlFor="offset" className="text-xs text-muted-foreground">
+            Skip first
+          </Label>
+          <Label htmlFor="take" className="text-xs text-muted-foreground">
+            Then take
+          </Label>
           <Input
             id="offset"
             type="number"
             disabled={disabled}
             value={option.value.offset}
-            onChange={(e) => setOption({ tag: "FirstOffsetN", value: { ...option.value, offset: toU8(e.target.value) } })}
+            onChange={(e) =>
+              setOption({
+                tag: "FirstOffsetN",
+                value: { ...option.value, offset: toU8(e.target.value) },
+              })
+            }
           />
           <Input
             id="take"
             type="number"
             disabled={disabled}
             value={option.value.take}
-            onChange={(e) => setOption({ tag: "FirstOffsetN", value: { ...option.value, take: toU8(e.target.value) } })}
+            onChange={(e) =>
+              setOption({
+                tag: "FirstOffsetN",
+                value: { ...option.value, take: toU8(e.target.value) },
+              })
+            }
           />
         </div>
       )}
@@ -191,12 +265,23 @@ function DataOptionForm({
           placeholder="Positions, e.g. 1, 4, 5"
           defaultValue={Array.from(option.value).join(", ")}
           onChange={(e) =>
-            setOption({ tag: "Custom", value: Uint8Array.from(e.target.value.split(",").filter((s) => s.trim()).map(toU8)) })
+            setOption({
+              tag: "Custom",
+              value: Uint8Array.from(
+                e.target.value
+                  .split(",")
+                  .filter((s) => s.trim())
+                  .map(toU8),
+              ),
+            })
           }
         />
       )}
 
-      <Button disabled={disabled} onClick={() => update({ connectionId, option })}>
+      <Button
+        disabled={disabled}
+        onClick={() => update({ connectionId, option })}
+      >
         <IconDeviceFloppy />
         Save
       </Button>
