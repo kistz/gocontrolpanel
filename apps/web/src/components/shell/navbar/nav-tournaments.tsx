@@ -1,0 +1,207 @@
+"use client";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { generatePath, getCurrentId } from "@/lib/utils";
+import { routes } from "@/routes";
+import {
+  IconLogin,
+  IconPlus,
+  IconServer,
+  IconTrophy,
+} from "@tabler/icons-react";
+import Link from "next/link";
+
+import { signInToTmservers } from "@/lib/spacetimedb/session";
+
+import Modal from "@/components/modals/modal";
+import CreateTournamentModal from "@/components/modals/tournaments/tournament/create-tournament";
+import { useMyProjects } from "@/hooks/tournaments/projects/use-my-projects";
+import { ChevronRight } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useAuth } from "react-oidc-context";
+import { useSpacetimeDB } from "spacetimedb/react";
+
+export default function NavTournaments() {
+  const auth = useAuth();
+
+  if (auth.isLoading) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton disabled>Loading...</SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
+  if (!auth.isAuthenticated || !auth.user?.id_token) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+        <SidebarGroupLabel>Tournaments</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => signInToTmservers(auth)}>
+                <IconLogin />
+                Log in to view tournaments
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
+  // SpacetimeDB hooks need the provider, which only mounts once a token exists
+  return <TournamentList />;
+}
+
+function TournamentList() {
+  const pathname = usePathname();
+  const activeId = getCurrentId(pathname);
+
+  const spacetime = useSpacetimeDB();
+  const { tournaments, isReady } = useMyProjects();
+
+  const upcomingTournaments = tournaments
+    .filter((t) => t.endingAt.toDate() >= new Date())
+    // Sort by starting date ascending, closest first
+    .sort(
+      (a, b) =>
+        a.startingAt.toDate().getTime() - b.startingAt.toDate().getTime(),
+    );
+  const passedTournaments = tournaments.filter(
+    (t) => t.endingAt.toDate() < new Date(),
+  );
+
+  if (!spacetime.isActive || !isReady) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+        <SidebarGroupContent className="flex flex-col gap-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span>
+                    {spacetime.isActive
+                      ? "Loading tournaments..."
+                      : "Not connected to tmservers.live"}
+                  </span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
+  return (
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden select-none">
+      <SidebarGroupLabel>Tournaments</SidebarGroupLabel>
+      <SidebarGroupAction>
+        <Modal>
+          <CreateTournamentModal />
+          <IconPlus /> <span className="sr-only">Create Tournament</span>
+        </Modal>
+      </SidebarGroupAction>
+      <SidebarGroupContent className="flex flex-col gap-2">
+        <SidebarMenu>
+          {upcomingTournaments.map((tournament) => (
+            <SidebarMenuItem key={tournament.id}>
+              <SidebarMenuButton tooltip={tournament.name} asChild>
+                <Link
+                  href={generatePath(routes.tournaments.competition, {
+                    id: tournament.rootCompetition.toString(),
+                  })}
+                  className="select-none cursor-pointer"
+                >
+                  <IconTrophy />
+                  <span className="overflow-hidden text-ellipsis text-nowrap flex items-center">
+                    {tournament.name}
+                  </span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+
+          {passedTournaments.length > 0 && (
+            <Collapsible
+              asChild
+              className="group/collapsible"
+              defaultOpen={passedTournaments.some(
+                (t) => t.id.toString() === activeId,
+              )}
+            >
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton asChild>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">
+                        Passed Tournaments
+                      </span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </div>
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenu>
+                    {passedTournaments.map((tournament) => (
+                      <SidebarMenuItem key={tournament.id}>
+                        <SidebarMenuButton tooltip={tournament.name} asChild>
+                          <Link
+                            href={generatePath(routes.tournaments.competition, {
+                              id: tournament.rootCompetition.toString(),
+                            })}
+                            className="select-none cursor-pointer"
+                          >
+                            <IconTrophy />
+                            <span className="overflow-hidden text-ellipsis text-nowrap flex items-center">
+                              {tournament.name}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          )}
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="My Servers"
+              isActive={pathname === routes.tournaments.myServers}
+              asChild
+            >
+              <Link
+                href={routes.tournaments.myServers}
+                className="select-none cursor-pointer"
+              >
+                <IconServer />
+                <span>My Servers</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
