@@ -1,11 +1,11 @@
 import { packPlugin } from "@tmcontrolpanel/plugin-sdk/cli";
-import { createPluginPackage } from "@gcp/shared/plugin-package";
+import { createPluginPackage } from "@tmcontrolpanel/shared/plugin-package";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { DEFAULT_THEME, type PluginCustomEvent } from "@gcp/shared";
+import { DEFAULT_THEME, type PluginCustomEvent } from "@tmcontrolpanel/shared";
 import { DEFAULT_SANDBOX_LIMITS } from "../../src/core/plugins/sandbox/limits";
 import { definePlugin, type PluginContext } from "../../src/core/plugins/sdk";
 import { flush } from "../fakes/clock";
@@ -24,7 +24,7 @@ let outDir: string;
 let hello: Uint8Array;
 
 beforeAll(async () => {
-  outDir = mkdtempSync(join(tmpdir(), "gcp-sandbox-"));
+  outDir = mkdtempSync(join(tmpdir(), "tmcp-sandbox-"));
   hello = (await packPlugin(EXAMPLE, { outDir })).bytes;
 });
 

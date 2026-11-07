@@ -14,7 +14,7 @@ The repository is a Bun workspaces monorepo:
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) and Node.js 22 or newer
+- [Bun](https://bun.sh) 1.4.4 or newer (includes the Brotli CVE-2026-111497 fix) and Node.js 22 or newer
 - Docker with Compose v2 (tested with 2.39)
 - A Trackmania account with two things set up:
   - an OAuth app at the [Nadeo API manager](https://api.trackmania.com/manager), with `http://localhost:3000/api/auth/callback/nadeo` as redirect URL
@@ -94,4 +94,4 @@ If one of these is taken, stop whatever uses it. The databases only listen on `1
 
 ### Testing the GBX service
 
-The service has its own unit and integration tests, and an isolated stack for testing against a real dedicated server on separate ports, so it can run next to the setup above. See the [service README](apps/gbx-service/README.md) and [docs/real-server-testing.md](docs/real-server-testing.md).
+The service has its own unit and integration tests, and an isolated stack for testing against a real dedicated server on separate ports, so it can run next to the setup above. See the [service README](apps/gbx-service/README.md).

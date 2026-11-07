@@ -16,13 +16,16 @@ export class ApiValidationError extends Error {
   }
 }
 
-const STATUS_BY_CODE: Record<string, number> = {
+export const STATUS_BY_CODE: Record<string, number> = {
   Unauthorized: 403,
   ValidationError: 400,
   // From the GBX service: the server is unknown to it, or known but not connected right now
   ServerNotFound: 404,
+  // No GBX worker owns the server right now (failover in progress)
+  ServerUnavailable: 503,
   ServerNotConnected: 503,
   GbxServiceUnavailable: 503,
+  FileManagerNotHealthy: 503,
 };
 
 // The payloads depend on who is asking, so a shared cache must never store them

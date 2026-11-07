@@ -13,7 +13,7 @@ import {
 import { generatePath } from "@/lib/utils";
 import { routes } from "@/routes";
 import type { CatalogPlugin, Marketplace } from "@/types/plugins/catalog";
-import { describeCapability, GAME_MODE_TYPES } from "@gcp/shared";
+import { describeCapability, GAME_MODE_TYPES } from "@tmcontrolpanel/shared";
 import {
   IconAlertTriangle,
   IconBrandGithub,
@@ -70,8 +70,7 @@ function PluginCard({ plugin }: { plugin: CatalogPlugin }) {
           )}
           {!plugin.latest && <Badge variant="outline">Needs a newer panel</Badge>}
           {risky.length > 0 && (
-            <Badge variant="destructive">
-              <IconAlertTriangle />
+            <Badge variant="outline">
               {risky.map((c) => describeCapability(c).label).join(", ")}
             </Badge>
           )}

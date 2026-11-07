@@ -28,6 +28,9 @@ export const queryKeys = {
     ["servers", serverId, "server-plugin"] as const,
   ecmApiKey: (serverId: string) =>
     ["servers", serverId, "ecm", "api-key"] as const,
+  serverApiKeys: (serverId: string) =>
+    ["servers", serverId, "api-keys"] as const,
+  groupApiKeys: (groupId: string) => ["groups", groupId, "api-keys"] as const,
   codriverServer: (serverId: string) =>
     ["servers", serverId, "codriver"] as const,
   codriverChat: (serverId: string) =>
@@ -44,6 +47,8 @@ export const queryKeys = {
   users: (field: string, ids: string[]) => ["users", field, ...ids] as const,
   hetzner: (projectId: string, what: string) =>
     ["hetzner", projectId, what] as const,
+  dashboard: (what: "hetzner" | "activity" | "admin") =>
+    ["dashboard", what] as const,
   club: (clubId: number, what: string, ...rest: (string | number)[]) =>
     ["nadeo", "clubs", clubId, what, ...rest] as const,
   paginated: (

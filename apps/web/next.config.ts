@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // Trace from the monorepo root so workspace packages end up in the standalone build
   outputFileTracingRoot: path.join(__dirname, "../../"),
-  transpilePackages: ["@gcp/db", "@gcp/shared"],
+  transpilePackages: ["@tmcontrolpanel/db", "@tmcontrolpanel/shared"],
   images: {
     remotePatterns: [
       {
@@ -54,6 +54,16 @@ const nextConfig: NextConfig = {
       // Plugin packages are at most 5 MB; file uploads use their own route
       bodySizeLimit: "10mb",
     },
+  },
+  // The old reference page; Scalar replaces it
+  async redirects() {
+    return [
+      {
+        source: "/api-docs",
+        destination: "/api/v1/docs",
+        permanent: false,
+      },
+    ];
   },
   async headers() {
     return [

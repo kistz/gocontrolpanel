@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,15 +8,17 @@ import type { PublicStats } from "@/services/stats";
 import {
   IconAdjustmentsHorizontal,
   IconAlertTriangle,
+  IconApi,
   IconBrandDiscord,
   IconBrandGithub,
   IconBroadcast,
   IconCloud,
-  IconDeviceGamepad2,
   IconFolders,
   IconHistory,
   IconMap,
   IconPuzzle,
+  IconServerCog,
+  IconSettings,
   IconShieldLock,
   IconTrophy,
   IconUsers,
@@ -81,7 +84,27 @@ const features = [
     description:
       "Set up new dedicated servers, databases, networks and volumes on Hetzner Cloud from the panel, and watch their metrics.",
   },
+  {
+    icon: IconSettings,
+    title: "Server settings",
+    description:
+      "Change the server name, password and other general settings from the browser.",
+  },
+  {
+    icon: IconApi,
+    title: "Public API",
+    description:
+      "Create scoped API keys for bots, scoreboards and tournament tools. A server key reaches one server, a group key every server in the group. Comes with an OpenAPI reference.",
+  },
+  {
+    icon: IconServerCog,
+    title: "High availability",
+    description:
+      "Add a second host that runs the web app and GBX workers against the same database. If one worker goes down, another takes over its servers.",
+  },
 ];
+
+const DOCS_URL = `${GITHUB_URL}/blob/master/docs`;
 
 const plugins = [
   {
@@ -175,10 +198,8 @@ export default function LandingPage({
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <a href="#" className="flex items-center gap-2 text-white">
-            <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <IconDeviceGamepad2 className="size-5" />
-            </span>
-            <span className="text-lg font-bold">GoControlPanel</span>
+            <BrandMark className="size-9 shrink-0" />
+            <span className="text-lg font-bold">TMControlPanel</span>
           </a>
           <nav
             aria-label="Main"
@@ -201,7 +222,7 @@ export default function LandingPage({
               target="_blank"
               rel="noreferrer"
               className="rounded-md p-2 hover:text-white"
-              aria-label="GoControlPanel on GitHub"
+              aria-label="TMControlPanel on GitHub"
             >
               <IconBrandGithub className="size-5" />
             </a>
@@ -236,7 +257,7 @@ export default function LandingPage({
               variant="outline"
               className="border-white/20 bg-white/10 px-3 py-1 text-white backdrop-blur-sm"
             >
-              Open source · Self-hosted · Free
+              Open source · Free · Self-hostable
             </Badge>
 
             <div className="flex max-w-3xl flex-col gap-5">
@@ -245,9 +266,9 @@ export default function LandingPage({
                 <span className="text-primary">from one panel</span>
               </h1>
               <p className="max-w-2xl text-lg text-white/80">
-                GoControlPanel manages your dedicated servers from the browser:
+                TMControlPanel manages your dedicated servers from the browser:
                 live matches, maps, players, plugins and files, for one server
-                or a whole league, together with your team.
+                or a whole league. Use it here for free, or host it yourself.
               </p>
             </div>
 
@@ -285,7 +306,7 @@ export default function LandingPage({
         {/* Stats */}
         {stats && (
           <section
-            aria-label="GoControlPanel in numbers"
+            aria-label="TMControlPanel in numbers"
             className="relative z-10 -mt-16"
           >
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -340,26 +361,42 @@ export default function LandingPage({
                 <IconPuzzle className="size-5" />
               </span>
               <h2 className="text-3xl font-bold tracking-tight">
-                In-game plugins included
+                Plugin marketplace
               </h2>
               <p className="text-muted-foreground">
-                Turn widgets on per server and change their settings from the
-                panel. Changes show up in game right away, no restart needed.
+                Browse the marketplace and install plugins per server, or upload
+                your own privately. Plugins run in a sandbox with only the
+                permissions you accept, and you can update or roll back to an
+                older version at any time. Changes show up in game right away,
+                no restart needed.
               </p>
+              <a
+                href={`${DOCS_URL}/plugin-sdk.md`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Build your own with the plugin SDK
+              </a>
             </div>
 
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {plugins.map((plugin) => (
-                <Card asChild key={plugin.name} className="gap-1 p-4">
-                  <li>
-                    <span className="font-medium">{plugin.name}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {plugin.description}
-                    </span>
-                  </li>
-                </Card>
-              ))}
-            </ul>
+            <div className="flex flex-col gap-3">
+              <h3 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                First-party plugins
+              </h3>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {plugins.map((plugin) => (
+                  <Card asChild key={plugin.name} className="gap-1 p-4">
+                    <li>
+                      <span className="font-medium">{plugin.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {plugin.description}
+                      </span>
+                    </li>
+                  </Card>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -373,9 +410,17 @@ export default function LandingPage({
               Ready to take over your server?
             </h2>
             <p className="text-muted-foreground">
-              Sign in to see the servers you have access to. Running your own?
-              GoControlPanel ships as a Docker image that sits next to your
-              dedicated server, standalone or alongside PyPlanet and EvoSC.
+              Sign in to use the free hosted panel and see the servers you have
+              access to. Rather run it yourself? TMControlPanel ships as a
+              Docker image that sits next to your dedicated server, standalone
+              or alongside PyPlanet and EvoSC.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Self-hosting is recommended for people with some technical
+              knowledge: you should be comfortable with Docker, environment
+              variables and running a database. You are responsible for your own
+              deployment, though you are always welcome to ask questions in the
+              Discord.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <SignInButton callbackUrl={callbackUrl} />
@@ -395,7 +440,7 @@ export default function LandingPage({
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
           <span>
-            GoControlPanel · MIT licensed · Not affiliated with Ubisoft Nadeo
+            TMControlPanel · MIT licensed · Not affiliated with Ubisoft Nadeo
           </span>
           <div className="flex items-center gap-4">
             <a

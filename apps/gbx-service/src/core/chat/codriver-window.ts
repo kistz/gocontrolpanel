@@ -1,4 +1,4 @@
-import type { PlayerManialinkPageAnswer } from "@gcp/shared";
+import type { PlayerManialinkPageAnswer } from "@tmcontrolpanel/shared";
 import type { Logger } from "../logger";
 import type { ActionGroup } from "../manialink/components/action-group";
 import type { ManialinkDeps } from "../manialink/components/manialink";
@@ -307,7 +307,7 @@ export class CodriverWindows {
       id: CODRIVER_WINDOW_ID,
       template: "codriver-window",
       login,
-      title: "Codriver",
+      title: "Codriver (experimental)",
       size: SIZE,
       data: this.data(chat),
       onClose: () => {

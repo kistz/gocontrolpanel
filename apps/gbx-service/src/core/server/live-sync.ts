@@ -1,4 +1,4 @@
-import type { MainServerPlayerInfo, SMapInfo, SPlayerInfo, ScriptName } from "@gcp/shared";
+import type { MainServerPlayerInfo, SMapInfo, SPlayerInfo, ScriptName } from "@tmcontrolpanel/shared";
 import { TypedEventBus } from "../events";
 import type { GbxConnection } from "../gbx/connection";
 import type { LiveState } from "../live/live-state";
@@ -14,7 +14,7 @@ import type { MatchRecorder } from "./match-recorder";
 import { toPlayerInfo } from "./players";
 import type { ServerEventMap } from "./server-events";
 
-export const RESPONSE_ID = "gocontrolpanel";
+export const RESPONSE_ID = "tmcp";
 
 export interface LiveSyncDeps {
   gbx: GbxConnection;

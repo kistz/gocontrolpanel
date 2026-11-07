@@ -1,9 +1,9 @@
-import { createPrismaClient, type DbClient } from "@gcp/db";
+import { createPrismaClient, type DbClient } from "@tmcontrolpanel/db";
 import {
   createPluginPackage,
   readPluginPackage,
-} from "@gcp/shared/plugin-package";
-import { encryptServerCredential } from "@gcp/shared/server-credentials";
+} from "@tmcontrolpanel/shared/plugin-package";
+import { encryptServerCredential } from "@tmcontrolpanel/shared/server-credentials";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   PrismaFirstPartyRepository,
@@ -483,7 +483,7 @@ describe.skipIf(!url)("Prisma repositories", () => {
         version: "1.0.0",
         sdk: 1,
         description: "Shows the current map.",
-        author: "GoControlPanel",
+        author: "TMControlPanel",
         capabilities: ["ui", "maps:read"],
       }),
       "index.js": "globalThis.__tmcpRegister({ create() { return {}; } });",

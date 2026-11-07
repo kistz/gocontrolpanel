@@ -3,7 +3,7 @@ import {
   hasPermission,
   sessionClaimsSchema,
   type SessionClaims,
-} from "@gcp/shared";
+} from "@tmcontrolpanel/shared";
 import type { Session } from "next-auth";
 import "server-only";
 import { getClient } from "./dbclient";
@@ -21,6 +21,8 @@ export interface Actor {
   login: string;
   displayName: string;
   claims: SessionClaims;
+  // Set when acting through a public API key
+  apiKeyId?: string;
 }
 
 export function actorFromSession(session: Session): Actor {

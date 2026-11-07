@@ -10,7 +10,7 @@ COPY apps/gbx-service/package.json ./apps/gbx-service/
 COPY packages/db/package.json ./packages/db/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/plugin-sdk/package.json ./packages/plugin-sdk/
-RUN curl -fsSL https://bun.sh/install | bash \
+RUN curl -fsSL https://bun.sh/install | bash -s -- bun-v1.4.4 \
   && /root/.bun/bin/bun install --frozen-lockfile
 
 FROM base AS builder
@@ -23,7 +23,7 @@ COPY . .
 ARG DB_TYPE
 ENV DB=$DB_TYPE
 RUN bun run generate
-RUN bun run --filter @gcp/gbx-service build
+RUN bun run --filter @tmcontrolpanel/gbx-service build
 
 # Runtime dependencies only; workspace packages are bundled into dist
 FROM base AS prod-deps
@@ -47,6 +47,9 @@ COPY --from=builder /app/apps/gbx-service/templates ./templates
 
 USER gbx
 ENV PORT=3100
+# Commit shown in the in-game connect notice
+ARG APP_REVISION
+ENV APP_REVISION=$APP_REVISION
 EXPOSE 3100
 
 CMD ["node", "--enable-source-maps", "dist/main.js"]

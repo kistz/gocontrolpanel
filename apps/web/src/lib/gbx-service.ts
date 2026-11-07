@@ -5,13 +5,16 @@ import {
   SERVER_EVENTS_CHANNEL,
   type ChatConfig,
   type ChatConfigResult,
+  type ClusterOverview,
+  type CommandBody,
+  type CommandResult,
   type GbxCallBody,
   type MapsChangeResult,
   type PluginCommandBody,
   type PluginEventBody,
   type PointsBody,
   type ServerLifecycleEvent,
-} from "@gcp/shared";
+} from "@tmcontrolpanel/shared";
 import "server-only";
 import config from "./config";
 import { logger } from "./logger";
@@ -65,6 +68,39 @@ export function getGbxClient(serverId: string): GbxClient {
 
 // Commands that also update live state, plugins or chat announcements in the service
 export const gbxService = {
+  clusterOverview: () => request<ClusterOverview>("GET", "/internal/cluster"),
+  moveServer: (id: string, workerId: string) =>
+    request<null>(
+      "POST",
+      `/internal/cluster/servers/${encodeURIComponent(id)}/move`,
+      { workerId },
+    ),
+  claimServer: (id: string, workerId?: string) =>
+    request<null>(
+      "POST",
+      `/internal/cluster/servers/${encodeURIComponent(id)}/claim`,
+      { workerId },
+    ),
+  holdServer: (id: string) =>
+    request<null>(
+      "POST",
+      `/internal/cluster/servers/${encodeURIComponent(id)}/hold`,
+    ),
+  unholdServer: (id: string) =>
+    request<null>(
+      "POST",
+      `/internal/cluster/servers/${encodeURIComponent(id)}/unhold`,
+    ),
+  restartWorker: (workerId: string) =>
+    request<null>(
+      "POST",
+      `/internal/cluster/workers/${encodeURIComponent(workerId)}/restart`,
+    ),
+
+  executeCommand: (serverId: string, body: CommandBody) =>
+    request<CommandResult>("POST", internalPaths.command(serverId), body, {
+      timeoutMs: LONG_TIMEOUT_MS,
+    }),
   reconnect: (serverId: string) =>
     request<{ connected: boolean }>(
       "POST",
@@ -78,8 +114,6 @@ export const gbxService = {
     request<null>("POST", internalPaths.stopReconnect(serverId)),
   disconnect: (serverId: string) =>
     request<null>("POST", internalPaths.disconnect(serverId)),
-  resendManialinks: (serverId: string) =>
-    request<null>("POST", internalPaths.resendManialinks(serverId)),
   reloadPlugins: (serverId: string) =>
     request<null>("POST", internalPaths.reloadPlugins(serverId), undefined, {
       timeoutMs: LONG_TIMEOUT_MS,

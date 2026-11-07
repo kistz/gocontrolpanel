@@ -28,14 +28,27 @@ Every panel, self-hosted ones included, can browse a central plugin marketplace 
 
 ## Setting up the registry
 
-1. Create a public repository named `tmcontrolpanel-plugins` from the contents of `packages/plugin-sdk/registry-template`. The template includes the example `hello` plugin as its first entry.
+1. Create a public repository named `tmcontrolpanel-plugins` from the contents of `packages/plugin-sdk/registry-template`. Copy the hidden `.github` folder too, for example with `cp -r packages/plugin-sdk/registry-template/. ~/tmcontrolpanel-plugins`. The template includes the example `hello` plugin as its first entry.
 2. In the repository settings, set **Pages → Source** to **GitHub Actions**.
-3. Optionally set the repository variable `GOCONTROLPANEL_REF` to the GoControlPanel branch whose validator the workflows use (default `master`).
+3. Optionally set the repository variable `TMCONTROLPANEL_REF` to the TMControlPanel branch whose validator the workflows use (default `master`).
 4. Push to `main`. *Publish marketplace* builds the site, and panels read it at `https://<owner>.github.io/tmcontrolpanel-plugins/index.json`.
 
-`DEFAULT_MARKETPLACE_INDEX_URL` in `packages/shared/src/plugins/marketplace-index.ts` points at `https://mregterschot.github.io/tmcontrolpanel-plugins/index.json`. Change it if the registry lives elsewhere.
+`DEFAULT_MARKETPLACE_INDEX_URL` in `packages/shared/src/plugins/marketplace-index.ts` points at `https://plugins.tmcontrolpanel.com/index.json`, the custom domain of the official registry's Pages site. Change it if the registry lives elsewhere. A custom domain (**Pages → Custom domain**, with a DNS-only `CNAME` to `<owner>.github.io`) keeps the URL stable if the repository moves to another account; the `github.io` address doesn't.
 
 The registry's README has the submission steps, the review checklist and the takedown procedure.
+
+### Building the site locally
+
+To try a registry before you push it, run the builder from a clone of this repository (see the note in the [plugin SDK guide](./plugin-sdk.md#quick-start) on running the CLI):
+
+```bash
+bun packages/plugin-sdk/src/cli/main.ts registry --registry ~/tmcontrolpanel-plugins --check
+bun packages/plugin-sdk/src/cli/main.ts registry --registry ~/tmcontrolpanel-plugins --out ~/site
+```
+
+`--registry` defaults to the current folder and `--out` to `site` in the current folder, not in the registry. `--check` only validates. The result is a plain static site, so any file server works, for example `python3 -m http.server 8080 --bind 127.0.0.1` in the output folder. Point `MARKETPLACE_INDEX_URL` at `http://127.0.0.1:8080/index.json` to browse it from a panel.
+
+A version file's `url` must be an `https://` address or a path relative to the version file, as the template's `hello` entry does. The check fails when the package's sha256, slug or version doesn't match its file, or when the slug is reserved.
 
 ### Withdrawing a version (takedown)
 
@@ -89,27 +102,3 @@ What the sandbox can't stop: a plugin with the `ui` capability runs ManiaScript 
 | `plugin_storage` | `ctx.storage` values per server and plugin, removed on uninstall. |
 
 The [first-party plugins](./first-party-plugins.md) are marketplace rows whose versions the service stores on start. Other marketplace versions nobody runs any more are deleted with their last install. Private uploads stay until their owner deletes them.
-
-## Coverage of the requirements
-
-Against section 12 of [backend-split-requirements.md](./backend-split-requirements.md#12-future-plugin-marketplace):
-
-| Requirement | Status |
-|---|---|
-| PM-1 SDK boundary | Done: every plugin only gets the sandboxed `ctx`. |
-| PM-2 Port the built-ins | Done: the [first-party plugins](./first-party-plugins.md) are SDK packages, installed on start, with existing installs moved onto them. |
-| PM-3 Dynamic registry | Done. |
-| PM-4 Namespaced, runtime-loaded templates | Done. |
-| PM-5 Isolation | Done: QuickJS in WebAssembly. |
-| PM-6 Storage API | Done. |
-| PM-7 Config schema owned by the plugin | Done, with a generated form and write-only secrets. The first-party plugins keep the panel's own forms. |
-| PM-10 Package format | Done. Integrity comes from sha256 pins in the reviewed index rather than signatures. |
-| PM-11 Capabilities and consent | Done, including consent again for updates that add capabilities. |
-| PM-12 Resource limits | Done; going over a hard limit turns the plugin off and notifies admins. |
-| PM-13 Per-server lifecycle | Install, uninstall, on/off, update, roll back and pinned versions are done, all hot without reconnecting. Storage migrations between versions are left to the plugin. |
-| PM-14 Private plugins | Done. |
-| PM-15 Review workflow | Done through registry pull requests; yanking force-disables everywhere, and reports go through the issue form. |
-| PM-16 Catalog UI | Search, game mode filter, detail page (README, screenshots, changelog, versions, author), installed view with updates. No install counts: a GitHub-hosted registry can't count installs. |
-| PM-17 Permissions and audit log | `plugins:upload`; installing stays with the server Admin role; review happens on GitHub, so there's no `plugins:review`. |
-| PM-18 Developer experience | SDK with types, `tmcp-plugin` CLI, example plugin, this guide. Not published to npm yet, and there is no local dev mode against a test server beyond uploading to your own panel. |
-| PM-19 Bundle storage | In the database, so it works with the web app and the service in different containers. |

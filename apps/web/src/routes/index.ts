@@ -16,6 +16,7 @@ export const routes = {
     records: "/server/:id/records",
     advanced: "/server/:id/advanced",
     codriver: "/server/:id/codriver",
+    apiKeys: "/server/:id/api-keys",
   },
   tournaments: {
     tournament: "/tournaments/:id",
@@ -31,11 +32,13 @@ export const routes = {
     hetznerServers: "/admin/hetzner/:id",
     auditLogs: "/admin/audit-logs",
     codriver: "/admin/codriver",
+    apiKeys: "/admin/api-keys",
   },
   plugins: {
     index: "/plugins",
     detail: "/plugins/:slug",
   },
+  apiDocs: "/api/v1/docs",
   login: "/login",
 };
 
@@ -131,6 +134,7 @@ export const routePermissions = {
       "group:servers:id:moderator",
       "group:servers:id:admin",
     ],
+    apiKeys: ["servers:id:admin", "group:servers:id:admin"],
   },
   admin: {
     users: {
@@ -148,6 +152,8 @@ export const routePermissions = {
       create: ["groups:create"],
       edit: ["groups:edit", "groups:id:admin"],
       delete: ["groups:delete", "groups:id:admin"],
+      // Only the group's own admins; groups:edit alone does not hand out keys
+      apiKeys: ["groups:id:admin"],
     },
     servers: {
       view: [
@@ -194,6 +200,10 @@ export const routePermissions = {
     codriver: {
       view: ["codriver:view", "codriver:edit"],
       edit: ["codriver:edit"],
+    },
+    apiKeys: {
+      view: ["api-keys:view", "api-keys:revoke"],
+      revoke: ["api-keys:revoke"],
     },
     auditLogs: {
       view: [
@@ -392,6 +402,17 @@ export const breadCrumbs: {
     ],
   },
   {
+    path: routes.servers.apiKeys,
+    breadCrumbs: [
+      {
+        label: "Server",
+      },
+      {
+        label: "API Keys",
+      },
+    ],
+  },
+  {
     path: routes.admin.users,
     breadCrumbs: [
       {
@@ -469,6 +490,17 @@ export const breadCrumbs: {
       },
       {
         label: "Audit Logs",
+      },
+    ],
+  },
+  {
+    path: routes.admin.apiKeys,
+    breadCrumbs: [
+      {
+        label: "Admin",
+      },
+      {
+        label: "API Keys",
       },
     ],
   },

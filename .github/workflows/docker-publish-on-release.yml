@@ -33,16 +33,17 @@ jobs:
 
       - name: Build and tag images
         run: |
-          GBX_IMAGE_NAME=${{ vars.DOCKER_GBX_IMAGE_NAME || 'gocontrolpanel-gbx-service' }}
+          GBX_IMAGE_NAME=${{ vars.DOCKER_GBX_IMAGE_NAME || 'tmcontrolpanel-gbx-service' }}
+          WEB_IMAGE_NAME=${{ vars.DOCKER_WEB_IMAGE_NAME || 'tmcontrolpanel' }}
 
           # <dockerfile>=<image name>
           for target in \
-            "apps/web/Dockerfile=${{ vars.DOCKER_IMAGE_NAME }}" \
+            "apps/web/Dockerfile=$WEB_IMAGE_NAME" \
             "apps/gbx-service/Dockerfile=$GBX_IMAGE_NAME"; do
             DOCKERFILE=${target%%=*}
             IMAGE=${{ secrets.DOCKER_USERNAME }}/${target#*=}${{ matrix.db.suffix }}
 
-            docker build -f $DOCKERFILE -t $IMAGE:${{ env.RELEASE_TAG }} . --build-arg DB_TYPE=${{ matrix.db.name }}
+            docker build -f $DOCKERFILE -t $IMAGE:${{ env.RELEASE_TAG }} . --build-arg DB_TYPE=${{ matrix.db.name }} --build-arg APP_REVISION=${{ github.sha }}
 
             if [ "${{ env.IS_PRERELEASE }}" = "true" ]; then
               docker tag $IMAGE:${{ env.RELEASE_TAG }} $IMAGE:beta
@@ -58,9 +59,4 @@ jobs:
   send-discord:
     needs: build-and-push
     uses: ./.github/workflows/discord-changelog.yml
-    secrets: inherit
-
-  deploy:
-    needs: build-and-push
-    uses: ./.github/workflows/deploy-production.yml
     secrets: inherit

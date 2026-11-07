@@ -1,11 +1,12 @@
 "use client";
 
 import { sendChatMessage } from "@/actions/gbx/advanced";
+import { TmText } from "@/components/tm-text";
 import { parseTmTags } from "@/lib/tmtags";
 import { getErrorMessage } from "@/lib/utils";
 import { ServerError } from "@/types/responses";
-import { DetailedPlayerChat, SPlayerInfo } from "@gcp/shared";
 import { IconSend } from "@tabler/icons-react";
+import { DetailedPlayerChat, SPlayerInfo } from "@tmcontrolpanel/shared";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -96,7 +97,11 @@ function Message({
 }) {
   return (
     <div className="flex gap-1 text-sm">
-      {chat.Login != serverPlayerInfo?.Login && <span>[ {chat.Name} ]</span>}
+      {chat.Login != serverPlayerInfo?.Login && (
+        <span>
+          [ <TmText text={chat.Name} /> ]
+        </span>
+      )}
       <p
         dangerouslySetInnerHTML={{
           __html: parseTmTags(chat.Text),

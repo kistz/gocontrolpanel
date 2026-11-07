@@ -24,9 +24,9 @@ import {
 } from "@/lib/scripts";
 import { getErrorMessage } from "@/lib/utils";
 import { ServerError } from "@/types/responses";
-import { GameModeType } from "@gcp/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconFileTextSpark, IconPlus } from "@tabler/icons-react";
+import { GameModeType } from "@tmcontrolpanel/shared";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -196,7 +196,7 @@ export default function ScriptGeneratorForm({
 
         <div className="flex flex-col gap-2 rounded-md border p-3 text-sm">
           <p className="text-muted-foreground">
-            For GoControlPanel to detect the game mode, the script name must
+            For TMControlPanel to detect the game mode, the script name must
             include one of these type strings. Scripts that match none are
             treated as Rounds.
           </p>

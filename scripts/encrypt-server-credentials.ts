@@ -1,9 +1,10 @@
-import { createPrismaClient } from "@gcp/db";
+import { createPrismaClient } from "@tmcontrolpanel/db";
 import {
   decryptServerCredential,
   encryptServerCredential,
+  LEGACY_SERVER_CREDENTIAL_PREFIX,
   SERVER_CREDENTIAL_PREFIX,
-} from "@gcp/shared/server-credentials";
+} from "@tmcontrolpanel/shared/server-credentials";
 
 // Run after the schema migration, with both services stopped and a database backup available.
 const secret = process.env.SECRETS_KEY ?? "";
@@ -22,6 +23,12 @@ try {
     if (!rows.length) break;
     for (const row of rows) {
       const encrypt = (value: string) => {
+        // Rewrite the pre-rename marker under the current one, keeping the plaintext
+        if (value.startsWith(LEGACY_SERVER_CREDENTIAL_PREFIX))
+          return encryptServerCredential(
+            decryptServerCredential(value, secret),
+            secret,
+          );
         if (value.startsWith(SERVER_CREDENTIAL_PREFIX)) {
           decryptServerCredential(value, secret); // Do not silently accept another key's ciphertext.
           return value;

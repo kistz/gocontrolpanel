@@ -1,9 +1,10 @@
 import {
   MAX_CUSTOM_EVENT_BYTES,
+  type CommandResult,
   type LiveSnapshot,
   type PluginCustomEvent,
   type ServerClient,
-} from "@gcp/shared";
+} from "@tmcontrolpanel/shared";
 import { ChatService } from "../chat/chat-service";
 import {
   CODRIVER_HELP,
@@ -63,6 +64,8 @@ import type { ServerEventMap } from "./server-events";
 // Shared, server-independent dependencies; one set per process
 export interface RuntimeDependencies {
   log: Logger;
+  // Version shown in the connect notice
+  controller?: string;
   clock: Clock;
   sessionFactory: GbxSessionFactory;
   renderer: TemplateRenderer;
@@ -105,7 +108,11 @@ function sameTarget(a: ConnectionTarget, b: ConnectionTarget): boolean {
   );
 }
 
-// Everything GoControlPanel runs for one dedicated server
+const NOTICE_PREFIX = "$<$0cfTMControlPanel$>: ";
+// A goodbye message must not hold up a handover
+const NOTICE_TIMEOUT_MS = 1000;
+
+// Everything TMControlPanel runs for one dedicated server
 export class ServerRuntime {
   readonly events: TypedEventBus<ServerEventMap>;
   readonly state = new LiveState();
@@ -116,6 +123,7 @@ export class ServerRuntime {
 
   private readonly log: Logger;
   private readonly chatCommands: CommandRouter;
+  private readonly chat: ChatService;
   private readonly codriverWindows: CodriverWindows | null;
   private readonly liveSync: LiveSync;
   private readonly handler: GameEventHandler;
@@ -126,6 +134,8 @@ export class ServerRuntime {
   private name: string | null = null;
   // Details of the last connection attempt, whether or not it succeeded
   private attemptedTarget: ConnectionTarget | null = null;
+  // Added to the next "connected" chat message, e.g. that this worker took over after a crash
+  private connectNote: string | null = null;
 
   constructor(
     readonly serverId: string,
@@ -142,6 +152,7 @@ export class ServerRuntime {
     this.gbx = gbx;
 
     const chat = new ChatService(gbx, state, log);
+    this.chat = chat;
     const actions = new ActionRouter(log);
     this.manialinks = new ManialinkService(gbx, log);
     const manialinkDeps = {
@@ -335,15 +346,34 @@ export class ServerRuntime {
   }
 
   // Manual disconnect: stays offline until reconnect() is called
-  async disconnect(): Promise<void> {
+  async disconnect(
+    reason = "Disconnected by an admin, chat commands and widgets are off until it reconnects",
+  ): Promise<void> {
     this.supervisor.stop();
-    await this.closeSession();
+    await this.closeSession(reason);
   }
 
-  async dispose(): Promise<void> {
+  async dispose(reason?: string): Promise<void> {
     this.supervisor.stop();
-    await this.closeSession();
+    await this.closeSession(reason);
     this.events.clear();
+  }
+
+  // Shown in chat with the connect message, or straight away when already connected
+  setConnectNote(note: string): void {
+    if (this.connected) void this.notice(note);
+    else this.connectNote = note;
+  }
+
+  private async notice(text: string): Promise<void> {
+    try {
+      await Promise.race([
+        this.chat.send(NOTICE_PREFIX + text),
+        new Promise((resolve) => setTimeout(resolve, NOTICE_TIMEOUT_MS)),
+      ]);
+    } catch (error) {
+      this.log.debug({ err: errorMessage(error) }, "Could not send notice");
+    }
   }
 
   // Runs a plugin's chat command for the panel, as if `login` typed it; false when the
@@ -355,6 +385,28 @@ export class ServerRuntime {
     login: string,
   ): Promise<boolean> {
     return this.chatCommands.runAs(pluginId, command, args, login);
+  }
+
+  async executeCommand(
+    command: string,
+    params: string[],
+    login: string,
+  ): Promise<CommandResult> {
+    this.assertConnected();
+    const start = performance.now();
+    const { result, messages, messagesTruncated } =
+      await this.chat.captureCommand(login, () =>
+        this.chatCommands.executeDetailed(command, params, login),
+      );
+    return {
+      command: command.toLowerCase(),
+      login,
+      ...result,
+      messages,
+      messagesTruncated,
+      outputComplete: result.source !== "plugin" && !messagesTruncated,
+      durationMs: Math.round(performance.now() - start),
+    };
   }
 
   // Delivers an event from the panel (e.g. "codriver:action") to this server's plugins, the
@@ -532,6 +584,10 @@ export class ServerRuntime {
     this.connectedAt = this.deps.clock.now();
     this.log.info({ name: server.name }, "Connected to GBX server");
     this.events.emit("connect");
+    const note = this.connectNote;
+    this.connectNote = null;
+    const about = this.deps.controller ? ` (${this.deps.controller})` : "";
+    void this.notice(`Connected${about}.${note ? ` ${note}` : ""}`);
     // Pages were cleared for the new session; plugins add their buttons as they load
     this.codriverWindows?.showButton();
 
@@ -559,13 +615,22 @@ export class ServerRuntime {
     this.state.theme = server.theme;
     this.state.plugins = server.plugins;
 
+    // Callbacks start before the sync below has loaded the map and players, so hold them
+    // until it finishes; otherwise early finishes are dropped as "no active map"
+    let queued: [string, unknown][] | null = [];
     // Late callbacks from a replaced session must not touch the new state
     session.onCallback((method, data) => {
-      if (session === this.session) this.onCallback(method, data);
+      if (session !== this.session) return;
+      if (queued) queued.push([method, data]);
+      else this.onCallback(method, data);
     });
 
     await this.liveSync.syncMap();
     await this.liveSync.syncLiveInfo();
+
+    const held = queued;
+    queued = null;
+    for (const [method, data] of held) this.onCallback(method, data);
   }
 
   private onCallback(method: string, data: unknown): void {
@@ -595,11 +660,12 @@ export class ServerRuntime {
     this.supervisor.handleConnectionLost();
   }
 
-  private async closeSession(): Promise<void> {
+  private async closeSession(reason?: string): Promise<void> {
     const session = this.session;
     if (!session) return;
 
     if (this.connected) {
+      if (reason) await this.notice(`Disconnecting: ${reason}`);
       // Unload first so widgets are removed while the session can still send
       await this.plugins.unloadAll();
       this.connected = false;

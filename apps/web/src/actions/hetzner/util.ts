@@ -1,6 +1,7 @@
 import { axiosHetzner } from "@/lib/axios/hetzner";
 import { getHetznerProject } from "@/lib/hetzner";
 import { getKeyHetznerRateLimit, getRedisClient } from "@/lib/redis";
+import { assertNumericId } from "@/lib/resource-id";
 import { generateSSHKeyPair } from "@/lib/ssh";
 import { getList } from "@/lib/utils";
 import {
@@ -12,12 +13,19 @@ import { ServerError } from "@/types/responses";
 import { AxiosResponse } from "axios";
 import "server-only";
 
+// Machines provisioned before the rename keep the old extract directory; new ones use the new one
+export const HETZNER_DIR_SHELL =
+  "$([ -d /root/tmcontrolpanel-master ] && echo /root/tmcontrolpanel-master || echo /root/gocontrolpanel-master)/hetzner";
+
 export async function getApiToken(projectId: string): Promise<string> {
   const project = await getHetznerProject(projectId);
   const apiTokens = getList<string>(project?.apiTokens);
 
   if (apiTokens.length === 0) {
-    throw new ServerError("No API tokens found for the Hetzner project.", "HetznerApiTokenNotFound");
+    throw new ServerError(
+      "No API tokens found for the Hetzner project.",
+      "HetznerApiTokenNotFound",
+    );
   }
 
   return apiTokens[0];
@@ -59,6 +67,7 @@ export async function getHetznerServer(
   projectId: string,
   serverId: number,
 ): Promise<HetznerServer> {
+  assertNumericId(serverId);
   const token = await getApiToken(projectId);
 
   const res = await axiosHetzner.get<{

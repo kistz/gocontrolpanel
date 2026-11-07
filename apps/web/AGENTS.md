@@ -14,7 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 The panel uses Next.js App Router, React, and strict TypeScript. The `@/` alias resolves to `apps/web/src`. Follow the repository guide in `../../AGENTS.md` for workspace commands and the web/GBX service split.
 
-- `src/app`: route layouts, pages, GET API routes, and global Tailwind styles. Authenticated panel pages live under `(gocontroller)`; per-server pages use `server/[id]`.
+- `src/app`: route layouts, pages, GET API routes, and global Tailwind styles. Authenticated panel pages live under `(panel)`; per-server pages use `server/[id]`.
 - `src/components/ui`: the shared shadcn/ui primitives, built on Radix. Reuse these buttons, inputs, dialogs, selects, checkboxes, cards, and tables.
 - `src/components`: reusable domain UI, table wrappers, and modal components.
 - `src/forms`: React Hook Form components and Zod schemas, grouped by feature.
@@ -51,7 +51,7 @@ For browser data fetching, use this flow:
 
 Do not introduce manual `useEffect` fetch/loading/error state for reads or use Server Actions as the browser's read transport. Effects can synchronize fetched defaults into forms, but should preserve fields the user has already edited. For an example, see `use-ecm-api-key.ts`, the ECM GET route, and `send-ecm.tsx`.
 
-Live server data uses the existing WebSocket hooks/providers and contracts from `@gcp/shared`, rather than replacing live streams with polling. Route dedicated-server operations through the web's GBX service client helpers.
+Live server data uses the existing WebSocket hooks/providers and contracts from `@tmcontrolpanel/shared`, rather than replacing live streams with polling. Route dedicated-server operations through the web's GBX service client helpers.
 
 ## Writes: forms and Server Actions
 
@@ -63,4 +63,4 @@ Keep database writes scoped to the server and validate ownership of related IDs.
 
 ## Checks
 
-From the repository root, run `bun run --filter @gcp/web typecheck` and `bun run --filter @gcp/web test` for web behavior changes. Format only changed files with Prettier and run `git diff --check`. Existing tests cover API transport, query validation, service requests, plugin configuration, and ECM submission. Add meaningful regression coverage when changing these behaviors. Browser checks need an authenticated panel and any infrastructure used by the page; report when they were unavailable.
+From the repository root, run `bun run --filter @tmcontrolpanel/web typecheck` and `bun run --filter @tmcontrolpanel/web test` for web behavior changes. Format only changed files with Prettier and run `git diff --check`. Existing tests cover API transport, query validation, service requests, plugin configuration, and ECM submission. Add meaningful regression coverage when changing these behaviors. Browser checks need an authenticated panel and any infrastructure used by the page; report when they were unavailable.

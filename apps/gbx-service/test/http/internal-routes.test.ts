@@ -1,5 +1,6 @@
-import { internalPaths } from "@gcp/shared";
+import { internalPaths } from "@tmcontrolpanel/shared";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { AppError } from "../../src/core/errors";
 import { serverRecord } from "../fakes/harness";
 import { createApp, SERVICE_TOKEN } from "./app-fixture";
 
@@ -140,6 +141,73 @@ describe("connection controls", () => {
 });
 
 describe("plugin commands", () => {
+  it("executes built-in commands and reports unknown commands", async () => {
+    const { request } = await setup();
+    const known = await request("POST", internalPaths.command("server-1"), {
+      command: "version",
+      login: "abc",
+    });
+    expect(known.statusCode).toBe(200);
+    expect(known.json().data).toMatchObject({
+      command: "version",
+      login: "abc",
+      handled: true,
+      source: "builtin",
+      messages: [expect.stringContaining(" v")],
+      messagesTruncated: false,
+      outputComplete: true,
+      durationMs: expect.any(Number),
+    });
+    const unknown = await request("POST", internalPaths.command("server-1"), {
+      command: "not-registered",
+      login: "abc",
+      params: ["two words"],
+    });
+    expect(unknown.json().data).toMatchObject({
+      command: "not-registered",
+      handled: false,
+      source: null,
+      messages: [],
+      outputComplete: true,
+    });
+  });
+
+  it("validates commands and parameters before dispatch", async () => {
+    const { request, h } = await setup();
+    const run = vi.spyOn(h.runtime, "executeCommand");
+    for (const body of [
+      { command: "help match", login: "abc" },
+      { command: "help", login: "abc", params: [1] },
+      { command: "help", login: "" },
+    ]) {
+      const res = await request(
+        "POST",
+        internalPaths.command("server-1"),
+        body,
+      );
+      expect(res.statusCode).toBe(400);
+    }
+    expect(run).not.toHaveBeenCalled();
+    const res = await request("POST", internalPaths.command("server-1"), {
+      command: "help",
+      login: "abc",
+      params: ["two words"],
+    });
+    expect(res.statusCode).toBe(200);
+    expect(run).toHaveBeenCalledWith("help", ["two words"], "abc");
+  });
+
+  it("rejects command execution on a disconnected server", async () => {
+    const { request } = await setup();
+    await request("POST", internalPaths.disconnect("server-1"));
+    const res = await request("POST", internalPaths.command("server-1"), {
+      command: "version",
+      login: "abc",
+    });
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error.code).toBe("ServerNotConnected");
+  });
+
   it("runs a plugin's command and reports when it has none", async () => {
     const { request, h } = await setup();
     const run = vi.spyOn(h.runtime, "runPluginCommand");
@@ -169,6 +237,45 @@ describe("plugin commands", () => {
 });
 
 describe("gbx passthrough", () => {
+  it.each(["call", "multicall"])(
+    "encodes server options in a %s",
+    async (kind) => {
+      const { request, h } = await setup({
+        configure: (s) => s.respond("SetServerOptions", true),
+      });
+      const call = {
+        method: "SetServerOptions",
+        params: [{ CallVoteRatio: 1 }],
+      };
+      const res = await request(
+        "POST",
+        kind === "call"
+          ? internalPaths.gbxCall("server-1")
+          : internalPaths.gbxMulticall("server-1"),
+        kind === "call" ? call : { calls: [call] },
+      );
+      expect(res.statusCode).toBe(200);
+      const params =
+        kind === "call"
+          ? h.session.callsTo("SetServerOptions").at(-1)!.params
+          : h.session.multicalls.at(-1)![0].slice(1);
+      expect(params[0]).toMatchObject({
+        CallVoteRatio: { raw: "1", tagName: "double" },
+      });
+    },
+  );
+
+  it("allows reading the next map", async () => {
+    const { request } = await setup({
+      configure: (s) => s.respond("GetNextMapInfo", { UId: "next-map" }),
+    });
+    const res = await request("POST", internalPaths.gbxCall("server-1"), {
+      method: "GetNextMapInfo",
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().data).toEqual({ UId: "next-map" });
+  });
+
   it("forwards allowlisted calls", async () => {
     const { request, h } = await setup({
       configure: (s) => s.respond("GetChatLines", ["hello"]),
@@ -452,5 +559,62 @@ describe("plugin events from the panel", () => {
     });
     expect(res.statusCode).toBe(400);
     expect(received).not.toHaveBeenCalled();
+  });
+});
+
+describe("gateway availability", () => {
+  it("exposes readiness without authentication", async () => {
+    const { app, gateway } = await setup();
+    const healthy = await app.inject({ method: "GET", url: "/healthz" });
+    expect(healthy.statusCode).toBe(200);
+    expect(healthy.json()).toEqual({ status: "ok" });
+    vi.spyOn(gateway, "health").mockResolvedValue({
+      ok: false,
+      servers: 1,
+      connected: 0,
+      workers: 0,
+    });
+    const unavailable = await app.inject({ method: "GET", url: "/healthz" });
+    expect(unavailable.statusCode).toBe(503);
+    expect(unavailable.json()).toEqual({ status: "unavailable" });
+    const health = await app.inject({ method: "GET", url: "/health" });
+    expect(health.statusCode).toBe(503);
+    expect(health.json()).toEqual({
+      status: "degraded",
+      servers: 1,
+      connected: 0,
+      workers: 0,
+    });
+  });
+
+  it("maps unavailable gateway calls to 503", async () => {
+    const { gateway, request } = await setup();
+    vi.spyOn(gateway, "call").mockRejectedValueOnce(
+      new AppError("ServerUnavailable", "Worker unavailable"),
+    );
+    const res = await request("GET", internalPaths.server("server-1"));
+    expect(res.statusCode).toBe(503);
+    expect(res.json()).toEqual({
+      error: { code: "ServerUnavailable", message: "Worker unavailable" },
+    });
+  });
+});
+
+describe("cluster routes in single mode", () => {
+  it("reports single mode and rejects controls", async () => {
+    const { request } = await setup();
+    expect((await request("GET", "/internal/cluster")).json().data.mode).toBe(
+      "single",
+    );
+    for (const path of [
+      "servers/server-1/claim",
+      "servers/server-1/hold",
+      "servers/server-1/unhold",
+      "workers/node%3A123.1/restart",
+    ]) {
+      const response = await request("POST", "/internal/cluster/" + path);
+      expect(response.statusCode).toBe(400);
+      expect(response.json().error.code).toBe("BadRequest");
+    }
   });
 });
