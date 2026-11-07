@@ -192,6 +192,7 @@ export default function CompetitionGraph({
     <div className="flex-1 min-h-0 w-full h-full flex flex-col">
       <Card className="w-full flex-1 min-h-0 relative rounded-[calc(var(--radius)+4px)] overflow-hidden">
         <ReactFlow
+          proOptions={{ hideAttribution: true }}
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
